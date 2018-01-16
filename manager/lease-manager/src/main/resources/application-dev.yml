@@ -35,7 +35,7 @@ spring:
     timeout: 0
     password:
 mybatis:
-  type-aliases-package: cn.wz.base.persist.model.mybatis
+  type-aliases-package: com.elextec.lease.manager.dao.mybatis.mybatis
   mapper-locations: classpath*:sqlmap/*.xml
   configuration:
     cache-enabled: true
@@ -50,3 +50,5 @@ mybatis:
     hibernate:
       ddl-auto: update
     show-sql: true
+logging:
+  config: classpath:logback.xml
