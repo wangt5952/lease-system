@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: dev
+  mvc:
+    media-types.*: text/html;application/json
+cors.flag: true
+logging:
+  config: classpath:logback.xml
+catalina
+  base:

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+	<!--<properties resource="jdbc.properties" />-->
+    <context id="managementTables" targetRuntime="MyBatis3">
+		<property name="javaFileEncoding" value="UTF-8"/>
+		<plugin type="cn.wz.mybatis.page.plugin.PageExtPlugin"/>
+        <commentGenerator>
+            <property name="suppressAllComments" value="false" />
+            <property name="suppressDate" value="true" />
+        </commentGenerator>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+            connectionURL="jdbc:mysql://106.14.172.38:3996/wz_task_log?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;autoReconnect=true"
+            userId="njjsadmin"
+            password="njjspwd12345678$%^" />
+
+        <!-- 下面的都不用修改 -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+        
+        <!-- generate Model -->
+        <!--<javaModelGenerator targetPackage="cn.wz.base.persist.model.mybatis.manager" targetProject="src/main/java">-->
+        <javaModelGenerator targetPackage="cn.wz.base.persist.model.mybatis.daily" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+        
+        <!-- generate xml -->
+        <!--<sqlMapGenerator targetPackage="sqlmap/manager"  targetProject="src/main/resources">-->
+        <sqlMapGenerator targetPackage="sqlmap/daily"  targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+        
+        <!-- generate Mapper -->
+        <!--<javaClientGenerator type="XMLMAPPER" targetPackage="cn.wz.base.persist.dao.mybatis.manager" targetProject="src/main/java">-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="cn.wz.base.persist.dao.mybatis.daily" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+        
+        <!-- 规则信息表 -->
+        <!--<table schema="" tableName="sys_user" domainObjectName="SysUser"></table>
+        <table schema="" tableName="sys_role" domainObjectName="SysRole"></table>
+        <table schema="" tableName="sys_resources" domainObjectName="SysResources"></table>
+        <table schema="" tableName="sys_ref_user_role" domainObjectName="SysRefUserRole"></table>
+        <table schema="" tableName="sys_ref_role_resources" domainObjectName="SysRefRoleResources"></table>-->
+        <table schema="" tableName="task_leave_log" domainObjectName="TaskLeaveLog"></table>
+        <table schema="" tableName="task_project" domainObjectName="TaskProject"></table>
+        <table schema="" tableName="task_ref_project_user" domainObjectName="TaskRefProjectUser"></table>
+        <table schema="" tableName="task_work_log" domainObjectName="TaskWorkLog"></table>
+        <!--
+        <table schema="" tableName="jme_item_warning" domainObjectName="ItemWarning">
+            <generatedKey column="id" sqlStatement="JDBC" identity="true"/>
+            <columnOverride column="item_status" property="itemStatus" javaType="com.jsdttec.jme.persist.enums.SwitchState" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="comp_type" property="compType" javaType="com.jsdttec.jme.persist.enums.CompType" jdbcType="CHAR"></columnOverride>
+            <columnOverride column="account_type" property="accountType" javaType="com.jsdttec.jme.persist.enums.AccountType" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="item_type" property="itemType" javaType="com.jsdttec.jme.persist.enums.WarningItemType" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="pipe_type" property="pipeType" javaType="com.jsdttec.jme.persist.enums.WarningPipeType" jdbcType="VARCHAR"></columnOverride>
+        </table>-->
+    </context>
+</generatorConfiguration>
