@@ -1,4 +1,4 @@
-package com.elextec.lease.framework.config;
+package com.elextec.framework.config;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;

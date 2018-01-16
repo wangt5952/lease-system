@@ -1,4 +1,4 @@
-package com.elextec.lease.framework.exceptions;
+package com.elextec.framework.exceptions;
 
 /**
  * 自定义业务异常.
