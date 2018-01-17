@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: dev
+  mvc:
+    media-types.*: text/html;application/json
+  devtools:
+    restart:
+      additional-paths: src/main/java
+      exclude: src/main/resources/static/**,src/main/resources/templates/**
+logging:
+  config: classpath:logback.xml
+localsetting:
+  cors:
+    flag: true

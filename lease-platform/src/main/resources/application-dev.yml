@@ -1,0 +1,56 @@
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: utf-8
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://106.14.172.38:3996/lease_sys?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true
+    username: njjsadmin
+    password: njjspwd12345678$%^
+    druid:
+      initial-size: 5
+      min-idle: 3
+      max-active: 10
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 30000
+      validation-query: select now()
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat
+      web-stat-filter:
+        enabled: false
+  redis:
+    host: localhost
+    port: 6379
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 0
+    password:
+  session:
+    store-type: none
+mybatis:
+  type-aliases-package: com.elextec.persist.dao.mybatis
+  mapper-locations: classpath*:sqlmap/*.xml
+  configuration:
+    cache-enabled: true
+    lazy-loading-enabled: false
+    multiple-result-sets-enabled: true
+    use-column-label: true
+    use-generated-keys: false
+    default-statement-timeout: 25000
+    auto-mapping-behavior: full
+    map-underscore-to-camel-case: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+logging:
+  config: classpath:logback.xml
