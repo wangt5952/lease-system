@@ -5,5 +5,5 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Created by wangtao on 2018/1/16.
  */
-public class WzStrUtils extends StringUtils {
+public class WzStringUtils extends StringUtils {
 }
