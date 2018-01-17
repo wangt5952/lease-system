@@ -1,11 +1,11 @@
 server:
-  port: 8081
+  port: 8080
   tomcat:
     uri-encoding: utf-8
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://106.14.172.38:3996/wz_task_log?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true
+    url: jdbc:mysql://106.14.172.38:3996/lease_sys?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true
     username: njjsadmin
     password: njjspwd12345678$%^
     druid:
@@ -34,8 +34,10 @@ spring:
       min-idle: 0
     timeout: 0
     password:
+  session:
+    store-type: none
 mybatis:
-  type-aliases-package: com.elextec.lease.manager.dao.mybatis.mybatis
+  type-aliases-package: com.elextec.lease.manager.dao.mybatis
   mapper-locations: classpath*:sqlmap/*.xml
   configuration:
     cache-enabled: true

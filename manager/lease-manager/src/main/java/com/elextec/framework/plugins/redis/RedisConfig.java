@@ -1,10 +1,9 @@
 package com.elextec.framework.plugins.redis;
 
-import com.elextec.framework.utils.WzStrUtils;
+import com.elextec.framework.utils.WzStringUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -56,7 +55,7 @@ public class RedisConfig {
         jcf.setPort(port);
         jcf.setTimeout(timeout);
         jcf.setPoolConfig(jedisPoolConfig);
-        if (WzStrUtils.isNotBlank(password)) {
+        if (WzStringUtils.isNotBlank(password)) {
             jcf.setPassword(password);
         }
         return jcf;

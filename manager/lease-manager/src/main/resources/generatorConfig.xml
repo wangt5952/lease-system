@@ -11,7 +11,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-            connectionURL="jdbc:mysql://106.14.172.38:3996/wz_task_log?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;autoReconnect=true"
+            connectionURL="jdbc:mysql://106.14.172.38:3996/lease_sys?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;autoReconnect=true"
             userId="njjsadmin"
             password="njjspwd12345678$%^" />
 
@@ -22,33 +22,36 @@
         
         <!-- generate Model -->
         <!--<javaModelGenerator targetPackage="cn.wz.base.persist.model.mybatis.manager" targetProject="src/main/java">-->
-        <javaModelGenerator targetPackage="cn.wz.base.persist.model.mybatis.daily" targetProject="src/main/java">
+        <javaModelGenerator targetPackage="com.elextec.lease.manager.persist.model.mybatis" targetProject="src/main/java">
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
         </javaModelGenerator>
-        
+
         <!-- generate xml -->
         <!--<sqlMapGenerator targetPackage="sqlmap/manager"  targetProject="src/main/resources">-->
-        <sqlMapGenerator targetPackage="sqlmap/daily"  targetProject="src/main/resources">
+        <sqlMapGenerator targetPackage="sqlmap"  targetProject="src/main/resources">
             <property name="enableSubPackages" value="true" />
         </sqlMapGenerator>
         
         <!-- generate Mapper -->
         <!--<javaClientGenerator type="XMLMAPPER" targetPackage="cn.wz.base.persist.dao.mybatis.manager" targetProject="src/main/java">-->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="cn.wz.base.persist.dao.mybatis.daily" targetProject="src/main/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.elextec.lease.manager.persist.dao.mybatis" targetProject="src/main/java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
         
         <!-- 规则信息表 -->
-        <!--<table schema="" tableName="sys_user" domainObjectName="SysUser"></table>
+        <table schema="" tableName="sys_user" domainObjectName="SysUser">
+            <columnOverride column="user_type" property="userType" javaType="com.elextec.lease.manager.persist.enums.OrgAndUserType" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="user_status" property="userStatus" javaType="com.elextec.lease.manager.persist.enums.RecordStatus" jdbcType="VARCHAR"></columnOverride>
+        </table>
         <table schema="" tableName="sys_role" domainObjectName="SysRole"></table>
         <table schema="" tableName="sys_resources" domainObjectName="SysResources"></table>
         <table schema="" tableName="sys_ref_user_role" domainObjectName="SysRefUserRole"></table>
-        <table schema="" tableName="sys_ref_role_resources" domainObjectName="SysRefRoleResources"></table>-->
-        <table schema="" tableName="task_leave_log" domainObjectName="TaskLeaveLog"></table>
-        <table schema="" tableName="task_project" domainObjectName="TaskProject"></table>
-        <table schema="" tableName="task_ref_project_user" domainObjectName="TaskRefProjectUser"></table>
-        <table schema="" tableName="task_work_log" domainObjectName="TaskWorkLog"></table>
+        <table schema="" tableName="sys_ref_role_resources" domainObjectName="SysRefRoleResources"></table>
+        <table schema="" tableName="biz_organization" domainObjectName="BizOrganization">
+            <columnOverride column="org_type" property="orgType" javaType="com.elextec.lease.manager.persist.enums.OrgAndUserType" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="org_status" property="orgStatus" javaType="com.elextec.lease.manager.persist.enums.RecordStatus" jdbcType="VARCHAR"></columnOverride>
+        </table>
         <!--
         <table schema="" tableName="jme_item_warning" domainObjectName="ItemWarning">
             <generatedKey column="id" sqlStatement="JDBC" identity="true"/>

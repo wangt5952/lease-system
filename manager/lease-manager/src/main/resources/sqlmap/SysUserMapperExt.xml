@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elextec.lease.manager.persist.dao.mybatis.SysUserMapperExt">
+    <resultMap extends="BaseResultMap" id="SysUserExtResultMap" type="com.elextec.lease.manager.persist.model.mybatis.ext.SysUserExt">
+        <result column="org_code" jdbcType="VARCHAR" property="orgCode" />
+        <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+    </resultMap>
+    <select id="selectExtByExample" parameterType="com.elextec.lease.manager.persist.model.mybatis.SysUserExample" resultMap="SysUserExtResultMap">
+        <include refid="Pageable_Prefix" />
+        SELECT
+        <if test="distinct">
+            DISTINCT
+        </if>
+        a.id id,
+        a.login_name login_name,
+        a.nick_name nick_name,
+        a.user_name user_name,
+        a.user_status user_status,
+        a.create_user create_user,
+        a.create_time create_time,
+        a.update_user update_user,
+        a.update_time update_time,
+        a.org_id org_id,
+        b.org_code org_code,
+        b.org_name org_name
+        FROM
+        sys_user a
+        LEFT JOIN biz_organization b ON a.org_id=b.id
+        <if test="_parameter != null">
+            <include refid="Sys_User_Ext_Example_Where_Clause_Ext" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="Pageable_Suffix" />
+    </select>
+    <sql id="Sys_User_Ext_Example_Where_Clause_Ext">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and a.${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and a.${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and a.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and a.${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+</mapper>
