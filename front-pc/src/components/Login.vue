@@ -1,18 +1,26 @@
 <template>
-  <div>
-    <el-row type="flex" justify="center">
-      <el-col style="border:1px solid red;border-radius:5px;padding:10px;max-width:400px;">
-        <el-form ref="form" :model="form">
-          <el-form-item label="账号">
-            <el-input size="medium" v-model="form.username"></el-input>
-          </el-form-item>
-          <el-form-item label="密码">
-            <el-input size="medium" v-model="form.password"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button size="medium" type="primary" @click="handleSubmit" style="width:100%;margin-top:13px;">登录</el-button>
-          </el-form-item>
-        </el-form>
+  <div style="display:flex;flex-direction:column;height:100%;">
+    <div style="padding:10px 30px;background:#000;color:#fff;font-size:22px;font-weight:bold;">
+      小哥乐途后台登录系统
+    </div>
+    <el-row type="flex" justify="end" style="background:url(/static/pc-login-bg-1.jpg);height:100%;">
+      <el-col style="display:flex;background:#ffffff80;padding:10px;max-width:500px;">
+        <div style="margin:80px 40px; background:#fff;flex:1;">
+          <div style="padding:60px;padding-bottom:0;border-bottom:1px solid #eee;">
+            <div style="padding:10px 20px;border-bottom:4px solid #000;display:inline-block;font-size:20px;font-weight:bold;">登录</div>
+          </div>
+          <el-form ref="form" :model="form" style="margin-top:40px;" >
+            <el-form-item>
+              <el-input prefix-icon="lt lt-my" size="medium" v-model="form.username" placeholder="用户名"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-input prefix-icon="lt lt-lock" size="medium" v-model="form.password" placeholder="密码"></el-input>
+            </el-form-item>
+
+            <div style="cursor:pointer;background:#fff;border:2px solid #000;margin:40px 20px;text-align:center;padding:10px;border-radius:3px;" @click="handleSubmit" >登录</div>
+            <div></div>
+          </el-form>
+        </div>
       </el-col>
     </el-row>
 
@@ -36,4 +44,27 @@ export default {
 </script>
 
 <style scoped>
+>>> .el-form .el-form-item {
+  margin-bottom: 2px;
+}
+>>> .el-form .el-input {
+  background: #eee;
+  padding: 10px;
+  box-sizing: border-box;
+}
+>>> .el-form .el-input .el-input__prefix {
+  color: #000;
+  margin-left: 30px;
+}
+>>> .el-form .el-input .el-input__icon {
+  font-size: 20px;
+}
+
+>>> .el-form input.el-input__inner {
+  border: 0;
+  background: #eee;
+  padding-left: 60px;
+  font-size: 20px;
+  height: 44px;
+}
 </style>
