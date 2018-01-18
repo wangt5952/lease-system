@@ -20,11 +20,18 @@
         </template>
       </x-input>
 
-      <x-button type="primary" class="btn-normal" @click.native="handleSubmit">登录</x-button>
+      <x-input placeholder="验证码" type="password" v-model="form.password" style="background:#fff;">
+        <template slot="label">
+          <i class="lt lt-safe"/>
+        </template>
+        <x-button slot="right" class="btn-small" type="primary" @click.native="handleCode">获取验证码</x-button>
+      </x-input>
+
+      <x-button type="primary" class="btn-normal" @click.native="handleSubmit">注册</x-button>
     </div>
 
     <div style="display:flex; color:#00c985;margin:60px 30px;text-align:center;font-size:0.4rem;">
-      <router-link to="/join" style="flex:1;color:#00c985;">账号注册</router-link>
+      <div style="flex:1">账号注册</div>
       <div style="flex:1;border-left:1px solid #00c985">找回密码</div>
     </div>
   </div>
@@ -40,8 +47,12 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      this.$router.push('/');
+      console.log(1)
+      this.$router.push('/login');
     },
+    async handleCode() {
+      console.log(111)
+    }
   },
 };
 </script>
@@ -52,6 +63,10 @@ export default {
   border-radius: 100px;
   margin-bottom: 22px;
   padding: 10px;
+}
+
+>>> .weui-cell {
+  padding: 0px 5px;
 }
 
 >>> .weui-cell:before {
@@ -66,6 +81,16 @@ export default {
 
 >>> .weui-cell__bd {
   padding-left: 10px;
+  margin:10px;
+}
+
+>>> .btn-small {
+  background: #008E56;
+  font-size: 0.4rem;
+  border-radius: 30px;
+}
+>>> .btn-small:active {
+  background: #009C75 !important;
 }
 
 >>> .btn-normal {

@@ -11,7 +11,7 @@ export default {
 </script>
 
 <style lang="less">
-@import url(//at.alicdn.com/t/font_544955_6wjoo5waybx7ds4i.css);
+@import url(//at.alicdn.com/t/font_544955_kujwu5jorw1att9.css);
 @import '~vux/src/styles/reset.less';
 @import '~vux/src/styles/1px.less';
 @import '~vux/src/styles/tap.less';
