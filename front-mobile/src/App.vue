@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
     <router-view/>
   </div>
 </template>
@@ -11,13 +10,21 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less">
+@import url(//at.alicdn.com/t/font_544955_kujwu5jorw1att9.css);
+@import '~vux/src/styles/reset.less';
+@import '~vux/src/styles/1px.less';
+@import '~vux/src/styles/tap.less';
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  min-width:320px;
+  max-width:640px;
+  margin:0 auto;
+  height: 100%;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  -webkit-overflow-scrolling: touch;
+  user-select: none;
 }
 </style>
