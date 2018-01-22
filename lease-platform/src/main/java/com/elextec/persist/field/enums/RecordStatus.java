@@ -7,7 +7,7 @@ package com.elextec.persist.field.enums;
  */
 public enum RecordStatus {
     NORMAL("正常"),
-    FREEZE("冻结"),
+    FREEZE("冻结/维保"),
     INVALID("作废");
 
     /** Value. */

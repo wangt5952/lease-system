@@ -18,16 +18,22 @@ public class MessageResponse extends BaseModel {
     /*
      * 构造方法.
      */
+    public MessageResponse() {
+        this.code = "";
+        this.message = "";
+        this.respData = "";
+    }
+
     public MessageResponse(String code, String message) {
         this.code = code;
         this.message = message;
-        this.respData = null;
+        this.respData = "";
     }
 
     public MessageResponse(RunningResult runningResult) {
         this.code = runningResult.code();
         this.message = runningResult.getInfo();
-        this.respData = null;
+        this.respData = "";
     }
 
     public MessageResponse(String code, String message, Object respData) {

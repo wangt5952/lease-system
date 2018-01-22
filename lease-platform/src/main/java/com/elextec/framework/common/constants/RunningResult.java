@@ -7,7 +7,9 @@ package com.elextec.framework.common.constants;
 public enum RunningResult {
     SUCCESS("200", "成功"),
     BAD_REQUEST("400", "请求失败"),
-    UNAUTHORIZED("401", "用户名或密码错"),
+    UNAUTHORIZED("401", "非法请求"),
+    NAME_OR_PASSWORD_WRONG("40101", "用户名或密码错"),
+    NO_USER("40102", "未查询到用户"),
     FORBIDDEN("403", "禁止访问"),
     SERVER_ERROR("500", "服务器错误");
 

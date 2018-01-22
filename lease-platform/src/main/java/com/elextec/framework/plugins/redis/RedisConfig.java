@@ -1,6 +1,6 @@
 package com.elextec.framework.plugins.redis;
 
-import com.elextec.framework.utils.WzStringUtils;
+import com.elextec.framework.utils.WzStringUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +55,7 @@ public class RedisConfig {
         jcf.setPort(port);
         jcf.setTimeout(timeout);
         jcf.setPoolConfig(jedisPoolConfig);
-        if (WzStringUtils.isNotBlank(password)) {
+        if (WzStringUtil.isNotBlank(password)) {
             jcf.setPassword(password);
         }
         return jcf;

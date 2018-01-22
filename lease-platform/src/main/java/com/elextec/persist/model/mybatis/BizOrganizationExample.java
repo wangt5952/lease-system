@@ -883,6 +883,146 @@ public class BizOrganizationExample {
             return (Criteria) this;
         }
 
+        public Criteria andOrgBusinessLicenceFrontIsNull() {
+            addCriterion("org_business_licence_front is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontIsNotNull() {
+            addCriterion("org_business_licence_front is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontEqualTo(String value) {
+            addCriterion("org_business_licence_front =", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontNotEqualTo(String value) {
+            addCriterion("org_business_licence_front <>", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontGreaterThan(String value) {
+            addCriterion("org_business_licence_front >", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontGreaterThanOrEqualTo(String value) {
+            addCriterion("org_business_licence_front >=", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontLessThan(String value) {
+            addCriterion("org_business_licence_front <", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontLessThanOrEqualTo(String value) {
+            addCriterion("org_business_licence_front <=", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontLike(String value) {
+            addCriterion("org_business_licence_front like", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontNotLike(String value) {
+            addCriterion("org_business_licence_front not like", value, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontIn(List<String> values) {
+            addCriterion("org_business_licence_front in", values, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontNotIn(List<String> values) {
+            addCriterion("org_business_licence_front not in", values, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontBetween(String value1, String value2) {
+            addCriterion("org_business_licence_front between", value1, value2, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceFrontNotBetween(String value1, String value2) {
+            addCriterion("org_business_licence_front not between", value1, value2, "orgBusinessLicenceFront");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackIsNull() {
+            addCriterion("org_business_licence_back is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackIsNotNull() {
+            addCriterion("org_business_licence_back is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackEqualTo(String value) {
+            addCriterion("org_business_licence_back =", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackNotEqualTo(String value) {
+            addCriterion("org_business_licence_back <>", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackGreaterThan(String value) {
+            addCriterion("org_business_licence_back >", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackGreaterThanOrEqualTo(String value) {
+            addCriterion("org_business_licence_back >=", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackLessThan(String value) {
+            addCriterion("org_business_licence_back <", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackLessThanOrEqualTo(String value) {
+            addCriterion("org_business_licence_back <=", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackLike(String value) {
+            addCriterion("org_business_licence_back like", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackNotLike(String value) {
+            addCriterion("org_business_licence_back not like", value, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackIn(List<String> values) {
+            addCriterion("org_business_licence_back in", values, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackNotIn(List<String> values) {
+            addCriterion("org_business_licence_back not in", values, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackBetween(String value1, String value2) {
+            addCriterion("org_business_licence_back between", value1, value2, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgBusinessLicenceBackNotBetween(String value1, String value2) {
+            addCriterion("org_business_licence_back not between", value1, value2, "orgBusinessLicenceBack");
+            return (Criteria) this;
+        }
+
         public Criteria andOrgStatusIsNull() {
             addCriterion("org_status is null");
             return (Criteria) this;

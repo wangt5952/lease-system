@@ -1,14 +1,14 @@
 package com.elextec.framework.exceptions;
 
 import com.elextec.framework.common.constants.RunningResult;
-import com.elextec.framework.utils.WzStringUtils;
+import com.elextec.framework.utils.WzStringUtil;
 
 /**
  * 自定义业务异常.
  * Service及Controller应将Exception包装成BizException后再向上抛出
  * Created by wangtao on 2018/1/16.
  */
-public class BizException extends Exception {
+public class BizException extends RuntimeException {
     private String infoCode;
 
     public BizException() {
@@ -48,7 +48,7 @@ public class BizException extends Exception {
     }
 
     public String getInfoCode() {
-        if (WzStringUtils.isBlank(infoCode)) {
+        if (WzStringUtil.isBlank(infoCode)) {
             return "";
         } else {
             return infoCode;

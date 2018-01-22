@@ -11,5 +11,5 @@ public interface SysUserMapperExt extends SysUserMapper {
      * @param example 查询条件
      * @return 用户扩展信息列表
      */
-    List<SysUserExt> selectExtByExample(SysUserExample example);
+    List<SysUserExt> login(SysUserExample example);
 }
