@@ -3,6 +3,8 @@ package com.elextec.framework;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @ControllerAdvice
 public class WzControllerAdvice {
+    /** 日志. */
+    private final Logger logger = LoggerFactory.getLogger(WzControllerAdvice.class);
+
     /**
      * 全局业务异常处理.
      * @param ex BizException
@@ -32,6 +37,7 @@ public class WzControllerAdvice {
         mr.setCode(ex.getInfoCode());
         mr.setMessage(ex.getMessage());
         mr.setRespData(ex.getStackTrace());
+        logger.error("统一异常处理(ErrCode:" + mr.getCode() + ";Message:" + mr.getMessage() + ")");
         return mr;
     }
 
@@ -54,6 +60,7 @@ public class WzControllerAdvice {
         mr.setCode(RunningResult.SERVER_ERROR.code());
         mr.setMessage(ex.getMessage());
         mr.setRespData(ex.getStackTrace());
+        logger.error("统一异常处理(ErrCode:" + mr.getCode() + ";Message:" + mr.getMessage() + ")");
         return mr;
     }
 }

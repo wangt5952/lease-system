@@ -3,6 +3,7 @@ package com.elextec.framework.common.request;
 import com.elextec.framework.BaseModel;
 
 /**
+ * 登录参数.
  * Created by wangtao on 2018/1/22.
  */
 public class LoginParam extends BaseModel {
