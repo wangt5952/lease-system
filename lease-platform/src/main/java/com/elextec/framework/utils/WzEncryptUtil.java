@@ -476,4 +476,11 @@ public class WzEncryptUtil {
 //        }
 //        return new String(str);
 //    }
+public static void main(String args[]) {
+        String ps = getMD5("123", true);
+        long l = System.currentTimeMillis();
+        System.out.println(l);
+        System.out.println(getMD5("admin"+ps+l, true));
+
+}
 }

@@ -8,5 +8,5 @@ import com.elextec.persist.model.mybatis.ext.SysUserExt;
  * Created by wangtao on 2018/1/16.
  */
 public interface SysAuthService {
-    public SysUserExt login(String loginName, String authStr, long loginTime) throws BizException;
+    public SysUserExt login(String loginName, String authStr, long loginTime);
 }

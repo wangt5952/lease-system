@@ -25,4 +25,9 @@ public enum ShowFlag {
     public String getInfo() {
         return info;
     }
+
+    @Override
+    public String toString() {
+        return this.name();
+    }
 }

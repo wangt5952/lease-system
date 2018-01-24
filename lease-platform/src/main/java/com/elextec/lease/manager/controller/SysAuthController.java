@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +50,45 @@ public class SysAuthController extends BaseController {
     /**
      * 登录.
      * @param loginNameAndPassword 登录参数JSON
-     * @return
+     * <pre>
+     *     {
+     *         loginName:登录用户名,
+     *         loginAuthStr:验证字符串 MD5(用户名+MD5(密码).upper()+loginTime).upper(),
+     *         loginTime:登录时间
+     *     }
+     * </pre>
+     * @return 登录结果及登录账户信息
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *             key_login_token:登录Token,
+     *             key_user_info:{
+     *                 id:ID,
+     *                 loginName:登录用户名,
+     *                 userMobile:手机号码,
+     *                 userType:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）,
+     *                 userIcon:Icon路径,
+     *                 nickName:昵称,
+     *                 userName:名称,
+     *                 userRealNameAuthFlag:是否已实名认证,
+     *                 userPid:身份证号,
+     *                 userIcFront:身份证正面照路径,
+     *                 userIcBack:身份证背面照路径,
+     *                 userIcGroup:本人于身份证合照路径,
+     *                 orgId:所属企业ID,
+     *                 orgCode:企业Code,
+     *                 orgName:企业名,
+     *                 userStatus:用户状态（NORMAL-正常、FREEZE-冻结/维保、INVALID-作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             }
+     *         }
+     *     }
+     * </pre>
      */
     @RequestMapping(path = {"/login"})
     public MessageResponse login(@RequestBody String loginNameAndPassword) {
@@ -61,7 +100,8 @@ public class SysAuthController extends BaseController {
             // 参数解析错误
             LoginParam loginParam = null;
             try {
-                loginParam = JSON.parseObject(loginNameAndPassword, LoginParam.class);
+                String paramStr = URLDecoder.decode(loginNameAndPassword, "utf-8");
+                loginParam = JSON.parseObject(paramStr, LoginParam.class);
                 if (null == loginParam || WzStringUtil.isBlank(loginParam.getLoginName())
                         || WzStringUtil.isBlank(loginParam.getLoginAuthStr())
                         || null == loginParam.getLoginTime()) {

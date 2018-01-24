@@ -27,7 +27,7 @@ public class SysAuthServcieImpl implements SysAuthService {
     private SysUserMapperExt sysUserMapperExt;
 
     @Override
-    public SysUserExt login(String loginName, String authStr, long loginTime) throws BizException {
+    public SysUserExt login(String loginName, String authStr, long loginTime) {
         // 查询用户
         SysUserExample sysUserExample = new SysUserExample();
         SysUserExample.Criteria loginNameCri = sysUserExample.createCriteria();

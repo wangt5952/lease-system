@@ -24,4 +24,9 @@ public enum PartsType {
     public String getInfo() {
         return info;
     }
+
+    @Override
+    public String toString() {
+        return this.name();
+    }
 }

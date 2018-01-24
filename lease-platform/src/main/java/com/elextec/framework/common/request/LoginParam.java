@@ -9,7 +9,7 @@ import com.elextec.framework.BaseModel;
 public class LoginParam extends BaseModel {
     /** 用户名. */
     private String loginName;
-    /** 验证字符串(MD5(用户名+密码)). */
+    /** 验证字符串 MD5(loginName+MD5(登录密码).upper()+loginTime).upper(). */
     private String loginAuthStr;
     /** 登录时间的毫秒数. */
     private Long loginTime;

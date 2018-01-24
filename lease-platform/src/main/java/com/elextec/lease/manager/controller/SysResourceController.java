@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,8 @@ public class SysResourceController extends BaseController {
             // 参数解析错误报“参数解析错误”
             PageRequest pagingParam = null;
             try {
-                pagingParam = JSON.parseObject(paramAndPaging, PageRequest.class);
+                String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
+                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
@@ -137,7 +139,8 @@ public class SysResourceController extends BaseController {
             // 参数解析错误报“参数解析错误”
             List<SysResources> resInfos = null;
             try {
-                resInfos = JSON.parseArray(resources, SysResources.class);
+                String paramStr = URLDecoder.decode(resources, "utf-8");
+                resInfos = JSON.parseArray(paramStr, SysResources.class);
                 if (null == resInfos) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
@@ -180,7 +183,8 @@ public class SysResourceController extends BaseController {
             // 参数解析错误报“参数解析错误”
             SysResources resInfo = null;
             try {
-                resInfo = JSON.parseObject(resource, SysResources.class);
+                String paramStr = URLDecoder.decode(resource, "utf-8");
+                resInfo = JSON.parseObject(paramStr, SysResources.class);
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
@@ -209,7 +213,8 @@ public class SysResourceController extends BaseController {
             // 参数解析错误报“参数解析错误”
             List<String> resIds = null;
             try {
-                resIds = JSON.parseArray(resources, String.class);
+                String paramStr = URLDecoder.decode(resources, "utf-8");
+                resIds = JSON.parseArray(paramStr, String.class);
                 if (null == resIds) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
