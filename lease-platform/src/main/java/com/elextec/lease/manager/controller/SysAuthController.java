@@ -6,6 +6,7 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.LoginParam;
 import com.elextec.framework.common.response.MessageResponse;
+import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.redis.RedisClient;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
@@ -35,7 +36,7 @@ public class SysAuthController extends BaseController {
     private final Logger logger = LoggerFactory.getLogger(SysAuthController.class);
 
     @Value("localsetting.login-overtime-sec")
-    private Integer loginOvertime;
+    private String loginOvertime;
 
     @Autowired
     private SysAuthService sysAuthService;
@@ -52,16 +53,22 @@ public class SysAuthController extends BaseController {
     public MessageResponse login(@RequestBody String loginNameAndPassword) {
         // 无参数则报“非法请求”
         if (WzStringUtil.isBlank(loginNameAndPassword)) {
-            MessageResponse mr = new MessageResponse(RunningResult.UNAUTHORIZED);
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
-            // 参数解析错误则报“非法请求”
-            LoginParam loginParam = JSON.parseObject(loginNameAndPassword, LoginParam.class);
-            if (null == loginParam || WzStringUtil.isBlank(loginParam.getLoginName())
-                    || WzStringUtil.isBlank(loginParam.getLoginAuthStr())
-                    || null == loginParam.getLoginTime()) {
-                return new MessageResponse(RunningResult.UNAUTHORIZED);
+            // 参数解析错误
+            LoginParam loginParam = null;
+            try {
+                loginParam = JSON.parseObject(loginNameAndPassword, LoginParam.class);
+                if (null == loginParam || WzStringUtil.isBlank(loginParam.getLoginName())
+                        || WzStringUtil.isBlank(loginParam.getLoginAuthStr())
+                        || null == loginParam.getLoginTime()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
+
             // 验证用户并返回用户信息
             SysUserExt userExt = sysAuthService.login(loginParam.getLoginName(), loginParam.getLoginAuthStr(), loginParam.getLoginTime());
             // 组织登录返回信息
@@ -73,9 +80,12 @@ public class SysAuthController extends BaseController {
             // 设置登录用户信息
             loginInfo.put(WzConstants.KEY_USER_INFO, userExt);
             // 设置超时时间
-            Integer overtime = (null == loginOvertime) ? 900 : loginOvertime;
+            Integer overtime = 900;
+            if (WzStringUtil.isNumeric(loginOvertime)) {
+                overtime = Integer.parseInt(loginOvertime);
+            }
             // 登录成功，保存到Redis中
-            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + ":" + loginToken, userExt, overtime, TimeUnit.SECONDS);
+            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + ":" + loginToken, userExt, overtime, TimeUnit.SECONDS);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, loginInfo);
             return mr;

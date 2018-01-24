@@ -10,8 +10,11 @@ public enum RunningResult {
     UNAUTHORIZED("401", "非法请求"),
     NAME_OR_PASSWORD_WRONG("40101", "用户名或密码错"),
     NO_USER("40102", "未查询到用户"),
+    NO_PARAM("40103", "请求参数为空"),
+    PARAM_ANALYZE_ERROR("40104", "请求参数解析失败"),
     FORBIDDEN("403", "禁止访问"),
-    SERVER_ERROR("500", "服务器错误");
+    SERVER_ERROR("500", "服务器错误"),
+    DB_ERROR("50001", "数据库处理错误");
 
     /** Code. */
     private final String code;
