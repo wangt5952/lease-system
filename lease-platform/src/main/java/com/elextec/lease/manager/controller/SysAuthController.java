@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -104,7 +106,12 @@ public class SysAuthController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = {"/logout"})
-    public MessageResponse logout() {
+    public MessageResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        String token = WzStringUtil.defaultIfEmpty(request.getHeader(WzConstants.HEADER_LOGIN_TOKEN), "");
+        // 清除登录信息
+        redisClient.valueOperations().getOperations().delete(WzConstants.GK_PC_LOGIN_INFO + ":" + token);
+        // 组织返回结果并返回
+        MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
         return null;
     }
 

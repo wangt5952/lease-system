@@ -13,6 +13,9 @@ public class RedisClient {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    public RedisTemplate<String, Object> redisTemplate() {
+        return redisTemplate;
+    }
     public HashOperations<String, String, Object> hashOperations() {
         return redisTemplate.opsForHash();
     }

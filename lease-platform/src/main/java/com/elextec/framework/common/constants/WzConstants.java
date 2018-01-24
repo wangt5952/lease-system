@@ -4,6 +4,9 @@ package com.elextec.framework.common.constants;
  * Created by wangtao on 2018/1/22.
  */
 public class WzConstants {
+    /** 用户请求Header参数 登录Token. */
+    public static final String HEADER_LOGIN_TOKEN = "header_login_token";
+
     /** 全局Key 登录用户信息. */
     public static final String GK_PC_LOGIN_INFO = "gk_pc_login_info";
 
