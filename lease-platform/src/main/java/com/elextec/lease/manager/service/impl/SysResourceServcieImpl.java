@@ -34,9 +34,14 @@ public class SysResourceServcieImpl implements SysResourceService {
     @Override
     public PageResponse<SysResources> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
-        SysResourcesExample sysResourcesCountExample = new SysResourcesExample();
-        sysResourcesCountExample.setDistinct(true);
-        int resTotal = sysResourcesMapperExt.countByExample(sysResourcesCountExample);
+        int resTotal = 0;
+        if (0 < pr.getTotal()) {
+            resTotal = pr.getTotal();
+        } else {
+            SysResourcesExample sysResourcesCountExample = new SysResourcesExample();
+            sysResourcesCountExample.setDistinct(true);
+            resTotal = sysResourcesMapperExt.countByExample(sysResourcesCountExample);
+        }
         // 分页查询
         SysResourcesExample sysResourcesExample = new SysResourcesExample();
         sysResourcesExample.setDistinct(true);
