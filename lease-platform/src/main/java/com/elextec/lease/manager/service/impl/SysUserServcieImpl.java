@@ -121,4 +121,9 @@ public class SysUserServcieImpl implements SysUserService {
         }
 
     }
+
+    @Override
+    public SysUser getByPrimaryKey(String id) {
+        return sysUserMapperExt.selectByPrimaryKey(id);
+    }
 }

@@ -277,4 +277,35 @@ public class SysUserController extends BaseController {
             return mr;
         }
     }
+
+    /**
+     * 根据ID获取用户信息
+     * @param id 用户ID
+     * @return
+     */
+    @RequestMapping(path = "/getByPrimaryKey")
+    public MessageResponse getByPrimaryKey(@RequestBody String id) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(id)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> resId = null;
+            try {
+                String paramStr = URLDecoder.decode(id, "utf-8");
+                resId = JSON.parseArray(paramStr, String.class);
+                if (null == resId) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+
+            SysUser user = sysUserService.getByPrimaryKey(resId.get(0));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
+            return mr;
+        }
+    }
 }
