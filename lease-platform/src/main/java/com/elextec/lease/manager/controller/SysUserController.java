@@ -39,8 +39,44 @@ public class SysUserController extends BaseController {
 
     /**
      * 查询用户.
-     * @param paramAndPaging 查询及分页参数JSON
-     * @return
+     * @param paramAndPaging 分页参数JSON
+     * <pre>
+     *     {
+     *         currPage:当前页,
+     *         pageSize:每页记录数
+     *     }
+     * </pre>
+     * @return 资源列表
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 login_name:用户名,
+     *                 user_mobile:用户手机号码,
+     *                 user_type:用户类型（平台、企业或个人）,
+     *                 user_icon:用户LOGO路径,
+     *                 password:密码,
+     *                 nick_name:昵称,
+     *                 user_name:姓名,
+     *                 user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
+     *                 user_pid:身份证号,
+     *                 user_ic_front:身份证正面照片路径,
+     *                 user_ic_back:身份证背面照片路径,
+     *                 user_ic_group:用户手举身份证合照路径,
+     *                 org_id:所属组织ID,
+     *                 user_status:用户状态（正常、冻结、作废）,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/listusers")
     public MessageResponse listUsers(@RequestBody String paramAndPaging) {
@@ -69,8 +105,37 @@ public class SysUserController extends BaseController {
 
     /**
      * 批量增加用户.
-     * @param users 用户信息列表JSON
-     * @return
+     * @param users 用户列表JSON
+     * <pre>
+     *     [
+     *         {
+     *             login_name:用户名,
+     *             user_mobile:用户手机号码,
+     *             user_type:用户类型（平台、企业或个人）,
+     *             user_icon:用户LOGO路径,
+     *             password:密码,
+     *             nick_name:昵称,
+     *             user_name:姓名,
+     *             user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
+     *             user_pid:身份证号,
+     *             user_ic_front:身份证正面照片路径,
+     *             user_ic_back:身份证背面照片路径,
+     *             user_ic_group:用户手举身份证合照路径,
+     *             org_id:所属组织ID,
+     *             user_status:用户状态（正常、冻结、作废）,
+     *             create_user:创建人,
+     *             update_user:更新人
+     *         }
+     *     ]
+     * </pre>
+     * @return 批量新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/addusers")
     public MessageResponse addUsers(@RequestBody String users) {
@@ -100,6 +165,26 @@ public class SysUserController extends BaseController {
     /**
      * 修改用户信息.
      * @param user 用户信息JSON
+     * <pre>
+     *     {
+     *         id:ID,
+     *         login_name:用户名,
+     *         user_mobile:用户手机号码,
+     *         user_type:用户类型（平台、企业或个人）,
+     *         user_icon:用户LOGO路径,
+     *         password:密码,
+     *         nick_name:昵称,
+     *         user_name:姓名,
+     *         user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
+     *         user_pid:身份证号,
+     *         user_ic_front:身份证正面照片路径,
+     *         user_ic_back:身份证背面照片路径,
+     *         user_ic_group:用户手举身份证合照路径,
+     *         org_id:所属组织ID,
+     *         user_status:用户状态（正常、冻结、作废）,
+     *         update_user:更新人
+     *     }
+     * </pre>
      * @return
      */
     @RequestMapping(path = "/modifyuser")
@@ -160,6 +245,12 @@ public class SysUserController extends BaseController {
     /**
      * 给用户分配角色.
      * @param userAndRoles 用户及角色列表JSON
+     * <pre>
+     *     {
+     *         userId:用户ID,
+     *         roleIds:角色ID，多个以逗号隔开，例：角色1，角色2，角色3
+     *     }
+     * </pre>
      * @return
      */
     @RequestMapping(path = "/refuserandroles")
