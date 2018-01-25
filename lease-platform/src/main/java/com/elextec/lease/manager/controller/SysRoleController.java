@@ -38,7 +38,32 @@ public class SysRoleController extends BaseController {
     /**
      * 查询角色.
      * @param paramAndPaging 查询及分页参数JSON
-     * @return
+     * @param paramAndPaging 分页参数JSON
+     * <pre>
+     *     {
+     *         currPage:当前页,
+     *         pageSize:每页记录数
+     *     }
+     * </pre>
+     * @return 资源列表
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 role_name:角色名,
+     *                 role_introduce:角色说明,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/listroles")
     public MessageResponse listRoles(@RequestBody String paramAndPaging) {
@@ -68,7 +93,24 @@ public class SysRoleController extends BaseController {
     /**
      * 批量增加角色.
      * @param roles 角色列表JSON
-     * @return
+     * <pre>
+     *     [
+     *         {
+     *             role_name:角色名,
+     *             role_introduce:角色说明,
+     *             create_user:创建人,
+     *             update_user:更新人
+     *         }
+     *     ]
+     * </pre>
+     * @return 批量新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/addroles")
     public MessageResponse addRoles(@RequestBody String roles) {
@@ -98,6 +140,14 @@ public class SysRoleController extends BaseController {
     /**
      * 修改角色信息.
      * @param role 角色信息JSON
+     * <pre>
+     *     {
+     *         id:ID,
+     *         role_name:角色名,
+     *         role_introduce:角色说明,
+     *         update_user:更新人
+     *     }
+     * </pre>
      * @return
      */
     @RequestMapping(path = "/modifyrole")
@@ -158,6 +208,12 @@ public class SysRoleController extends BaseController {
     /**
      * 给角色分配资源.
      * @param roleAndResources 角色及资源列表JSON
+     * <pre>
+     *     {
+     *         roleId:角色ID,
+     *         resources:资源ID，多个以逗号隔开，例：资源1，资源2，资源3
+     *     }
+     * </pre>
      * @return
      */
     @RequestMapping(path = "/refroleandresources")
