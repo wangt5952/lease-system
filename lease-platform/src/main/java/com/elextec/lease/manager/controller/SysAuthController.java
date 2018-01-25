@@ -5,12 +5,16 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.LoginParam;
+import com.elextec.framework.common.request.ResetPasswordParam;
+import com.elextec.framework.common.request.SmsParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.redis.RedisClient;
+import com.elextec.framework.utils.WzCheckCodeUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.SysAuthService;
+import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +47,8 @@ public class SysAuthController extends BaseController {
 
     @Autowired
     private SysAuthService sysAuthService;
+
+    private SysUser
 
     @Autowired
     private RedisClient redisClient;
@@ -92,12 +98,12 @@ public class SysAuthController extends BaseController {
      */
     @RequestMapping(path = {"/login"})
     public MessageResponse login(@RequestBody String loginNameAndPassword) {
-        // 无参数则报“非法请求”
+        // 无参数则报“无参数”
         if (WzStringUtil.isBlank(loginNameAndPassword)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
-            // 参数解析错误
+            // 参数解析错误报“参数解析错误”
             LoginParam loginParam = null;
             try {
                 String paramStr = URLDecoder.decode(loginNameAndPassword, "utf-8");
@@ -127,7 +133,7 @@ public class SysAuthController extends BaseController {
                 overtime = Integer.parseInt(loginOvertime);
             }
             // 登录成功，保存到Redis中
-            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + ":" + loginToken, userExt, overtime, TimeUnit.SECONDS);
+            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + loginToken, userExt, overtime, TimeUnit.SECONDS);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, loginInfo);
             return mr;
@@ -180,12 +186,38 @@ public class SysAuthController extends BaseController {
     }
 
     /**
-     * 发送短信验证码.
-     * @param mobileAndVC 手机号码及验证码
+     * 获得图片验证码.
+     * @return 图片验证码Token
      * <pre>
      *     {
-     *          mobile:手机号码,
-     *          vc:图片验证码（用于发送短信用，根据短信平台可选）
+     *          code:处理Code,
+     *          message:处理消息,
+     *          respData:{
+     *              key_captcha_token:图片验证码Token
+     *          }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = {"/sendcaptcha"})
+    public MessageResponse sendCaptcha() {
+        String code = WzCheckCodeUtil.makeEDCode(4);
+        String token = WzUniqueValUtil.makeUUID();
+        // 图片验证码2分钟有效
+        redisClient.valueOperations().set(WzConstants.GK_CAPTCHA + token, code, 120, TimeUnit.SECONDS);
+        Map<String, String> tokenMap = new HashMap<String, String>();
+        tokenMap.put(WzConstants.KEY_CAPTCHA_TOKEN, token);
+        return new MessageResponse(RunningResult.SUCCESS, tokenMap);
+    }
+
+    /**
+     * 发送短信验证码.
+     * @param mobileAndVC 发送短信验证码需要参数
+     * <pre>
+     *     {
+     *         mobile:手机号码,
+     *         captcha:图形验证码,
+     *         captchaToken:图形验证码Token,
+     *         needCaptchaToken:是否需要验证图形验证码（仅 true 时需要验证）
      *     }
      * </pre>
      * @return 发送结果
@@ -194,23 +226,70 @@ public class SysAuthController extends BaseController {
      *          code:处理Code,
      *          message:处理消息,
      *          respData:{
-     *              resetToken:重置Token，重置密码时需要将此Token传回进行验证
+     *              key_sms_vcode_token:短信验证码Token
      *          }
      *     }
      * </pre>
      */
     @RequestMapping(path = {"/sendsms"})
     public MessageResponse sendSms(@RequestBody String mobileAndVC) {
-        return null;
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(mobileAndVC)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            SmsParam smsParam = null;
+            try {
+                String paramStr = URLDecoder.decode(mobileAndVC, "utf-8");
+                smsParam = JSON.parseObject(paramStr, SmsParam.class);
+                if (null == smsParam || WzStringUtil.isBlank(smsParam.getMobile())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 需要验证图形验证码
+                if (WzStringUtil.isNotBlank(smsParam.getNeedCaptchaToken())
+                        && "true".equals(smsParam.getNeedCaptchaToken().toLowerCase())) {
+                    // 未获得图形验证码Token
+                    if (WzStringUtil.isBlank(smsParam.getCaptchaToken())
+                            || WzStringUtil.isBlank(smsParam.getCaptcha())) {
+                        throw new BizException(RunningResult.NO_PARAM.code(), "验证码解析失败");
+                        // 开始验证图形验证码
+                    } else {
+                        // 获得预存图形验证码
+                        String cc = (String) redisClient.valueOperations().get(WzConstants.GK_CAPTCHA + smsParam.getCaptchaToken());
+                        // 图形验证码过期报错
+                        if (WzStringUtil.isBlank(cc)) {
+                            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
+                        }
+                        // 验证码不一致报错
+                        if (!cc.equals(smsParam.getCaptcha())) {
+                            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
+                        }
+                    }
+                    // 只要进行验证后，不管成功失败均将之前验证码作废
+                    redisClient.valueOperations().getOperations().delete(WzConstants.GK_CAPTCHA + smsParam.getCaptchaToken());
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 生成短信验证码
+            String smsVCode = WzCheckCodeUtil.makeDCode(6);
+            String smsVCodeToken = WzUniqueValUtil.makeUUID();
+            // 短信验证码2分钟有效
+            redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE + smsVCodeToken, smsVCode, 120, TimeUnit.SECONDS);
+            Map<String, String> smsTokenMap = new HashMap<String, String>();
+            smsTokenMap.put(WzConstants.KEY_SMS_VCODE_TOKEN, smsVCodeToken);
+            return new MessageResponse(RunningResult.SUCCESS, smsTokenMap);
+        }
     }
 
     /**
      * 重置密码.
-     * @param resetTokenAndNewPassword 重置密码参数JSON
+     * @param smsTokenAndNewPassword 重置密码参数JSON
      * <pre>
      *     {
-     *         userId:用户ID,
-     *         resetToken:重置密码Token,
+     *         smsToken:重置密码用短信验证码Token,
+     *         smsVCode:短信验证码,
      *         newPassword:新密码
      *     }
      * </pre>
@@ -224,7 +303,55 @@ public class SysAuthController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = {"/resetpassword"})
-    public MessageResponse resetPassword(@RequestBody String resetTokenAndNewPassword) {
-        return null;
+    public MessageResponse resetPassword(@RequestBody String smsTokenAndNewPassword, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(smsTokenAndNewPassword)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            ResetPasswordParam resetParam = null;
+            try {
+                String paramStr = URLDecoder.decode(smsTokenAndNewPassword, "utf-8");
+                resetParam = JSON.parseObject(paramStr, ResetPasswordParam.class);
+                if (null == resetParam
+                        || WzStringUtil.isBlank(resetParam.getSmsVCode())
+                        || WzStringUtil.isBlank(resetParam.getSmsToken())
+                        || WzStringUtil.isBlank(resetParam.getNewPassword())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 验证短信验证码
+                // 获得预存短信验证码
+                String vCode = (String) redisClient.valueOperations().get(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
+                // 短信验证码过期报错
+                if (WzStringUtil.isBlank(vCode)) {
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
+                }
+                // 验证码不一致报错
+                if (!vCode.equals(resetParam.getSmsVCode())) {
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
+                }
+                // 只要进行验证后，不管成功失败均将之前验证码作废
+                redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 获得用户Token
+            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
+            SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+            SysUser updateVo = new SysUser();
+            updateVo.setId(sue.getId());
+            updateVo.setPassword(resetParam.getNewPassword());
+            updateVo.setUpdateUser(sue.getId());
+            // 更新密码
+            String smsVCode = WzCheckCodeUtil.makeDCode(6);
+            String smsVCodeToken = WzUniqueValUtil.makeUUID();
+            // 短信验证码2分钟有效
+            redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE + smsVCodeToken, smsVCode, 120, TimeUnit.SECONDS);
+            Map<String, String> smsTokenMap = new HashMap<String, String>();
+            smsTokenMap.put(WzConstants.KEY_SMS_VCODE_TOKEN, smsVCodeToken);
+            return new MessageResponse(RunningResult.SUCCESS, smsTokenMap);
+        }
     }
 }

@@ -16,3 +16,9 @@ localsetting:
   download-prefix: http://127.0.0.1:8080/upload
   platform-type: mobile
   login-overtime-sec: 300
+  sms:
+    url: http://112.74.76.186:8030/service/httpService/httpInterface.do
+    username: JSM41961
+    password: 5tjfzvne
+    verycode: upxg5dedtrk2
+    tempid1: JSM41961-0001
