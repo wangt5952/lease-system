@@ -32,9 +32,9 @@ public interface SysUserService {
 
     /**
      * 修改用户信息.
-     * @param res 新的用户信息
+     * @param userInfo 新的用户信息
      */
-    public void updateSysUser(SysUser res);
+    public void updateSysUser(SysUser userInfo);
 
     /**
      * 批量删除用户.

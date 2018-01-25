@@ -40,17 +40,26 @@ public class SysAuthServcieImpl implements SysAuthService {
         } else {
             SysUserExt sue = sysUserLs.get(0);
             // 验证用户
-            // 如果登录时间和当前时间相差超过5分钟，则作为“非法请求”
-            if ((System.currentTimeMillis() - loginTime) > 120000) {
-                throw new BizException(RunningResult.UNAUTHORIZED);
-            }
             // 验证用户名和密码是否正确
-            String chkStr = loginName + sue.getPassword() + loginTime;
-            if (authStr.equals(WzEncryptUtil.getMD5(chkStr, true))) {
+            if (verifyUser(loginName, sue.getPassword(), authStr, loginTime)) {
                 return sue;
             } else {
                 throw new BizException(RunningResult.NAME_OR_PASSWORD_WRONG);
             }
+        }
+    }
+
+    @Override
+    public boolean verifyUser(String loginName, String password, String authStr, long authTime) {
+        // 如果登录时间和当前时间相差超过2分钟，则报错“认证超时”
+        if ((System.currentTimeMillis() - authTime) > 120000) {
+            throw new BizException(RunningResult.AUTH_OVER_TIME);
+        }
+        String chkStr = loginName + password + authTime;
+        if (authStr.equals(WzEncryptUtil.getMD5(chkStr, true))) {
+            return true;
+        } else {
+            throw new BizException(RunningResult.NAME_OR_PASSWORD_WRONG);
         }
     }
 }

@@ -31,9 +31,9 @@ public interface SysRoleService {
 
     /**
      * 修改角色信息.
-     * @param res 新的角色信息
+     * @param roleInfo 新的角色信息
      */
-    public void updateSysRole(SysRole res);
+    public void updateSysRole(SysRole roleInfo);
 
     /**
      * 批量删除角色.
