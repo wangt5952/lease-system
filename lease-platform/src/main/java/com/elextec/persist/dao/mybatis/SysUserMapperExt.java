@@ -1,5 +1,6 @@
 package com.elextec.persist.dao.mybatis;
 
+import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
@@ -12,4 +13,8 @@ public interface SysUserMapperExt extends SysUserMapper {
      * @return 用户扩展信息列表
      */
     List<SysUserExt> login(SysUserExample example);
+
+    void refUserAndRoles(SysRefUserRoleKey sysRefUserRoleKey);
+
+    void deleteUserAndRoles(String userId);
 }

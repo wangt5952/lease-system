@@ -12,7 +12,7 @@ logging:
 localsetting:
   cors:
     flag: true
-  upload-root: D:/myproject/lease-system/lease-platform/upload
+  upload-root: C:/myproject/lease-system/lease-platform/upload
   download-prefix: http://127.0.0.1:8080/upload
   platform-type: mobile
   login-overtime-sec: 300
