@@ -105,7 +105,7 @@ public class SysUserServcieImpl implements SysUserService {
         int i = 0;
         String userId = params.getUserId();
         String[] rolesIds = params.getRoleIds().split(",");
-        SysRefUserRoleKey sysRefUserRoleKey = null;
+        SysRefUserRoleKey sysRefUserRoleKey = new SysRefUserRoleKey();
         if(rolesIds.length > 0){
             try{
                 //删除用户原来的ROLE

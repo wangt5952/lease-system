@@ -102,7 +102,7 @@ public class SysRoleServcieImpl implements SysRoleService {
         int i = 0;
         String roleId = params.getRoleId();
         String[] resourceIds = params.getResources().split(",");
-        SysRefRoleResourcesKey sysRefRoleResourcesKey = null;
+        SysRefRoleResourcesKey sysRefRoleResourcesKey = new SysRefRoleResourcesKey();
         if(resourceIds.length > 0){
             try{
                 //删除角色原来的Resources
