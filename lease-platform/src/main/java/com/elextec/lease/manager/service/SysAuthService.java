@@ -3,6 +3,8 @@ package com.elextec.lease.manager.service;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
+import java.util.Map;
+
 /**
  * 接口 权限控制Service.
  * Created by wangtao on 2018/1/16.
@@ -13,9 +15,9 @@ public interface SysAuthService {
      * @param loginName 用户名或手机号码
      * @param authStr 验证字符串
      * @param loginTime 登录时间
-     * @return 查询到的用户信息
+     * @return 用户登录后的必备信息
      */
-    public SysUserExt login(String loginName, String authStr, long loginTime);
+    public Map<String, Object> login(String loginName, String authStr, long loginTime);
 
     /**
      * 用户权限认证.

@@ -16,6 +16,8 @@ public class WzConstants {
     public static final String KEY_LOGIN_TOKEN = "key_login_token";
     /** Key 登录用户详细信息. */
     public static final String KEY_USER_INFO = "key_user_info";
+    /** Key 登录用户可用资源信息. */
+    public static final String KEY_RES_INFO = "key_res_info";
 
     /*
      * 短信相关Key.

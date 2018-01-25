@@ -14,6 +14,7 @@ public enum RunningResult {
     PARAM_ANALYZE_ERROR("40104", "请求参数解析失败"),
     PARAM_VERIFY_ERROR("40105", "请求参数验证失败"),
     AUTH_OVER_TIME("40106", "认证已超时"),
+    NO_PERMISSION("40107", "您无权使用该系统"),
     FORBIDDEN("403", "禁止访问"),
     SERVER_ERROR("500", "服务器错误"),
     DB_ERROR("50001", "数据库处理错误"),

@@ -94,7 +94,25 @@ public class SysAuthController extends BaseController {
      *                 createTime:创建时间,
      *                 updateUser:更新人,
      *                 updateTime:更新时间
-     *             }
+     *             },
+     *             key_res_info:[
+     *                 {
+     *                     id:资源ID,
+     *                     res_code:资源Code,
+     *                     res_name:资源名称,
+     *                     res_type:资源类型,
+     *                     res_url:请求地址或页面名,
+     *                     res_sort:分组排序（通过分组排序将菜单组排序后，菜单组内通过级别进行排序）,
+     *                     show_flag:是否显示,
+     *                     parent:父级ID（最上级为null）,
+     *                     level:级别,
+     *                     create_user:创建人,
+     *                     create_time:创建时间,
+     *                     update_user:更新人,
+     *                     update_time:更新时间
+     *                 },
+     *                 ... ...
+     *             ]
      *         }
      *     }
      * </pre>
@@ -121,22 +139,23 @@ public class SysAuthController extends BaseController {
             }
 
             // 验证用户并返回用户信息
-            SysUserExt userExt = sysAuthService.login(loginParam.getLoginName(), loginParam.getLoginAuthStr(), loginParam.getLoginTime());
+            Map<String, Object> loginVo = sysAuthService.login(loginParam.getLoginName(), loginParam.getLoginAuthStr(), loginParam.getLoginTime());
             // 组织登录返回信息
             Map<String, Object> loginInfo = new HashMap<String, Object>();
             // 登录Token
             // 生成登录token
             String loginToken = WzUniqueValUtil.makeUUID();
             loginInfo.put(WzConstants.KEY_LOGIN_TOKEN, loginToken);
-            // 设置登录用户信息
-            loginInfo.put(WzConstants.KEY_USER_INFO, userExt);
+            // 设置登录信息
+            loginInfo.put(WzConstants.KEY_USER_INFO, loginVo.get(WzConstants.KEY_USER_INFO));
+            loginInfo.put(WzConstants.KEY_RES_INFO, loginVo.get(WzConstants.KEY_RES_INFO));
             // 设置超时时间
-            Integer overtime = 900;
+            Integer overtime = 5;
             if (WzStringUtil.isNumeric(loginOvertime)) {
                 overtime = Integer.parseInt(loginOvertime);
             }
             // 登录成功，保存到Redis中
-            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + loginToken, userExt, overtime, TimeUnit.SECONDS);
+            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.MINUTES);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, loginInfo);
             return mr;

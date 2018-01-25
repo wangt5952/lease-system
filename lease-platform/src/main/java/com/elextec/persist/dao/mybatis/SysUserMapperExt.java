@@ -14,7 +14,15 @@ public interface SysUserMapperExt extends SysUserMapper {
      */
     List<SysUserExt> login(SysUserExample example);
 
+    /**
+     * 为用户分配角色
+     * @param sysRefUserRoleKey 用户和角色对
+     */
     void refUserAndRoles(SysRefUserRoleKey sysRefUserRoleKey);
 
+    /**
+     * 删除用户所有角色.
+     * @param userId 用户ID
+     */
     void deleteUserAndRoles(String userId);
 }
