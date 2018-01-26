@@ -185,6 +185,9 @@ public class SysRoleController extends BaseController {
     /**
      * 批量删除角色.
      * @param roles 待删除的角色列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
      * @return 批量删除角色返回
      * <pre>
      *     {
@@ -266,6 +269,9 @@ public class SysRoleController extends BaseController {
     /**
      * 根据ID获取角色信息
      * @param id 角色ID
+     * <pre>
+     *     [id]
+     * </pre>
      * @return 根据ID获取角色返回
      * <pre>
      *     {

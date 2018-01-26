@@ -222,6 +222,9 @@ public class SysUserController extends BaseController {
     /**
      * 批量删除用户.
      * @param users 待删除的用户列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
      * @return 批量删除用户返回
      * <pre>
      *     {
@@ -303,6 +306,9 @@ public class SysUserController extends BaseController {
     /**
      * 根据ID获取用户信息
      * @param id 用户ID
+     * <pre>
+     *     [id]
+     * </pre>
      * @return 根据ID获取用户信息返回
      * <pre>
      *     {
