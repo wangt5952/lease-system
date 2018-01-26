@@ -185,7 +185,14 @@ public class SysUserController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return
+     * @return 修改用户信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/modifyuser")
     public MessageResponse modifyUser(@RequestBody String user) {
@@ -215,7 +222,14 @@ public class SysUserController extends BaseController {
     /**
      * 批量删除用户.
      * @param users 待删除的用户列表JSON
-     * @return
+     * @return 批量删除用户信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/deleteusers")
     public MessageResponse deleteUsers(@RequestBody String users) {
@@ -251,7 +265,14 @@ public class SysUserController extends BaseController {
      *         roleIds:角色ID，多个以逗号隔开，例：角色1，角色2，角色3
      *     }
      * </pre>
-     * @return
+     * @return 给用户分配角色返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/refuserandroles")
     public MessageResponse refUserAndRoles(@RequestBody String userAndRoles) {
@@ -281,7 +302,34 @@ public class SysUserController extends BaseController {
     /**
      * 根据ID获取用户信息
      * @param id 用户ID
-     * @return
+     * @return 根据ID获取用户信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *                 id:ID,
+     *                 login_name:用户名,
+     *                 user_mobile:用户手机号码,
+     *                 user_type:用户类型（平台、企业或个人）,
+     *                 user_icon:用户LOGO路径,
+     *                 password:密码,
+     *                 nick_name:昵称,
+     *                 user_name:姓名,
+     *                 user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
+     *                 user_pid:身份证号,
+     *                 user_ic_front:身份证正面照片路径,
+     *                 user_ic_back:身份证背面照片路径,
+     *                 user_ic_group:用户手举身份证合照路径,
+     *                 org_id:所属组织ID,
+     *                 user_status:用户状态（正常、冻结、作废）,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             }
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/getByPrimaryKey")
     public MessageResponse getByPrimaryKey(@RequestBody String id) {

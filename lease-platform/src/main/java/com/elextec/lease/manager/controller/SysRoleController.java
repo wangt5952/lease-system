@@ -148,7 +148,14 @@ public class SysRoleController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return
+     * @return 修改角色信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/modifyrole")
     public MessageResponse modifyRole(@RequestBody String role) {
@@ -178,7 +185,14 @@ public class SysRoleController extends BaseController {
     /**
      * 批量删除角色.
      * @param roles 待删除的角色列表JSON
-     * @return
+     * @return 批量删除返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/deleteroles")
     public MessageResponse deleteRoles(@RequestBody String roles) {
@@ -214,7 +228,14 @@ public class SysRoleController extends BaseController {
      *         resources:资源ID，多个以逗号隔开，例：资源1，资源2，资源3
      *     }
      * </pre>
-     * @return
+     * @return 给角色分配资源返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/refroleandresources")
     public MessageResponse refRoleAndResources(@RequestBody String roleAndResources) {
@@ -244,7 +265,22 @@ public class SysRoleController extends BaseController {
     /**
      * 根据ID获取角色信息
      * @param id 角色ID
-     * @return
+     * @return 根据ID获取角色信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *                 id:ID,
+     *                 role_name:角色名,
+     *                 role_introduce:角色说明,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             }
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/getByPrimaryKey")
     public MessageResponse getByPrimaryKey(@RequestBody String id) {

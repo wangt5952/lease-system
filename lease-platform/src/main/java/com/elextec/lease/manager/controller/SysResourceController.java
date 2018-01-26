@@ -171,7 +171,14 @@ public class SysResourceController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return
+     * @return 修改资源信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/manager/modifyresource")
     public MessageResponse modifyResource(@RequestBody String resource) {
@@ -201,7 +208,14 @@ public class SysResourceController extends BaseController {
     /**
      * 批量删除资源.
      * @param resources 待删除的资源列表JSON
-     * @return
+     * @return 批量删除资源返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/manager/deleteresources")
     public MessageResponse deleteResources(@RequestBody String resources) {
@@ -231,7 +245,28 @@ public class SysResourceController extends BaseController {
     /**
      * 根据ID获取资源信息
      * @param id 资源ID
-     * @return
+     * @return 根据ID获取资源信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *                 id:ID,
+     *                 res_code:资源编码,
+     *                 res_name:资源名,
+     *                 res_type:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 res_url:资源请求URL,
+     *                 res_sort:排序,
+     *                 show_flag:显示标志（显示、不显示）,
+     *                 parent:上级资源（Root为空）,
+     *                 level:级别,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             }
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/getByPrimaryKey")
     public MessageResponse getByPrimaryKey(@RequestBody String id) {
