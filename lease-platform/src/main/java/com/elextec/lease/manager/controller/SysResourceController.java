@@ -55,29 +55,24 @@ public class SysResourceController extends BaseController {
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:{
-     *             currPage:当前页,
-     *             pageSize:每页记录数,
-     *             total:总记录数,
-     *             rows:[
-     *                 {
-     *                     id:ID,
-     *                     res_code:资源编码,
-     *                     res_name:资源名,
-     *                     res_type:资源类型（目录、菜单、页面、功能或按钮）,
-     *                     res_url:资源请求URL,
-     *                     res_sort:排序,
-     *                     show_flag:显示标志（显示、不显示）,
-     *                     parent:上级资源（Root为空）,
-     *                     level:级别,
-     *                     create_user:创建人,
-     *                     create_time:创建时间,
-     *                     update_user:更新人,
-     *                     update_time:更新时间
-     *                 },
-     *                 ... ...
-     *             ]
-     *         }
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 res_code:资源编码,
+     *                 res_name:资源名,
+     *                 res_type:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 res_url:资源请求URL,
+     *                 res_sort:排序,
+     *                 show_flag:显示标志（显示、不显示）,
+     *                 parent:上级资源（Root为空）,
+     *                 level:级别,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             },
+     *             ... ...
+     *         ]
      *     }
      * </pre>
      */
@@ -130,7 +125,7 @@ public class SysResourceController extends BaseController {
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
@@ -176,12 +171,12 @@ public class SysResourceController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return 修改结果
+     * @return 修改资源信息返回
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:""
+     *         respData:
      *     }
      * </pre>
      */
@@ -213,7 +208,7 @@ public class SysResourceController extends BaseController {
     /**
      * 批量删除资源.
      * @param resources 待删除的资源列表JSON
-     * @return 删除结果
+     * @return 批量删除资源返回
      * <pre>
      *     {
      *         code:返回Code,
@@ -243,6 +238,58 @@ public class SysResourceController extends BaseController {
             sysResourceService.deleteSysResources(resIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 根据ID获取资源信息
+     * @param id 资源ID
+     * @return 根据ID获取资源信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *                 id:ID,
+     *                 res_code:资源编码,
+     *                 res_name:资源名,
+     *                 res_type:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 res_url:资源请求URL,
+     *                 res_sort:排序,
+     *                 show_flag:显示标志（显示、不显示）,
+     *                 parent:上级资源（Root为空）,
+     *                 level:级别,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/getByPrimaryKey")
+    public MessageResponse getByPrimaryKey(@RequestBody String id) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(id)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> resId = null;
+            try {
+                String paramStr = URLDecoder.decode(id, "utf-8");
+                resId = JSON.parseArray(paramStr, String.class);
+                if (null == resId) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+
+            SysResources user = sysResourceService.getByPrimaryKey(resId.get(0));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
             return mr;
         }
     }

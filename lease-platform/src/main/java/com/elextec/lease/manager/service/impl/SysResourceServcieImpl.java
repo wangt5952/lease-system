@@ -96,4 +96,9 @@ public class SysResourceServcieImpl implements SysResourceService {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
         }
     }
+
+    @Override
+    public SysResources getByPrimaryKey(String id) {
+        return sysResourcesMapperExt.selectByPrimaryKey(id);
+    }
 }

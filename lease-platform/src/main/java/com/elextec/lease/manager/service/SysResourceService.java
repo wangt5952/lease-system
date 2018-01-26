@@ -40,4 +40,10 @@ public interface SysResourceService {
      * @param ids 待删除的资源ID列表
      */
     public void deleteSysResources(List<String> ids);
+
+    /**
+     * 根据ID查询资源信息
+     * @param id 资源ID
+     * */
+    public SysResources getByPrimaryKey(String id);
 }
