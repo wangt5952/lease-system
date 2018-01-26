@@ -83,11 +83,13 @@ public class SysUserServcieImpl implements SysUserService {
     }
 
     @Override
+    @Transactional
     public void updateSysUser(SysUser res) {
         sysUserMapperExt.updateByPrimaryKeySelective(res);
     }
 
     @Override
+    @Transactional
     public void deleteSysUser(List<String> ids) {
         int i = 0;
         try {
@@ -101,7 +103,7 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     @Transactional
-    public void refUserAndRoles(RefUserRolesParam params){
+    public void refSysUserAndRoles(RefUserRolesParam params){
         int i = 0;
         String userId = params.getUserId();
         String[] rolesIds = params.getRoleIds().split(",");
@@ -123,7 +125,7 @@ public class SysUserServcieImpl implements SysUserService {
     }
 
     @Override
-    public SysUser getByPrimaryKey(String id) {
+    public SysUser getSysUserByPrimaryKey(String id) {
         return sysUserMapperExt.selectByPrimaryKey(id);
     }
 }

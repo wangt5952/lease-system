@@ -15,6 +15,8 @@ import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.field.enums.MfrsType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizManufacturer;
+import com.elextec.persist.model.mybatis.SysResources;
+import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,58 +47,15 @@ public class BizMfrsController extends BaseController {
     private BizManufacturerService bizManufacturerService;
 
     /**
-     * 根据id查询单个对象
-     * {
-     *     id:id
-     * }
-     * @param id 页面传过来的id
-     * @return
-     * <pre>
-     *     {
-     *         code:返回Code,
-     *         message:返回消息,
-     *         respData:[
-     *             {
-     *                 id:ID,
-     *                 mfrs_name:制造商名称,
-     *                 mfrs_type:制造商类型（车辆、电池、配件）,
-     *                 mfrs_introduce:制造商介绍,
-     *                 mfrs_address:制造商地址,
-     *                 mfrs_contacts:联系人（多人用 , 分割）,
-     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
-     *                 mfrs_status:制造商状态（正常、冻结、作废）,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
-     *             },
-     *             ... ...
-     *         ]
-     *     }
-     * </pre>
-     */
-    @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
-    public MessageResponse getByPK(@RequestBody String id){
-        try {
-            if (id != null) {
-                JSONObject jsonObject = JSON.parseObject(id);
-                return bizManufacturerService.selectByPrimaryKey(jsonObject.get("id").toString());
-            } else {
-                throw new BizException(RunningResult.NO_PARAM);
-            }
-        } catch (Exception e) {
-            throw new BizException(RunningResult.PARAM_ANALYZE_ERROR);
-        }
-    }
-
-    /**
      * 查询制造商.
-     * {
-     *      currPage:当前页,
-     *      pageSize:每页记录数
-     * }
      * @param paramAndPaging 查询及分页参数JSON
-     * @return
+     * <pre>
+     *     {
+     *         currPage:当前页,
+     *         pageSize:每页记录数
+     *     }
+     * </pre>
+     * @return 查询结果列表
      * <pre>
      *     {
      *         code:返回Code,
@@ -121,8 +80,8 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/listmfrs",method = RequestMethod.POST)
-    public MessageResponse listMfrs(@RequestBody String paramAndPaging) {
+    @RequestMapping(value = "/list",method = RequestMethod.POST)
+    public MessageResponse list(@RequestBody String paramAndPaging) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -139,28 +98,31 @@ public class BizMfrsController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<BizManufacturer> resPageResp = bizManufacturerService.paging(true,pagingParam);
+            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.list(true, pagingParam);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, resPageResp);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, mfrsPageResp);
             return mr;
         }
     }
 
     /**
      * 批量增加制造商.
-     * [
-     *      {
-     *                 mfrs_name:制造商名称,
-     *                 mfrs_introduce:制造商介绍,
-     *                 mfrs_address:制造商地址,
-     *                 mfrs_contacts:联系人（多人用 , 分割）,
-     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
-     *                 create_user:创建人,
-     *                 update_user:更新人
-     *      },
-     * ]
-     * @param mfrs 制造商信息列表JSON
-     * @return
+     * @param addParam 批量新增参数列表JSON
+     * <pre>
+     *     [
+     *         {
+     *             mfrs_name:制造商名称,
+     *             mfrs_introduce:制造商介绍,
+     *             mfrs_address:制造商地址,
+     *             mfrs_contacts:联系人（多人用 , 分割）,
+     *             mfrs_phone:联系电话（多个电话用 , 分割）,
+     *             create_user:创建人,
+     *             update_user:更新人
+     *         },
+     *         ... ...
+     *     ]
+     * </pre>
+     * @return 批量新增结果
      * <pre>
      *     {
      *         code:返回Code,
@@ -169,54 +131,46 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/addmfrs",method = RequestMethod.POST)
-    public MessageResponse addUsers(@RequestBody String mfrs) {
-        if (WzStringUtil.isBlank(mfrs)) {
-            //当参数为空时返回给前台
-            return new MessageResponse(RunningResult.NO_PARAM);
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    public MessageResponse add(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
         } else {
-            List<Map<String,Object>> list = JSON.parseObject(mfrs,new TypeReference<List<Map<String,Object>>>(){});
-            List<BizManufacturer> bizManufacturerList = new ArrayList<BizManufacturer>();
-            if (list.size() != 0) {
-                for (int i = 0; i < list.size(); i++) {
-                    BizManufacturer biz = new BizManufacturer();
-                    biz.setId(WzUniqueValUtil.makeUUID());
-                    biz.setMfrsName(list.get(i).get("mfrsName").toString());
-                    biz.setMfrsType(MfrsType.VEHICLE);
-                    biz.setMfrsIntroduce(list.get(i).get("mfrsIntroduce").toString());
-                    biz.setMfrsAddress(list.get(i).get("mfrsAddress").toString());
-                    biz.setMfrsContacts(list.get(i).get("mfrsContacts").toString());
-                    biz.setMfrsPhone(list.get(i).get("mfrsPhone").toString());
-                    biz.setMfrsStatus(RecordStatus.NORMAL.toString());
-                    biz.setCreateUser(list.get(i).get("createUser").toString());
-                    biz.setCreateTime(new Date());
-                    biz.setUpdateUser(list.get(i).get("updateUser").toString());
-                    bizManufacturerList.add(biz);
+            // 参数解析错误报“参数解析错误”
+            List<BizManufacturer> mfrsInfos = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                mfrsInfos = JSON.parseArray(paramStr, BizManufacturer.class);
+                if (null == mfrsInfos) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                return bizManufacturerService.insert(bizManufacturerList);
-            } else {
-                //前台参数解析错误
-                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
+            bizManufacturerService.insertBizManufacturers(mfrsInfos);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
         }
     }
 
     /**
      * 修改制造商信息.
-     * [
-     *      {
-     *                 id:ID,
-     *                 mfrs_name:制造商名称,
-     *                 mfrs_introduce:制造商介绍,
-     *                 mfrs_address:制造商地址,
-     *                 mfrs_contacts:联系人（多人用 , 分割）,
-     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
-     *                 create_user:创建人,
-     *                 update_user:更新人
-     *      },
-     * ]
-     * @param mfrs 制造商信息JSON
-     * @return
+     * @param modifyParam 修改参数JSON
+     * <pre>
+     *     {
+     *         id:ID,
+     *         mfrs_name:制造商名称,
+     *         mfrs_introduce:制造商介绍,
+     *         mfrs_address:制造商地址,
+     *         mfrs_contacts:联系人（多人用 , 分割）,
+     *         mfrs_phone:联系电话（多个电话用 , 分割）,
+     *         update_user:更新人
+     *     }
+     * </pre>
+     * @return 修改结果
      * <pre>
      *     {
      *         code:返回Code,
@@ -225,50 +179,38 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/modifymfrs",method = RequestMethod.POST)
-    public MessageResponse modifyMfrs(@RequestBody String mfrs) {
-        try {
-            String data = URLDecoder.decode(mfrs, "utf-8");
-            if(WzStringUtil.isBlank(mfrs)){
-                return new MessageResponse(RunningResult.NO_PARAM);
-            } else {
-                List<Map<String,Object>> list = JSON.parseObject(data,new TypeReference<List<Map<String,Object>>>(){});
-                if (list.size() != 0) {
-                    List<BizManufacturer> list1 = new ArrayList<BizManufacturer>();
-                    for (int i = 0; i < list.size(); i++) {
-                        BizManufacturer biz = new BizManufacturer();
-                        biz.setId(list.get(i).get("id").toString());
-                        biz.setMfrsName(list.get(i).get("mfrsName").toString());
-                        biz.setMfrsType(MfrsType.BATTERY);
-                        biz.setMfrsIntroduce(list.get(i).get("mfrsIntroduce").toString());
-                        biz.setMfrsAddress(list.get(i).get("mfrsAddress").toString());
-                        biz.setMfrsContacts(list.get(i).get("mfrsContacts").toString());
-                        biz.setMfrsPhone(list.get(i).get("mfrsPhone").toString());
-                        biz.setMfrsStatus(RecordStatus.NORMAL.toString());
-                        biz.setCreateUser(list.get(i).get("createUser").toString());
-                        biz.setUpdateUser(list.get(i).get("updateUser").toString());
-                        list1.add(biz);
-                    }
-                    return bizManufacturerService.updateByPrimaryKey(list1);
-                } else {
+    @RequestMapping(value = "/modify",method = RequestMethod.POST)
+    public MessageResponse modify(@RequestBody String modifyParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(modifyParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            BizManufacturer mfrsInfo = null;
+            try {
+                String paramStr = URLDecoder.decode(modifyParam, "utf-8");
+                mfrsInfo = JSON.parseObject(paramStr, BizManufacturer.class);
+                if (null == mfrsInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            throw new BizException(RunningResult.PARAM_ANALYZE_ERROR);
+            bizManufacturerService.updateBizManufacturer(mfrsInfo);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
         }
     }
 
     /**
      * 批量删除制造商.
-     * [
-     *      {
-     *          id:"id"
-     *      }
-     * ]
-     * @param mfrs 待删除的制造商列表JSON
-     * @return
+     * @param deleteParam 删除ID列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
+     * @return 批量删除结果
      * <pre>
      *     {
      *         code:返回Code,
@@ -277,22 +219,82 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/deletemfrs",method = RequestMethod.POST)
-    public MessageResponse deleteUsers(@RequestBody String mfrs) {
-        if (WzStringUtil.isBlank(mfrs)) {
-            return new MessageResponse(RunningResult.NO_PARAM);
+    @RequestMapping(value = "/delete",method = RequestMethod.POST)
+    public MessageResponse delete(@RequestBody String deleteParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(deleteParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
         } else {
-            List<Map<String,Object>> list = JSON.parseObject(mfrs,new TypeReference<List<Map<String,Object>>>(){});
-            if (list.size() != 0) {
-                List<String> list1 = new ArrayList<String>();
-                for (int i = 0; i < list.size(); i++) {
-                    String id = list.get(i).get("id").toString();
-                    list1.add(id);
+            // 参数解析错误报“参数解析错误”
+            List<String> mfrsIds = null;
+            try {
+                String paramStr = URLDecoder.decode(deleteParam, "utf-8");
+                mfrsIds = JSON.parseArray(paramStr, String.class);
+                if (null == mfrsIds || 0 == mfrsIds.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                return bizManufacturerService.deleteByPrimaryKey(list1);
-            } else {
-                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
+            bizManufacturerService.deleteBizManufacturers(mfrsIds);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 根据id查询制造商信息.
+     * @param id 查询ID
+     * <pre>
+     *     [id]
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *             id:ID,
+     *             mfrs_name:制造商名称,
+     *             mfrs_type:制造商类型（车辆、电池、配件）,
+     *             mfrs_introduce:制造商介绍,
+     *             mfrs_address:制造商地址,
+     *             mfrs_contacts:联系人（多人用 , 分割）,
+     *             mfrs_phone:联系电话（多个电话用 , 分割）,
+     *             mfrs_status:制造商状态（正常、冻结、作废）,
+     *             create_user:创建人,
+     *             create_time:创建时间,
+     *             update_user:更新人,
+     *             update_time:更新时间
+     *         }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
+    public MessageResponse getByPK(@RequestBody String id) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(id)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> mfrsId = null;
+            try {
+                String paramStr = URLDecoder.decode(id, "utf-8");
+                mfrsId = JSON.parseArray(paramStr, String.class);
+                if (null == mfrsId || 0 == mfrsId.size() || WzStringUtil.isBlank(mfrsId.get(0))) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+
+            BizManufacturer mfrs = bizManufacturerService.getBizManufacturerByPrimaryKey(mfrsId.get(0));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, mfrs);
+            return mr;
         }
     }
 }

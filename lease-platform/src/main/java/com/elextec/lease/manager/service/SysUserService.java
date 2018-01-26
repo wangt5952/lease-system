@@ -46,11 +46,11 @@ public interface SysUserService {
      * 给用户分配角色
      * @param params 用户对应角色map
      * */
-    public void refUserAndRoles(RefUserRolesParam params);
+    public void refSysUserAndRoles(RefUserRolesParam params);
 
     /**
      * 根据ID查询用户信息
      * @param id 用户ID
      * */
-    public SysUser getByPrimaryKey(String id);
+    public SysUser getSysUserByPrimaryKey(String id);
 }

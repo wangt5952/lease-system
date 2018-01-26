@@ -43,14 +43,14 @@ public class SysResourceController extends BaseController {
 
     /**
      * 查询资源.
-     * @param paramAndPaging 分页参数JSON
+     * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
      *         currPage:当前页,
      *         pageSize:每页记录数
      *     }
      * </pre>
-     * @return 资源列表
+     * @return 查询结果列表
      * <pre>
      *     {
      *         code:返回Code,
@@ -77,8 +77,8 @@ public class SysResourceController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/manager/listresources")
-    public MessageResponse listRoles(@RequestBody String paramAndPaging) {
+    @RequestMapping(path = "/list")
+    public MessageResponse list(@RequestBody String paramAndPaging) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -104,7 +104,7 @@ public class SysResourceController extends BaseController {
 
     /**
      * 批量增加资源.
-     * @param resources 资源列表JSON
+     * @param addParam 批量新增参数JSON
      * <pre>
      *     [
      *         {
@@ -131,17 +131,17 @@ public class SysResourceController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/manager/addresources")
-    public MessageResponse addResources(@RequestBody String resources) {
+    @RequestMapping(path = "/add")
+    public MessageResponse add(@RequestBody String addParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(resources)) {
+        if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             List<SysResources> resInfos = null;
             try {
-                String paramStr = URLDecoder.decode(resources, "utf-8");
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
                 resInfos = JSON.parseArray(paramStr, SysResources.class);
                 if (null == resInfos) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -158,7 +158,7 @@ public class SysResourceController extends BaseController {
 
     /**
      * 修改资源信息.
-     * @param resource 资源信息JSON
+     * @param modifyParam 修改参数JSON
      * <pre>
      *     {
      *         id:ID,
@@ -183,17 +183,17 @@ public class SysResourceController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/manager/modifyresource")
-    public MessageResponse modifyResource(@RequestBody String resource) {
+    @RequestMapping(path = "/modify")
+    public MessageResponse modify(@RequestBody String modifyParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(resource)) {
+        if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             SysResources resInfo = null;
             try {
-                String paramStr = URLDecoder.decode(resource, "utf-8");
+                String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 resInfo = JSON.parseObject(paramStr, SysResources.class);
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -210,11 +210,11 @@ public class SysResourceController extends BaseController {
 
     /**
      * 批量删除资源.
-     * @param resources 待删除的资源列表JSON
+     * @param deleteParam 删除ID列表JSON
      * <pre>
      *     [ID1,ID2,......]
      * </pre>
-     * @return 批量删除资源返回
+     * @return 批量删除结果
      * <pre>
      *     {
      *         code:返回Code,
@@ -223,17 +223,17 @@ public class SysResourceController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/manager/deleteresources")
-    public MessageResponse deleteResources(@RequestBody String resources) {
+    @RequestMapping(path = "/delete")
+    public MessageResponse delete(@RequestBody String deleteParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(resources)) {
+        if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             List<String> resIds = null;
             try {
-                String paramStr = URLDecoder.decode(resources, "utf-8");
+                String paramStr = URLDecoder.decode(deleteParam, "utf-8");
                 resIds = JSON.parseArray(paramStr, String.class);
                 if (null == resIds) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -250,11 +250,11 @@ public class SysResourceController extends BaseController {
 
     /**
      * 根据ID获取资源信息.
-     * @param id 资源ID
+     * @param id 查询ID
      * <pre>
      *     [id]
      * </pre>
-     * @return 根据ID获取资源信息返回
+     * @return 查询结果
      * <pre>
      *     {
      *         code:返回Code,
@@ -278,8 +278,8 @@ public class SysResourceController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/getByPrimaryKey")
-    public MessageResponse getByPrimaryKey(@RequestBody String id) {
+    @RequestMapping(path = "/getbypk")
+    public MessageResponse getByPK(@RequestBody String id) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -290,16 +290,16 @@ public class SysResourceController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(id, "utf-8");
                 resId = JSON.parseArray(paramStr, String.class);
-                if (null == resId) {
+                if (null == resId || 0 == resId.size() || WzStringUtil.isBlank(resId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 
-            SysResources user = sysResourceService.getByPrimaryKey(resId.get(0));
+            SysResources res = sysResourceService.getSysResourceByPrimaryKey(resId.get(0));
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, res);
             return mr;
         }
     }
