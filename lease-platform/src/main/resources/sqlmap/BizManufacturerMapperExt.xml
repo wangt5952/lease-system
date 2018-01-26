@@ -2,9 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.BizManufacturerMapperExt">
 
-    <!--分页查询-->
-    <select id="findAll" parameterType="java.util.Map" resultMap="BaseResultMap">
-        SELECT * FROM biz_manufacturer limit
+    <select id="getByName" parameterType="java.lang.String" resultType="com.elextec.persist.model.mybatis.BizManufacturer">
+        SELECT * FROM biz_manufacturer WHERE mfrs_name = #{mfrsName,jdbcType=VARCHAR}
     </select>
 
 </mapper>

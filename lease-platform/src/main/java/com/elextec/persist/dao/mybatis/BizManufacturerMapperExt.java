@@ -7,4 +7,11 @@ import java.util.Map;
 
 public interface BizManufacturerMapperExt extends BizManufacturerMapper {
 
+    /**
+     * 查询制造商名字
+     * @param mfrs_name
+     * @return
+     */
+    public BizManufacturer getByName(String mfrs_name);
+
 }

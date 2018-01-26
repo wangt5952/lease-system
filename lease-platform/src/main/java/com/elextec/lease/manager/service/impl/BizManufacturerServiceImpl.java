@@ -19,20 +19,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
 public class BizManufacturerServiceImpl implements BizManufacturerService {
 
-    /**日志*/
+    /*日志信息*/
     private final Logger logger = LoggerFactory.getLogger(BizManufacturerServiceImpl.class);
 
     @Autowired
     private BizManufacturerMapperExt bizManufacturerMapperExt;
 
     @Override
+    @Transactional
     public MessageResponse insert(List<BizManufacturer> list) throws BizException{
         try {
             for (BizManufacturer biz : list) {
-                bizManufacturerMapperExt.insert(biz);
+                if (bizManufacturerMapperExt.getByName(biz.getMfrsName()) == null) {
+                    bizManufacturerMapperExt.insert(biz);
+                } else {
+                    return new MessageResponse(RunningResult.UNAUTHORIZED,"制造商不能重复");
+                }
             }
             return new MessageResponse(RunningResult.SUCCESS);
         } catch (Exception e) {
@@ -56,7 +60,11 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     public MessageResponse updateByPrimaryKey(List<BizManufacturer> list) throws BizException{
         try {
             for (BizManufacturer biz: list) {
-                bizManufacturerMapperExt.updateByPrimaryKey(biz);
+                if ( bizManufacturerMapperExt.getByName(biz.getMfrsName()) == null || bizManufacturerMapperExt.getByName(biz.getMfrsName()).getId().equals(biz.getId())){
+                    bizManufacturerMapperExt.updateByPrimaryKey(biz);
+                } else {
+                    return new MessageResponse(RunningResult.UNAUTHORIZED,"已有该制造商，不能修改相同名称");
+                }
             }
             return new MessageResponse(RunningResult.SUCCESS);
         } catch (Exception e) {
@@ -110,3 +118,4 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
 
 
 }
+

@@ -15,7 +15,6 @@ import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.field.enums.MfrsType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizManufacturer;
-import com.elextec.persist.model.mybatis.SysResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,8 +46,34 @@ public class BizMfrsController extends BaseController {
 
     /**
      * 根据id查询单个对象
+     * {
+     *     id:id
+     * }
      * @param id 页面传过来的id
      * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 mfrs_name:制造商名称,
+     *                 mfrs_type:制造商类型（车辆、电池、配件）,
+     *                 mfrs_introduce:制造商介绍,
+     *                 mfrs_address:制造商地址,
+     *                 mfrs_contacts:联系人（多人用 , 分割）,
+     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
+     *                 mfrs_status:制造商状态（正常、冻结、作废）,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
      */
     @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
     public MessageResponse getByPK(@RequestBody String id){
@@ -68,8 +91,35 @@ public class BizMfrsController extends BaseController {
 
     /**
      * 查询制造商.
+     * {
+     *      currPage:当前页,
+     *      pageSize:每页记录数
+     * }
      * @param paramAndPaging 查询及分页参数JSON
      * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 mfrs_name:制造商名称,
+     *                 mfrs_type:制造商类型（车辆、电池、配件）,
+     *                 mfrs_introduce:制造商介绍,
+     *                 mfrs_address:制造商地址,
+     *                 mfrs_contacts:联系人（多人用 , 分割）,
+     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
+     *                 mfrs_status:制造商状态（正常、冻结、作废）,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
      */
     @RequestMapping(value = "/listmfrs",method = RequestMethod.POST)
     public MessageResponse listMfrs(@RequestBody String paramAndPaging) {
@@ -98,8 +148,26 @@ public class BizMfrsController extends BaseController {
 
     /**
      * 批量增加制造商.
+     * [
+     *      {
+     *                 mfrs_name:制造商名称,
+     *                 mfrs_introduce:制造商介绍,
+     *                 mfrs_address:制造商地址,
+     *                 mfrs_contacts:联系人（多人用 , 分割）,
+     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
+     *                 create_user:创建人,
+     *                 update_user:更新人
+     *      },
+     * ]
      * @param mfrs 制造商信息列表JSON
      * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
      */
     @RequestMapping(value = "/addmfrs",method = RequestMethod.POST)
     public MessageResponse addUsers(@RequestBody String mfrs) {
@@ -135,8 +203,27 @@ public class BizMfrsController extends BaseController {
 
     /**
      * 修改制造商信息.
+     * [
+     *      {
+     *                 id:ID,
+     *                 mfrs_name:制造商名称,
+     *                 mfrs_introduce:制造商介绍,
+     *                 mfrs_address:制造商地址,
+     *                 mfrs_contacts:联系人（多人用 , 分割）,
+     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
+     *                 create_user:创建人,
+     *                 update_user:更新人
+     *      },
+     * ]
      * @param mfrs 制造商信息JSON
      * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
      */
     @RequestMapping(value = "/modifymfrs",method = RequestMethod.POST)
     public MessageResponse modifyMfrs(@RequestBody String mfrs) {
@@ -175,8 +262,20 @@ public class BizMfrsController extends BaseController {
 
     /**
      * 批量删除制造商.
+     * [
+     *      {
+     *          id:"id"
+     *      }
+     * ]
      * @param mfrs 待删除的制造商列表JSON
      * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
      */
     @RequestMapping(value = "/deletemfrs",method = RequestMethod.POST)
     public MessageResponse deleteUsers(@RequestBody String mfrs) {
