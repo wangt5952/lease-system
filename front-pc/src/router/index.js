@@ -11,6 +11,9 @@ export default new Router({
       component: () => import('@/components/Layout'),
       children: [
         { path: '/organization', component: () => import('@/components/Organization') },
+        { path: '/resource', component: () => import('@/components/Resource') },
+        { path: '/role', component: () => import('@/components/Role') },
+        { path: '/user', component: () => import('@/components/User') },
         { path: '/user', component: () => import('@/components/User') },
         { path: '/manufacturer', component: () => import('@/components/Manufacturer') },
         { path: '/map', component: () => import('@/components/Map') },

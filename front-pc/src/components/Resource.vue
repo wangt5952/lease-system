@@ -2,17 +2,22 @@
   <div v-loading="loading" style="padding:10px;">
 
     <div>
-      <el-button icon="el-icon-plus" type="primary" size="medium" @click="showForm()">添加人员</el-button>
+      <el-button icon="el-icon-plus" type="primary" size="medium" @click="showForm()">添加资源</el-button>
     </div>
 
     <el-table :data="list" style="width: 100%;margin-top:10px;">
-      <el-table-column prop="loginName" label="用户名"></el-table-column>
-      <el-table-column prop="userMobile" label="手机号"></el-table-column>
-      <el-table-column prop="userType" label="用户类型"></el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
-      <el-table-column prop="nickName" label="昵称"></el-table-column>
-      <el-table-column prop="userName" label="姓名"></el-table-column>
-      <el-table-column prop="userRealNameAuthFlag" label="用户实名认证标志"></el-table-column>
+      <el-table-column prop="resCode" label="资源编码"></el-table-column>
+      <el-table-column prop="resName" label="资源名"></el-table-column>
+      <el-table-column prop="resType" label="资源类型"></el-table-column>
+      <el-table-column prop="resUrl" label="资源请求URL"></el-table-column>
+      <el-table-column prop="resSort" label="排序"></el-table-column>
+      <el-table-column prop="showFlag" label="显示标志"></el-table-column>
+      <el-table-column prop="parent" label="上级资源"></el-table-column>
+      <el-table-column prop="level" label="级别"></el-table-column>
+      <el-table-column prop="createUser" label="创建人"></el-table-column>
+      <el-table-column prop="createTime" label="创建时间"></el-table-column>
+      <el-table-column prop="updateUser" label="更新人"></el-table-column>
+      <el-table-column prop="updateTime" label="更新时间"></el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
@@ -35,11 +40,29 @@
 
     <el-dialog title="资源信息" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form :model="form" label-width="100px">
-        <el-form-item label="loginName">
-          <el-input v-model="form.loginName" auto-complete="off"></el-input>
+        <el-form-item label="资源编码">
+          <el-input v-model="form.resCode" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="userMobile">
-          <el-input v-model="form.userMobile" auto-complete="off"></el-input>
+        <el-form-item label="资源名">
+          <el-input v-model="form.resName" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="资源类型">
+          <el-input v-model="form.resType" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="资源请求URL">
+          <el-input v-model="form.resUrl" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input v-model="form.resSort" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="显示标志">
+          <el-input v-model="form.showFlag" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="上级资源">
+          <el-input v-model="form.parent" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="级别">
+          <el-input v-model="form.level" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -78,7 +101,7 @@ export default {
 
     async reload() {
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
+        const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
           currPage: this.currentPage, pageSize: this.pageSize
         })).body;
         if(code != '200') throw new Error(message);
@@ -103,7 +126,7 @@ export default {
     },
 
     showForm(form = { }) {
-      this.form = _.pick(form, ['id', 'loginName', 'userMobile']);
+      this.form = _.pick(form, ['id', 'resCode', 'resName', 'resType', 'resUrl', 'resSort', 'showFlag', 'parent', 'level']);
       this.formVisible = true;
     },
     closeForm() {
@@ -117,7 +140,7 @@ export default {
           await this.$http.put(`/api/user/${id}`, form);
         } else {
           const { ...form } = this.form;
-          const { code, message, respData } = (await this.$http.post('/api/manager/user/add', form)).body;
+          const { code, message, respData } = (await this.$http.post('/api/manager/res/add', form)).body;
           if(code != '200') throw new Error(message);
         }
         await this.reload();

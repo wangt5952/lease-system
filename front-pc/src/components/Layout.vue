@@ -6,6 +6,14 @@
           <i class="el-icon-menu"></i>
           <span slot="title">企业管理</span>
         </el-menu-item>
+        <el-menu-item index="/resource">
+          <i class="el-icon-setting"></i>
+          <span slot="title">资源管理</span>
+        </el-menu-item>
+        <el-menu-item index="/role">
+          <i class="el-icon-setting"></i>
+          <span slot="title">角色管理</span>
+        </el-menu-item>
         <el-menu-item index="/user">
           <i class="el-icon-setting"></i>
           <span slot="title">人员管理</span>

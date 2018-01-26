@@ -6,7 +6,7 @@
     </div>
 
     <el-table :data="list" style="width: 100%;margin-top:10px;">
-      <el-table-column prop="loginName" label="用户名"></el-table-column>
+      <el-table-column prop="roleName" label="角色名"></el-table-column>
       <el-table-column prop="userMobile" label="手机号"></el-table-column>
       <el-table-column prop="userType" label="用户类型"></el-table-column>
       <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
@@ -78,7 +78,7 @@ export default {
 
     async reload() {
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
+        const { code, message, respData } = (await this.$http.post('/api/manager/role/list', {
           currPage: this.currentPage, pageSize: this.pageSize
         })).body;
         if(code != '200') throw new Error(message);
