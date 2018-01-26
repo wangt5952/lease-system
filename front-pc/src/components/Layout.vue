@@ -10,6 +10,14 @@
           <i class="el-icon-setting"></i>
           <span slot="title">人员管理</span>
         </el-menu-item>
+        <el-menu-item index="/manufacturer">
+          <i class="el-icon-setting"></i>
+          <span slot="title">制造商管理</span>
+        </el-menu-item>
+        <el-menu-item index="/map" >
+          <i class="el-icon-location"></i>
+          <span slot="title">地图</span>
+        </el-menu-item>
       </el-menu>
     </div>
     <router-view style="flex:1;"/>
