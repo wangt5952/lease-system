@@ -5,10 +5,13 @@ import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
 import com.elextec.persist.model.mybatis.BizManufacturer;
 import com.elextec.persist.model.mybatis.BizManufacturerExample;
+import com.elextec.persist.model.mybatis.SysResources;
+import com.elextec.persist.model.mybatis.SysResourcesExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,64 +19,28 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
-@Transactional
 public class BizManufacturerServiceImpl implements BizManufacturerService {
 
-    /**日志*/
+    /*日志信息*/
     private final Logger logger = LoggerFactory.getLogger(BizManufacturerServiceImpl.class);
 
     @Autowired
     private BizManufacturerMapperExt bizManufacturerMapperExt;
 
     @Override
-    public MessageResponse insert(List<BizManufacturer> list) throws BizException{
-        try {
-            for (BizManufacturer biz : list) {
-                bizManufacturerMapperExt.insert(biz);
-            }
-            return new MessageResponse(RunningResult.SUCCESS);
-        } catch (Exception e) {
-            throw new BizException(RunningResult.DB_ERROR);
-        }
-    }
-
-    @Override
-    public MessageResponse deleteByPrimaryKey(List<String> list) throws BizException{
-        try {
-            for (int i = 0; i < list.size(); i++) {
-                bizManufacturerMapperExt.deleteByPrimaryKey(list.get(i));
-            }
-            return new MessageResponse(RunningResult.SUCCESS);
-        } catch (Exception e) {
-            throw new BizException(RunningResult.DB_ERROR);
-        }
-    }
-
-    @Override
-    public MessageResponse updateByPrimaryKey(List<BizManufacturer> list) throws BizException{
-        try {
-            for (BizManufacturer biz: list) {
-                bizManufacturerMapperExt.updateByPrimaryKey(biz);
-            }
-            return new MessageResponse(RunningResult.SUCCESS);
-        } catch (Exception e) {
-            throw new BizException(RunningResult.DB_ERROR);
-        }
-    }
-
-    @Override
-    public PageResponse<BizManufacturer> paging(boolean needPaging, PageRequest pr) {
+    public PageResponse<BizManufacturer> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
-        int resTotal = 0;
-        if (pr.getTotal() > 0) {
-            resTotal = pr.getTotal();
+        int mfrsTotal = 0;
+        if (0 < pr.getTotal()) {
+            mfrsTotal = pr.getTotal();
         } else {
-            BizManufacturerExample bizManufacturerExample = new BizManufacturerExample();
-            bizManufacturerExample.setDistinct(true);
-            resTotal = bizManufacturerMapperExt.countByExample(bizManufacturerExample);
+            BizManufacturerExample bizManufacturerCountExample = new BizManufacturerExample();
+            bizManufacturerCountExample.setDistinct(true);
+            mfrsTotal = bizManufacturerMapperExt.countByExample(bizManufacturerCountExample);
         }
         // 分页查询
         BizManufacturerExample bizManufacturerExample = new BizManufacturerExample();
@@ -82,31 +49,59 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
             bizManufacturerExample.setPageBegin(pr.getPageBegin());
             bizManufacturerExample.setPageSize(pr.getPageSize());
         }
-        List<BizManufacturer> resLs = bizManufacturerMapperExt.selectByExample(bizManufacturerExample);
+        List<BizManufacturer> mfrsLs = bizManufacturerMapperExt.selectByExample(bizManufacturerExample);
         // 组织并返回结果
         PageResponse<BizManufacturer> presp = new PageResponse<BizManufacturer>();
         presp.setCurrPage(pr.getCurrPage());
         presp.setPageSize(pr.getPageSize());
-        presp.setTotal(resTotal);
-        if (null == resLs) {
+        presp.setTotal(mfrsTotal);
+        if (null == mfrsLs) {
             presp.setRows(new ArrayList<BizManufacturer>());
         } else {
-            presp.setRows(resLs);
+            presp.setRows(mfrsLs);
         }
         return presp;
     }
 
     @Override
-    public MessageResponse selectByPrimaryKey(String id) {
-        if (id != null) {
-            System.err.println(id);
-            BizManufacturer biz = bizManufacturerMapperExt.selectByPrimaryKey(id);
-            System.err.println(biz);
-            return new MessageResponse(RunningResult.SUCCESS,biz);
-        } else {
-            throw new BizException(RunningResult.NO_PARAM);
+    @Transactional
+    public void insertBizManufacturers(List<BizManufacturer> mfrsInfos) {
+        int i = 0;
+        BizManufacturer insertVo = null;
+        try {
+            for (; i < mfrsInfos.size(); i++) {
+                insertVo = mfrsInfos.get(i);
+                insertVo.setId(WzUniqueValUtil.makeUUID());
+                insertVo.setCreateTime(new Date());
+                bizManufacturerMapperExt.insertSelective(insertVo);
+            }
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误", ex);
         }
     }
 
+    @Override
+    @Transactional
+    public void updateBizManufacturer(BizManufacturer mfrsInfo) {
+        bizManufacturerMapperExt.updateByPrimaryKeySelective(mfrsInfo);
+    }
 
+    @Override
+    @Transactional
+    public void deleteBizManufacturers(List<String> ids) {
+        int i = 0;
+        try {
+            for (; i < ids.size(); i++) {
+                bizManufacturerMapperExt.deleteByPrimaryKey(ids.get(i));
+            }
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
+        }
+    }
+
+    @Override
+    public BizManufacturer getBizManufacturerByPrimaryKey(String id) {
+        return bizManufacturerMapperExt.selectByPrimaryKey(id);
+    }
 }
+

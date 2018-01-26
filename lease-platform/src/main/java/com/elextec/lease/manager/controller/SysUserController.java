@@ -39,14 +39,14 @@ public class SysUserController extends BaseController {
 
     /**
      * 查询用户.
-     * @param paramAndPaging 分页参数JSON
+     * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
      *         currPage:当前页,
      *         pageSize:每页记录数
      *     }
      * </pre>
-     * @return 资源列表
+     * @return 查询结果列表
      * <pre>
      *     {
      *         code:返回Code,
@@ -78,8 +78,8 @@ public class SysUserController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/listusers")
-    public MessageResponse listUsers(@RequestBody String paramAndPaging) {
+    @RequestMapping(path = "/list")
+    public MessageResponse list(@RequestBody String paramAndPaging) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -105,7 +105,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 批量增加用户.
-     * @param users 用户列表JSON
+     * @param addParam 批量新增参数列表JSON
      * <pre>
      *     [
      *         {
@@ -133,21 +133,21 @@ public class SysUserController extends BaseController {
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/addusers")
-    public MessageResponse addUsers(@RequestBody String users) {
+    @RequestMapping(path = "/add")
+    public MessageResponse add(@RequestBody String addParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(users)) {
+        if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             List<SysUser> resInfos = null;
             try {
-                String paramStr = URLDecoder.decode(users, "utf-8");
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
                 resInfos = JSON.parseArray(paramStr, SysUser.class);
                 if (null == resInfos) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -164,7 +164,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 修改用户信息.
-     * @param user 用户信息JSON
+     * @param modifyParam 修改参数JSON
      * <pre>
      *     {
      *         id:ID,
@@ -185,26 +185,26 @@ public class SysUserController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return 修改用户信息返回
+     * @return 修改结果
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/modifyuser")
-    public MessageResponse modifyUser(@RequestBody String user) {
+    @RequestMapping(path = "/modify")
+    public MessageResponse modify(@RequestBody String modifyParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(user)) {
+        if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             SysUser resInfo = null;
             try {
-                String paramStr = URLDecoder.decode(user, "utf-8");
+                String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 resInfo = JSON.parseObject(paramStr, SysUser.class);
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -221,27 +221,30 @@ public class SysUserController extends BaseController {
 
     /**
      * 批量删除用户.
-     * @param users 待删除的用户列表JSON
-     * @return 批量删除用户返回
+     * @param deleteParam 删除ID列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
+     * @return 批量删除结果
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/deleteusers")
-    public MessageResponse deleteUsers(@RequestBody String users) {
+    @RequestMapping(path = "/delete")
+    public MessageResponse delete(@RequestBody String deleteParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(users)) {
+        if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             List<String> resIds = null;
             try {
-                String paramStr = URLDecoder.decode(users, "utf-8");
+                String paramStr = URLDecoder.decode(deleteParam, "utf-8");
                 resIds = JSON.parseArray(paramStr, String.class);
                 if (null == resIds) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -262,15 +265,15 @@ public class SysUserController extends BaseController {
      * <pre>
      *     {
      *         userId:用户ID,
-     *         roleIds:角色ID，多个以逗号隔开，例：角色1，角色2，角色3
+     *         roleIds:角色ID，多个以逗号隔开，例：角色Id1,角色Id2,角色Id3
      *     }
      * </pre>
-     * @return 给用户分配角色返回
+     * @return 处理结果
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
@@ -282,17 +285,17 @@ public class SysUserController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            RefUserRolesParam res = null;
+            RefUserRolesParam ur = null;
             try {
                 String paramStr = URLDecoder.decode(userAndRoles, "utf-8");
-                res = JSON.parseObject(paramStr, RefUserRolesParam.class);
-                if (null == res) {
+                ur = JSON.parseObject(paramStr, RefUserRolesParam.class);
+                if (null == ur || WzStringUtil.isBlank(ur.getUserId()) || WzStringUtil.isBlank(ur.getRoleIds())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.refUserAndRoles(res);
+            sysUserService.refSysUserAndRoles(ur);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -301,9 +304,12 @@ public class SysUserController extends BaseController {
 
 
     /**
-     * 根据ID获取用户信息
-     * @param id 用户ID
-     * @return 根据ID获取用户信息返回
+     * 根据ID获取用户信息.
+     * @param id 查询ID
+     * <pre>
+     *     [id]
+     * </pre>
+     * @return 查询结果
      * <pre>
      *     {
      *         code:返回Code,
@@ -332,30 +338,28 @@ public class SysUserController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/getByPrimaryKey")
-    public MessageResponse getByPrimaryKey(@RequestBody String id) {
+    @RequestMapping(path = "/getbypk")
+    public MessageResponse getByPK(@RequestBody String id) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> resId = null;
+            List<String> userId = null;
             try {
                 String paramStr = URLDecoder.decode(id, "utf-8");
-                resId = JSON.parseArray(paramStr, String.class);
-                if (null == resId) {
+                userId = JSON.parseArray(paramStr, String.class);
+                if (null == userId || 0 == userId.size() || WzStringUtil.isBlank(userId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-
-            SysUser user = sysUserService.getByPrimaryKey(resId.get(0));
+            SysUser user = sysUserService.getSysUserByPrimaryKey(userId.get(0));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
             return mr;
         }
     }
-
 }

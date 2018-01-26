@@ -81,11 +81,13 @@ public class SysResourceServcieImpl implements SysResourceService {
     }
 
     @Override
+    @Transactional
     public void updateSysResources(SysResources res) {
         sysResourcesMapperExt.updateByPrimaryKeySelective(res);
     }
 
     @Override
+    @Transactional
     public void deleteSysResources(List<String> ids) {
         int i = 0;
         try {
@@ -98,7 +100,7 @@ public class SysResourceServcieImpl implements SysResourceService {
     }
 
     @Override
-    public SysResources getByPrimaryKey(String id) {
+    public SysResources getSysResourceByPrimaryKey(String id) {
         return sysResourcesMapperExt.selectByPrimaryKey(id);
     }
 }

@@ -803,6 +803,66 @@ public class SysResourcesExample {
             return (Criteria) this;
         }
 
+        public Criteria andGroupSortIsNull() {
+            addCriterion("group_sort is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortIsNotNull() {
+            addCriterion("group_sort is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortEqualTo(Integer value) {
+            addCriterion("group_sort =", value, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortNotEqualTo(Integer value) {
+            addCriterion("group_sort <>", value, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortGreaterThan(Integer value) {
+            addCriterion("group_sort >", value, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortGreaterThanOrEqualTo(Integer value) {
+            addCriterion("group_sort >=", value, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortLessThan(Integer value) {
+            addCriterion("group_sort <", value, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortLessThanOrEqualTo(Integer value) {
+            addCriterion("group_sort <=", value, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortIn(List<Integer> values) {
+            addCriterion("group_sort in", values, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortNotIn(List<Integer> values) {
+            addCriterion("group_sort not in", values, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortBetween(Integer value1, Integer value2) {
+            addCriterion("group_sort between", value1, value2, "groupSort");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroupSortNotBetween(Integer value1, Integer value2) {
+            addCriterion("group_sort not between", value1, value2, "groupSort");
+            return (Criteria) this;
+        }
+
         public Criteria andLevelIsNull() {
             addCriterion("level is null");
             return (Criteria) this;

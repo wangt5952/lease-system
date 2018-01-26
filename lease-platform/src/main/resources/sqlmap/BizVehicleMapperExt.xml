@@ -1,3 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.elextec.persist.dao.mybatis.BizVehicleMapperExt" />
+<mapper namespace="com.elextec.persist.dao.mybatis.BizVehicleMapperExt">
+    <select id="getVehicleInfoById" resultType="java.util.Map" parameterType="java.lang.String" >
+        select
+        v.id vehicleId,
+        v.vehicle_code,
+        v.vehicle_pn,
+        v.vehicle_brand,
+        v.vehicle_made_in,
+        v.mfrs_id vehicleMfrsId,
+        v.vehicle_status,
+        v.create_user,
+        v.create_time,
+        v.update_user,
+        v.update_time,
+        m1.mfrs_name vehicleMfrsName,
+        b.id batteryId,
+        b.battery_code,
+        b.battery_name,
+        b.battery_brand,
+        b.battery_pn,
+        b.battery_parameters,
+        b.mfrs_id batteryMfrsId,
+        m2.mfrs_name batteryMfrsName,
+        b.battery_status
+        from biz_vehicle v
+        LEFT JOIN biz_manufacturer m1 ON v.mfrs_id = m1.id
+        LEFT JOIN biz_ref_vehicle_battery r ON v.id = r.vehicle_id
+        LEFT JOIN biz_battery b ON r.battery_id = b.id
+        LEFT JOIN biz_manufacturer m2 ON b.mfrs_id = m2.id
+        where v.id = #{id,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

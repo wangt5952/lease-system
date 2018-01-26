@@ -81,11 +81,13 @@ public class SysRoleServcieImpl implements SysRoleService {
     }
 
     @Override
+    @Transactional
     public void updateSysRole(SysRole res) {
         sysRoleMapperExt.updateByPrimaryKeySelective(res);
     }
 
     @Override
+    @Transactional
     public void deleteSysRole(List<String> ids) {
         int i = 0;
         try {
@@ -98,7 +100,8 @@ public class SysRoleServcieImpl implements SysRoleService {
     }
 
     @Override
-    public void refRoleAndResource(RefRoleResourceParam params){
+    @Transactional
+    public void refSysRoleAndResource(RefRoleResourceParam params){
         int i = 0;
         String roleId = params.getRoleId();
         String[] resourceIds = params.getResources().split(",");
@@ -120,7 +123,7 @@ public class SysRoleServcieImpl implements SysRoleService {
     }
 
     @Override
-    public SysRole getByPrimaryKey(String id) {
+    public SysRole getSysRoleByPrimaryKey(String id) {
         return sysRoleMapperExt.selectByPrimaryKey(id);
     }
 }

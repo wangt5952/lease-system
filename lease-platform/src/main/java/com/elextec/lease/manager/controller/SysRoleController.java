@@ -38,14 +38,13 @@ public class SysRoleController extends BaseController {
     /**
      * 查询角色.
      * @param paramAndPaging 查询及分页参数JSON
-     * @param paramAndPaging 分页参数JSON
      * <pre>
      *     {
      *         currPage:当前页,
      *         pageSize:每页记录数
      *     }
      * </pre>
-     * @return 资源列表
+     * @return 查询结果列表
      * <pre>
      *     {
      *         code:返回Code,
@@ -65,8 +64,8 @@ public class SysRoleController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/listroles")
-    public MessageResponse listRoles(@RequestBody String paramAndPaging) {
+    @RequestMapping(path = "/list")
+    public MessageResponse list(@RequestBody String paramAndPaging) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -92,7 +91,7 @@ public class SysRoleController extends BaseController {
 
     /**
      * 批量增加角色.
-     * @param roles 角色列表JSON
+     * @param addParam 批量新增参数列表JSON
      * <pre>
      *     [
      *         {
@@ -100,7 +99,8 @@ public class SysRoleController extends BaseController {
      *             role_introduce:角色说明,
      *             create_user:创建人,
      *             update_user:更新人
-     *         }
+     *         },
+     *         ... ...
      *     ]
      * </pre>
      * @return 批量新增结果
@@ -112,17 +112,17 @@ public class SysRoleController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/addroles")
-    public MessageResponse addRoles(@RequestBody String roles) {
+    @RequestMapping(path = "/add")
+    public MessageResponse add(@RequestBody String addParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(roles)) {
+        if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             List<SysRole> resInfos = null;
             try {
-                String paramStr = URLDecoder.decode(roles, "utf-8");
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
                 resInfos = JSON.parseArray(paramStr, SysRole.class);
                 if (null == resInfos) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -139,7 +139,7 @@ public class SysRoleController extends BaseController {
 
     /**
      * 修改角色信息.
-     * @param role 角色信息JSON
+     * @param modifyParam 修改参数JSON
      * <pre>
      *     {
      *         id:ID,
@@ -148,26 +148,26 @@ public class SysRoleController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return 修改角色信息返回
+     * @return 修改结果
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/modifyrole")
-    public MessageResponse modifyRole(@RequestBody String role) {
+    @RequestMapping(path = "/modify")
+    public MessageResponse modify(@RequestBody String modifyParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(role)) {
+        if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             SysRole resInfo = null;
             try {
-                String paramStr = URLDecoder.decode(role, "utf-8");
+                String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 resInfo = JSON.parseObject(paramStr, SysRole.class);
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -184,27 +184,30 @@ public class SysRoleController extends BaseController {
 
     /**
      * 批量删除角色.
-     * @param roles 待删除的角色列表JSON
-     * @return 批量删除角色返回
+     * @param deleteParam 删除ID列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
+     * @return 批量删除结果
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/deleteroles")
-    public MessageResponse deleteRoles(@RequestBody String roles) {
+    @RequestMapping(path = "/delete")
+    public MessageResponse delete(@RequestBody String deleteParam) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(roles)) {
+        if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
             List<String> resIds = null;
             try {
-                String paramStr = URLDecoder.decode(roles, "utf-8");
+                String paramStr = URLDecoder.decode(deleteParam, "utf-8");
                 resIds = JSON.parseArray(paramStr, String.class);
                 if (null == resIds) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
@@ -225,15 +228,15 @@ public class SysRoleController extends BaseController {
      * <pre>
      *     {
      *         roleId:角色ID,
-     *         resources:资源ID，多个以逗号隔开，例：资源1，资源2，资源3
+     *         resources:资源ID，多个以逗号隔开，例：资源Id1,资源Id2,资源Id3
      *     }
      * </pre>
-     * @return 给角色分配资源返回
+     * @return 处理结果
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:
+     *         respData:""
      *     }
      * </pre>
      */
@@ -245,17 +248,17 @@ public class SysRoleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            RefRoleResourceParam res = null;
+            RefRoleResourceParam rr = null;
             try {
                 String paramStr = URLDecoder.decode(roleAndResources, "utf-8");
-                res = JSON.parseObject(paramStr, RefRoleResourceParam.class);
-                if (null == res) {
+                rr = JSON.parseObject(paramStr, RefRoleResourceParam.class);
+                if (null == rr || WzStringUtil.isBlank(rr.getRoleId()) || WzStringUtil.isBlank(rr.getResources())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysRoleService.refRoleAndResource(res);
+            sysRoleService.refSysRoleAndResource(rr);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -264,9 +267,12 @@ public class SysRoleController extends BaseController {
 
 
     /**
-     * 根据ID获取角色信息
-     * @param id 角色ID
-     * @return 根据ID获取角色返回
+     * 根据ID获取角色信息.
+     * @param id 查询ID
+     * <pre>
+     *     [id]
+     * </pre>
+     * @return 查询结果
      * <pre>
      *     {
      *         code:返回Code,
@@ -283,26 +289,26 @@ public class SysRoleController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/getByPrimaryKey")
-    public MessageResponse getByPrimaryKey(@RequestBody String id) {
+    @RequestMapping(path = "/getbypk")
+    public MessageResponse getByPK(@RequestBody String id) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> resId = null;
+            List<String> roleId = null;
             try {
                 String paramStr = URLDecoder.decode(id, "utf-8");
-                resId = JSON.parseArray(paramStr, String.class);
-                if (null == resId) {
+                roleId = JSON.parseArray(paramStr, String.class);
+                if (null == roleId || 0 == roleId.size() || WzStringUtil.isBlank(roleId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 
-            SysRole user = sysRoleService.getByPrimaryKey(resId.get(0));
+            SysRole user = sysRoleService.getSysRoleByPrimaryKey(roleId.get(0));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
             return mr;

@@ -45,5 +45,5 @@ public interface SysResourceService {
      * 根据ID查询资源信息
      * @param id 资源ID
      * */
-    public SysResources getByPrimaryKey(String id);
+    public SysResources getSysResourceByPrimaryKey(String id);
 }

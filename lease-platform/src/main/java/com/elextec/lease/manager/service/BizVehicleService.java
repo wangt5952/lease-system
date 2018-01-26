@@ -1,13 +1,14 @@
 package com.elextec.lease.manager.service;
 
+import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.persist.model.mybatis.BizVehicle;
-import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 接口 车辆管理Service.
@@ -21,7 +22,7 @@ public interface BizVehicleService {
      * @return 车辆列表
      * @throws BizException 查询业务异常
      */
-    public PageResponse<SysResources> list(boolean needPaging, PageRequest pr);
+    public PageResponse<BizVehicle> list(boolean needPaging, PageRequest pr);
 
     /**
      * 根据中心点经纬度及半径获得相关车辆信息.
@@ -37,7 +38,7 @@ public interface BizVehicleService {
      * @param vehicleInfos 车辆信息列表
      * @throws BizException 插入时异常，异常时全部数据回滚，日志记录出错记录号
      */
-    public void insertVehicles(List<BizVehicle> vehicleInfos);
+    public void insertVehicles(List<VehicleBatteryParam> vehicleInfos);
 
     /**
      * 修改车辆信息.
@@ -50,4 +51,10 @@ public interface BizVehicleService {
      * @param ids 待删除的车辆ID列表
      */
     public void deleteVehicles(List<String> ids);
+
+    /**
+     * 根据ID查询车辆信息
+     * @param id 车辆ID
+     * */
+    public Map<String,Object> getByPrimaryKey(String id);
 }

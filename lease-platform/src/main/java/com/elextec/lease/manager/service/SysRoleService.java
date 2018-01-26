@@ -45,11 +45,11 @@ public interface SysRoleService {
      * 给角色分配资源
      * @param params 角色对应资源map
      * */
-    public void refRoleAndResource(RefRoleResourceParam params);
+    public void refSysRoleAndResource(RefRoleResourceParam params);
 
     /**
-     * 根据ID查询角色信息
+     * 根据ID查询角色信息.
      * @param id 角色ID
      * */
-    public SysRole getByPrimaryKey(String id);
+    public SysRole getSysRoleByPrimaryKey(String id);
 }
