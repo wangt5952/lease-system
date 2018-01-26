@@ -164,6 +164,8 @@ public class SysAuthController extends BaseController {
 
     /**
      * 退出.
+     * @param request 请求
+     * @param response 响应
      * @return 退出结果
      * <pre>
      *     {
@@ -185,6 +187,7 @@ public class SysAuthController extends BaseController {
 
     /**
      * 修改密码.
+     * @param request 请求
      * @param oldAndNewPassword 旧密码及新密码
      * <pre>
      *     {
@@ -341,6 +344,7 @@ public class SysAuthController extends BaseController {
 
     /**
      * 重置密码.
+     * @param request 请求
      * @param smsTokenAndNewPassword 重置密码参数JSON
      * <pre>
      *     {

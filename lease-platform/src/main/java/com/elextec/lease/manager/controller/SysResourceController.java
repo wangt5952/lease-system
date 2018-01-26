@@ -176,7 +176,14 @@ public class SysResourceController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return
+     * @return 修改结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/manager/modifyresource")
     public MessageResponse modifyResource(@RequestBody String resource) {
@@ -206,7 +213,14 @@ public class SysResourceController extends BaseController {
     /**
      * 批量删除资源.
      * @param resources 待删除的资源列表JSON
-     * @return
+     * @return 删除结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/manager/deleteresources")
     public MessageResponse deleteResources(@RequestBody String resources) {
