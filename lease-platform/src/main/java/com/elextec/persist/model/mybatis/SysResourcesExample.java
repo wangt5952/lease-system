@@ -1,5 +1,7 @@
 package com.elextec.persist.model.mybatis;
 
+import com.elextec.persist.field.enums.ResourceType;
+import com.elextec.persist.field.enums.ShowFlag;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -471,62 +473,62 @@ public class SysResourcesExample {
             return (Criteria) this;
         }
 
-        public Criteria andResTypeEqualTo(String value) {
+        public Criteria andResTypeEqualTo(ResourceType value) {
             addCriterion("res_type =", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeNotEqualTo(String value) {
+        public Criteria andResTypeNotEqualTo(ResourceType value) {
             addCriterion("res_type <>", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeGreaterThan(String value) {
+        public Criteria andResTypeGreaterThan(ResourceType value) {
             addCriterion("res_type >", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeGreaterThanOrEqualTo(String value) {
+        public Criteria andResTypeGreaterThanOrEqualTo(ResourceType value) {
             addCriterion("res_type >=", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeLessThan(String value) {
+        public Criteria andResTypeLessThan(ResourceType value) {
             addCriterion("res_type <", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeLessThanOrEqualTo(String value) {
+        public Criteria andResTypeLessThanOrEqualTo(ResourceType value) {
             addCriterion("res_type <=", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeLike(String value) {
+        public Criteria andResTypeLike(ResourceType value) {
             addCriterion("res_type like", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeNotLike(String value) {
+        public Criteria andResTypeNotLike(ResourceType value) {
             addCriterion("res_type not like", value, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeIn(List<String> values) {
+        public Criteria andResTypeIn(List<ResourceType> values) {
             addCriterion("res_type in", values, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeNotIn(List<String> values) {
+        public Criteria andResTypeNotIn(List<ResourceType> values) {
             addCriterion("res_type not in", values, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeBetween(String value1, String value2) {
+        public Criteria andResTypeBetween(ResourceType value1, ResourceType value2) {
             addCriterion("res_type between", value1, value2, "resType");
             return (Criteria) this;
         }
 
-        public Criteria andResTypeNotBetween(String value1, String value2) {
+        public Criteria andResTypeNotBetween(ResourceType value1, ResourceType value2) {
             addCriterion("res_type not between", value1, value2, "resType");
             return (Criteria) this;
         }
@@ -671,62 +673,62 @@ public class SysResourcesExample {
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagEqualTo(String value) {
+        public Criteria andShowFlagEqualTo(ShowFlag value) {
             addCriterion("show_flag =", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagNotEqualTo(String value) {
+        public Criteria andShowFlagNotEqualTo(ShowFlag value) {
             addCriterion("show_flag <>", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagGreaterThan(String value) {
+        public Criteria andShowFlagGreaterThan(ShowFlag value) {
             addCriterion("show_flag >", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagGreaterThanOrEqualTo(String value) {
+        public Criteria andShowFlagGreaterThanOrEqualTo(ShowFlag value) {
             addCriterion("show_flag >=", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagLessThan(String value) {
+        public Criteria andShowFlagLessThan(ShowFlag value) {
             addCriterion("show_flag <", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagLessThanOrEqualTo(String value) {
+        public Criteria andShowFlagLessThanOrEqualTo(ShowFlag value) {
             addCriterion("show_flag <=", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagLike(String value) {
+        public Criteria andShowFlagLike(ShowFlag value) {
             addCriterion("show_flag like", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagNotLike(String value) {
+        public Criteria andShowFlagNotLike(ShowFlag value) {
             addCriterion("show_flag not like", value, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagIn(List<String> values) {
+        public Criteria andShowFlagIn(List<ShowFlag> values) {
             addCriterion("show_flag in", values, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagNotIn(List<String> values) {
+        public Criteria andShowFlagNotIn(List<ShowFlag> values) {
             addCriterion("show_flag not in", values, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagBetween(String value1, String value2) {
+        public Criteria andShowFlagBetween(ShowFlag value1, ShowFlag value2) {
             addCriterion("show_flag between", value1, value2, "showFlag");
             return (Criteria) this;
         }
 
-        public Criteria andShowFlagNotBetween(String value1, String value2) {
+        public Criteria andShowFlagNotBetween(ShowFlag value1, ShowFlag value2) {
             addCriterion("show_flag not between", value1, value2, "showFlag");
             return (Criteria) this;
         }

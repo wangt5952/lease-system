@@ -12,3 +12,13 @@ logging:
 localsetting:
   cors:
     flag: true
+  upload-root: /root/tomcat-8990/webapps/leaseupload
+  download-prefix: http://106.14.172.38:8990/leaseupload
+  platform-type: mobile
+  login-overtime-sec: 300
+  sms:
+    url: http://112.74.76.186:8030/service/httpService/httpInterface.do
+    username: JSM41961
+    password: 5tjfzvne
+    verycode: upxg5dedtrk2
+    tempid1: JSM41961-0001

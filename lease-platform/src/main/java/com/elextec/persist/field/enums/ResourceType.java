@@ -27,4 +27,9 @@ public enum ResourceType {
     public String getInfo() {
         return info;
     }
+
+    @Override
+    public String toString() {
+        return this.name();
+    }
 }

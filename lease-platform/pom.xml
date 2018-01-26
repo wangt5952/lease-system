@@ -30,6 +30,7 @@
 		<commons-lang3.version>3.1</commons-lang3.version>
 		<common-collections4.version>4.0</common-collections4.version>
 		<commons-io.version>2.4</commons-io.version>
+		<commons-codec.version>1.11</commons-codec.version>
 	</properties>
 
 	<dependencies>
@@ -118,6 +119,11 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons-io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${commons-codec.version}</version>
 		</dependency>
 	</dependencies>
 

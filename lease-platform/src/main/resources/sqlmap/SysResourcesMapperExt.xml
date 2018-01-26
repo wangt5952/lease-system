@@ -1,3 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.elextec.persist.dao.mybatis.SysResourcesMapperExt" />
+<mapper namespace="com.elextec.persist.dao.mybatis.SysResourcesMapperExt">
+    <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT DISTINCT
+        a.id,
+        a.res_code,
+        a.res_name,
+        a.res_type,
+        a.res_url,
+        a.res_sort,
+        a.show_flag,
+        a.parent,
+        a.level,
+        a.create_user,
+        a.create_time,
+        a.update_user,
+        a.update_time
+        FROM
+        sys_resources a, sys_ref_user_role b, sys_ref_role_resources c
+        WHERE
+        a.id=c.res_id AND c.role_id=b.role_id AND b.user_id=#{userId,jdbcType=VARCHAR}
+        ORDER BY
+        a.res_sort, a.level
+    </select>
+</mapper>
