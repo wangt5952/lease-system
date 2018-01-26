@@ -148,7 +148,14 @@ public class SysRoleController extends BaseController {
      *         update_user:更新人
      *     }
      * </pre>
-     * @return
+     * @return 修改角色信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/modifyrole")
     public MessageResponse modifyRole(@RequestBody String role) {
@@ -178,7 +185,14 @@ public class SysRoleController extends BaseController {
     /**
      * 批量删除角色.
      * @param roles 待删除的角色列表JSON
-     * @return
+     * @return 批量删除角色返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/deleteroles")
     public MessageResponse deleteRoles(@RequestBody String roles) {
@@ -214,7 +228,14 @@ public class SysRoleController extends BaseController {
      *         resources:资源ID，多个以逗号隔开，例：资源1，资源2，资源3
      *     }
      * </pre>
-     * @return
+     * @return 给角色分配资源返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
      */
     @RequestMapping(path = "/refroleandresources")
     public MessageResponse refRoleAndResources(@RequestBody String roleAndResources) {
@@ -237,6 +258,53 @@ public class SysRoleController extends BaseController {
             sysRoleService.refRoleAndResource(res);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+
+    /**
+     * 根据ID获取角色信息
+     * @param id 角色ID
+     * @return 根据ID获取角色返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *                 id:ID,
+     *                 role_name:角色名,
+     *                 role_introduce:角色说明,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/getByPrimaryKey")
+    public MessageResponse getByPrimaryKey(@RequestBody String id) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(id)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> resId = null;
+            try {
+                String paramStr = URLDecoder.decode(id, "utf-8");
+                resId = JSON.parseArray(paramStr, String.class);
+                if (null == resId) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+
+            SysRole user = sysRoleService.getByPrimaryKey(resId.get(0));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
             return mr;
         }
     }

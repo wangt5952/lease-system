@@ -118,4 +118,9 @@ public class SysRoleServcieImpl implements SysRoleService {
         }
 
     }
+
+    @Override
+    public SysRole getByPrimaryKey(String id) {
+        return sysRoleMapperExt.selectByPrimaryKey(id);
+    }
 }

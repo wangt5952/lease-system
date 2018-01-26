@@ -46,4 +46,10 @@ public interface SysRoleService {
      * @param params 角色对应资源map
      * */
     public void refRoleAndResource(RefRoleResourceParam params);
+
+    /**
+     * 根据ID查询角色信息
+     * @param id 角色ID
+     * */
+    public SysRole getByPrimaryKey(String id);
 }
