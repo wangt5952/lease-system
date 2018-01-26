@@ -211,6 +211,9 @@ public class SysResourceController extends BaseController {
     /**
      * 批量删除资源.
      * @param resources 待删除的资源列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
      * @return 批量删除资源返回
      * <pre>
      *     {
@@ -246,7 +249,11 @@ public class SysResourceController extends BaseController {
     }
 
     /**
-     * 根据ID获取资源信息
+     * 根据ID获取资源信息.
+     * @param id 资源ID
+     * <pre>
+     *     [id]
+     * </pre>
      * @return 根据ID获取资源信息返回
      * <pre>
      *     {
