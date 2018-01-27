@@ -87,21 +87,20 @@ export default {
   computed: {
     selectedItem() {
       return _.find(this.list, { id: this.selectedId }) || {};
-    }
+    },
   },
   methods: {
-    syncCenterAndZoom( { target }) {
-
+    syncCenterAndZoom({ target }) {
       const { lng, lat } = target.getCenter();
       const zoom = target.getZoom();
       console.log(lng, lat, zoom);
 
-      const sLng = parseInt(lng * 4)/4 - 0.5, eLng = parseInt(lng * 4)/4 + 0.5, sLat = parseInt(lat * 4) / 4 - 0.5, eLat = parseInt(lat * 4) / 4 + 0.5;
+      const sLng = (parseInt(lng * 4, 10)/4) - 0.5, eLng = (parseInt(lng * 4, 10)/4) + 0.5, sLat = (parseInt(lat * 4, 10) / 4) - 0.5, eLat = (parseInt(lat * 4, 10) / 4) + 0.5;
 
       const points = [];
-      for(let x = sLng; x <= eLng; x += 0.1){
-        for(let y = sLat; y <= eLat; y += 0.1){
-          points.push({lng: x, lat: y});
+      for (let x = sLng; x <= eLng; x += 0.1) {
+        for (let y = sLat; y <= eLat; y += 0.1) {
+          points.push({ lng: x, lat: y });
         }
       }
       console.log(points);
