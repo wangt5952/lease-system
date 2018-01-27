@@ -95,7 +95,10 @@ export default {
       const zoom = target.getZoom();
       console.log(lng, lat, zoom);
 
-      const sLng = (parseInt(lng * 4, 10)/4) - 0.5, eLng = (parseInt(lng * 4, 10)/4) + 0.5, sLat = (parseInt(lat * 4, 10) / 4) - 0.5, eLat = (parseInt(lat * 4, 10) / 4) + 0.5;
+      const sLng = (parseInt(lng * 4, 10) / 4) - 0.5;
+      const eLng = (parseInt(lng * 4, 10) / 4) + 0.5;
+      const sLat = (parseInt(lat * 4, 10) / 4) - 0.5;
+      const eLat = (parseInt(lat * 4, 10) / 4) + 0.5;
 
       const points = [];
       for (let x = sLng; x <= eLng; x += 0.1) {
