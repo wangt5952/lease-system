@@ -22,9 +22,9 @@
           <i class="el-icon-setting"></i>
           <span slot="title">制造商管理</span>
         </el-menu-item>
-        <el-menu-item index="/map" >
+        <el-menu-item index="/monitor" >
           <i class="el-icon-location"></i>
-          <span slot="title">地图</span>
+          <span slot="title">车辆监控</span>
         </el-menu-item>
       </el-menu>
     </div>

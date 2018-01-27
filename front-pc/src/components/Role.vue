@@ -2,17 +2,12 @@
   <div v-loading="loading" style="padding:10px;">
 
     <div>
-      <el-button icon="el-icon-plus" type="primary" size="medium" @click="showForm()">添加人员</el-button>
+      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加角色</el-button>
     </div>
 
     <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="roleName" label="角色名"></el-table-column>
-      <el-table-column prop="userMobile" label="手机号"></el-table-column>
-      <el-table-column prop="userType" label="用户类型"></el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
-      <el-table-column prop="nickName" label="昵称"></el-table-column>
-      <el-table-column prop="userName" label="姓名"></el-table-column>
-      <el-table-column prop="userRealNameAuthFlag" label="用户实名认证标志"></el-table-column>
+      <el-table-column prop="roleIntroduce" label="说明"></el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
@@ -33,14 +28,20 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="资源信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" label-width="100px">
-        <el-form-item label="loginName">
-          <el-input v-model="form.loginName" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="userMobile">
-          <el-input v-model="form.userMobile" auto-complete="off"></el-input>
-        </el-form-item>
+    <el-dialog title="角色信息" :visible.sync="formVisible" :close-on-click-modal="false">
+      <el-form :model="form" ref="form" size="medium">
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item prop="roleName" :rules="[{required:true, message:'请填写角色名'}]" label="用户名">
+              <el-input v-model="form.roleName" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="roleIntroduce" :rules="[{required:true, message:'请填写角色说明'}]" label="说明">
+              <el-input v-model="form.roleIntroduce" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="medium" @click="closeForm">取消</el-button>
@@ -53,6 +54,9 @@
 
 <script>
 import _ from 'lodash';
+import {
+  mapState,
+} from 'vuex';
 
 export default {
   data() {
@@ -67,8 +71,20 @@ export default {
 
       formVisible: false,
       form: {},
-
     };
+  },
+  computed: {
+    ...mapState({
+      key_user_info: state => state.key_user_info,
+    }),
+  },
+  watch: {
+    formVisible(v) {
+      if(!v){
+        const $form = this.$refs.form;
+        $form.resetFields();
+      }
+    }
   },
   methods: {
     async handleSizeChange(pageSize) {
@@ -84,26 +100,33 @@ export default {
         if(code != '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
-        this.list = rows;
+        this.list = _.map(rows, o => ({
+          ...o,
+          userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
+          userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
+        }));
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
-    async handleDelete({ id, name }) {
+    async handleDelete({ id, roleName }) {
       try {
-        await this.$confirm(`确认删除${name}, 是否继续?`, '提示', { type: 'warning' });
-        await this.$http.delete(`/api/user/${id}`);
+        await this.$confirm(`确认删除${roleName}, 是否继续?`, '提示', { type: 'warning' });
+        const { code, message, respData } = (await this.$http.post('/api/manager/role/delete', [id])).body;
+        if(code != '200') throw new Error(message);
         await this.reload();
         this.$message.success('删除成功');
       } catch (e) {
-        const message = e.statusText;
+        const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
 
     showForm(form = { }) {
-      this.form = _.pick(form, ['id', 'loginName', 'userMobile']);
+      this.form = _.pick(form, ['id','loginName',
+      'roleName',
+      'roleIntroduce',]);
       this.formVisible = true;
     },
     closeForm() {
@@ -111,19 +134,29 @@ export default {
       this.formVisible = false;
     },
     async saveForm() {
+      const { loginName } = this.key_user_info;
       try {
+        const $form = this.$refs.form;
+        await $form.validate();
+
         if (this.form.id) {
-          const { id, ...form } = this.form;
-          await this.$http.put(`/api/user/${id}`, form);
+          const { ...form } = this.form;
+          form.update_user = loginName;
+          const { code, message, respData } = (await this.$http.post('/api/manager/role/modify', form)).body;
+          if(code != '200') throw new Error(message);
+          this.$message.success('编辑成功');
         } else {
           const { ...form } = this.form;
-          const { code, message, respData } = (await this.$http.post('/api/manager/user/add', form)).body;
+          form.create_user = loginName;
+          form.update_user = loginName;
+          const { code, message, respData } = (await this.$http.post('/api/manager/role/add', [form])).body;
           if(code != '200') throw new Error(message);
+          this.$message.success('添加成功');
         }
         await this.reload();
-        this.form = {};
-        this.formVisible = false;
+        this.closeForm()
       } catch (e) {
+        if(!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
@@ -136,5 +169,7 @@ export default {
 </script>
 
 <style scoped>
-
+>>> .el-form-item {
+  height: 73px;
+}
 </style>

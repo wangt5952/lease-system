@@ -16,7 +16,7 @@ export default new Router({
         { path: '/user', component: () => import('@/components/User') },
         { path: '/user', component: () => import('@/components/User') },
         { path: '/manufacturer', component: () => import('@/components/Manufacturer') },
-        { path: '/map', component: () => import('@/components/Map') },
+        { path: '/monitor', component: () => import('@/components/Monitor') },
       ],
     },
   ],
