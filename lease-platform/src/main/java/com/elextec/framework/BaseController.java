@@ -5,4 +5,8 @@ package com.elextec.framework;
  * Created by wangtao on 2018/1/16.
  */
 public class BaseController {
+
+    protected Object jsonToPojoAndVerify(String json) {
+        return null;
+    }
 }
