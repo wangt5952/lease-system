@@ -19,16 +19,20 @@ public interface SysUserService {
      * @param needPaging 是否需要分页
      * @param pr 分页参数
      * @return 用户列表
-     * @throws BizException 查询业务异常
      */
     public PageResponse<SysUser> list(boolean needPaging, PageRequest pr);
 
     /**
      * 批量插入用户.
      * @param userInfos 用户信息
-     * @throws BizException 插入时异常，异常时全部数据回滚，日志记录出错记录号
      */
     public void insertSysUsers(List<SysUser> userInfos);
+
+    /**
+     * 插入用户.
+     * @param userInfo 用户信息
+     */
+    public void insertSysUser(SysUser userInfo);
 
     /**
      * 修改用户信息.

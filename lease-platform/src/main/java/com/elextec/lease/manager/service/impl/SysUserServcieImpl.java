@@ -84,8 +84,37 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     @Transactional
-    public void updateSysUser(SysUser res) {
-        sysUserMapperExt.updateByPrimaryKeySelective(res);
+    public void insertSysUser(SysUser userInfo) {
+        // 用户名重复提示错误
+        SysUserExample lnExample = new SysUserExample();
+        SysUserExample.Criteria lnCriteria = lnExample.createCriteria();
+        lnCriteria.andLoginNameEqualTo(userInfo.getLoginName());
+        int lnCnt = sysUserMapperExt.countByExample(lnExample);
+        if (0 < lnCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "用户名(" + userInfo.getLoginName() + ")已存在");
+        }
+        // 手机号码重复提示错误
+        SysUserExample mobileExample = new SysUserExample();
+        SysUserExample.Criteria mobileCriteria = mobileExample.createCriteria();
+        mobileCriteria.andUserMobileEqualTo(userInfo.getUserMobile());
+        int mobileCnt = sysUserMapperExt.countByExample(mobileExample);
+        if (0 < mobileCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "手机号码(" + userInfo.getUserMobile() + ")已存在");
+        }
+        // 保存用户信息
+        try {
+            userInfo.setId(WzUniqueValUtil.makeUUID());
+            userInfo.setCreateTime(new Date());
+            sysUserMapperExt.insertSelective(userInfo);
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateSysUser(SysUser userInfo) {
+        sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
     }
 
     @Override

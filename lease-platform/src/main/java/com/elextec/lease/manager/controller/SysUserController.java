@@ -13,6 +13,8 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysUser;
+import com.elextec.persist.model.mybatis.SysUserExample;
+import org.hibernate.jpa.event.internal.jpa.CallbackRegistryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,22 +111,22 @@ public class SysUserController extends BaseController {
      * <pre>
      *     [
      *         {
-     *             login_name:用户名,
-     *             user_mobile:用户手机号码,
-     *             user_type:用户类型（平台、企业或个人）,
-     *             user_icon:用户LOGO路径,
-     *             password:密码,
-     *             nick_name:昵称,
-     *             user_name:姓名,
-     *             user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
-     *             user_pid:身份证号,
-     *             user_ic_front:身份证正面照片路径,
-     *             user_ic_back:身份证背面照片路径,
-     *             user_ic_group:用户手举身份证合照路径,
-     *             org_id:所属组织ID,
-     *             user_status:用户状态（正常、冻结、作废）,
-     *             create_user:创建人,
-     *             update_user:更新人
+     *             login_name:用户名（必填）,
+     *             user_mobile:用户手机号码（必填）,
+     *             user_type:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）（必填）,
+     *             user_icon:用户LOGO路径（非必填）,
+     *             password:密码（非必填）,
+     *             nick_name:昵称（非必填）,
+     *             user_name:姓名（非必填）,
+     *             user_real_name_auth_flag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）（必填）,
+     *             user_pid:身份证号（非必填）,
+     *             user_ic_front:身份证正面照片路径（非必填）,
+     *             user_ic_back:身份证背面照片路径（非必填）,
+     *             user_ic_group:用户手举身份证合照路径（非必填）,
+     *             org_id:所属组织ID（非必填）,
+     *             user_status:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）（必填）,
+     *             create_user:创建人（必填）,
+     *             update_user:更新人（必填）
      *         }
      *     ]
      * </pre>
@@ -163,25 +165,82 @@ public class SysUserController extends BaseController {
     }
 
     /**
+     * 增加用户.
+     * @param addParam 新增参数列表JSON
+     * <pre>
+     *     {
+     *         login_name:用户名（必填）,
+     *         user_mobile:用户手机号码（必填）,
+     *         user_type:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）（必填）,
+     *         user_icon:用户LOGO路径（非必填）,
+     *         password:密码（非必填）,
+     *         nick_name:昵称（非必填）,
+     *         user_name:姓名（非必填）,
+     *         user_real_name_auth_flag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）（必填）,
+     *         user_pid:身份证号（非必填）,
+     *         user_ic_front:身份证正面照片路径（非必填）,
+     *         user_ic_back:身份证背面照片路径（非必填）,
+     *         user_ic_group:用户手举身份证合照路径（非必填）,
+     *         org_id:所属组织ID（非必填）,
+     *         user_status:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）（必填）,
+     *         create_user:创建人（必填）,
+     *         update_user:更新人（必填）
+     *     }
+     * </pre>
+     * @return 新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/addone")
+    public MessageResponse addOne(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            SysUser userInfo = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                userInfo = JSON.parseObject(paramStr, SysUser.class);
+                if (null == userInfo) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            sysUserService.insertSysUser(userInfo);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
      * 修改用户信息.
      * @param modifyParam 修改参数JSON
      * <pre>
      *     {
-     *         id:ID,
+     *         id:ID（必填）,
      *         login_name:用户名,
      *         user_mobile:用户手机号码,
-     *         user_type:用户类型（平台、企业或个人）,
+     *         user_type:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）,
      *         user_icon:用户LOGO路径,
      *         password:密码,
      *         nick_name:昵称,
      *         user_name:姓名,
-     *         user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
+     *         user_real_name_auth_flag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）,
      *         user_pid:身份证号,
      *         user_ic_front:身份证正面照片路径,
      *         user_ic_back:身份证背面照片路径,
      *         user_ic_group:用户手举身份证合照路径,
      *         org_id:所属组织ID,
-     *         user_status:用户状态（正常、冻结、作废）,
+     *         user_status:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）,
      *         update_user:更新人
      *     }
      * </pre>
