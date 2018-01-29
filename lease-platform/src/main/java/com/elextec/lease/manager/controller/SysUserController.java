@@ -139,8 +139,8 @@ public class SysUserController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/batchadd")
-    public MessageResponse batchAdd(@RequestBody String addParam) {
+    @RequestMapping(path = "/add")
+    public MessageResponse add(@RequestBody String addParam) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -196,8 +196,8 @@ public class SysUserController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParam) {
+    @RequestMapping(path = "/addone")
+    public MessageResponse addOne(@RequestBody String addParam) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
