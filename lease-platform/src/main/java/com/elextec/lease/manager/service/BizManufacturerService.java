@@ -27,6 +27,12 @@ public interface BizManufacturerService {
     public void insertBizManufacturers(List<BizManufacturer> mfrsInfos);
 
     /**
+     * 插入公司组织资源.
+     * @param mfrsInfo 资源信息
+     */
+    public void insertBizManufacturers(BizManufacturer mfrsInfo);
+
+    /**
      * 修改制造商信息.
      * @param mfrsInfo 新的制造商信息
      */

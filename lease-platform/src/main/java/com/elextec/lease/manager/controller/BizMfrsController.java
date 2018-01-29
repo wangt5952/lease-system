@@ -157,6 +157,54 @@ public class BizMfrsController extends BaseController {
     }
 
     /**
+     * 增加制造商信息.
+     * @param addParam 批量新增参数JSON
+     * <pre>
+     *  {
+     *             mfrs_name:制造商名称,
+     *             mfrs_introduce:制造商介绍,
+     *             mfrs_address:制造商地址,
+     *             mfrs_contacts:联系人（多人用 , 分割）,
+     *             mfrs_phone:联系电话（多个电话用 , 分割）,
+     *             create_user:创建人,
+     *             update_user:更新人
+     *         }
+     * </pre>
+     * @return 新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/addone",method = RequestMethod.POST)
+    public MessageResponse addone(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            BizManufacturer resInfo = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                resInfo = JSON.parseObject(paramStr, BizManufacturer.class);
+                if (null == resInfo) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizManufacturerService.insertBizManufacturers(resInfo);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
      * 修改制造商信息.
      * @param modifyParam 修改参数JSON
      * <pre>
