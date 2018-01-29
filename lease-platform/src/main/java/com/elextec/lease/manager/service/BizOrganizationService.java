@@ -7,7 +7,7 @@ import com.elextec.persist.model.mybatis.BizOrganization;
 import java.util.List;
 
 /**
- * 接口 公司组织Service
+ * 公司组织Service
  * Created by Yangkun on 2018/1/29
  */
 public interface BizOrganizationService {

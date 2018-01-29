@@ -29,7 +29,7 @@ import java.util.List;
 @RequestMapping(path = "/manager/org")
 public class BizOrgController extends BaseController {
 
-    /* 日志 */
+    /*日志*/
     private final Logger logger = LoggerFactory.getLogger(BizOrgController.class);
 
     @Autowired

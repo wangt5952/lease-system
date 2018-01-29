@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 public class BizOrganizationServiceImpl implements BizOrganizationService {
 
-    /*日志信息*/
+    /*日志*/
     private final Logger logger = LoggerFactory.getLogger(BizOrganizationServiceImpl.class);
 
     @Autowired

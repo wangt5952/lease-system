@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.BizOrganizationMapperExt">
+
+    <!--根据code查询-->
     <select id="getByCode" parameterType="java.lang.String" resultType="com.elextec.persist.model.mybatis.BizOrganization">
         SELECT * FROM biz_organization WHERE org_code = #{orgCode,jdbcType=VARCHAR}
     </select>
+
 </mapper>

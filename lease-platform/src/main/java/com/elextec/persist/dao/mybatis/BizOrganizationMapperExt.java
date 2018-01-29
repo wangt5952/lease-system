@@ -5,7 +5,7 @@ import com.elextec.persist.model.mybatis.BizOrganization;
 public interface BizOrganizationMapperExt extends BizOrganizationMapper {
 
     /**
-     * 根据code查询
+     * 根据code查询对象
      * @param orgCode
      * @return
      */
