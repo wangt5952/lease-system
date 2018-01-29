@@ -44,9 +44,9 @@ export default {
       form.loginAuthStr = md5(form.loginName + md5(password).toUpperCase() + loginTime).toUpperCase();
       form.loginTime = loginTime;
 
-      try{
+      try {
         const { code, message, respData } = (await this.$http.post('/api/manager/auth/login', form)).body;
-        if (code != '200') throw new Error(message || code );
+        if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_res_info, key_user_info } = respData;
         await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
         this.$message.success({
@@ -57,8 +57,8 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      //this.$router.push('/');
-    }
+      // this.$router.push('/');
+    },
   },
 };
 </script>

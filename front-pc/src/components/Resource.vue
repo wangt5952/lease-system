@@ -152,14 +152,14 @@ export default {
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
-          currPage: this.currentPage, pageSize: this.pageSize
+          currPage: this.currentPage, pageSize: this.pageSize,
         })).body;
-        if (code != '200') throw new Error(message);
+        if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
         this.list = _.map(rows, o => ({
           ...o,
-          resTypeText: (_.find(this.typeList, { id: o.resType }) || {name: o.resType}).name,
+          resTypeText: (_.find(this.typeList, { id: o.resType }) || { name: o.resType }).name,
           showFlagText: (_.find(this.showFlagList, { id: o.showFlag }) || {}).name,
         }));
       } catch (e) {
@@ -170,8 +170,8 @@ export default {
     async handleDelete({ id, resName }) {
       try {
         await this.$confirm(`确认删除${resName}, 是否继续?`, '提示', { type: 'warning' });
-        const { code, message, respData } = (await this.$http.post('/api/manager/res/delete', [id])).body;
-        if (code != '200') throw new Error(message);
+        const { code, message } = (await this.$http.post('/api/manager/res/delete', [id])).body;
+        if (code !== '200') throw new Error(message);
         await this.reload();
         this.$message.success('删除成功');
       } catch (e) {
@@ -181,7 +181,8 @@ export default {
     },
 
     showForm(form = { }) {
-      this.form = _.pick(form, ['id',
+      this.form = _.pick(form, [
+        'id',
         'resCode',
         'resName',
         'resType',
@@ -206,22 +207,22 @@ export default {
 
         if (this.form.id) {
           const { ...form } = this.form;
-          if (form.parent == '') form.parent = null;
+          if (form.parent === '') form.parent = null;
           form.update_user = loginName;
-          const { code, message, respData } = (await this.$http.post('/api/manager/res/modify', form)).body;
-          if (code != '200') throw new Error(message);
+          const { code, message } = (await this.$http.post('/api/manager/res/modify', form)).body;
+          if (code !== '200') throw new Error(message);
           this.$message.success('编辑成功');
         } else {
           const { ...form } = this.form;
-          if (form.parent == '') form.parent = null;
+          if (form.parent === '') form.parent = null;
           form.create_user = loginName;
           form.update_user = loginName;
-          const { code, message, respData } = (await this.$http.post('/api/manager/res/add', [form])).body;
-          if (code != '200') throw new Error(message);
+          const { code, message } = (await this.$http.post('/api/manager/res/add', [form])).body;
+          if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }
         await this.reload();
-        this.closeForm()
+        this.closeForm();
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
