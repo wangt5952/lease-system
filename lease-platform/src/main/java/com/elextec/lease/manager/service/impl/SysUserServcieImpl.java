@@ -91,7 +91,7 @@ public class SysUserServcieImpl implements SysUserService {
         lnCriteria.andLoginNameEqualTo(userInfo.getLoginName());
         int lnCnt = sysUserMapperExt.countByExample(lnExample);
         if (0 < lnCnt) {
-            throw new BizException(RunningResult.MULTIPLE_USER.code(), "用户名(" + userInfo.getLoginName() + ")已存在");
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "用户名(" + userInfo.getLoginName() + ")已存在");
         }
         // 手机号码重复提示错误
         SysUserExample mobileExample = new SysUserExample();
@@ -99,7 +99,7 @@ public class SysUserServcieImpl implements SysUserService {
         mobileCriteria.andUserMobileEqualTo(userInfo.getUserMobile());
         int mobileCnt = sysUserMapperExt.countByExample(mobileExample);
         if (0 < mobileCnt) {
-            throw new BizException(RunningResult.MULTIPLE_USER.code(), "手机号码(" + userInfo.getUserMobile() + ")已存在");
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "手机号码(" + userInfo.getUserMobile() + ")已存在");
         }
         // 保存用户信息
         try {
