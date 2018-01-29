@@ -1,16 +1,9 @@
 package com.elextec.lease.device.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
-import com.elextec.framework.common.constants.RunningResult;
-import com.elextec.framework.common.constants.WzConstants;
-import com.elextec.framework.common.request.LoginParam;
-import com.elextec.framework.common.response.MessageResponse;
-import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.redis.RedisClient;
 import com.elextec.framework.utils.WzStringUtil;
-import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.BizDeviceConfService;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.model.mybatis.BizDeviceConf;
@@ -18,15 +11,9 @@ import com.elextec.persist.model.mybatis.BizDeviceConfKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 与硬件设备接口.
@@ -34,9 +21,9 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @RequestMapping(path = "/device/v1")
-public class DeviceController extends BaseController {
+public class DeviceApi extends BaseController {
     /** 日志. */
-    private final Logger logger = LoggerFactory.getLogger(DeviceController.class);
+    private final Logger logger = LoggerFactory.getLogger(DeviceApi.class);
 
     private static final String RESP_ERR_CODE = "errorcode";
     private static final String RESP_ERR_MSG = "errormsg";

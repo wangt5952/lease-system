@@ -56,24 +56,24 @@ public class SysUserController extends BaseController {
      *         respData:[
      *             {
      *                 id:ID,
-     *                 login_name:用户名,
-     *                 user_mobile:用户手机号码,
-     *                 user_type:用户类型（平台、企业或个人）,
-     *                 user_icon:用户LOGO路径,
+     *                 loginName:用户名,
+     *                 userMobile:用户手机号码,
+     *                 userType:用户类型（平台、企业或个人）,
+     *                 userIcon:用户LOGO路径,
      *                 password:密码,
-     *                 nick_name:昵称,
-     *                 user_name:姓名,
-     *                 user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
-     *                 user_pid:身份证号,
-     *                 user_ic_front:身份证正面照片路径,
-     *                 user_ic_back:身份证背面照片路径,
-     *                 user_ic_group:用户手举身份证合照路径,
-     *                 org_id:所属组织ID,
-     *                 user_status:用户状态（正常、冻结、作废）,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 nickName:昵称,
+     *                 userName:姓名,
+     *                 userRealNameAuthFlag:用户实名认证标志（已实名、未实名）,
+     *                 userPid:身份证号,
+     *                 userIcFront:身份证正面照片路径,
+     *                 userIcBack:身份证背面照片路径,
+     *                 userIcGroup:用户手举身份证合照路径,
+     *                 orgId:所属组织ID,
+     *                 userStatus:用户状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             },
      *             ... ...
      *         ]
@@ -98,9 +98,9 @@ public class SysUserController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<SysUser> resPageResp = sysUserService.list(true, pagingParam);
+            PageResponse<SysUser> userPageResp = sysUserService.list(true, pagingParam);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, resPageResp);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, userPageResp);
             return mr;
         }
     }
@@ -111,22 +111,22 @@ public class SysUserController extends BaseController {
      * <pre>
      *     [
      *         {
-     *             login_name:用户名（必填）,
-     *             user_mobile:用户手机号码（必填）,
-     *             user_type:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）（必填）,
-     *             user_icon:用户LOGO路径（非必填）,
+     *             loginName:用户名（必填）,
+     *             userMobile:用户手机号码（必填）,
+     *             userType:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）（必填）,
+     *             userIcon:用户LOGO路径（非必填）,
      *             password:密码（非必填）,
-     *             nick_name:昵称（非必填）,
-     *             user_name:姓名（非必填）,
-     *             user_real_name_auth_flag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）（必填）,
-     *             user_pid:身份证号（非必填）,
-     *             user_ic_front:身份证正面照片路径（非必填）,
-     *             user_ic_back:身份证背面照片路径（非必填）,
-     *             user_ic_group:用户手举身份证合照路径（非必填）,
-     *             org_id:所属组织ID（非必填）,
-     *             user_status:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）（必填）,
-     *             create_user:创建人（必填）,
-     *             update_user:更新人（必填）
+     *             nickName:昵称（非必填）,
+     *             userName:姓名（非必填）,
+     *             userRealNameAuthFlag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）（必填）,
+     *             userPid:身份证号（非必填）,
+     *             userIcFront:身份证正面照片路径（非必填）,
+     *             userIcBack:身份证背面照片路径（非必填）,
+     *             userIcGroup:用户手举身份证合照路径（非必填）,
+     *             orgId:所属组织ID（非必填）,
+     *             userStatus:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）（必填）,
+     *             createUser:创建人（必填）,
+     *             updateUser:更新人（必填）
      *         }
      *     ]
      * </pre>
@@ -147,17 +147,17 @@ public class SysUserController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<SysUser> resInfos = null;
+            List<SysUser> userInfos = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                resInfos = JSON.parseArray(paramStr, SysUser.class);
-                if (null == resInfos) {
+                userInfos = JSON.parseArray(paramStr, SysUser.class);
+                if (null == userInfos || 0 == userInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.insertSysUsers(resInfos);
+            sysUserService.insertSysUsers(userInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -169,22 +169,22 @@ public class SysUserController extends BaseController {
      * @param addParam 新增参数列表JSON
      * <pre>
      *     {
-     *         login_name:用户名（必填）,
-     *         user_mobile:用户手机号码（必填）,
-     *         user_type:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）（必填）,
-     *         user_icon:用户LOGO路径（非必填）,
+     *         loginName:用户名（必填）,
+     *         userMobile:用户手机号码（必填）,
+     *         userType:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）（必填）,
+     *         userIcon:用户LOGO路径（非必填）,
      *         password:密码（非必填）,
-     *         nick_name:昵称（非必填）,
-     *         user_name:姓名（非必填）,
-     *         user_real_name_auth_flag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）（必填）,
-     *         user_pid:身份证号（非必填）,
-     *         user_ic_front:身份证正面照片路径（非必填）,
-     *         user_ic_back:身份证背面照片路径（非必填）,
-     *         user_ic_group:用户手举身份证合照路径（非必填）,
-     *         org_id:所属组织ID（非必填）,
-     *         user_status:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）（必填）,
-     *         create_user:创建人（必填）,
-     *         update_user:更新人（必填）
+     *         nickName:昵称（非必填）,
+     *         userName:姓名（非必填）,
+     *         userRealNameAuthFlag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）（必填）,
+     *         userPid:身份证号（非必填）,
+     *         userIcFront:身份证正面照片路径（非必填）,
+     *         userIcBack:身份证背面照片路径（非必填）,
+     *         userIcGroup:用户手举身份证合照路径（非必填）,
+     *         orgId:所属组织ID（非必填）,
+     *         userStatus:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）（必填）,
+     *         createUser:创建人（必填）,
+     *         updateUuser:更新人（必填）
      *     }
      * </pre>
      * @return 新增结果
@@ -227,21 +227,21 @@ public class SysUserController extends BaseController {
      * <pre>
      *     {
      *         id:ID（必填）,
-     *         login_name:用户名,
-     *         user_mobile:用户手机号码,
-     *         user_type:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）,
-     *         user_icon:用户LOGO路径,
+     *         loginName:用户名,
+     *         userMobile:用户手机号码,
+     *         userType:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）,
+     *         userIcon:用户LOGO路径,
      *         password:密码,
-     *         nick_name:昵称,
-     *         user_name:姓名,
-     *         user_real_name_auth_flag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）,
-     *         user_pid:身份证号,
-     *         user_ic_front:身份证正面照片路径,
-     *         user_ic_back:身份证背面照片路径,
-     *         user_ic_group:用户手举身份证合照路径,
-     *         org_id:所属组织ID,
-     *         user_status:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）,
-     *         update_user:更新人
+     *         nickName:昵称,
+     *         userName:姓名,
+     *         userRealNameAuthFlag:用户实名认证标志（AUTHORIZED-已实名、UNAUTHORIZED-未实名）,
+     *         userPid:身份证号,
+     *         userIcFront:身份证正面照片路径,
+     *         userIcBack:身份证背面照片路径,
+     *         userIcGoup:用户手举身份证合照路径,
+     *         orgId:所属组织ID,
+     *         userStatus:用户状态（NORMAL-正常、FREEZE-冻结、INVALID-作废）,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 修改结果
@@ -261,17 +261,20 @@ public class SysUserController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            SysUser resInfo = null;
+            SysUser userInfo = null;
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
-                resInfo = JSON.parseObject(paramStr, SysUser.class);
-                if (null == resInfo) {
+                userInfo = JSON.parseObject(paramStr, SysUser.class);
+                if (null == userInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(userInfo.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.updateSysUser(resInfo);
+            sysUserService.updateSysUser(userInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -301,17 +304,17 @@ public class SysUserController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> resIds = null;
+            List<String> userIds = null;
             try {
                 String paramStr = URLDecoder.decode(deleteParam, "utf-8");
-                resIds = JSON.parseArray(paramStr, String.class);
-                if (null == resIds) {
+                userIds = JSON.parseArray(paramStr, String.class);
+                if (null == userIds || 0 == userIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.deleteSysUser(resIds);
+            sysUserService.deleteSysUser(userIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -375,24 +378,24 @@ public class SysUserController extends BaseController {
      *         message:返回消息,
      *         respData:{
      *                 id:ID,
-     *                 login_name:用户名,
-     *                 user_mobile:用户手机号码,
-     *                 user_type:用户类型（平台、企业或个人）,
-     *                 user_icon:用户LOGO路径,
+     *                 loginName:用户名,
+     *                 userMobile:用户手机号码,
+     *                 userType:用户类型（平台、企业或个人）,
+     *                 userIcon:用户LOGO路径,
      *                 password:密码,
-     *                 nick_name:昵称,
-     *                 user_name:姓名,
-     *                 user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
-     *                 user_pid:身份证号,
-     *                 user_ic_front:身份证正面照片路径,
-     *                 user_ic_back:身份证背面照片路径,
-     *                 user_ic_group:用户手举身份证合照路径,
-     *                 org_id:所属组织ID,
-     *                 user_status:用户状态（正常、冻结、作废）,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 nickName:昵称,
+     *                 userName:姓名,
+     *                 userRealNameAuthFlag:用户实名认证标志（已实名、未实名）,
+     *                 userPid:身份证号,
+     *                 userIcFront:身份证正面照片路径,
+     *                 userIcBack:身份证背面照片路径,
+     *                 userIcGroup:用户手举身份证合照路径,
+     *                 orgId:所属组织ID,
+     *                 userStatus:用户状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             }
      *     }
      * </pre>
