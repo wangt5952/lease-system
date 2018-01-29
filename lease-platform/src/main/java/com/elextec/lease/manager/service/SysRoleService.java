@@ -30,6 +30,12 @@ public interface SysRoleService {
     public void insertSysRoles(List<SysRole> roleInfos);
 
     /**
+     * 插入角色.
+     * @param roleInfo 角色信息
+     */
+    public void insertSysRole(SysRole roleInfo);
+
+    /**
      * 修改角色信息.
      * @param roleInfo 新的角色信息
      */

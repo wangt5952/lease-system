@@ -140,6 +140,77 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
+    public void insertVehicle(VehicleBatteryParam vehicleInfo) {
+        // 车辆编号重复提示错误
+        BizVehicleExample lnExample = new BizVehicleExample();
+        BizVehicleExample.Criteria lnCriteria = lnExample.createCriteria();
+        lnCriteria.andVehicleCodeEqualTo(vehicleInfo.getBizVehicleInfo().getVehicleCode());
+        int lnCnt = bizVehicleMapperExt.countByExample(lnExample);
+        if (0 < lnCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "车辆编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
+        }
+        // 电池编号重复提示错误
+        BizBatteryExample brExample = new BizBatteryExample();
+        BizBatteryExample.Criteria brCriteria = brExample.createCriteria();
+        brCriteria.andBatteryCodeEqualTo(vehicleInfo.getBatteryInfo().getBatteryCode());
+        int brCnt = bizBatteryMapperExt.countByExample(brExample);
+        if (0 < brCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
+        }
+        BizVehicle insertVehicleVo = null;
+        BizBattery insertBatteryVo = null;
+        BizRefVehicleBattery temp = new BizRefVehicleBattery();
+        try {
+            //新车与新电池信息配对
+            if("0".equals(vehicleInfo.getFlag())){
+                insertVehicleVo = vehicleInfo.getBizVehicleInfo();
+                insertBatteryVo = vehicleInfo.getBatteryInfo();
+                String vehicleId = WzUniqueValUtil.makeUUID();
+                String batteryId = WzUniqueValUtil.makeUUID();
+                //插入新车信息
+                insertVehicleVo.setId(vehicleId);
+                insertVehicleVo.setCreateTime(new Date());
+                bizVehicleMapperExt.insertSelective(insertVehicleVo);
+                //插入新电池信息
+                insertBatteryVo.setId(batteryId);
+                insertBatteryVo.setCreateTime(new Date());
+                bizBatteryMapperExt.insertSelective(insertBatteryVo);
+                //插入新车与新电池的MAP信息
+                temp.setVehicleId(vehicleId);
+                temp.setBatteryId(batteryId);
+                temp.setBindTime(new Date());
+                bizRefVehicleBatteryMapperExt.insertSelective(temp);
+            }
+            //新车与旧电池配对
+            else if("1".equals(vehicleInfo.getFlag()))
+            {
+                insertVehicleVo = vehicleInfo.getBizVehicleInfo();
+                String vehicleId = WzUniqueValUtil.makeUUID();
+                //插入新车信息
+                insertVehicleVo.setId(vehicleId);
+                insertVehicleVo.setCreateTime(new Date());
+                bizVehicleMapperExt.insertSelective(insertVehicleVo);
+                //插入新车与旧电池MAP信息
+                temp.setVehicleId(vehicleId);
+                temp.setBatteryId(vehicleInfo.getBatteryInfo().getId());
+                temp.setBindTime(new Date());
+                bizRefVehicleBatteryMapperExt.insertSelective(temp);
+            }
+            //只有新车信息
+            else if("2".equals(vehicleInfo.getFlag()))
+            {
+                insertVehicleVo = vehicleInfo.getBizVehicleInfo();
+                //插入新车信息
+                insertVehicleVo.setId(WzUniqueValUtil.makeUUID());
+                insertVehicleVo.setCreateTime(new Date());
+                bizVehicleMapperExt.insertSelective(insertVehicleVo);
+            }
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
+        }
+    }
+
+    @Override
     @Transactional
     public void updateVehicle(BizVehicle vehicle) {
         bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);

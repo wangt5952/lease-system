@@ -30,6 +30,12 @@ public interface SysResourceService {
     public void insertSysResources(List<SysResources> resourceInfos);
 
     /**
+     * 插入资源.
+     * @param resourceInfo 资源信息
+     */
+    public void insertSysResource(SysResources resourceInfo);
+
+    /**
      * 修改资源信息.
      * @param res 新的资源信息
      */

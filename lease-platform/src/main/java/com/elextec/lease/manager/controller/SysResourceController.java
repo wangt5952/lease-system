@@ -157,6 +157,61 @@ public class SysResourceController extends BaseController {
     }
 
     /**
+     * 增加资源.
+     * @param addParam 批量新增参数JSON
+     * <pre>
+     *
+     *         {
+     *             res_code:资源编码,
+     *             res_name:资源名,
+     *             res_type:资源类型（目录、菜单、页面、功能或按钮）,
+     *             res_url:资源请求URL,
+     *             group_sort:分组排序,
+     *             res_sort:组内排序,
+     *             show_flag:显示标志（显示、不显示）,
+     *             parent:上级资源（Root为空）,
+     *             level:级别,
+     *             create_user:创建人,
+     *             update_user:更新人
+     *         }
+     *
+     * </pre>
+     * @return 新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/addone")
+    public MessageResponse addone(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            SysResources resInfo = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                resInfo = JSON.parseObject(paramStr, SysResources.class);
+                if (null == resInfo) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            sysResourceService.insertSysResource(resInfo);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+
+    /**
      * 修改资源信息.
      * @param modifyParam 修改参数JSON
      * <pre>

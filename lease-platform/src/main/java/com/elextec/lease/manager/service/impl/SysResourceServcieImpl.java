@@ -81,6 +81,25 @@ public class SysResourceServcieImpl implements SysResourceService {
     }
 
     @Override
+    public void insertSysResource(SysResources resourceInfo) {
+        // 资源code重复提示错误
+        SysResourcesExample lnExample = new SysResourcesExample();
+        SysResourcesExample.Criteria lnCriteria = lnExample.createCriteria();
+        lnCriteria.andResCodeEqualTo(resourceInfo.getResCode());
+        int lnCnt = sysResourcesMapperExt.countByExample(lnExample);
+        if (0 < lnCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "资源code(" + resourceInfo.getResCode() + ")已存在");
+        }
+        try {
+            resourceInfo.setId(WzUniqueValUtil.makeUUID());
+            resourceInfo.setCreateTime(new Date());
+            sysResourcesMapperExt.insertSelective(resourceInfo);
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
+        }
+    }
+
+    @Override
     @Transactional
     public void updateSysResources(SysResources res) {
         sysResourcesMapperExt.updateByPrimaryKeySelective(res);

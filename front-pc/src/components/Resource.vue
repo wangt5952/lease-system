@@ -137,11 +137,11 @@ export default {
   },
   watch: {
     formVisible(v) {
-      if(!v){
+      if (!v) {
         const $form = this.$refs.form;
         $form.resetFields();
       }
-    }
+    },
   },
   methods: {
     async handleSizeChange(pageSize) {
@@ -154,7 +154,7 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
           currPage: this.currentPage, pageSize: this.pageSize
         })).body;
-        if(code != '200') throw new Error(message);
+        if (code != '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
         this.list = _.map(rows, o => ({
@@ -171,7 +171,7 @@ export default {
       try {
         await this.$confirm(`确认删除${resName}, 是否继续?`, '提示', { type: 'warning' });
         const { code, message, respData } = (await this.$http.post('/api/manager/res/delete', [id])).body;
-        if(code != '200') throw new Error(message);
+        if (code != '200') throw new Error(message);
         await this.reload();
         this.$message.success('删除成功');
       } catch (e) {
@@ -206,24 +206,24 @@ export default {
 
         if (this.form.id) {
           const { ...form } = this.form;
-          if(form.parent == '') form.parent = null;
+          if (form.parent == '') form.parent = null;
           form.update_user = loginName;
           const { code, message, respData } = (await this.$http.post('/api/manager/res/modify', form)).body;
-          if(code != '200') throw new Error(message);
+          if (code != '200') throw new Error(message);
           this.$message.success('编辑成功');
         } else {
           const { ...form } = this.form;
-          if(form.parent == '') form.parent = null;
+          if (form.parent == '') form.parent = null;
           form.create_user = loginName;
           form.update_user = loginName;
           const { code, message, respData } = (await this.$http.post('/api/manager/res/add', [form])).body;
-          if(code != '200') throw new Error(message);
+          if (code != '200') throw new Error(message);
           this.$message.success('添加成功');
         }
         await this.reload();
         this.closeForm()
       } catch (e) {
-        if(!e) return;
+        if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
