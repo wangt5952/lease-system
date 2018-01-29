@@ -16,25 +16,31 @@ public interface BizOrganizationService {
      * 获得公司组织列表.
      * @param needPaging 是否需要分页
      * @param pr 分页参数
-     * @return 制造商列表
+     * @return 公司组织列表
      */
     public PageResponse<BizOrganization> list(boolean needPaging, PageRequest pr);
 
     /**
      * 批量插入公司组织.
-     * @param mfrsInfos 制造商信息
+     * @param orgInfos 公司组织信息
      */
-    public void insertBizOrganization(List<BizOrganization> mfrsInfos);
+    public void insertBizOrganization(List<BizOrganization> orgInfos);
+
+    /**
+     * 插入资源.
+     * @param orgInfo 资源信息
+     */
+    public void insertBizOrganization(BizOrganization orgInfo);
 
     /**
      * 修改公司组织信息.
-     * @param mfrsInfo 新的制造商信息
+     * @param orgInfo 新的公司组织信息
      */
-    public void updateBizOrganization(BizOrganization mfrsInfo);
+    public void updateBizOrganization(BizOrganization orgInfo);
 
     /**
      * 批量删除公司组织.
-     * @param ids 待删除的制造商ID列表
+     * @param ids 待删除的公司ID列表
      */
     public void deleteBizOrganization(List<String> ids);
 

@@ -155,7 +155,7 @@ public class BizOrgController extends BaseController {
     }
 
     /**
-     * 修改制造商信息.
+     * 修改公司组织信息.
      * @param modifyParam 修改参数JSON
      * <pre>
      *     {
@@ -207,7 +207,62 @@ public class BizOrgController extends BaseController {
     }
 
     /**
-     * 批量删除制造商.
+     * 增加资源.
+     * @param addParam 批量新增参数JSON
+     * <pre>
+     *
+     *         {
+     *            org_code:组织Code,
+     *            org_name:组织名称,
+     *            org_introduce:组织介绍,
+     *            org_address:组织地址,
+     *            org_contacts:联系人（多人用 , 分割）,
+     *            org_phone:联系电话（多个电话用 , 分割）,
+     *            org_business_licences:营业执照号码,
+     *            org_business_licence_front:营业执照正面照片路径,
+     *            org_business_licence_back:营业执照背面照片路径,
+     *            org_status:组织状态（正常、冻结、作废）,
+     *            create_user:创建人
+     *            update_user:更新人
+     *         }
+     *
+     * </pre>
+     * @return 新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/addone")
+    public MessageResponse addone(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            BizOrganization resInfo = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                resInfo = JSON.parseObject(paramStr, BizOrganization.class);
+                if (null == resInfo) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizOrganizationService.insertBizOrganization(resInfo);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 批量删除公司组织.
      * @param deleteParam 删除ID列表JSON
      * <pre>
      *     [ID1,ID2,......]
@@ -247,7 +302,7 @@ public class BizOrgController extends BaseController {
     }
 
     /**
-     * 根据id查询制造商信息.
+     * 根据id查询公司组织信息.
      * @param id 查询ID
      * <pre>
      *     [id]
