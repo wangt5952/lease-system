@@ -207,7 +207,7 @@ public class BizOrgController extends BaseController {
     }
 
     /**
-     * 增加资源.
+     * 增加公司组织资源.
      * @param addParam 批量新增参数JSON
      * <pre>
      *
@@ -236,7 +236,7 @@ public class BizOrgController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/addone")
+    @RequestMapping(value = "/addone",method = RequestMethod.POST)
     public MessageResponse addone(@RequestBody String addParam) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {

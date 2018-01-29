@@ -27,7 +27,7 @@ public interface BizOrganizationService {
     public void insertBizOrganization(List<BizOrganization> orgInfos);
 
     /**
-     * 插入资源.
+     * 插入公司组织资源.
      * @param orgInfo 资源信息
      */
     public void insertBizOrganization(BizOrganization orgInfo);
