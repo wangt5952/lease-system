@@ -11,10 +11,10 @@
           </div>
           <el-form ref="form" :model="form" style="margin-top:40px;" >
             <el-form-item>
-              <el-input prefix-icon="lt lt-my" size="medium" v-model="form.username" placeholder="用户名"></el-input>
+              <el-input prefix-icon="lt lt-my" size="medium" v-model="form.loginName" placeholder="用户名"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-input prefix-icon="lt lt-lock" size="medium" v-model="form.password" placeholder="密码"></el-input>
+              <el-input prefix-icon="lt lt-lock" size="medium" v-model="form.password" type="password" placeholder="密码"></el-input>
             </el-form-item>
 
             <div style="cursor:pointer;background:#fff;border:2px solid #000;margin:40px 20px;text-align:center;padding:10px;border-radius:3px;" @click="handleSubmit" >登录</div>
@@ -28,17 +28,37 @@
 </template>
 
 <script>
+import moment from 'moment';
+import md5 from 'js-md5';
+
 export default {
   data() {
     return {
       form: {},
-      msg: 'Welcome to Your Vue.js App',
     };
   },
   methods: {
-    handleSubmit() {
-      this.$router.push('/');
-    },
+    async handleSubmit() {
+      const { password, ...form } = this.form;
+      const loginTime = moment().unix() * 1000;
+      form.loginAuthStr = md5(form.loginName + md5(password).toUpperCase() + loginTime).toUpperCase();
+      form.loginTime = loginTime;
+
+      try{
+        const { code, message, respData } = (await this.$http.post('/api/manager/auth/login', form)).body;
+        if(code != '200') throw new Error(message || code );
+        const { key_login_token, key_res_info, key_user_info } = respData;
+        await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
+        this.$message.success({
+          message: `欢迎回来，${key_user_info.userName}`,
+        });
+        this.$router.push('/');
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      //this.$router.push('/');
+    }
   },
 };
 </script>
