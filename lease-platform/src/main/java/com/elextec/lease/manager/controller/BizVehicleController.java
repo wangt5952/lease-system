@@ -163,6 +163,77 @@ public class BizVehicleController extends BaseController {
     }
 
     /**
+     * 增加车辆信息.（车辆与电池信息配对）
+     * @param addParams 车辆电池配对信息列表JSON
+     * <pre>
+     *     {
+     *          "bizVehicleInfo": {
+     *               vehicle_code:车辆编号,
+     *               vehicle_pn:车辆型号,
+     *               vehicle_brand:车辆品牌,
+     *               vehicle_made_in:车辆产地,
+     *               mfrs_id:生产商ID,
+     *               vehicle_status:车辆状态（正常、冻结、报废）,
+     *               create_user:创建人,
+     *               create_time:创建时间,
+     *               update_user:更新人,
+     *               update_time:更新时间
+     *
+     *          },
+     *          "flag": 有无电池flag("0"是新车配新电池信息,"1"是新车配旧电池信息,旧电池信息只带ID既可,"2"是只有车辆信息，电池信息不用传),
+     *          "batteryInfo": {
+     *               id:ID,
+     *               battery_code:电池编号,
+     *               battery_name:电池货名,
+     *               battery_brand:电池品牌,
+     *               battery_pn:电池型号,
+     *               battery_parameters:电池参数,
+     *               mfrs_id:生产商ID,
+     *               battery_status:电池状态（正常、冻结、作废）,
+     *               create_user:创建人,
+     *               create_time:创建时间,
+     *               update_user:更新人,
+     *               update_time:更新时间
+     *          }
+     *    }
+     * </pre>
+     * @return 新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/addone")
+    public MessageResponse addone(@RequestBody String addParams) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParams)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            VehicleBatteryParam resInfos = null;
+            try {
+                String paramStr = URLDecoder.decode(addParams, "utf-8");
+                resInfos = JSON.parseObject(paramStr, VehicleBatteryParam.class);
+                if (null == resInfos) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizVehicleService.insertVehicle(resInfos);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+
+
+    /**
      * 修改车辆信息.
      * @param vehicle 车辆信息JSON
      * <pre>

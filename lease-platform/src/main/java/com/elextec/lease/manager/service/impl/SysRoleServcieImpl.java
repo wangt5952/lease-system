@@ -81,6 +81,26 @@ public class SysRoleServcieImpl implements SysRoleService {
     }
 
     @Override
+    public void insertSysRole(SysRole roleInfo) {
+        // 角色名称重复提示错误
+        SysRoleExample lnExample = new SysRoleExample();
+        SysRoleExample.Criteria lnCriteria = lnExample.createCriteria();
+        lnCriteria.andRoleNameEqualTo(roleInfo.getRoleName());
+        int lnCnt = sysRoleMapperExt.countByExample(lnExample);
+        if (0 < lnCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "角色名称(" + roleInfo.getRoleName() + ")已存在");
+        }
+        // 保存用户信息
+        try {
+            roleInfo.setId(WzUniqueValUtil.makeUUID());
+            roleInfo.setCreateTime(new Date());
+            sysRoleMapperExt.insertSelective(roleInfo);
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
+        }
+    }
+
+    @Override
     @Transactional
     public void updateSysRole(SysRole res) {
         sysRoleMapperExt.updateByPrimaryKeySelective(res);
