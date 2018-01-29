@@ -396,21 +396,4 @@ public class BizManufacturer implements Serializable {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
-
-    public String showInfo() {
-        return "BizManufacturer{" +
-                "id='" + id + '\'' +
-                ", mfrsName='" + mfrsName + '\'' +
-                ", mfrsType=" + mfrsType +
-                ", mfrsIntroduce='" + mfrsIntroduce + '\'' +
-                ", mfrsAddress='" + mfrsAddress + '\'' +
-                ", mfrsContacts='" + mfrsContacts + '\'' +
-                ", mfrsPhone='" + mfrsPhone + '\'' +
-                ", mfrsStatus='" + mfrsStatus + '\'' +
-                ", createUser='" + createUser + '\'' +
-                ", createTime=" + createTime +
-                ", updateUser='" + updateUser + '\'' +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }
