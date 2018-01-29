@@ -51,17 +51,17 @@ public class BizBatteryController extends BaseController {
      *         respData:[
      *             {
      *                 id:ID,
-     *                 battery_code:电池编号,
-     *                 battery_name:电池货名,
-     *                 battery_brand:电池品牌,
-     *                 battery_pn:电池型号,
-     *                 battery_parameters:电池参数,
-     *                 mfrs_id:生产商ID,
-     *                 battery_status:电池状态（正常、冻结、作废）,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 batteryCode:电池编号,
+     *                 batteryName:电池货名,
+     *                 batteryBrand:电池品牌,
+     *                 batteryPn:电池型号,
+     *                 batteryParameters:电池参数,
+     *                 mfrsId:生产商ID,
+     *                 batteryStatus:电池状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             },
      *             ... ...
      *         ]
@@ -86,9 +86,9 @@ public class BizBatteryController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<BizBattery> resPageResp = bizBatteryService.list(true, pagingParam);
+            PageResponse<BizBattery> batteryPageResp = bizBatteryService.list(true, pagingParam);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, resPageResp);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, batteryPageResp);
             return mr;
         }
     }
@@ -99,15 +99,15 @@ public class BizBatteryController extends BaseController {
      * <pre>
      *     [
      *         {
-     *              battery_code:电池编号,
-     *              battery_name:电池货名,
-     *              battery_brand:电池品牌,
-     *              battery_pn:电池型号,
-     *              battery_parameters:电池参数,
-     *              mfrs_id:生产商ID,
-     *              battery_status:电池状态（正常、冻结、作废）,
-     *              create_user:创建人,
-     *              update_user:更新人
+     *              batteryCode:电池编号,
+     *              batteryName:电池货名,
+     *              batteryBrand:电池品牌,
+     *              batteryPn:电池型号,
+     *              batteryParameters:电池参数,
+     *              mfrsId:生产商ID,
+     *              batteryStatus:电池状态（正常、冻结、作废）,
+     *              createUser:创建人,
+     *              updateUser:更新人
      *         }
      *     ]
      * </pre>
@@ -128,17 +128,17 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<BizBattery> resInfos = null;
+            List<BizBattery> batteryInfos = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                resInfos = JSON.parseArray(paramStr, BizBattery.class);
-                if (null == resInfos) {
+                batteryInfos = JSON.parseArray(paramStr, BizBattery.class);
+                if (null == batteryInfos || 0 == batteryInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.insertBatterys(resInfos);
+            bizBatteryService.insertBatterys(batteryInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -150,15 +150,15 @@ public class BizBatteryController extends BaseController {
      * @param addParam 新增参数列表JSON
      * <pre>
      *     {
-     *         battery_code:电池编号,
-     *         battery_name:电池货名,
-     *         battery_brand:电池品牌,
-     *         battery_pn:电池型号,
-     *         battery_parameters:电池参数,
-     *         mfrs_id:生产商ID,
-     *         battery_status:电池状态（正常、冻结、作废）,
-     *         create_user:创建人,
-     *         update_user:更新人
+     *         batteryCode:电池编号,
+     *         batteryName:电池货名,
+     *         batteryBrand:电池品牌,
+     *         batteryPn:电池型号,
+     *         batteryPrameters:电池参数,
+     *         mfrsId:生产商ID,
+     *         batteryStatus:电池状态（正常、冻结、作废）,
+     *         createUser:创建人,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 新增结果
@@ -178,17 +178,17 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizBattery resInfo = null;
+            BizBattery batteryInfo = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                resInfo = JSON.parseObject(paramStr, BizBattery.class);
-                if (null == resInfo) {
+                batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
+                if (null == batteryInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.insertBattery(resInfo);
+            bizBatteryService.insertBattery(batteryInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -201,14 +201,14 @@ public class BizBatteryController extends BaseController {
      * <pre>
      *     {
      *         id:ID（必填）,
-     *         battery_code:电池编号,
-     *         battery_name:电池货名,
-     *         battery_brand:电池品牌,
-     *         battery_pn:电池型号,
-     *         battery_parameters:电池参数,
-     *         mfrs_id:生产商ID,
-     *         battery_status:电池状态（正常、冻结、作废）,
-     *         update_user:更新人
+     *         batteryCode:电池编号,
+     *         batteryName:电池货名,
+     *         batteryBrand:电池品牌,
+     *         batteryPn:电池型号,
+     *         batteryParameters:电池参数,
+     *         mfrsId:生产商ID,
+     *         batteryStatus:电池状态（正常、冻结、作废）,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 修改结果
@@ -228,17 +228,20 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizBattery resInfo = null;
+            BizBattery batteryInfo = null;
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
-                resInfo = JSON.parseObject(paramStr, BizBattery.class);
-                if (null == resInfo) {
+                batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
+                if (null == batteryInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(batteryInfo.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.updateBattery(resInfo);
+            bizBatteryService.updateBattery(batteryInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -268,17 +271,17 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> resIds = null;
+            List<String> batteryIds = null;
             try {
                 String paramStr = URLDecoder.decode(deleteParam, "utf-8");
-                resIds = JSON.parseArray(paramStr, String.class);
-                if (null == resIds) {
+                batteryIds = JSON.parseArray(paramStr, String.class);
+                if (null == batteryIds || 0 == batteryIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.deleteBattery(resIds);
+            bizBatteryService.deleteBattery(batteryIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -297,26 +300,19 @@ public class BizBatteryController extends BaseController {
      *         code:返回Code,
      *         message:返回消息,
      *         respData:{
-     *                 id:ID,
-     *                 login_name:用户名,
-     *                 user_mobile:用户手机号码,
-     *                 user_type:用户类型（平台、企业或个人）,
-     *                 user_icon:用户LOGO路径,
-     *                 password:密码,
-     *                 nick_name:昵称,
-     *                 user_name:姓名,
-     *                 user_real_name_auth_flag:用户实名认证标志（已实名、未实名）,
-     *                 user_pid:身份证号,
-     *                 user_ic_front:身份证正面照片路径,
-     *                 user_ic_back:身份证背面照片路径,
-     *                 user_ic_group:用户手举身份证合照路径,
-     *                 org_id:所属组织ID,
-     *                 user_status:用户状态（正常、冻结、作废）,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
-     *             }
+     *             id:ID,
+     *             batteryCode:电池编号,
+     *             batteryName:电池货名,
+     *             batteryBrand:电池品牌,
+     *             batteryPn:电池型号,
+     *             batteryParameters:电池参数,
+     *             mfrsId:生产商ID,
+     *             batteryStatus:电池状态（正常、冻结、作废）,
+     *             createUser:创建人,
+     *             createTime:创建时间,
+     *             updateUser:更新人,
+     *             updateTime:更新时间
+     *         }
      *     }
      * </pre>
      */
