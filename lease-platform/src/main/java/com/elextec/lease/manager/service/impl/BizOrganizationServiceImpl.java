@@ -64,21 +64,17 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
 
     @Override
     @Transactional
-    public void insertBizOrganization(List<BizOrganization> mfrsInfos) {
+    public void insertBizOrganization(List<BizOrganization> orgInfos) {
         int i = 0;
         BizOrganization insertVo = null;
         try {
-            for (; i < mfrsInfos.size(); i++) {
-                if (bizOrganizationMapperExt.getByCode(mfrsInfos.get(i).getOrgCode()) == null) {
-                    insertVo = mfrsInfos.get(i);
-                    insertVo.setId(WzUniqueValUtil.makeUUID());
-                    insertVo.setOrgStatus(RecordStatus.NORMAL);
-                    insertVo.setOrgType(OrgAndUserType.ENTERPRISE);
-                    insertVo.setCreateTime(new Date());
-                    bizOrganizationMapperExt.insertSelective(insertVo);
-                } else {
-                    throw new BizException(RunningResult.MULTIPLE_RECORD.code(),"不能插入重复的code");
-                }
+            for (; i < orgInfos.size(); i++) {
+                insertVo = orgInfos.get(i);
+                insertVo.setId(WzUniqueValUtil.makeUUID());
+                insertVo.setOrgStatus(RecordStatus.NORMAL);
+                insertVo.setOrgType(OrgAndUserType.ENTERPRISE);
+                insertVo.setCreateTime(new Date());
+                bizOrganizationMapperExt.insertSelective(insertVo);
             }
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误", ex);
@@ -86,9 +82,30 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     }
 
     @Override
+    public void insertBizOrganization(BizOrganization orgInfo) {
+        // 资源code重复提示错误
+        BizOrganizationExample lnExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria lnCriteria = lnExample.createCriteria();
+        lnCriteria.andOrgCodeEqualTo(orgInfo.getOrgCode());
+        int lnCnt = bizOrganizationMapperExt.countByExample(lnExample);
+        if (0 < lnCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "资源code(" + orgInfo.getOrgCode() + ")已存在");
+        }
+        try {
+            orgInfo.setId(WzUniqueValUtil.makeUUID());
+            orgInfo.setOrgStatus(RecordStatus.NORMAL);
+            orgInfo.setOrgType(OrgAndUserType.ENTERPRISE);
+            orgInfo.setCreateTime(new Date());
+            bizOrganizationMapperExt.insertSelective(orgInfo);
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
+        }
+    }
+
+    @Override
     @Transactional
-    public void updateBizOrganization(BizOrganization mfrsInfo) {
-        bizOrganizationMapperExt.updateByPrimaryKeySelective(mfrsInfo);
+    public void updateBizOrganization(BizOrganization orgInfo) {
+        bizOrganizationMapperExt.updateByPrimaryKeySelective(orgInfo);
     }
 
     @Override
