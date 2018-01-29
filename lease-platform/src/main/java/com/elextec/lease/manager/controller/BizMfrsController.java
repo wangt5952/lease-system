@@ -63,17 +63,17 @@ public class BizMfrsController extends BaseController {
      *         respData:[
      *             {
      *                 id:ID,
-     *                 mfrs_name:制造商名称,
-     *                 mfrs_type:制造商类型（车辆、电池、配件）,
-     *                 mfrs_introduce:制造商介绍,
-     *                 mfrs_address:制造商地址,
-     *                 mfrs_contacts:联系人（多人用 , 分割）,
-     *                 mfrs_phone:联系电话（多个电话用 , 分割）,
-     *                 mfrs_status:制造商状态（正常、冻结、作废）,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 mfrsName:制造商名称,
+     *                 mfrsType:制造商类型（车辆、电池、配件）,
+     *                 mfrsIntroduce:制造商介绍,
+     *                 mfrsAddress:制造商地址,
+     *                 mfrsContacts:联系人（多人用 , 分割）,
+     *                 mfrsPhone:联系电话（多个电话用 , 分割）,
+     *                 mfrsStatus:制造商状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             },
      *             ... ...
      *         ]
@@ -111,13 +111,13 @@ public class BizMfrsController extends BaseController {
      * <pre>
      *     [
      *         {
-     *             mfrs_name:制造商名称,
-     *             mfrs_introduce:制造商介绍,
-     *             mfrs_address:制造商地址,
-     *             mfrs_contacts:联系人（多人用 , 分割）,
-     *             mfrs_phone:联系电话（多个电话用 , 分割）,
-     *             create_user:创建人,
-     *             update_user:更新人
+     *             mfrsName:制造商名称,
+     *             mfrsIntroduce:制造商介绍,
+     *             mfrsAddress:制造商地址,
+     *             mfrsContacts:联系人（多人用 , 分割）,
+     *             mfrsPhone:联系电话（多个电话用 , 分割）,
+     *             createUser:创建人,
+     *             updateUser:更新人
      *         },
      *         ... ...
      *     ]
@@ -143,7 +143,7 @@ public class BizMfrsController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
                 mfrsInfos = JSON.parseArray(paramStr, BizManufacturer.class);
-                if (null == mfrsInfos) {
+                if (null == mfrsInfos || mfrsInfos.size()==0) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
@@ -161,14 +161,14 @@ public class BizMfrsController extends BaseController {
      * @param addParam 批量新增参数JSON
      * <pre>
      *  {
-     *             mfrs_name:制造商名称,
-     *             mfrs_introduce:制造商介绍,
-     *             mfrs_address:制造商地址,
-     *             mfrs_contacts:联系人（多人用 , 分割）,
-     *             mfrs_phone:联系电话（多个电话用 , 分割）,
-     *             create_user:创建人,
-     *             update_user:更新人
-     *         }
+     *             mfrsName:制造商名称,
+     *             mfrsIntroduce:制造商介绍,
+     *             mfrsAddress:制造商地址,
+     *             mfrsContacts:联系人（多人用 , 分割）,
+     *             mfrsPhone:联系电话（多个电话用 , 分割）,
+     *             createUser:创建人,
+     *             updateUser:更新人
+     *  }
      * </pre>
      * @return 新增结果
      * <pre>
@@ -187,17 +187,17 @@ public class BizMfrsController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizManufacturer resInfo = null;
+            BizManufacturer mfrs = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                resInfo = JSON.parseObject(paramStr, BizManufacturer.class);
-                if (null == resInfo) {
+                mfrs = JSON.parseObject(paramStr, BizManufacturer.class);
+                if (null == mfrs) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizManufacturerService.insertBizManufacturers(resInfo);
+            bizManufacturerService.insertBizManufacturers(mfrs);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -210,12 +210,12 @@ public class BizMfrsController extends BaseController {
      * <pre>
      *     {
      *         id:ID,
-     *         mfrs_name:制造商名称,
-     *         mfrs_introduce:制造商介绍,
-     *         mfrs_address:制造商地址,
-     *         mfrs_contacts:联系人（多人用 , 分割）,
-     *         mfrs_phone:联系电话（多个电话用 , 分割）,
-     *         update_user:更新人
+     *         mfrsName:制造商名称,
+     *         mfrsIntroduce:制造商介绍,
+     *         mfrsAddress:制造商地址,
+     *         mfrsContacts:联系人（多人用 , 分割）,
+     *         mfrsPhone:联系电话（多个电话用 , 分割）,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 修改结果
@@ -235,17 +235,17 @@ public class BizMfrsController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizManufacturer mfrsInfo = null;
+            BizManufacturer mfrs = null;
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
-                mfrsInfo = JSON.parseObject(paramStr, BizManufacturer.class);
-                if (null == mfrsInfo) {
+                mfrs = JSON.parseObject(paramStr, BizManufacturer.class);
+                if (null == mfrs) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizManufacturerService.updateBizManufacturer(mfrsInfo);
+            bizManufacturerService.updateBizManufacturer(mfrs);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -304,19 +304,19 @@ public class BizMfrsController extends BaseController {
      *         code:返回Code,
      *         message:返回消息,
      *         respData:{
-     *             id:ID,
-     *             mfrs_name:制造商名称,
-     *             mfrs_type:制造商类型（车辆、电池、配件）,
-     *             mfrs_introduce:制造商介绍,
-     *             mfrs_address:制造商地址,
-     *             mfrs_contacts:联系人（多人用 , 分割）,
-     *             mfrs_phone:联系电话（多个电话用 , 分割）,
-     *             mfrs_status:制造商状态（正常、冻结、作废）,
-     *             create_user:创建人,
-     *             create_time:创建时间,
-     *             update_user:更新人,
-     *             update_time:更新时间
-     *         }
+     *                 id:ID,
+     *                 mfrsName:制造商名称,
+     *                 mfrsType:制造商类型（车辆、电池、配件）,
+     *                 mfrsIntroduce:制造商介绍,
+     *                 mfrsAddress:制造商地址,
+     *                 mfrsContacts:联系人（多人用 , 分割）,
+     *                 mfrsPhone:联系电话（多个电话用 , 分割）,
+     *                 mfrsStatus:制造商状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             }
      *     }
      * </pre>
      */
@@ -345,4 +345,5 @@ public class BizMfrsController extends BaseController {
             return mr;
         }
     }
+
 }
