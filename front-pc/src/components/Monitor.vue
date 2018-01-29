@@ -25,7 +25,7 @@
       </div>
       <baidu-map @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="15" @moveend="syncCenterAndZoom" @zoomend="syncCenterAndZoom">
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
-        <bm-marker v-for="o in list" :key="`${[o.lng,o.lat].join(',')}`" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
+        <bm-marker v-for="o in list" :key="`${[o.lng,o.lat].join(',')}`" :icon="{url: '/static/blue-vehicle.svg', size: {width: 64, height: 64}, opts:{ imageSize: {width: 64, height: 64} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
       </baidu-map>
       <!-- <div style="display:flex;background:#eff5f8;height:180px;padding:10px 0;">
         <div style="flex:1;background:#fff;margin-left:10px;">可用车辆</div>
@@ -120,21 +120,19 @@ export default {
       batteryDialogVisible: false,
       userDialogVisible: false,
       vehiclePathVisible: false,
+
+      mapCenter: '南京',
+
     };
   },
   computed: {
     selectedItem() {
       return _.find(this.list, { id: this.selectedId }) || {};
     },
-    mapCenter() {
-      if(this.selectedItem.lng && this.selectedItem.lat){
-        const point = {
-          lng: this.selectedItem.lng, lat: this.selectedItem.lat
-        };
-        console.log(point);
-        return point;
-      }
-      return this.search.keyword || '南京';
+  },
+  watch: {
+    'search.keyword'(v) {
+      this.mapCenter = v;
     }
   },
   methods: {
@@ -155,6 +153,10 @@ export default {
       console.log(point);
     },
     handleSelectItem(item) {
+      this.mapCenter = {
+        lng: item.lng, lat: item.lat
+      }
+
       this.selectedId = item.id
     }
   },
