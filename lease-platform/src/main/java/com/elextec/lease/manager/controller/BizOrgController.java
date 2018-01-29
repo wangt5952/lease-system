@@ -141,7 +141,7 @@ public class BizOrgController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
                 orgInfos = JSON.parseArray(paramStr, BizOrganization.class);
-                if (null == orgInfos || orgInfos.size() == 0) {
+                if (null == orgInfos || 0 == orgInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
@@ -359,5 +359,4 @@ public class BizOrgController extends BaseController {
             return mr;
         }
     }
-
 }

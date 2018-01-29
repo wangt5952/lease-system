@@ -143,7 +143,7 @@ public class BizMfrsController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
                 mfrsInfos = JSON.parseArray(paramStr, BizManufacturer.class);
-                if (null == mfrsInfos || mfrsInfos.size()==0) {
+                if (null == mfrsInfos || 0 == mfrsInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
@@ -304,19 +304,19 @@ public class BizMfrsController extends BaseController {
      *         code:返回Code,
      *         message:返回消息,
      *         respData:{
-     *                 id:ID,
-     *                 mfrsName:制造商名称,
-     *                 mfrsType:制造商类型（车辆、电池、配件）,
-     *                 mfrsIntroduce:制造商介绍,
-     *                 mfrsAddress:制造商地址,
-     *                 mfrsContacts:联系人（多人用 , 分割）,
-     *                 mfrsPhone:联系电话（多个电话用 , 分割）,
-     *                 mfrsStatus:制造商状态（正常、冻结、作废）,
-     *                 createUser:创建人,
-     *                 createTime:创建时间,
-     *                 updateUser:更新人,
-     *                 updateTime:更新时间
-     *             }
+     *             id:ID,
+     *             mfrsName:制造商名称,
+     *             mfrsType:制造商类型（车辆、电池、配件）,
+     *             mfrsIntroduce:制造商介绍,
+     *             mfrsAddress:制造商地址,
+     *             mfrsContacts:联系人（多人用 , 分割）,
+     *             mfrsPhone:联系电话（多个电话用 , 分割）,
+     *             mfrsStatus:制造商状态（正常、冻结、作废）,
+     *             createUser:创建人,
+     *             createTime:创建时间,
+     *             updateUser:更新人,
+     *             updateTime:更新时间
+     *         }
      *     }
      * </pre>
      */
@@ -345,5 +345,4 @@ public class BizMfrsController extends BaseController {
             return mr;
         }
     }
-
 }
