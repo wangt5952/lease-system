@@ -8,7 +8,6 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.*;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -24,9 +23,9 @@ import java.util.Random;
  * Created by wangtao on 2018/1/16.
  */
 @Component
-public class CaptchaClient {
+public class WzImageClient {
     /** 日志. */
-    private static final Logger logger = LoggerFactory.getLogger(CaptchaClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(WzImageClient.class);
 
     @Value("localsetting.upload-captcha-root")
     private String uploadCaptchaRoot;
