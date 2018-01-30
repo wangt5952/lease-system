@@ -1,0 +1,6 @@
+
+*.xml
+*.class
+*.yml
+lease-platform/src/main/java/com/elextec/lease/manager/controller/SysResourceController.java
+lease-platform/src/main/java/com/elextec/lease/manager/controller/SysResourceController.java
