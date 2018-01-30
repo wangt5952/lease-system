@@ -93,6 +93,8 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         }
         try {
             orgInfo.setId(WzUniqueValUtil.makeUUID());
+            orgInfo.setOrgStatus(RecordStatus.NORMAL);
+            orgInfo.setOrgType(OrgAndUserType.ENTERPRISE);
             orgInfo.setCreateTime(new Date());
             bizOrganizationMapperExt.insertSelective(orgInfo);
         } catch (Exception ex) {

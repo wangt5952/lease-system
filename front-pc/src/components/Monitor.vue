@@ -94,26 +94,26 @@ export default {
       points: [],
       selectedId: '1',
       list: [
-        { id: '1', code: 'aima001', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.822436, lat: 32.029365 },
-        { id: '2', code: 'aima002', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.799044, lat: 32.040109 },
-        { id: '3', code: 'aima003', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.797499, lat: 32.029977 },
-        { id: '4', code: 'aima004', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.7906, lat: 32.037017 },
-        { id: '5', code: 'aima005', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.788229, lat: 32.028814 },
-        { id: '6', code: 'aima006', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.773712, lat: 32.048587 },
-        { id: '7', code: 'aima007', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.782839, lat: 32.048219 },
-        { id: '8', code: 'aima008', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.765448, lat: 32.043506 },
-        { id: '9', code: 'aima009', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.801164, lat: 32.019875 },
-        { id: '10', code: 'aima010', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.754165, lat: 32.040568 },
-        { id: '11', code: 'aima011', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.746044, lat: 32.034017 },
-        { id: '12', code: 'aima012', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.742595, lat: 32.021038 },
-        { id: '13', code: 'aima013', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.781366, lat: 32.01268 },
-        { id: '14', code: 'aima014', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.799332, lat: 32.009863 },
-        { id: '15', code: 'aima015', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.801919, lat: 32.001534 },
-        { id: '16', code: 'aima016', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.768574, lat: 31.997125 },
-        { id: '17', code: 'aima017', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.789702, lat: 32.064714 },
-        { id: '18', code: 'aima018', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.790852, lat: 32.057248 },
-        { id: '19', code: 'aima019', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.803069, lat: 32.055044 },
-        { id: '20', code: 'aima020', value: '60%', status: '正常', scsid:'艾玛电动车生产商am001', clcd:'江苏省南京市', clpp:'艾玛', clxh:'型号A', lng: 118.812267, lat: 32.063735 },
+        { id: '1', code: 'aima001', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.822436, lat: 32.029365 },
+        { id: '2', code: 'aima002', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799044, lat: 32.040109 },
+        { id: '3', code: 'aima003', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.797499, lat: 32.029977 },
+        { id: '4', code: 'aima004', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.7906, lat: 32.037017 },
+        { id: '5', code: 'aima005', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.788229, lat: 32.028814 },
+        { id: '6', code: 'aima006', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.773712, lat: 32.048587 },
+        { id: '7', code: 'aima007', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.782839, lat: 32.048219 },
+        { id: '8', code: 'aima008', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.765448, lat: 32.043506 },
+        { id: '9', code: 'aima009', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801164, lat: 32.019875 },
+        { id: '10', code: 'aima010', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.754165, lat: 32.040568 },
+        { id: '11', code: 'aima011', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.746044, lat: 32.034017 },
+        { id: '12', code: 'aima012', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.742595, lat: 32.021038 },
+        { id: '13', code: 'aima013', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.781366, lat: 32.01268 },
+        { id: '14', code: 'aima014', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799332, lat: 32.009863 },
+        { id: '15', code: 'aima015', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801919, lat: 32.001534 },
+        { id: '16', code: 'aima016', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.768574, lat: 31.997125 },
+        { id: '17', code: 'aima017', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.789702, lat: 32.064714 },
+        { id: '18', code: 'aima018', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.790852, lat: 32.057248 },
+        { id: '19', code: 'aima019', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.803069, lat: 32.055044 },
+        { id: '20', code: 'aima020', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.812267, lat: 32.063735 },
       ],
 
       vehicleDialogVisible: false,
@@ -122,7 +122,6 @@ export default {
       vehiclePathVisible: false,
 
       mapCenter: '南京',
-
     };
   },
   computed: {
@@ -133,7 +132,7 @@ export default {
   watch: {
     'search.keyword'(v) {
       this.mapCenter = v;
-    }
+    },
   },
   methods: {
     syncCenterAndZoom() {},
@@ -149,16 +148,15 @@ export default {
     showVehiclePath() {
       this.vehiclePathVisible = true;
     },
-    handleMapClick({point}) {
+    handleMapClick({ point }) {
       console.log(point);
     },
     handleSelectItem(item) {
       this.mapCenter = {
-        lng: item.lng, lat: item.lat
-      }
-
-      this.selectedId = item.id
-    }
+        lng: item.lng, lat: item.lat,
+      };
+      this.selectedId = item.id;
+    },
   },
 };
 </script>

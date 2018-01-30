@@ -52,12 +52,12 @@ public class SysRoleController extends BaseController {
      *         respData:[
      *             {
      *                 id:ID,
-     *                 role_name:角色名,
-     *                 role_introduce:角色说明,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 roleName:角色名,
+     *                 roleIntroduce:角色说明,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             },
      *             ... ...
      *         ]
@@ -82,9 +82,9 @@ public class SysRoleController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<SysRole> resPageResp = sysRoleService.list(true, pagingParam);
+            PageResponse<SysRole> rolePageResp = sysRoleService.list(true, pagingParam);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, resPageResp);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, rolePageResp);
             return mr;
         }
     }
@@ -95,10 +95,10 @@ public class SysRoleController extends BaseController {
      * <pre>
      *     [
      *         {
-     *             role_name:角色名,
-     *             role_introduce:角色说明,
-     *             create_user:创建人,
-     *             update_user:更新人
+     *             roleName:角色名,
+     *             roleIntroduce:角色说明,
+     *             createUser:创建人,
+     *             updateUser:更新人
      *         },
      *         ... ...
      *     ]
@@ -120,17 +120,17 @@ public class SysRoleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<SysRole> resInfos = null;
+            List<SysRole> roleInfos = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                resInfos = JSON.parseArray(paramStr, SysRole.class);
-                if (null == resInfos) {
+                roleInfos = JSON.parseArray(paramStr, SysRole.class);
+                if (null == roleInfos) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysRoleService.insertSysRoles(resInfos);
+            sysRoleService.insertSysRoles(roleInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -143,10 +143,10 @@ public class SysRoleController extends BaseController {
      * <pre>
      *
      *         {
-     *             role_name:角色名,
-     *             role_introduce:角色说明,
-     *             create_user:创建人,
-     *             update_user:更新人
+     *             roleName:角色名,
+     *             roleIntroduce:角色说明,
+     *             createUser:创建人,
+     *             updateUser:更新人
      *         }
      *
      * </pre>
@@ -167,17 +167,17 @@ public class SysRoleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            SysRole resInfo = null;
+            SysRole roleInfo = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                resInfo = JSON.parseObject(paramStr, SysRole.class);
-                if (null == resInfo) {
+                roleInfo = JSON.parseObject(paramStr, SysRole.class);
+                if (null == roleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysRoleService.insertSysRole(resInfo);
+            sysRoleService.insertSysRole(roleInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -212,17 +212,17 @@ public class SysRoleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            SysRole resInfo = null;
+            SysRole roleInfo = null;
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
-                resInfo = JSON.parseObject(paramStr, SysRole.class);
-                if (null == resInfo) {
+                roleInfo = JSON.parseObject(paramStr, SysRole.class);
+                if (null == roleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysRoleService.updateSysRole(resInfo);
+            sysRoleService.updateSysRole(roleInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -252,17 +252,17 @@ public class SysRoleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> resIds = null;
+            List<String> roleIds = null;
             try {
                 String paramStr = URLDecoder.decode(deleteParam, "utf-8");
-                resIds = JSON.parseArray(paramStr, String.class);
-                if (null == resIds) {
+                roleIds = JSON.parseArray(paramStr, String.class);
+                if (null == roleIds) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysRoleService.deleteSysRole(resIds);
+            sysRoleService.deleteSysRole(roleIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

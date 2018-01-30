@@ -13,6 +13,8 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.SysResourceService;
+import com.elextec.persist.field.enums.DeviceType;
+import com.elextec.persist.field.enums.ResourceType;
 import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
@@ -58,19 +60,19 @@ public class SysResourceController extends BaseController {
      *         respData:[
      *             {
      *                 id:ID,
-     *                 res_code:资源编码,
-     *                 res_name:资源名,
-     *                 res_type:资源类型（目录、菜单、页面、功能或按钮）,
-     *                 res_url:资源请求URL,
-     *                 group_sort:分组排序,
-     *                 res_sort:组内排序,
-     *                 show_flag:显示标志（显示、不显示）,
+     *                 resCode:资源编码,
+     *                 resName:资源名,
+     *                 resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 resUrl:资源请求URL,
+     *                 groupSort:分组排序,
+     *                 resSort:组内排序,
+     *                 showFlag:显示标志（显示、不显示）,
      *                 parent:上级资源（Root为空）,
      *                 level:级别,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             },
      *             ... ...
      *         ]
@@ -108,17 +110,17 @@ public class SysResourceController extends BaseController {
      * <pre>
      *     [
      *         {
-     *             res_code:资源编码,
-     *             res_name:资源名,
-     *             res_type:资源类型（目录、菜单、页面、功能或按钮）,
-     *             res_url:资源请求URL,
-     *             group_sort:分组排序,
-     *             res_sort:组内排序,
-     *             show_flag:显示标志（显示、不显示）,
-     *             parent:上级资源（Root为空）,
-     *             level:级别,
-     *             create_user:创建人,
-     *             update_user:更新人
+     *             resCode:资源编码（必填）,
+     *             resName:资源名（必填）,
+     *             resType:资源类型（目录、菜单、页面、功能或按钮）（必填）,
+     *             resUrl:资源请求URL（非必填）,
+     *             groupSort:分组排序（必填）,
+     *             resSort:组内排序（必填）,
+     *             showFlag:显示标志（显示、不显示）（必填）,
+     *             parent:上级资源（Root为空）（非必填）,
+     *             level:级别（必填）,
+     *             createUser:创建人（必填）,
+     *             updateUser:更新人（必填）
      *         }
      *     ]
      * </pre>
@@ -143,7 +145,7 @@ public class SysResourceController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
                 resInfos = JSON.parseArray(paramStr, SysResources.class);
-                if (null == resInfos) {
+                if (null == resInfos || 0 == resInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
@@ -162,17 +164,17 @@ public class SysResourceController extends BaseController {
      * <pre>
      *
      *         {
-     *             res_code:资源编码,
-     *             res_name:资源名,
-     *             res_type:资源类型（目录、菜单、页面、功能或按钮）,
-     *             res_url:资源请求URL,
-     *             group_sort:分组排序,
-     *             res_sort:组内排序,
-     *             show_flag:显示标志（显示、不显示）,
-     *             parent:上级资源（Root为空）,
-     *             level:级别,
-     *             create_user:创建人,
-     *             update_user:更新人
+     *             resCode:资源编码（必填）,
+     *             resName:资源名（必填）,
+     *             resType:资源类型（目录、菜单、页面、功能或按钮）（必填）,
+     *             resUrl:资源请求URL（非必填）,
+     *             groupSort:分组排序（必填）,
+     *             resSort:组内排序（必填）,
+     *             showFlag:显示标志（显示、不显示）（必填）,
+     *             parent:上级资源（Root为空）（非必填）,
+     *             level:级别（必填）,
+     *             createUser:创建人（必填）,
+     *             updateUser:更新人（必填）
      *         }
      *
      * </pre>
@@ -200,6 +202,22 @@ public class SysResourceController extends BaseController {
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                if (WzStringUtil.isBlank(resInfo.getResCode())
+                        || WzStringUtil.isBlank(resInfo.getResName())
+                        || null == resInfo.getResType()
+                        || null == resInfo.getLevel()
+                        || null == resInfo.getResSort()
+                        || null == resInfo.getGroupSort()
+                        || WzStringUtil.isBlank(resInfo.getCreateUser())
+                        || WzStringUtil.isBlank(resInfo.getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "资源参数有误");
+                }
+                if (!resInfo.getResType().toString().equals(ResourceType.CATALOG.toString())
+                        && !resInfo.getResType().toString().equals(ResourceType.MENU.toString())
+                        && !resInfo.getResType().toString().equals(ResourceType.PAGE.toString())
+                        && !resInfo.getResType().toString().equals(ResourceType.FUNCTION.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的资源类别");
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -217,16 +235,16 @@ public class SysResourceController extends BaseController {
      * <pre>
      *     {
      *         id:ID,
-     *         res_code:资源编码,
-     *         res_name:资源名,
-     *         res_type:资源类型（目录、菜单、页面、功能或按钮）,
-     *         res_url:资源请求URL,
-     *         group_sort:分组排序,
-     *         res_sort:组内排序,
-     *         show_flag:显示标志（显示、不显示）,
+     *         resCode:资源编码,
+     *         resName:资源名,
+     *         resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *         resUrl:资源请求URL,
+     *         groupSort:分组排序,
+     *         resSort:组内排序,
+     *         showFlag:显示标志（显示、不显示）,
      *         parent:上级资源（Root为空）,
      *         level:级别,
-     *         update_user:更新人
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 修改结果
@@ -252,6 +270,9 @@ public class SysResourceController extends BaseController {
                 resInfo = JSON.parseObject(paramStr, SysResources.class);
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(resInfo.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
@@ -290,7 +311,7 @@ public class SysResourceController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(deleteParam, "utf-8");
                 resIds = JSON.parseArray(paramStr, String.class);
-                if (null == resIds) {
+                if (null == resIds || 0 == resIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
@@ -316,19 +337,19 @@ public class SysResourceController extends BaseController {
      *         message:返回消息,
      *         respData:{
      *                 id:ID,
-     *                 res_code:资源编码,
-     *                 res_name:资源名,
-     *                 res_type:资源类型（目录、菜单、页面、功能或按钮）,
-     *                 res_url:资源请求URL,
-     *                 res_sort:组内排序,
-     *                 group_sort:分组排序,
-     *                 show_flag:显示标志（显示、不显示）,
+     *                 resCode:资源编码,
+     *                 resName:资源名,
+     *                 resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 resUrl:资源请求URL,
+     *                 resSort:组内排序,
+     *                 groupSort:分组排序,
+     *                 showFlag:显示标志（显示、不显示）,
      *                 parent:上级资源（Root为空）,
      *                 level:级别,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             }
      *     }
      * </pre>

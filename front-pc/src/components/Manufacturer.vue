@@ -82,8 +82,8 @@ export default {
 
     async reload() {
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/listmfrs', { currPage: this.currentPage, pageSize: this.pageSize})).body;
-        if (code != '200') throw new Error(message);
+        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/listmfrs', { currPage: this.currentPage, pageSize: this.pageSize })).body;
+        if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
         this.list = rows;
@@ -95,8 +95,8 @@ export default {
     async handleDelete({ id, name }) {
       try {
         await this.$confirm(`确认删除${name}, 是否继续?`, '提示', { type: 'warning' });
-        const { code, message } = (await this.$http.post(`/api/manager/mfrs/deletemfrs`, [{id:id}])).body;
-        if (code != '200') throw new Error(message);
+        const { code, message } = (await this.$http.post('/api/manager/mfrs/deletemfrs', [{ id }])).body;
+        if (code !== '200') throw new Error(message);
         await this.reload();
         this.$message.success('删除成功');
       } catch (e) {
@@ -117,12 +117,12 @@ export default {
       try {
         if (this.form.id) {
           const { id, ...form } = this.form;
-          const { code, message, respData } = (await this.$http.post(`/api/manager/mfrs/modifymfrs`, [{ ...form, id }])).body;
-          if (code != '200') throw new Error(message || code );
+          const { code, message } = (await this.$http.post('/api/manager/mfrs/modifymfrs', [{ ...form, id }])).body;
+          if (code !== '200') throw new Error(message || code);
         } else {
           const { ...form } = this.form;
-          const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/addmfrs', [form])).body;
-          if (code != '200') throw new Error(message || code );
+          const { code, message } = (await this.$http.post('/api/manager/mfrs/addmfrs', [form])).body;
+          if (code !== '200') throw new Error(message || code);
         }
         await this.reload();
         this.form = {};

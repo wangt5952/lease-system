@@ -6,11 +6,11 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
-import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.manager.service.SysUserService;
-import com.elextec.persist.dao.mybatis.SysResourcesMapperExt;
 import com.elextec.persist.dao.mybatis.SysUserMapperExt;
-import com.elextec.persist.model.mybatis.*;
+import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
+import com.elextec.persist.model.mybatis.SysUser;
+import com.elextec.persist.model.mybatis.SysUserExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,7 +150,6 @@ public class SysUserServcieImpl implements SysUserService {
                 throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
             }
         }
-
     }
 
     @Override

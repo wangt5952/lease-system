@@ -1,15 +1,22 @@
 package com.elextec.lease.manager.controller;
 
+
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
+import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
-import com.elextec.lease.manager.service.BizBatteryService;
-import com.elextec.persist.model.mybatis.BizBattery;
+import com.elextec.lease.manager.service.BizDeviceConfService;
+import com.elextec.lease.manager.service.SysUserService;
+import com.elextec.persist.field.enums.DeviceType;
+import com.elextec.persist.model.mybatis.BizDeviceConf;
+import com.elextec.persist.model.mybatis.BizDeviceConfKey;
+import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,21 +28,21 @@ import java.net.URLDecoder;
 import java.util.List;
 
 /**
- * 电池管理Controller.
- * Created by wangtao on 2018/1/19.
+ * 设备参数管理Controller.
+ * Created by wangtao on 2018/1/16.
  */
 @RestController
-@RequestMapping(path = "/manager/battery")
-public class BizBatteryController extends BaseController {
+@RequestMapping(path = "/manager/device")
+public class BizDeviceConfController extends BaseController {
 
     /** 日志. */
-    private final Logger logger = LoggerFactory.getLogger(BizBatteryController.class);
+    private final Logger logger = LoggerFactory.getLogger(BizDeviceConfController.class);
 
     @Autowired
-    private BizBatteryService bizBatteryService;
+    private BizDeviceConfService bizDeviceConfService;
 
     /**
-     * 查询电池
+     * 查询参数设置.
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
@@ -50,18 +57,11 @@ public class BizBatteryController extends BaseController {
      *         message:返回消息,
      *         respData:[
      *             {
-     *                 id:ID,
-     *                 batteryCode:电池编号,
-     *                 batteryName:电池货名,
-     *                 batteryBrand:电池品牌,
-     *                 batteryPn:电池型号,
-     *                 batteryParameters:电池参数,
-     *                 mfrsId:生产商ID,
-     *                 batteryStatus:电池状态（正常、冻结、作废）,
-     *                 createUser:创建人,
-     *                 createTime:创建时间,
-     *                 updateUser:更新人,
-     *                 updateTime:更新时间
+     *                 deviceId:设备ID,
+     *                 deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *                 perSet:请求间隔时间（单位：秒）,
+     *                 reset:硬件复位标志（0：无处理；1；复位重启）,
+     *                 request:主动请求数据标志（0：无处理；1：主动请求）
      *             },
      *             ... ...
      *         ]
@@ -86,29 +86,26 @@ public class BizBatteryController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<BizBattery> batteryPageResp = bizBatteryService.list(true, pagingParam);
+            PageResponse<BizDeviceConf> devPageResp = bizDeviceConfService.list(true, pagingParam);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, batteryPageResp);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, devPageResp);
             return mr;
         }
     }
 
     /**
-     * 批量增加电池.
+     * 批量增加参数设置.
      * @param addParam 批量新增参数列表JSON
      * <pre>
      *     [
      *         {
-     *              batteryCode:电池编号,
-     *              batteryName:电池货名,
-     *              batteryBrand:电池品牌,
-     *              batteryPn:电池型号,
-     *              batteryParameters:电池参数,
-     *              mfrsId:生产商ID,
-     *              batteryStatus:电池状态（正常、冻结、作废）,
-     *              createUser:创建人,
-     *              updateUser:更新人
-     *         }
+     *             deviceId:设备ID,
+     *             deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *             perSet:请求间隔时间（单位：秒）,
+     *             reset:硬件复位标志（0：无处理；1；复位重启）,
+     *             request:主动请求数据标志（0：无处理；1：主动请求）
+     *         },
+     *         ... ...
      *     ]
      * </pre>
      * @return 批量新增结果
@@ -128,17 +125,17 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<BizBattery> batteryInfos = null;
+            List<BizDeviceConf> devConfInfos = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                batteryInfos = JSON.parseArray(paramStr, BizBattery.class);
-                if (null == batteryInfos || 0 == batteryInfos.size()) {
+                devConfInfos = JSON.parseArray(paramStr, BizDeviceConf.class);
+                if (null == devConfInfos || 0 == devConfInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.insertBatterys(batteryInfos);
+            bizDeviceConfService.insertBizDeviceConfs(devConfInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -146,19 +143,15 @@ public class BizBatteryController extends BaseController {
     }
 
     /**
-     * 增加电池.
+     * 增加设备参数.
      * @param addParam 新增参数列表JSON
      * <pre>
      *     {
-     *         batteryCode:电池编号,
-     *         batteryName:电池货名,
-     *         batteryBrand:电池品牌,
-     *         batteryPn:电池型号,
-     *         batteryPrameters:电池参数,
-     *         mfrsId:生产商ID,
-     *         batteryStatus:电池状态（正常、冻结、作废）,
-     *         createUser:创建人,
-     *         updateUser:更新人
+     *         deviceId:设备ID,
+     *         deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *         perSet:请求间隔时间（单位：秒）,
+     *         reset:硬件复位标志（0：无处理；1；复位重启）,
+     *         request:主动请求数据标志（0：无处理；1：主动请求）
      *     }
      * </pre>
      * @return 新增结果
@@ -178,17 +171,31 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizBattery batteryInfo = null;
+            BizDeviceConf devConfInfo = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
-                if (null == batteryInfo) {
+                devConfInfo = JSON.parseObject(paramStr, BizDeviceConf.class);
+                if (null == devConfInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(devConfInfo.getDeviceId())
+                        || null == devConfInfo.getDeviceType()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "设备ID不能为空");
+                }
+                if (!devConfInfo.getDeviceType().toString().equals(DeviceType.BATTERY.toString())
+                        && !devConfInfo.getDeviceType().toString().equals(DeviceType.VEHICLE.toString())
+                        && !devConfInfo.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的设备类别");
+                }
+                if (null == devConfInfo.getPerSet()
+                        && null == devConfInfo.getReset()
+                        && null == devConfInfo.getRequest()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无需更新");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.insertBattery(batteryInfo);
+            bizDeviceConfService.insertBizDeviceConf(devConfInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -196,19 +203,15 @@ public class BizBatteryController extends BaseController {
     }
 
     /**
-     * 修改电池信息.
+     * 修改设备参数信息.
      * @param modifyParam 修改参数JSON
      * <pre>
      *     {
-     *         id:ID（必填）,
-     *         batteryCode:电池编号,
-     *         batteryName:电池货名,
-     *         batteryBrand:电池品牌,
-     *         batteryPn:电池型号,
-     *         batteryParameters:电池参数,
-     *         mfrsId:生产商ID,
-     *         batteryStatus:电池状态（正常、冻结、作废）,
-     *         updateUser:更新人
+     *         deviceId:设备ID,
+     *         deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *         perSet:请求间隔时间（单位：秒）,
+     *         reset:硬件复位标志（0：无处理；1；复位重启）,
+     *         request:主动请求数据标志（0：无处理；1：主动请求）
      *     }
      * </pre>
      * @return 修改结果
@@ -228,20 +231,31 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizBattery batteryInfo = null;
+            BizDeviceConf devConfInfo = null;
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
-                batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
-                if (null == batteryInfo) {
+                devConfInfo = JSON.parseObject(paramStr, BizDeviceConf.class);
+                if (null == devConfInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if (WzStringUtil.isBlank(batteryInfo.getId())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
+                if (WzStringUtil.isBlank(devConfInfo.getDeviceId())
+                        || null == devConfInfo.getDeviceType()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "设备ID不能为空");
+                }
+                if (!devConfInfo.getDeviceType().toString().equals(DeviceType.BATTERY.toString())
+                        && !devConfInfo.getDeviceType().toString().equals(DeviceType.VEHICLE.toString())
+                        && !devConfInfo.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的设备类别");
+                }
+                if (null == devConfInfo.getPerSet()
+                        && null == devConfInfo.getReset()
+                        && null == devConfInfo.getRequest()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无需更新");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.updateBattery(batteryInfo);
+            bizDeviceConfService.updateBizDeviceConf(devConfInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -249,10 +263,16 @@ public class BizBatteryController extends BaseController {
     }
 
     /**
-     * 批量删除电池.
+     * 批量删除用户.
      * @param deleteParam 删除ID列表JSON
      * <pre>
-     *     [ID1,ID2,......]
+     *     [
+     *         {
+     *             deviceId:设备ID,
+     *             deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *         },
+     *         ... ...
+     *     ]
      * </pre>
      * @return 批量删除结果
      * <pre>
@@ -271,17 +291,17 @@ public class BizBatteryController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> batteryIds = null;
+            List<BizDeviceConfKey> devConfIds = null;
             try {
                 String paramStr = URLDecoder.decode(deleteParam, "utf-8");
-                batteryIds = JSON.parseArray(paramStr, String.class);
-                if (null == batteryIds || 0 == batteryIds.size()) {
+                devConfIds = JSON.parseArray(paramStr, BizDeviceConfKey.class);
+                if (null == devConfIds || 0 == devConfIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.deleteBattery(batteryIds);
+            bizDeviceConfService.deleteBizDeviceConfs(devConfIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -289,10 +309,13 @@ public class BizBatteryController extends BaseController {
     }
 
     /**
-     * 根据ID获取电池信息.
-     * @param id 查询ID
+     * 根据设备ID和设备类别获取设置信息.
+     * @param paramPK 查询参数
      * <pre>
-     *     [id]
+     *     {
+     *         deviceId:设备ID,
+     *         deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *     }
      * </pre>
      * @return 查询结果
      * <pre>
@@ -300,45 +323,46 @@ public class BizBatteryController extends BaseController {
      *         code:返回Code,
      *         message:返回消息,
      *         respData:{
-     *             id:ID,
-     *             batteryCode:电池编号,
-     *             batteryName:电池货名,
-     *             batteryBrand:电池品牌,
-     *             batteryPn:电池型号,
-     *             batteryParameters:电池参数,
-     *             mfrsId:生产商ID,
-     *             batteryStatus:电池状态（正常、冻结、作废）,
-     *             createUser:创建人,
-     *             createTime:创建时间,
-     *             updateUser:更新人,
-     *             updateTime:更新时间
+     *             deviceId:设备ID,
+     *             deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *             perSet:请求间隔时间（单位：秒）,
+     *             reset:硬件复位标志（0：无处理；1；复位重启）,
+     *             request:主动请求数据标志（0：无处理；1：主动请求）
      *         }
      *     }
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String id) {
+    public MessageResponse getByPK(@RequestBody String paramPK) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(id)) {
+        if (WzStringUtil.isBlank(paramPK)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> batteryId = null;
+            BizDeviceConfKey devConfKey = null;
             try {
-                String paramStr = URLDecoder.decode(id, "utf-8");
-                batteryId = JSON.parseArray(paramStr, String.class);
-                if (null == batteryId || 0 == batteryId.size() || WzStringUtil.isBlank(batteryId.get(0))) {
+                String paramStr = URLDecoder.decode(paramPK, "utf-8");
+                devConfKey = JSONObject.parseObject(paramStr, BizDeviceConfKey.class);
+                if (null == devConfKey) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(devConfKey.getDeviceId())
+                        || null == devConfKey.getDeviceType()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "设备ID及类别不能为空");
+                }
+                if (!devConfKey.getDeviceType().toString().equals(DeviceType.BATTERY.toString())
+                        && !devConfKey.getDeviceType().toString().equals(DeviceType.VEHICLE.toString())
+                        && !devConfKey.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的设备类别");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            BizBattery battery = bizBatteryService.getBatteryByPrimaryKey(batteryId.get(0));
+            BizDeviceConf devConf = bizDeviceConfService.getBizDeviceConfByPrimaryKey(devConfKey);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,battery);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, devConf);
             return mr;
         }
     }
-
 }

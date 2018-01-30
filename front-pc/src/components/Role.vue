@@ -95,9 +95,9 @@ export default {
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/role/list', {
-          currPage: this.currentPage, pageSize: this.pageSize
+          currPage: this.currentPage, pageSize: this.pageSize,
         })).body;
-        if (code != '200') throw new Error(message);
+        if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
         this.list = _.map(rows, o => ({
@@ -113,8 +113,8 @@ export default {
     async handleDelete({ id, roleName }) {
       try {
         await this.$confirm(`确认删除${roleName}, 是否继续?`, '提示', { type: 'warning' });
-        const { code, message, respData } = (await this.$http.post('/api/manager/role/delete', [id])).body;
-        if (code != '200') throw new Error(message);
+        const { code, message } = (await this.$http.post('/api/manager/role/delete', [id])).body;
+        if (code !== '200') throw new Error(message);
         await this.reload();
         this.$message.success('删除成功');
       } catch (e) {
@@ -124,9 +124,12 @@ export default {
     },
 
     showForm(form = { }) {
-      this.form = _.pick(form, ['id','loginName',
-      'roleName',
-      'roleIntroduce',]);
+      this.form = _.pick(form, [
+        'id',
+        'loginName',
+        'roleName',
+        'roleIntroduce',
+      ]);
       this.formVisible = true;
     },
     closeForm() {
@@ -142,19 +145,19 @@ export default {
         if (this.form.id) {
           const { ...form } = this.form;
           form.update_user = loginName;
-          const { code, message, respData } = (await this.$http.post('/api/manager/role/modify', form)).body;
-          if (code != '200') throw new Error(message);
+          const { code, message } = (await this.$http.post('/api/manager/role/modify', form)).body;
+          if (code !== '200') throw new Error(message);
           this.$message.success('编辑成功');
         } else {
           const { ...form } = this.form;
           form.create_user = loginName;
           form.update_user = loginName;
-          const { code, message, respData } = (await this.$http.post('/api/manager/role/add', [form])).body;
-          if (code != '200') throw new Error(message);
+          const { code, message } = (await this.$http.post('/api/manager/role/add', [form])).body;
+          if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }
         await this.reload();
-        this.closeForm()
+        this.closeForm();
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;

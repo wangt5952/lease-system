@@ -8,10 +8,9 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
-import com.elextec.persist.model.mybatis.BizManufacturer;
-import com.elextec.persist.model.mybatis.BizManufacturerExample;
-import com.elextec.persist.model.mybatis.SysResources;
-import com.elextec.persist.model.mybatis.SysResourcesExample;
+import com.elextec.persist.field.enums.MfrsType;
+import com.elextec.persist.field.enums.RecordStatus;
+import com.elextec.persist.model.mybatis.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +80,27 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     }
 
     @Override
+    public void insertBizManufacturers(BizManufacturer mfrsInfo) {
+        // 资源code重复提示错误
+        BizManufacturerExample lnExample = new BizManufacturerExample();
+        BizManufacturerExample.Criteria lnCriteria = lnExample.createCriteria();
+        lnCriteria.andMfrsNameEqualTo(mfrsInfo.getMfrsName());
+        int lnCnt = bizManufacturerMapperExt.countByExample(lnExample);
+        if (0 < lnCnt) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "制造商名称(" + mfrsInfo.getMfrsName() + ")已存在");
+        }
+        try {
+            mfrsInfo.setId(WzUniqueValUtil.makeUUID());
+            mfrsInfo.setMfrsType(MfrsType.VEHICLE);
+            mfrsInfo.setMfrsStatus(RecordStatus.NORMAL.getInfo());
+            mfrsInfo.setCreateTime(new Date());
+            bizManufacturerMapperExt.insertSelective(mfrsInfo);
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
+        }
+    }
+
+    @Override
     @Transactional
     public void updateBizManufacturer(BizManufacturer mfrsInfo) {
         bizManufacturerMapperExt.updateByPrimaryKeySelective(mfrsInfo);
@@ -103,5 +123,6 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     public BizManufacturer getBizManufacturerByPrimaryKey(String id) {
         return bizManufacturerMapperExt.selectByPrimaryKey(id);
     }
+
 }
 

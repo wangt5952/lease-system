@@ -52,21 +52,21 @@ public class BizOrgController extends BaseController {
      *         respData:[
      *             {
      *                 id:ID,
-     *                 org_code:组织Code,
-     *                 org_name:组织名称,
-     *                 org_type:组织类别（平台、企业）,
-     *                 org_introduce:组织介绍,
-     *                 org_address:组织地址,
-     *                 org_contacts:联系人（多人用 , 分割）,
-     *                 org_phone:联系电话（多个电话用 , 分割）,
-     *                 org_business_licences:营业执照号码,
-     *                 org_business_licence_front:营业执照正面照片路径,
-     *                 org_business_licence_back:营业执照背面照片路径,
-     *                 org_status:组织状态（正常、冻结、作废）,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 orgCode:组织Code,
+     *                 orgName:组织名称,
+     *                 orgType:组织类别（平台、企业）,
+     *                 orgIntroduce:组织介绍,
+     *                 orgAddress:组织地址,
+     *                 orgContacts:联系人（多人用 , 分割）,
+     *                 orgPhone:联系电话（多个电话用 , 分割）,
+     *                 orgBusinessLicences:营业执照号码,
+     *                 orgBusinessLicenceFront:营业执照正面照片路径,
+     *                 orgBusinessLicenceBack:营业执照背面照片路径,
+     *                 orgStatus:组织状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             },
      *             ... ...
      *         ]
@@ -91,9 +91,9 @@ public class BizOrgController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<BizOrganization> mfrsPageResp = bizOrganizationService.list(true, pagingParam);
+            PageResponse<BizOrganization> orgPageResp = bizOrganizationService.list(true, pagingParam);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, mfrsPageResp);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, orgPageResp);
             return mr;
         }
     }
@@ -106,16 +106,16 @@ public class BizOrgController extends BaseController {
      *         {
      *            org_code:组织Code,
      *            org_name:组织名称,
-     *            org_introduce:组织介绍,
-     *            org_address:组织地址,
-     *            org_contacts:联系人（多人用 , 分割）,
-     *            org_phone:联系电话（多个电话用 , 分割）,
-     *            org_business_licences:营业执照号码,
-     *            org_business_licence_front:营业执照正面照片路径,
-     *            org_business_licence_back:营业执照背面照片路径,
-     *            org_status:组织状态（正常、冻结、作废）,
-     *            create_user:创建人
-     *            update_user:更新人
+     *            orgIntroduce:组织介绍,
+     *            orgAddress:组织地址,
+     *            orgContacts:联系人（多人用 , 分割）,
+     *            orgPhone:联系电话（多个电话用 , 分割）,
+     *            orgBusinessLicences:营业执照号码,
+     *            orgBusinessLicenceFront:营业执照正面照片路径,
+     *            orgBusinessLicenceBack:营业执照背面照片路径,
+     *            orgStatus:组织状态（正常、冻结、作废）,
+     *            createUser:创建人
+     *            updateUser:更新人
      *         },
      *         ... ...
      *     ]
@@ -137,17 +137,17 @@ public class BizOrgController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<BizOrganization> mfrsInfos = null;
+            List<BizOrganization> orgInfos = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                mfrsInfos = JSON.parseArray(paramStr, BizOrganization.class);
-                if (null == mfrsInfos) {
+                orgInfos = JSON.parseArray(paramStr, BizOrganization.class);
+                if (null == orgInfos || 0 == orgInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.insertBizOrganization(mfrsInfos);
+            bizOrganizationService.insertBizOrganization(orgInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -160,16 +160,16 @@ public class BizOrgController extends BaseController {
      * <pre>
      *     {
      *         id:ID,
-     *         org_name:组织名称,
-     *         org_type:组织类别（平台、企业）,
-     *         org_introduce:组织介绍,
-     *         org_address:组织地址,
-     *         org_contacts:联系人（多人用 , 分割）,
-     *         org_phone:联系电话（多个电话用 , 分割）,
-     *         org_business_licences:营业执照号码,
-     *         org_business_licence_front:营业执照正面照片路径,
-     *         org_business_licence_back:营业执照背面照片路径,
-     *         update_user:更新人
+     *         orgName:组织名称,
+     *         orgType:组织类别（平台、企业）,
+     *         orgIntroduce:组织介绍,
+     *         orgAddress:组织地址,
+     *         orgContacts:联系人（多人用 , 分割）,
+     *         orgPhone:联系电话（多个电话用 , 分割）,
+     *         orgBusinessLicences:营业执照号码,
+     *         orgBusinessLicenceFront:营业执照正面照片路径,
+     *         orgBusinessLicenceBack:营业执照背面照片路径,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 修改结果
@@ -189,17 +189,17 @@ public class BizOrgController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误
-            BizOrganization mfrsInfo = null;
+            BizOrganization org = null;
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
-                mfrsInfo = JSON.parseObject(paramStr, BizOrganization.class);
-                if (null == mfrsInfo) {
+                org = JSON.parseObject(paramStr, BizOrganization.class);
+                if (null == org) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.updateBizOrganization(mfrsInfo);
+            bizOrganizationService.updateBizOrganization(org);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -207,23 +207,23 @@ public class BizOrgController extends BaseController {
     }
 
     /**
-     * 增加资源.
+     * 增加公司组织资源.
      * @param addParam 批量新增参数JSON
      * <pre>
      *
      *         {
-     *            org_code:组织Code,
-     *            org_name:组织名称,
-     *            org_introduce:组织介绍,
-     *            org_address:组织地址,
-     *            org_contacts:联系人（多人用 , 分割）,
-     *            org_phone:联系电话（多个电话用 , 分割）,
-     *            org_business_licences:营业执照号码,
-     *            org_business_licence_front:营业执照正面照片路径,
-     *            org_business_licence_back:营业执照背面照片路径,
-     *            org_status:组织状态（正常、冻结、作废）,
-     *            create_user:创建人
-     *            update_user:更新人
+     *            orgCode:组织Code,
+     *            orgName:组织名称,
+     *            orgIntroduce:组织介绍,
+     *            orgAddress:组织地址,
+     *            orgContacts:联系人（多人用 , 分割）,
+     *            orgPhone:联系电话（多个电话用 , 分割）,
+     *            orgBusinessLicences:营业执照号码,
+     *            orgBusinessLicenceFront:营业执照正面照片路径,
+     *            orgBusinessLicenceBack:营业执照背面照片路径,
+     *            orgStatus:组织状态（正常、冻结、作废）,
+     *            createUser:创建人
+     *            updateUser:更新人
      *         }
      *
      * </pre>
@@ -236,7 +236,7 @@ public class BizOrgController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/addone")
+    @RequestMapping(value = "/addone",method = RequestMethod.POST)
     public MessageResponse addone(@RequestBody String addParam) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
@@ -244,17 +244,17 @@ public class BizOrgController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizOrganization resInfo = null;
+            BizOrganization org = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                resInfo = JSON.parseObject(paramStr, BizOrganization.class);
-                if (null == resInfo) {
+                org = JSON.parseObject(paramStr, BizOrganization.class);
+                if (null == org) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.insertBizOrganization(resInfo);
+            bizOrganizationService.insertBizOrganization(org);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -284,17 +284,17 @@ public class BizOrgController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> mfrsIds = null;
+            List<String> orgIds = null;
             try {
                 String paramStr = URLDecoder.decode(deleteParam, "utf-8");
-                mfrsIds = JSON.parseArray(paramStr, String.class);
-                if (null == mfrsIds || 0 == mfrsIds.size()) {
+                orgIds = JSON.parseArray(paramStr, String.class);
+                if (null == orgIds || 0 == orgIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.deleteBizOrganization(mfrsIds);
+            bizOrganizationService.deleteBizOrganization(orgIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -314,23 +314,23 @@ public class BizOrgController extends BaseController {
      *         message:返回消息,
      *         respData:
      *         {
-     *             id:ID,
-     *             org_code:组织Code,
-     *             org_name:组织名称,
-     *             org_type:组织类别（平台、企业）,
-     *             org_introduce:组织介绍,
-     *             org_address:组织地址,
-     *             org_contacts:联系人（多人用 , 分割）,
-     *             org_phone:联系电话（多个电话用 , 分割）,
-     *             org_business_licences:营业执照号码,
-     *             org_business_licence_front:营业执照正面照片路径,
-     *             org_business_licence_back:营业执照背面照片路径,
-     *             org_status:组织状态（正常、冻结、作废）,
-     *             create_user:创建人,
-     *             create_time:创建时间,
-     *             update_user:更新人,
-     *             update_time:更新时间
-     *         }
+     *                 id:ID,
+     *                 orgCode:组织Code,
+     *                 orgName:组织名称,
+     *                 orgType:组织类别（平台、企业）,
+     *                 orgIntroduce:组织介绍,
+     *                 orgAddress:组织地址,
+     *                 orgContacts:联系人（多人用 , 分割）,
+     *                 orgPhone:联系电话（多个电话用 , 分割）,
+     *                 orgBusinessLicences:营业执照号码,
+     *                 orgBusinessLicenceFront:营业执照正面照片路径,
+     *                 orgBusinessLicenceBack:营业执照背面照片路径,
+     *                 orgStatus:组织状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             }
      *     }
      * </pre>
      */
@@ -342,22 +342,21 @@ public class BizOrgController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> mfrsId = null;
+            List<String> orgId = null;
             try {
                 String paramStr = URLDecoder.decode(id, "utf-8");
-                mfrsId = JSON.parseArray(paramStr, String.class);
-                if (null == mfrsId || 0 == mfrsId.size() || WzStringUtil.isBlank(mfrsId.get(0))) {
+                orgId = JSON.parseArray(paramStr, String.class);
+                if (null == orgId || 0 == orgId.size() || WzStringUtil.isBlank(orgId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 
-            BizOrganization mfrs = bizOrganizationService.getBizOrganizationByPrimaryKey(mfrsId.get(0));
+            BizOrganization mfrs = bizOrganizationService.getBizOrganizationByPrimaryKey(orgId.get(0));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, mfrs);
             return mr;
         }
     }
-
 }
