@@ -34,7 +34,7 @@ public class WzCaptchaUtil {
      * @param heightPx 图形高度
      * @return 图形文件名
      */
-    public String madeAndGetCapthaUrl(String saveDir, String captchaCode, int widthPx, int heightPx) {
+    public static String madeAndGetCapthaUrl(String saveDir, String captchaCode, int widthPx, int heightPx) {
         int usedWidthPx = DEF_WIDTH_PX;
         int usedHeightPx = DEF_HEIGHT_PX;
         Random localRandom = new Random();
@@ -96,7 +96,7 @@ public class WzCaptchaUtil {
      * @param heightPx 图形高度
      * @return 图形验证码图像的Base64字符串
      */
-    public String madeAndGetCapthaBase64(String captchaCode, int widthPx, int heightPx) {
+    public static String madeAndGetCapthaBase64(String captchaCode, int widthPx, int heightPx) {
         int usedWidthPx = DEF_WIDTH_PX;
         int usedHeightPx = DEF_HEIGHT_PX;
         Random localRandom = new Random();
@@ -155,7 +155,7 @@ public class WzCaptchaUtil {
      * @param bc 背景色
      * @return 颜色
      */
-    private Color getRandColor(int fc, int bc) {
+    private static Color getRandColor(int fc, int bc) {
         Random random = new Random();
         if (fc > 255) {
             fc = 255;

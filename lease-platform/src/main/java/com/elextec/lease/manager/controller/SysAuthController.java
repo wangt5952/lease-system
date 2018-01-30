@@ -10,8 +10,7 @@ import com.elextec.framework.common.request.ResetPasswordParam;
 import com.elextec.framework.common.request.SmsParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.image.WzImageClient;
-import com.elextec.framework.plugins.redis.RedisClient;
+import com.elextec.framework.utils.WzCaptchaUtil;
 import com.elextec.framework.utils.WzCheckCodeUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
@@ -53,9 +52,6 @@ public class SysAuthController extends BaseController {
 
     @Autowired
     private SysUserService sysUserService;
-
-    @Autowired
-    private WzImageClient wzImageClient;
 
 //    @Autowired
 //    private RedisClient redisClient;
@@ -265,7 +261,8 @@ public class SysAuthController extends BaseController {
     public MessageResponse getCaptcha() {
         String code = WzCheckCodeUtil.makeEDCode(4);
         String token = WzUniqueValUtil.makeUUID();
-        String codeBase64 = wzImageClient.madeAndGetCapthaBase64(code, 0, 0);
+        // 生成验证码图片Base64码
+        String codeBase64 = WzCaptchaUtil.madeAndGetCapthaBase64(code, 0, 0);
         // 图片验证码2分钟有效
         redisClient.valueOperations().set(WzConstants.GK_CAPTCHA + token, code, 120, TimeUnit.SECONDS);
         Map<String, String> tokenMap = new HashMap<String, String>();

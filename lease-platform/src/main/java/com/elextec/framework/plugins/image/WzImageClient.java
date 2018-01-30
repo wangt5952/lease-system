@@ -21,6 +21,7 @@ import java.util.Random;
 /**
  * 图形验证码工具类.
  * Created by wangtao on 2018/1/16.
+ * @deprecated
  */
 @Component
 public class WzImageClient {
