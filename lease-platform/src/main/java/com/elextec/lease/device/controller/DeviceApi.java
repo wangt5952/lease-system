@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.plugins.redis.RedisClient;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.device.common.DeviceRespMsg;
 import com.elextec.lease.manager.service.BizDeviceConfService;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.model.mybatis.BizDeviceConf;
@@ -31,8 +32,8 @@ public class DeviceApi extends BaseController {
     @Autowired
     private BizDeviceConfService bizDeviceConfService;
 
-    @Autowired
-    private RedisClient redisClient;
+//    @Autowired
+//    private RedisClient redisClient;
 
     /**
      * 获得控制参数.
@@ -100,15 +101,15 @@ public class DeviceApi extends BaseController {
         JSONObject respData = new JSONObject();
         // deviceid或devicetype为空则需要报错
         if (WzStringUtil.isBlank(deviceid) || WzStringUtil.isBlank(devicetype)) {
-            respData.put(RESP_ERR_CODE, "NONE_ID_AND_TYPE");
-            respData.put(RESP_ERR_MSG, "参数deviceid和devicetype不能为空");
+            respData.put(RESP_ERR_CODE, DeviceRespMsg.NONE_ID_AND_TYPE.code());
+            respData.put(RESP_ERR_MSG, DeviceRespMsg.NONE_ID_AND_TYPE.getInfo());
             return respData;
         }
         if (!devicetype.toUpperCase().equals(DeviceType.BATTERY.toString())
                 && !devicetype.toUpperCase().equals(DeviceType.VEHICLE.toString())
                 && !devicetype.toUpperCase().equals(DeviceType.PARTS.toString())) {
-            respData.put(RESP_ERR_CODE, "INVALID_DEVICE");
-            respData.put(RESP_ERR_MSG, "无效的设备类别");
+            respData.put(RESP_ERR_CODE, DeviceRespMsg.INVALID_DEVICE.code());
+            respData.put(RESP_ERR_MSG, DeviceRespMsg.INVALID_DEVICE.getInfo());
             return respData;
         }
         BizDeviceConfKey selectKey = new BizDeviceConfKey();
@@ -116,8 +117,8 @@ public class DeviceApi extends BaseController {
         selectKey.setDeviceType(DeviceType.valueOf(devicetype));
         BizDeviceConf deviceConfVo = bizDeviceConfService.getBizDeviceConfByPrimaryKey(selectKey);
         if (null == deviceConfVo) {
-            respData.put(RESP_ERR_CODE, "NO_DEVICE");
-            respData.put(RESP_ERR_MSG, "NO_DEVICE");
+            respData.put(RESP_ERR_CODE, DeviceRespMsg.NO_DEVICE.code());
+            respData.put(RESP_ERR_MSG, DeviceRespMsg.NO_DEVICE.getInfo());
             return respData;
         }
         return null;

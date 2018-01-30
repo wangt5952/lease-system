@@ -53,8 +53,8 @@ public class SysAuthController extends BaseController {
     @Autowired
     private SysUserService sysUserService;
 
-    @Autowired
-    private RedisClient redisClient;
+//    @Autowired
+//    private RedisClient redisClient;
 
     /**
      * 登录.
