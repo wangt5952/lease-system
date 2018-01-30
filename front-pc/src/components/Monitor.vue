@@ -28,7 +28,7 @@
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
         <template v-if="vehiclePathVisible">
           <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
-          <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 64, height: 64}, opts:{ imageSize: {width: 64, height: 64} } }" :position="{lng: selectedItem.lng, lat: selectedItem.lat}"></bm-marker>
+          <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.lng, lat: selectedItem.lat}"></bm-marker>
         </template>
         <bm-marker v-else v-for="o in list" :key="`${[o.lng,o.lat].join(',')}`" :icon="{url: selectedItem.id == o.id ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
 
