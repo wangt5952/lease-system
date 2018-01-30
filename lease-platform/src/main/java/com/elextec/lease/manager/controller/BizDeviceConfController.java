@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
+import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 设备参数管理Controller.
@@ -256,6 +258,8 @@ public class BizDeviceConfController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             bizDeviceConfService.updateBizDeviceConf(devConfInfo);
+            // 修改后进行缓存
+            redisClient.valueOperations().set(WzConstants.GK_DEVICE_CONF + devConfInfo.getDeviceId() + WzConstants.KEY_SPLIT + devConfInfo.getDeviceType().toString(), devConfInfo, 30, TimeUnit.MINUTES);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

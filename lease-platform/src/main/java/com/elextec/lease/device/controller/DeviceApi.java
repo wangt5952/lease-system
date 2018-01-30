@@ -2,7 +2,7 @@ package com.elextec.lease.device.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
-import com.elextec.framework.plugins.redis.RedisClient;
+import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.device.common.DeviceRespMsg;
 import com.elextec.lease.manager.service.BizDeviceConfService;
@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 与硬件设备接口.
@@ -32,67 +34,31 @@ public class DeviceApi extends BaseController {
     @Autowired
     private BizDeviceConfService bizDeviceConfService;
 
-//    @Autowired
-//    private RedisClient redisClient;
+    /*
+     * 设备设定参数控制相关Key.
+     */
+    /** 设备ID. */
+    private static final String RESP_DEVICE_CONF_DEVICE_ID = "DeviceID";
+    /** 设置设备上传时间间隔. */
+    private static final String RESP_DEVICE_CONF_PERSET = "PerSet";
+    /** 硬件复位. */
+    private static final String RESP_DEVICE_CONF_RESET = "Reset";
+    /** 主动请求数据. */
+    private static final String RESP_DEVICE_CONF_REQUEST = "Request";
 
     /**
      * 获得控制参数.
-     * @param d 登录参数JSON
-     * <pre>
-     *     {
-     *         loginName:登录用户名,
-     *         loginAuthStr:验证字符串 MD5(用户名+MD5(密码).upper()+loginTime).upper(),
-     *         loginTime:登录时间
-     *     }
-     * </pre>
+     * @param deviceid 设备ID
+     * @param devicetype 设备类别（）
      * @return 登录结果及登录账户信息
      * <pre>
      *     {
-     *         code:返回Code,
-     *         message:返回消息,
-     *         respData:{
-     *             key_login_token:登录Token,
-     *             key_user_info:{
-     *                 id:ID,
-     *                 loginName:登录用户名,
-     *                 userMobile:手机号码,
-     *                 userType:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）,
-     *                 userIcon:Icon路径,
-     *                 nickName:昵称,
-     *                 userName:名称,
-     *                 userRealNameAuthFlag:是否已实名认证,
-     *                 userPid:身份证号,
-     *                 userIcFront:身份证正面照路径,
-     *                 userIcBack:身份证背面照路径,
-     *                 userIcGroup:本人于身份证合照路径,
-     *                 orgId:所属企业ID,
-     *                 orgCode:企业Code,
-     *                 orgName:企业名,
-     *                 userStatus:用户状态（NORMAL-正常、FREEZE-冻结/维保、INVALID-作废）,
-     *                 createUser:创建人,
-     *                 createTime:创建时间,
-     *                 updateUser:更新人,
-     *                 updateTime:更新时间
-     *             },
-     *             key_res_info:[
-     *                 {
-     *                     id:资源ID,
-     *                     res_code:资源Code,
-     *                     res_name:资源名称,
-     *                     res_type:资源类型,
-     *                     res_url:请求地址或页面名,
-     *                     res_sort:分组排序（通过分组排序将菜单组排序后，菜单组内通过级别进行排序）,
-     *                     show_flag:是否显示,
-     *                     parent:父级ID（最上级为null）,
-     *                     level:级别,
-     *                     create_user:创建人,
-     *                     create_time:创建时间,
-     *                     update_user:更新人,
-     *                     update_time:更新时间
-     *                 },
-     *                 ... ...
-     *             ]
-     *         }
+     *         errorcode:返回Code,
+     *         errormsg:返回消息,
+     *         DeviceID:设备ID,
+     *         PerSet:请求间隔时间（单位：秒）,
+     *         Reset:硬件复位标志（0：无处理；1；复位重启）,
+     *         Request:主动请求数据标志（0：无处理；1：主动请求）
      *     }
      * </pre>
      */
@@ -112,52 +78,36 @@ public class DeviceApi extends BaseController {
             respData.put(RESP_ERR_MSG, DeviceRespMsg.INVALID_DEVICE.getInfo());
             return respData;
         }
+        // Redis中有则直接返回Redis中的数据
+        BizDeviceConf dc = (BizDeviceConf) redisClient.valueOperations().get(WzConstants.GK_DEVICE_CONF + deviceid + WzConstants.KEY_SPLIT + devicetype);
+        if (null !=  dc) {
+            respData.put(RESP_ERR_CODE, DeviceRespMsg.SUCCESS.code());
+            respData.put(RESP_ERR_MSG, DeviceRespMsg.SUCCESS.getInfo());
+            respData.put(RESP_DEVICE_CONF_DEVICE_ID, dc.getDeviceId());
+            respData.put(RESP_DEVICE_CONF_PERSET, dc.getPerSet());
+            respData.put(RESP_DEVICE_CONF_RESET, dc.getReset());
+            respData.put(RESP_DEVICE_CONF_REQUEST, dc.getRequest());
+            return respData;
+        }
+        // Redis中没有则进行查库
         BizDeviceConfKey selectKey = new BizDeviceConfKey();
         selectKey.setDeviceId(deviceid);
         selectKey.setDeviceType(DeviceType.valueOf(devicetype));
         BizDeviceConf deviceConfVo = bizDeviceConfService.getBizDeviceConfByPrimaryKey(selectKey);
+        // 库中没有直接返回错误
         if (null == deviceConfVo) {
             respData.put(RESP_ERR_CODE, DeviceRespMsg.NO_DEVICE.code());
             respData.put(RESP_ERR_MSG, DeviceRespMsg.NO_DEVICE.getInfo());
             return respData;
         }
-        return null;
-//        else {
-//            // 参数解析错误报“参数解析错误”
-//            LoginParam loginParam = null;
-//            try {
-//                String paramStr = URLDecoder.decode(loginNameAndPassword, "utf-8");
-//                loginParam = JSON.parseObject(paramStr, LoginParam.class);
-//                if (null == loginParam || WzStringUtil.isBlank(loginParam.getLoginName())
-//                        || WzStringUtil.isBlank(loginParam.getLoginAuthStr())
-//                        || null == loginParam.getLoginTime()) {
-//                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
-//                }
-//            } catch (Exception ex) {
-//                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
-//            }
-//
-//            // 验证用户并返回用户信息
-//            Map<String, Object> loginVo = sysAuthService.login(loginParam.getLoginName(), loginParam.getLoginAuthStr(), loginParam.getLoginTime());
-//            // 组织登录返回信息
-//            Map<String, Object> loginInfo = new HashMap<String, Object>();
-//            // 登录Token
-//            // 生成登录token
-//            String loginToken = WzUniqueValUtil.makeUUID();
-//            loginInfo.put(WzConstants.KEY_LOGIN_TOKEN, loginToken);
-//            // 设置登录信息
-//            loginInfo.put(WzConstants.KEY_USER_INFO, loginVo.get(WzConstants.KEY_USER_INFO));
-//            loginInfo.put(WzConstants.KEY_RES_INFO, loginVo.get(WzConstants.KEY_RES_INFO));
-//            // 设置超时时间
-//            Integer overtime = 5;
-//            if (WzStringUtil.isNumeric(loginOvertime)) {
-//                overtime = Integer.parseInt(loginOvertime);
-//            }
-//            // 登录成功，保存到Redis中
-//            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.MINUTES);
-//            // 组织返回结果并返回
-//            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, loginInfo);
-//            return mr;
-//        }
+        // 库中更存在则设置缓存到Redis中并返回
+        redisClient.valueOperations().set(WzConstants.GK_DEVICE_CONF + deviceid + WzConstants.KEY_SPLIT + devicetype, deviceConfVo, 30, TimeUnit.MINUTES);
+        respData.put(RESP_ERR_CODE, DeviceRespMsg.SUCCESS.code());
+        respData.put(RESP_ERR_MSG, DeviceRespMsg.SUCCESS.getInfo());
+        respData.put(RESP_DEVICE_CONF_DEVICE_ID, deviceConfVo.getDeviceId());
+        respData.put(RESP_DEVICE_CONF_PERSET, deviceConfVo.getPerSet());
+        respData.put(RESP_DEVICE_CONF_RESET, deviceConfVo.getReset());
+        respData.put(RESP_DEVICE_CONF_REQUEST, deviceConfVo.getRequest());
+        return respData;
     }
 }

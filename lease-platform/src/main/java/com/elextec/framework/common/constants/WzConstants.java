@@ -4,6 +4,10 @@ package com.elextec.framework.common.constants;
  * Created by wangtao on 2018/1/22.
  */
 public class WzConstants {
+
+    /** Redis关键字分隔符. */
+    public static final String KEY_SPLIT = ":";
+
     /** 用户请求Header参数 登录Token. */
     public static final String HEADER_LOGIN_TOKEN = "header_login_token";
 
@@ -12,11 +16,11 @@ public class WzConstants {
      */
     /** 全局Key 登录用户信息前缀. */
     public static final String GK_PC_LOGIN_INFO = "gk_pc_login_info:";
-    /** Key 登录Token. */
+    /** 登录Token. */
     public static final String KEY_LOGIN_TOKEN = "key_login_token";
-    /** Key 登录用户详细信息. */
+    /** 登录用户详细信息. */
     public static final String KEY_USER_INFO = "key_user_info";
-    /** Key 登录用户可用资源信息. */
+    /** 登录用户可用资源信息. */
     public static final String KEY_RES_INFO = "key_res_info";
 
     /*
@@ -36,4 +40,10 @@ public class WzConstants {
     public static final String KEY_CAPTCHA_TOKEN = "key_captcha_token";
     /** 图形验证码图像Base64字符串. */
     public static final String KEY_CAPTCHA_BASE64 = "key_captcha_base64";
+
+    /*
+     * 设备设定参数控制相关Key.
+     */
+    /** 全局Key 设备设定前缀 */
+    public static final String GK_DEVICE_CONF = "gk_device_conf:";
 }
