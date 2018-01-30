@@ -120,6 +120,19 @@ public class SysResourceServcieImpl implements SysResourceService {
 
     @Override
     public SysResources getSysResourceByPrimaryKey(String id) {
-        return sysResourcesMapperExt.selectByPrimaryKey(id);
+        SysResources data = sysResourcesMapperExt.selectByPrimaryKey(id);
+        if (null == data) {
+            throw new BizException(RunningResult.NO_RESOURCE);
+        }
+        return data;
+    }
+
+    @Override
+    public List<SysResources> listSysResourcesByRoleId(String roleId) {
+        List<SysResources> datas = sysResourcesMapperExt.selectByRoleId(roleId);
+        if (null == datas || 0 == datas.size()) {
+            throw new BizException(RunningResult.NO_RESOURCE);
+        }
+        return datas;
     }
 }

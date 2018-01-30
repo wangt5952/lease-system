@@ -4,6 +4,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.persist.model.mybatis.SysResources;
+import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
 import java.util.List;
@@ -50,6 +51,14 @@ public interface SysResourceService {
     /**
      * 根据ID查询资源信息
      * @param id 资源ID
-     * */
+     * @return 资源信息
+     */
     public SysResources getSysResourceByPrimaryKey(String id);
+
+    /**
+     * 根据角色ID查询资源列表.
+     * @param roleId 角色ID
+     * @return 资源列表
+     */
+    public List<SysResources> listSysResourcesByRoleId(String roleId);
 }

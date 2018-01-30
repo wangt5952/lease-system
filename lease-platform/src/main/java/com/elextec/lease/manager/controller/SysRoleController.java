@@ -4,13 +4,16 @@ package com.elextec.lease.manager.controller;
 import com.alibaba.fastjson.JSON;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
+import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.RefRoleResourceParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.manager.service.SysRoleService;
+import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 角色管理Controller.
@@ -34,6 +39,9 @@ public class SysRoleController extends BaseController {
 
     @Autowired
     private SysRoleService sysRoleService;
+
+    @Autowired
+    private SysResourceService sysResourceService;
 
     /**
      * 查询角色.
@@ -190,9 +198,9 @@ public class SysRoleController extends BaseController {
      * <pre>
      *     {
      *         id:ID,
-     *         role_name:角色名,
-     *         role_introduce:角色说明,
-     *         update_user:更新人
+     *         roleName:角色名,
+     *         roleIntroduce:角色说明,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 修改结果
@@ -325,14 +333,32 @@ public class SysRoleController extends BaseController {
      *         code:返回Code,
      *         message:返回消息,
      *         respData:{
+     *             key_role_info:{
      *                 id:ID,
-     *                 role_name:角色名,
-     *                 role_introduce:角色说明,
-     *                 create_user:创建人,
-     *                 create_time:创建时间,
-     *                 update_user:更新人,
-     *                 update_time:更新时间
+     *                 roleName:角色名,
+     *                 roleIntroduce:角色说明,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             },
+     *             key_res_info:{
+     *                 id:ID,
+     *                 resCode:资源编码,
+     *                 resName:资源名,
+     *                 resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 resUrl:资源请求URL,
+     *                 resSort:组内排序,
+     *                 groupSort:分组排序,
+     *                 showFlag:显示标志（显示、不显示）,
+     *                 parent:上级资源（Root为空）,
+     *                 level:级别,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             }
+     *         }
      *     }
      * </pre>
      */
@@ -354,10 +380,13 @@ public class SysRoleController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-
-            SysRole user = sysRoleService.getSysRoleByPrimaryKey(roleId.get(0));
+            SysRole role = sysRoleService.getSysRoleByPrimaryKey(roleId.get(0));
+            List<SysResources> roleResources = sysResourceService.listSysResourcesByRoleId(roleId.get(0));
+            Map<String, Object> respMap = new HashMap<String, Object>();
+            respMap.put(WzConstants.KEY_ROLE_INFO, role);
+            respMap.put(WzConstants.KEY_RES_INFO, roleResources);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, respMap);
             return mr;
         }
     }

@@ -16,4 +16,10 @@ public interface SysResourcesMapperExt extends SysResourcesMapper {
      * @param userId 用户ID
      */
     List<SysResources> selectByUserId(@Param("userId") String userId);
+
+    /**
+     * 查询角色关联的所有资源.
+     * @param roleId 角色ID
+     */
+    List<SysResources> selectByRoleId(@Param("roleId") String roleId);
 }

@@ -4,14 +4,17 @@ package com.elextec.lease.manager.controller;
 import com.alibaba.fastjson.JSON;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
+import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.service.SysRoleService;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.persist.model.mybatis.SysResources;
+import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import org.hibernate.jpa.event.internal.jpa.CallbackRegistryImpl;
@@ -23,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理Controller.
@@ -38,6 +43,9 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private SysUserService sysUserService;
+
+    @Autowired
+    private SysRoleService sysRoleService;
 
     /**
      * 查询用户.
@@ -377,6 +385,7 @@ public class SysUserController extends BaseController {
      *         code:返回Code,
      *         message:返回消息,
      *         respData:{
+     *             key_user_info:{
      *                 id:ID,
      *                 loginName:用户名,
      *                 userMobile:用户手机号码,
@@ -396,7 +405,17 @@ public class SysUserController extends BaseController {
      *                 createTime:创建时间,
      *                 updateUser:更新人,
      *                 updateTime:更新时间
+     *             },
+     *             key_role_info:{
+     *                 id:ID,
+     *                 roleName:角色名,
+     *                 roleIntroduce:角色说明,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
      *             }
+     *         }
      *     }
      * </pre>
      */
@@ -419,8 +438,12 @@ public class SysUserController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             SysUser user = sysUserService.getSysUserByPrimaryKey(userId.get(0));
+            List<SysRole> userRoles = sysRoleService.listSysRolesByUserId(userId.get(0));
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,user);
+            Map<String, Object> respMap = new HashMap<String, Object>();
+            respMap.put(WzConstants.KEY_USER_INFO, user);
+            respMap.put(WzConstants.KEY_ROLE_INFO, userRoles);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, respMap);
             return mr;
         }
     }

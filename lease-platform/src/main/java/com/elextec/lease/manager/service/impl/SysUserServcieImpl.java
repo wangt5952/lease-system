@@ -9,6 +9,7 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.persist.dao.mybatis.SysUserMapperExt;
 import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
+import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import org.slf4j.Logger;
@@ -154,6 +155,10 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     public SysUser getSysUserByPrimaryKey(String id) {
-        return sysUserMapperExt.selectByPrimaryKey(id);
+        SysUser data = sysUserMapperExt.selectByPrimaryKey(id);
+        if (null == data) {
+            throw new BizException(RunningResult.NO_USER);
+        }
+        return data;
     }
 }

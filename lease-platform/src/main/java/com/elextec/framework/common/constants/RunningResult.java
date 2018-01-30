@@ -16,6 +16,8 @@ public enum RunningResult {
     AUTH_OVER_TIME("40106", "认证已超时"),
     NO_PERMISSION("40107", "您无权使用该系统"),
     MULTIPLE_RECORD("40108", "记录已存在"),
+    NO_ROLE("40109", "未查询到角色"),
+    NO_RESOURCE("40110", "未查询到资源"),
     FORBIDDEN("403", "禁止访问"),
     SERVER_ERROR("500", "服务器错误"),
     DB_ERROR("50001", "数据库处理错误"),

@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.SysRoleMapperExt">
+    <select id="selectByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT DISTINCT
+        a.id,
+        a.role_name,
+        a.role_introduce,
+        a.create_user,
+        a.create_time,
+        a.update_user,
+        a.update_time
+        FROM
+        sys_role a, sys_ref_user_role b
+        WHERE
+        a.id=b.role_id AND b.user_id=#{userId,jdbcType=VARCHAR}
+    </select>
 </mapper>

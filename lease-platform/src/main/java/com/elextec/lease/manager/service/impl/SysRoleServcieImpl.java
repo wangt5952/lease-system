@@ -144,6 +144,19 @@ public class SysRoleServcieImpl implements SysRoleService {
 
     @Override
     public SysRole getSysRoleByPrimaryKey(String id) {
-        return sysRoleMapperExt.selectByPrimaryKey(id);
+        SysRole data = sysRoleMapperExt.selectByPrimaryKey(id);
+        if (null == data) {
+            throw new BizException(RunningResult.NO_ROLE);
+        }
+        return data;
+    }
+
+    @Override
+    public List<SysRole> listSysRolesByUserId(String userId) {
+        List<SysRole> datas = sysRoleMapperExt.selectByUserId(userId);
+        if (null == datas || 0 == datas.size()) {
+            throw new BizException(RunningResult.NO_ROLE);
+        }
+        return datas;
     }
 }

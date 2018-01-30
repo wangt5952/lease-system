@@ -24,4 +24,27 @@
         ORDER BY
         a.group_sort, a.level, a.res_sort
     </select>
+    <select id="selectByRoleId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT DISTINCT
+        a.id,
+        a.res_code,
+        a.res_name,
+        a.res_type,
+        a.res_url,
+        a.res_sort,
+        a.group_sort,
+        a.show_flag,
+        a.parent,
+        a.level,
+        a.create_user,
+        a.create_time,
+        a.update_user,
+        a.update_time
+        FROM
+        sys_resources a, sys_ref_role_resources b
+        WHERE
+        a.id=b.res_id AND b.role_id=#{roleId,jdbcType=VARCHAR}
+        ORDER BY
+        a.group_sort, a.level, a.res_sort
+    </select>
 </mapper>

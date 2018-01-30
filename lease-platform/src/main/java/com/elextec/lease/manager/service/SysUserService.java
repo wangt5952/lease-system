@@ -5,6 +5,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.persist.model.mybatis.SysResources;
+import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 
 import java.util.List;
@@ -47,14 +48,14 @@ public interface SysUserService {
     public void deleteSysUser(List<String> ids);
 
     /**
-     * 给用户分配角色
+     * 给用户分配角色.
      * @param params 用户对应角色map
-     * */
+     */
     public void refSysUserAndRoles(RefUserRolesParam params);
 
     /**
-     * 根据ID查询用户信息
+     * 根据ID查询用户信息.
      * @param id 用户ID
-     * */
+     */
     public SysUser getSysUserByPrimaryKey(String id);
 }
