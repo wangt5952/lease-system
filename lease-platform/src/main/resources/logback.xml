@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml" />
-    <substitutionProperty name="log.base" value="C:/myproject/lease-system/lease-platform/logs" />
-    <!--<substitutionProperty name="log.base" value="/root/leaseplatform/logs" />-->
+    <!--<substitutionProperty name="log.base" value="C:/myproject/lease-system/lease-platform/logs" />-->
+    <substitutionProperty name="log.base" value="/root/leaseplatform/logs" />
     <jmxConfigurator />
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
