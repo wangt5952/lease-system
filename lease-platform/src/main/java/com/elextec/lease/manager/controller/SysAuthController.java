@@ -251,13 +251,14 @@ public class SysAuthController extends BaseController {
      *          code:处理Code,
      *          message:处理消息,
      *          respData:{
-     *              key_captcha_token:图片验证码Token
+     *              key_captcha_token:图片验证码Token,
+     *              key_captcha_url:图形验证码图像URL
      *          }
      *     }
      * </pre>
      */
-    @RequestMapping(path = {"/sendcaptcha"})
-    public MessageResponse sendCaptcha() {
+    @RequestMapping(path = {"/getcaptcha"})
+    public MessageResponse getCaptcha() {
         String code = WzCheckCodeUtil.makeEDCode(4);
         String token = WzUniqueValUtil.makeUUID();
         // 图片验证码2分钟有效

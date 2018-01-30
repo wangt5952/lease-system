@@ -19,7 +19,8 @@ public enum RunningResult {
     FORBIDDEN("403", "禁止访问"),
     SERVER_ERROR("500", "服务器错误"),
     DB_ERROR("50001", "数据库处理错误"),
-    SMS_SEND_FAIL("50002", "短信发送失败");
+    SMS_SEND_FAIL("50002", "短信发送失败"),
+    IO_FAIL("50003", "读写文件是发生错误");
 
     /** Code. */
     private final String code;
