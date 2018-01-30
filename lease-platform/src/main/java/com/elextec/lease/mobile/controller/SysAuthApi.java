@@ -10,10 +10,7 @@ import com.elextec.framework.common.request.SmsParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.image.WzImageClient;
-import com.elextec.framework.utils.WzCaptchaUtil;
-import com.elextec.framework.utils.WzCheckCodeUtil;
-import com.elextec.framework.utils.WzStringUtil;
-import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.framework.utils.*;
 import com.elextec.lease.manager.controller.SysAuthController;
 import com.elextec.lease.manager.service.SysAuthService;
 import com.elextec.lease.manager.service.SysUserService;
@@ -49,6 +46,18 @@ public class SysAuthApi extends BaseController {
 
     @Value("localsetting.login-overtime-sec")
     private String loginOvertime;
+
+    @Value("localsetting.upload-user-icon-root")
+    private String uploadUserIconRoot;
+
+    @Value("localsetting.download-user-icon-prefix")
+    private String downloadUserIconPrefix;
+
+    @Value("localsetting.upload-user-realname-root")
+    private String uploadUserRealnameRoot;
+
+    @Value("localsetting.download-user-realname-prefix")
+    private String downloadUserRealnamePrefix;
 
     @Autowired
     private SysAuthService sysAuthService;
@@ -415,7 +424,7 @@ public class SysAuthApi extends BaseController {
      * <pre>
      *     {
      *         id:ID,
-     *         loginName:用户名(可以为空）,
+     *         loginName:用户名,
      *         nickName:用户昵称,
      *         userName:用户姓名,
      *         userPid:用户身份证码,
@@ -457,7 +466,7 @@ public class SysAuthApi extends BaseController {
                         userTemp.setNickName(resetParam.getNickName());
                         userTemp.setUserName(resetParam.getUserName());
                         //判断用户是否已实名认证，如果已实名认证，则不可修改身份证号码
-                        if(!RealNameAuthFlag.AUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo()) ||
+                        if(!RealNameAuthFlag.AUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo()) &&
                                  !RealNameAuthFlag.TOAUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo())){
                              //用户不是已认证或待认证状态，可以更改用户身份证号
                              userTemp.setUserPid(resetParam.getUserPid());
@@ -482,5 +491,56 @@ public class SysAuthApi extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
         }
+    }
+
+    /**
+     * 上传用户头像.
+     * @param userIdAndIconBase64Data 用户ID和用户头像图片BASE64
+     * <pre>
+     *     {
+     *         id:ID,
+     *         userIcon:用户头像BASE64
+     *     }
+     * </pre>
+     * @return 上传用户头像结果
+     * <pre>
+     *     {
+     *          code:处理Code,
+     *          message:处理消息,
+     *          respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = {"/uplodeusericon"})
+    public MessageResponse uplodeUserIcon(@RequestBody String userIdAndIconBase64Data){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(userIdAndIconBase64Data)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            SysUser resetParam = null;
+            try{
+                String paramStr = URLDecoder.decode(userIdAndIconBase64Data, "utf-8");
+                resetParam = JSON.parseObject(paramStr, SysUser.class);
+                if(WzStringUtil.isNotBlank(resetParam.getId())){
+                    if(WzStringUtil.isNotBlank(resetParam.getUserIcon())){
+                        String imageName = WzUniqueValUtil.makeUniqueTimes();
+                        WzFileUtil.save(resetParam.getUserIcon(), uploadUserIconRoot, "", imageName, WzFileUtil.EXT_JPG);
+                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", imageName + WzFileUtil.EXT_JPG);
+                    }else{
+                        MessageResponse mr = new MessageResponse(RunningResult.PARAM_VERIFY_ERROR);
+                        return mr;
+                    }
+                }else{
+                    //ID为空的话，参数解析失败
+                    MessageResponse mr = new MessageResponse(RunningResult.PARAM_VERIFY_ERROR);
+                    return mr;
+                }
+            }catch(Exception ex){
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+
+        }
+        return null;
     }
 }
