@@ -150,6 +150,7 @@ export default {
     },
 
     async reload() {
+      this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
           currPage: this.currentPage, pageSize: this.pageSize,
@@ -162,7 +163,9 @@ export default {
           resTypeText: (_.find(this.typeList, { id: o.resType }) || { name: o.resType }).name,
           showFlagText: (_.find(this.showFlagList, { id: o.showFlag }) || {}).name,
         }));
+        this.loading = false;
       } catch (e) {
+        this.loading = false;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
