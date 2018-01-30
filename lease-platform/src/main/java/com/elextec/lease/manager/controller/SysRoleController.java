@@ -342,22 +342,25 @@ public class SysRoleController extends BaseController {
      *                 updateUser:更新人,
      *                 updateTime:更新时间
      *             },
-     *             key_res_info:{
-     *                 id:ID,
-     *                 resCode:资源编码,
-     *                 resName:资源名,
-     *                 resType:资源类型（目录、菜单、页面、功能或按钮）,
-     *                 resUrl:资源请求URL,
-     *                 resSort:组内排序,
-     *                 groupSort:分组排序,
-     *                 showFlag:显示标志（显示、不显示）,
-     *                 parent:上级资源（Root为空）,
-     *                 level:级别,
-     *                 createUser:创建人,
-     *                 createTime:创建时间,
-     *                 updateUser:更新人,
-     *                 updateTime:更新时间
-     *             }
+     *             key_res_info:[
+     *                 {
+     *                     id:ID,
+     *                     resCode:资源编码,
+     *                     resName:资源名,
+     *                     resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *                     resUrl:资源请求URL,
+     *                     resSort:组内排序,
+     *                     groupSort:分组排序,
+     *                     showFlag:显示标志（显示、不显示）,
+     *                     parent:上级资源（Root为空）,
+     *                     level:级别,
+     *                     createUser:创建人,
+     *                     createTime:创建时间,
+     *                     updateUser:更新人,
+     *                     updateTime:更新时间
+     *                 },
+     *                 ......
+     *             ]
      *         }
      *     }
      * </pre>

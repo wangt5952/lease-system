@@ -406,15 +406,18 @@ public class SysUserController extends BaseController {
      *                 updateUser:更新人,
      *                 updateTime:更新时间
      *             },
-     *             key_role_info:{
-     *                 id:ID,
-     *                 roleName:角色名,
-     *                 roleIntroduce:角色说明,
-     *                 createUser:创建人,
-     *                 createTime:创建时间,
-     *                 updateUser:更新人,
-     *                 updateTime:更新时间
-     *             }
+     *             key_role_info:[
+     *                 {
+     *                     id:ID,
+     *                     roleName:角色名,
+     *                     roleIntroduce:角色说明,
+     *                     createUser:创建人,
+     *                     createTime:创建时间,
+     *                     updateUser:更新人,
+     *                     updateTime:更新时间
+     *                 },
+     *                 ......
+     *             ]
      *         }
      *     }
      * </pre>
