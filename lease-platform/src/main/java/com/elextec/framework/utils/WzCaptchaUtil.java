@@ -1,14 +1,9 @@
-package com.elextec.framework.plugins.image;
+package com.elextec.framework.utils;
 
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.utils.WzEncryptUtil;
-import com.elextec.framework.utils.WzFileUtil;
-import com.elextec.framework.utils.WzUniqueValUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,28 +17,9 @@ import java.util.Random;
  * 图形验证码工具类.
  * Created by wangtao on 2018/1/16.
  */
-@Component
-public class WzImageClient {
+public class WzCaptchaUtil {
     /** 日志. */
-    private static final Logger logger = LoggerFactory.getLogger(WzImageClient.class);
-
-    @Value("localsetting.upload-captcha-root")
-    private String uploadCaptchaRoot;
-
-    @Value("localsetting.download-captcha-prefix")
-    private String downloadCaptchaPrefix;
-
-    @Value("localsetting.upload-user-icon-root")
-    private String uploadUserIconRoot;
-
-    @Value("localsetting.download-user-icon-prefix")
-    private String downloadUserIconPrefix;
-
-    @Value("localsetting.upload-user-realname-root")
-    private String uploadUserRealnameRoot;
-
-    @Value("localsetting.download-user-realname-prefix")
-    private String downloadUserRealnamePrefix;
+    private static final Logger logger = LoggerFactory.getLogger(WzCaptchaUtil.class);
 
     /** 默认宽度. */
     private static final int DEF_WIDTH_PX = 125;
@@ -52,12 +28,13 @@ public class WzImageClient {
 
     /**
      * 生成图形验证码并保存并返回访问地址.
+     * @param saveDir 保存路径
      * @param captchaCode 图形验证码
      * @param widthPx 图形宽度
      * @param heightPx 图形高度
-     * @return 图形访问地址
+     * @return 图形文件名
      */
-    public String madeAndGetCapthaUrl(String captchaCode, int widthPx, int heightPx) {
+    public String madeAndGetCapthaUrl(String saveDir, String captchaCode, int widthPx, int heightPx) {
         int usedWidthPx = DEF_WIDTH_PX;
         int usedHeightPx = DEF_HEIGHT_PX;
         Random localRandom = new Random();
@@ -95,7 +72,7 @@ public class WzImageClient {
         }
         // 保存
         String imageName = WzUniqueValUtil.makeUniqueTimes();
-        String imageFullName = WzFileUtil.makeFilePath(uploadCaptchaRoot, "", imageName, WzFileUtil.EXT_JPG);
+        String imageFullName = WzFileUtil.makeFilePath(saveDir, "", imageName, WzFileUtil.EXT_JPG);
         OutputStream out = null;
         try {
             out = new FileOutputStream(imageFullName);
@@ -109,7 +86,7 @@ public class WzImageClient {
                 throw new BizException(RunningResult.IO_FAIL.code(), "关闭输出流失败", ex);
             }
         }
-        return WzFileUtil.makeRequestUrl(downloadCaptchaPrefix,"", imageName);
+        return imageName + WzFileUtil.EXT_JPG;
     }
 
     /**
@@ -152,7 +129,7 @@ public class WzImageClient {
         for (int i = 0; i < captchaCode.length(); i++) {
             String ch = captchaCode.substring(i, i + 1);
             localGraphics.setColor(new Color(20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110)));
-            localGraphics.setFont(new Font("宋体", Font.BOLD, 25));
+            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
             localGraphics.drawString(ch, 20 * i + 6, 20);
         }
         // 返回Base64
@@ -170,28 +147,6 @@ public class WzImageClient {
                 throw new BizException(RunningResult.IO_FAIL.code(), "关闭输出流失败", ex);
             }
         }
-    }
-
-    /**
-     * 保存用户头像并保存并返回访问地址.
-     * @param fileBase64Data 用户头像Base64编码
-     * @return 用户头像访问路径
-     */
-    public String madeAndGetUserIconUrl(String fileBase64Data) {
-        String imageName = WzUniqueValUtil.makeUniqueTimes();
-        WzFileUtil.save(fileBase64Data, uploadUserIconRoot, "", imageName, WzFileUtil.EXT_JPG);
-        return WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", imageName + WzFileUtil.EXT_JPG);
-    }
-
-    /**
-     * 保存用户实名验证相关图片并保存并返回访问地址.
-     * @param fileBase64Data 用户实名验证相关图片Base64编码
-     * @return 用户实名验证相关图片访问路径
-     */
-    public String madeAndGetUserRealAuthUrl(String fileBase64Data) {
-        String imageName = WzUniqueValUtil.makeUniqueTimes();
-        WzFileUtil.save(fileBase64Data, uploadUserRealnameRoot, "", imageName, WzFileUtil.EXT_JPG);
-        return WzFileUtil.makeRequestUrl(downloadUserRealnamePrefix,"", imageName + WzFileUtil.EXT_JPG);
     }
 
     /**

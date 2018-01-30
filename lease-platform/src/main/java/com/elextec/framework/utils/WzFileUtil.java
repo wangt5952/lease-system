@@ -42,7 +42,7 @@ public class WzFileUtil {
      * @param ext 扩展名
      */
     public static void save(String fileBase64Data, String saveRoot, String saveDir, String fileName, String ext) {
-        String filePath = madeFilePath(saveRoot, saveDir, fileName, ext);
+        String filePath = makeFilePath(saveRoot, saveDir, fileName, ext);
         byte[] fileBytes = WzEncryptUtil.base64ToByteArr(fileBase64Data);
         if (null == fileBytes) {
             throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), "文件内容解码失败");
@@ -59,7 +59,7 @@ public class WzFileUtil {
      * @param ext 扩展名
      */
     public static void save(byte[] fileData, String saveRoot, String saveDir, String fileName, String ext) {
-        String filePath = madeFilePath(saveRoot, saveDir, fileName, ext);
+        String filePath = makeFilePath(saveRoot, saveDir, fileName, ext);
         save(filePath, fileData);
     }
 
@@ -92,12 +92,12 @@ public class WzFileUtil {
     /**
      * 组合文件全路径.
      * @param saveRoot 保存根目录
-     * @param saveDir 保存相对目录
+     * @param relativePath 保存相对目录
      * @param fileName 文件名（不带扩展名）
      * @param ext 扩展名
      * @return 全路径
      */
-    public static String madeFilePath(String saveRoot, String saveDir, String fileName, String ext) {
+    public static String makeFilePath(String saveRoot, String relativePath, String fileName, String ext) {
         StringBuffer savedPath = new StringBuffer("");
         if (WzStringUtil.isBlank(saveRoot)
                 || WzStringUtil.isBlank(fileName)
@@ -112,8 +112,8 @@ public class WzFileUtil {
         savedPath.append(usedSaveRoot);
         // 处理相对目录，在开始加/并去掉末尾的/
         String usedSaveDir = null;
-        if (WzStringUtil.isNotBlank(saveDir)) {
-            usedSaveDir = saveDir.replace("\\", "/");
+        if (WzStringUtil.isNotBlank(relativePath)) {
+            usedSaveDir = relativePath.replace("\\", "/");
             if (!usedSaveDir.startsWith("/")) {
                 usedSaveDir = "/" + usedSaveDir;
             }
@@ -145,13 +145,57 @@ public class WzFileUtil {
     }
 
     /**
+     * 组合文件全路径.
+     * @param saveRoot 保存根目录
+     * @param relativePath 保存相对目录
+     * @param fileName 文件名（不带扩展名）
+     * @return 全路径
+     */
+    public static String makeFilePath(String saveRoot, String relativePath, String fileName) {
+        StringBuffer savedPath = new StringBuffer("");
+        if (WzStringUtil.isBlank(saveRoot)
+                || WzStringUtil.isBlank(fileName)) {
+            throw new BizException(RunningResult.IO_FAIL.code(), "文件保存目录有误");
+        }
+        // 处理保存Root，并去掉末尾的/
+        String usedSaveRoot = saveRoot.replace("\\", "/");
+        if (usedSaveRoot.endsWith("/")) {
+            usedSaveRoot = usedSaveRoot.substring(0, usedSaveRoot.length() - 1);
+        }
+        savedPath.append(usedSaveRoot);
+        // 处理相对目录，在开始加/并去掉末尾的/
+        String usedSaveDir = null;
+        if (WzStringUtil.isNotBlank(relativePath)) {
+            usedSaveDir = relativePath.replace("\\", "/");
+            if (!usedSaveDir.startsWith("/")) {
+                usedSaveDir = "/" + usedSaveDir;
+            }
+            if (usedSaveDir.endsWith("/")) {
+                usedSaveDir = usedSaveDir.substring(0, usedSaveDir.length() - 1);
+            }
+            savedPath.append(usedSaveDir);
+        }
+        File f = new File(savedPath.toString());
+        if (!f.exists() || !f.isDirectory()) {
+            f.mkdirs();
+        }
+        // 处理文件名，在开始加/并如果存在.xx的扩展名则去掉
+        String usedFileName = fileName;
+        if (!usedFileName.startsWith("/")) {
+            usedFileName = "/" + usedFileName;
+        }
+        savedPath.append(usedFileName);
+        return savedPath.toString();
+    }
+
+    /**
      * 组合文件访问Url.
      * @param prefix 访问根目录
      * @param relativePath 相对目录
      * @param fileName 文件名
      * @return 访问URL
      */
-    public static String madeRequestUrl(String prefix, String relativePath, String fileName) {
+    public static String makeRequestUrl(String prefix, String relativePath, String fileName) {
         StringBuffer reqUrl = new StringBuffer("");
         if (WzStringUtil.isBlank(prefix)
                 || WzStringUtil.isBlank(fileName)) {
