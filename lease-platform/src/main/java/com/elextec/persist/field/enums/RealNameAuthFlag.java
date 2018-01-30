@@ -6,7 +6,9 @@ package com.elextec.persist.field.enums;
  */
 public enum RealNameAuthFlag {
     AUTHORIZED("已实名认证"),
-    UNAUTHORIZED("未实名认证");
+    UNAUTHORIZED("未实名认证"),
+    TOAUTHORIZED("待实名认证"),
+    REJECTAUTHORIZED("驳回");
 
     /** Value. */
     private final String info;
