@@ -34,6 +34,6 @@ public class WzConstants {
     public static final String GK_CAPTCHA = "gk_captcha:";
     /** 图片验证码Token. */
     public static final String KEY_CAPTCHA_TOKEN = "key_captcha_token";
-    /** 图形验证码图像URL. */
-    public static final String KEY_CAPTCHA_URL = "key_captcha_url";
+    /** 图形验证码图像Base64字符串. */
+    public static final String KEY_CAPTCHA_BASE64 = "key_captcha_base64";
 }
