@@ -1,4 +1,4 @@
-package com.elextec.framework.plugins.captcha;
+package com.elextec.framework.plugins.image;
 
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
