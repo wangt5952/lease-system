@@ -16,10 +16,27 @@ public class BaseController {
     @Autowired
     protected RedisClient redisClient;
 
+    /**
+     * 获得登录用户信息.
+     * @param request HttpServletRequest
+     * @return 登录用户信息对象
+     */
     protected SysUserExt getLoginUserInfo(HttpServletRequest request) {
         String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
         Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
         SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
-        return null;
+        return sue;
+    }
+
+    /**
+     * 修改用户后更新Session中的登录用户信息.
+     * @param request HttpServletRequest
+     * @param newUserExt 新用户登录信息
+     */
+    protected void resetLoginUserInfo(HttpServletRequest request, SysUserExt newUserExt) {
+        String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
+        userInfo.remove(WzConstants.KEY_USER_INFO);
+        userInfo.put(WzConstants.KEY_USER_INFO, newUserExt);
     }
 }

@@ -7,6 +7,8 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
+import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
 import java.util.List;
 
@@ -58,4 +60,11 @@ public interface SysUserService {
      * @param id 用户ID
      */
     public SysUser getSysUserByPrimaryKey(String id);
+
+    /**
+     * 根据ID查询用户扩展信息.
+     * @param example 查询条件
+     * @return 用户扩展信息
+     */
+    public SysUserExt getExtById(SysUserExample example);
 }

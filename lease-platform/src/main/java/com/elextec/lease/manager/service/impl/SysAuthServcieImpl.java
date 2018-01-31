@@ -45,7 +45,7 @@ public class SysAuthServcieImpl implements SysAuthService {
         loginNameCri.andLoginNameEqualTo(loginName);
         SysUserExample.Criteria mobileCri = sysUserExample.or();
         mobileCri.andUserMobileEqualTo(loginName);
-        List<SysUserExt> sysUserLs = sysUserMapperExt.login(sysUserExample);
+        List<SysUserExt> sysUserLs = sysUserMapperExt.selectExtByExample(sysUserExample);
 
         // 处理用户信息
         if (null == sysUserLs || 0 == sysUserLs.size()) {
