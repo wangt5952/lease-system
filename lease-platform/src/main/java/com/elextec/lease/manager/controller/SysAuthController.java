@@ -44,7 +44,7 @@ public class SysAuthController extends BaseController {
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SysAuthController.class);
 
-    @Value("localsetting.login-overtime-sec")
+    @Value("${localsetting.login-overtime-sec}")
     private String loginOvertime;
 
     @Autowired

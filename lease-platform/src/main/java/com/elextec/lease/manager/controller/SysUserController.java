@@ -312,7 +312,7 @@ public class SysUserController extends BaseController {
             SysUserExample.Criteria reListCri = reListParam.createCriteria();
             reListCri.andIdEqualTo(userInfo.getId());
             SysUserExt uExt = sysUserService.getExtById(reListParam);
-            resetLoginUserInfo(request, uExt);
+            resetPcLoginUserInfo(request, uExt);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, uExt);
             return mr;
