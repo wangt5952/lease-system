@@ -13,9 +13,10 @@
       <el-table-column prop="nickName" label="昵称"></el-table-column>
       <el-table-column prop="userName" label="姓名"></el-table-column>
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="200">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+          <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
           <el-tooltip content="删除" placement="top">
             <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
           </el-tooltip>
@@ -115,6 +116,24 @@
       </span>
     </el-dialog>
 
+    <el-dialog :title="`分配角色 ( ${assignRoleForm.name} ) `" :visible.sync="assignRoleFormVisible" :close-on-click-modal="false">
+      <el-form :model="form" ref="form" size="medium" v-loading="loading && assignRoleFormVisible">
+        <el-row :gutter="10">
+          <el-col :span="24">
+            <el-form-item label="角色">
+              <el-select v-model="assignRoleForm.list" :placeholder="`请选择角色`" style="width:100%;" multiple>
+                <el-option v-for="o in roleList" :key="o.id" :label="o.roleName" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer" >
+        <el-button size="medium" @click="closeAssignRoleForm">取消</el-button>
+        <el-button :disabled="loading" size="medium" type="primary" @click="saveAssignRoleForm">{{form.id ? '保存' : '添加'}}</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -152,6 +171,11 @@ export default {
         { id: 'FREEZE', name: '冻结' },
         { id: 'INVALID', name: '作废' },
       ],
+
+      assignRoleFormVisible: false,
+      assignRoleForm: { list: [] },
+
+      roleList: [],
     };
   },
   computed: {
@@ -174,6 +198,7 @@ export default {
     },
 
     async reload() {
+      this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
           currPage: this.currentPage, pageSize: this.pageSize,
@@ -186,7 +211,9 @@ export default {
           userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
+        this.loading = false;
       } catch (e) {
+        this.loading = false;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
@@ -255,8 +282,43 @@ export default {
         this.$message.error(message);
       }
     },
+
+    async showAssignRoleForm({ id, loginName }) {
+      this.assignRoleFormVisible = true;
+
+      this.assignRoleForm = { id, name: loginName, list: [] };
+
+      this.loading = true;
+      const { code, respData } = (await this.$http.post('/api/manager/user/getbypk', [id])).body;
+      this.loading = false;
+      if (code === '200') {
+        const { key_role_info } = respData;
+        this.assignRoleForm.list = _.map(key_role_info, 'id');
+      }
+    },
+    closeAssignRoleForm() {
+      this.assignRoleFormVisible = false;
+    },
+
+    async saveAssignRoleForm() {
+      try {
+        const { id, list } = this.assignRoleForm;
+        const { code, message } = (await this.$http.post('/api/manager/user/refuserandroles', { userId: id, roleIds: list.join(',') })).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('分配成功');
+        this.closeAssignRoleForm();
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
   },
   async mounted() {
+    const { code, respData } = (await this.$http.post('/api/manager/role/list', {
+      currPage: 1, pageSize: 999,
+    })).body;
+    if (code === '200') this.roleList = respData.rows;
     await this.reload();
   },
 };

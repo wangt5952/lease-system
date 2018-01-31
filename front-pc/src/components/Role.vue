@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading && !formVisible && !assignResFormVisible" style="padding:10px;">
 
     <div>
       <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加角色</el-button>
@@ -8,9 +8,10 @@
     <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="roleName" label="角色名"></el-table-column>
       <el-table-column prop="roleIntroduce" label="说明"></el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="200">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+          <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignResForm(row)">分配资源</el-button>
           <el-tooltip content="删除" placement="top">
             <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
           </el-tooltip>
@@ -29,23 +30,42 @@
     </el-pagination>
 
     <el-dialog title="角色信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" size="medium">
+      <el-form :model="form" ref="form" size="medium" v-loading="loading && formVisible">
         <el-row :gutter="10">
-          <el-col :span="8">
-            <el-form-item prop="roleName" :rules="[{required:true, message:'请填写角色名'}]" label="用户名">
+          <el-col :span="12">
+            <el-form-item prop="roleName" :rules="[{required:true, message:'请填写角色名'}]" label="角色名">
               <el-input v-model="form.roleName" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <el-form-item prop="roleIntroduce" :rules="[{required:true, message:'请填写角色说明'}]" label="说明">
               <el-input v-model="form.roleIntroduce" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer" >
         <el-button size="medium" @click="closeForm">取消</el-button>
-        <el-button size="medium" type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button :disabled="loading" size="medium" type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+      </span>
+    </el-dialog>
+
+
+    <el-dialog :title="`分配资源 ( ${assignResForm.name} ) `" :visible.sync="assignResFormVisible" :close-on-click-modal="false">
+      <el-form :model="form" ref="form" size="medium" v-loading="loading && assignResFormVisible">
+        <el-row :gutter="10">
+          <el-col :span="24" v-for="p in resTypeList" :key="p.id">
+            <el-form-item :label="p.name">
+              <el-select v-model="assignResForm[p.id]" :placeholder="`请选择${p.name}`" style="width:100%;" multiple>
+                <el-option v-for="o in resList" :key="o.id" v-if="o.resType == p.id" :label="o.resName" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer" >
+        <el-button size="medium" @click="closeAssignResForm">取消</el-button>
+        <el-button :disabled="loading" size="medium" type="primary" @click="saveAssignResForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
 
@@ -71,6 +91,17 @@ export default {
 
       formVisible: false,
       form: {},
+
+      assignResFormVisible: false,
+      assignResForm: {},
+
+      resList: [],
+      resTypeList: [
+        { id: 'CATALOG', name: '目录' },
+        { id: 'MENU', name: '菜单' },
+        { id: 'PAGE', name: '页面' },
+        { id: 'FUNCTION', name: '功能' },
+      ],
     };
   },
   computed: {
@@ -82,6 +113,7 @@ export default {
     formVisible(v) {
       if (!v) {
         const $form = this.$refs.form;
+        this.loading = false;
         $form.resetFields();
       }
     },
@@ -93,6 +125,7 @@ export default {
     },
 
     async reload() {
+      this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/role/list', {
           currPage: this.currentPage, pageSize: this.pageSize,
@@ -105,7 +138,9 @@ export default {
           userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
+        this.loading = false;
       } catch (e) {
+        this.loading = false;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
@@ -123,10 +158,9 @@ export default {
       }
     },
 
-    showForm(form = { }) {
+    async showForm(form = { }) {
       this.form = _.pick(form, [
         'id',
-        'loginName',
         'roleName',
         'roleIntroduce',
       ]);
@@ -152,7 +186,7 @@ export default {
           const { ...form } = this.form;
           form.create_user = loginName;
           form.update_user = loginName;
-          const { code, message } = (await this.$http.post('/api/manager/role/add', [form])).body;
+          const { code, message } = (await this.$http.post('/api/manager/role/addone', form)).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }
@@ -164,8 +198,48 @@ export default {
         this.$message.error(message);
       }
     },
+
+    async showAssignResForm({ id, roleName }) {
+      this.assignResFormVisible = true;
+
+      this.assignResForm = _(this.resTypeList).groupBy('id').mapValues(() => []).value();
+      this.assignResForm.id = id;
+      this.assignResForm.name = roleName;
+
+      this.loading = true;
+      const { code, respData } = (await this.$http.post('/api/manager/role/getbypk', [id])).body;
+      this.loading = false;
+      if (code === '200') {
+        const { key_res_info } = respData;
+        this.assignResForm = {
+          ...this.assignResForm,
+          ..._(this.resTypeList).groupBy('id').mapValues((o, resType) => _(key_res_info).filter({ resType }).map('id').value()).value(),
+        };
+      }
+    },
+    closeAssignResForm() {
+      this.assignResFormVisible = false;
+    },
+    async saveAssignResForm() {
+      try {
+        const { id, name, ...form } = this.assignResForm;
+        const resources = _(form).values().flatten().join(',');
+        const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resources })).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('分配成功');
+        this.closeAssignResForm();
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
   },
   async mounted() {
+    const { code, respData } = (await this.$http.post('/api/manager/res/list', {
+      currPage: 1, pageSize: 999,
+    })).body;
+    if (code === '200') this.resList = respData.rows;
     await this.reload();
   },
 };
@@ -173,6 +247,6 @@ export default {
 
 <style scoped>
 >>> .el-form-item {
-  height: 73px;
+  min-height: 73px;
 }
 </style>
