@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
