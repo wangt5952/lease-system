@@ -482,7 +482,6 @@ public class SysAuthApi extends BaseController {
      *         nickName:用户昵称,
      *         userName:用户姓名,
      *         userPid:用户身份证码,
-     *         createUser:创建人,
      *         updateUser:更新人
      *     }
      * </pre>
@@ -522,6 +521,7 @@ public class SysAuthApi extends BaseController {
                         userTemp.setLoginName(resetParam.getLoginName());
                         userTemp.setNickName(resetParam.getNickName());
                         userTemp.setUserName(resetParam.getUserName());
+                        userTemp.setUpdateUser(resetParam.getUpdateUser());
                         //判断用户是否已实名认证，如果已实名认证，则不可修改身份证号码
                         if(!RealNameAuthFlag.AUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo()) &&
                                  !RealNameAuthFlag.TOAUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo())){
@@ -556,7 +556,8 @@ public class SysAuthApi extends BaseController {
      * <pre>
      *     {
      *         id:ID,
-     *         userIcon:用户头像BASE64
+     *         userIcon:用户头像BASE64,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 上传用户头像结果
@@ -596,6 +597,7 @@ public class SysAuthApi extends BaseController {
                         String oldIconName = userTemp.getUserIcon();
                         //数据库只保存文件名
                         userTemp.setUserIcon(imageName + WzFileUtil.EXT_JPG);
+                        userTemp.setUpdateUser(resetParam.getUpdateUser());
                         sysUserService.updateSysUser(userTemp);
                         //删除旧的头像文件
                         if(WzStringUtil.isNotBlank(oldIconName)){
@@ -627,7 +629,8 @@ public class SysAuthApi extends BaseController {
      *         userPid:用户身份证号
      *         userIcFront:身份证正面照片BASE64码,
      *         userIcBack:身份证背面照片BASE64码,
-     *         userIcGroup:用户手举身份证合照
+     *         userIcGroup:用户手举身份证合照,
+     *         updateUser:更新人
      *     }
      * </pre>
      * @return 用户实名认证结果
@@ -682,6 +685,7 @@ public class SysAuthApi extends BaseController {
 //                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
 
                         userTemp.setUserPid(resetParam.getUserPid());
+                        userTemp.setUpdateUser(resetParam.getUpdateUser());
                         //数据库只保存文件名
                         userTemp.setUserIcFront(frontImageName + WzFileUtil.EXT_JPG);
                         userTemp.setUserIcBack(backImageName + WzFileUtil.EXT_JPG);
