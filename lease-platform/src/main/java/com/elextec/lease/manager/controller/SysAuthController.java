@@ -63,7 +63,10 @@ public class SysAuthController extends BaseController {
      *     {
      *         loginName:登录用户名,
      *         loginAuthStr:验证字符串 MD5(用户名+MD5(密码).upper()+loginTime).upper(),
-     *         loginTime:登录时间
+     *         loginTime:登录时间,
+     *         needCaptcha:是否需要验证码，仅true有效,
+     *         capthaToken:验证码Token,
+     *         captcha:验证码内容
      *     }
      * </pre>
      * @return 登录结果及登录账户信息
@@ -133,6 +136,29 @@ public class SysAuthController extends BaseController {
                         || WzStringUtil.isBlank(loginParam.getLoginAuthStr())
                         || null == loginParam.getLoginTime()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 验证码判断
+                if (WzStringUtil.isNotBlank(loginParam.getNeedCaptcha())
+                        && "true".equals(loginParam.getNeedCaptcha().toLowerCase())) {
+                    // 未获得图形验证码Token
+                    if (WzStringUtil.isBlank(loginParam.getCaptchaToken())
+                            || WzStringUtil.isBlank(loginParam.getCaptcha())) {
+                        throw new BizException(RunningResult.NO_PARAM.code(), "验证码解析失败");
+                        // 开始验证图形验证码
+                    } else {
+                        // 获得预存图形验证码
+                        String cc = (String) redisClient.valueOperations().get(WzConstants.GK_CAPTCHA + loginParam.getCaptchaToken());
+                        // 图形验证码过期报错
+                        if (WzStringUtil.isBlank(cc)) {
+                            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
+                        }
+                        // 验证码不一致报错
+                        if (!cc.equals(loginParam.getCaptcha())) {
+                            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
+                        }
+                    }
+                    // 只要进行验证后，不管成功失败均将之前验证码作废
+                    redisClient.valueOperations().getOperations().delete(WzConstants.GK_CAPTCHA + loginParam.getCaptchaToken());
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
