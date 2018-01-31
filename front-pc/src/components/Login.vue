@@ -50,7 +50,7 @@ export default {
         if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_res_info, key_user_info } = respData;
 
-        console.log(JSON.stringify(_.filter(key_res_info, {resType:'MENU'})));
+        console.log(JSON.stringify(_.filter(key_res_info, { resType: 'MENU' })));
         await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
         this.$message.success({
           message: `欢迎回来，${key_user_info.userName}`,

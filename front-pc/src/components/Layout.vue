@@ -49,7 +49,9 @@ const menuTree = [
       { id: '', name: '车辆监控', path: '/monitor', resCode: 'vehicle_monitor' },
     ],
   },
-  { name: '车辆', icon: 'lt lt-diandongche' },
+  { name: '车辆', icon: 'lt lt-diandongche', children: [
+    { name: ''}
+  ]},
   { name: '电池及配件', icon: 'lt lt-iconset0250', resCode: 'battery_parts' },
   { name: '制造商', icon: 'lt lt-scsxx' },
   { name: '企业',
@@ -60,7 +62,7 @@ const menuTree = [
   },
   { name: '权限',
     icon: 'lt lt-quanxian',
-      children: [
+    children: [
       { name: '用户管理', path: '/user', resCode: 'user_manager' },
       { name: '角色管理', path: '/role', resCode: 'role_manager' },
       { name: '资源管理', path: '/resource', resCode: 'res_manager' },
@@ -92,16 +94,16 @@ export default {
           return o;
         }), o => (o.resCode && resList.indexOf(o.resCode)) || (o.children && o.children.length))
       }
-      
+
       return travTree(menuTree);
-    }
+    },
   },
   methods: {
     async handleLogout() {
       await this.$store.commit('logout');
       this.$router.replace('/login');
     },
-  }
+  },
 };
 </script>
 
