@@ -1,11 +1,11 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
 
     <div>
       <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加人员</el-button>
     </div>
 
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" height="100%"  style="width: 100%;margin-top:10px;">
       <el-table-column prop="loginName" label="用户名"></el-table-column>
       <el-table-column prop="userMobile" label="手机号"></el-table-column>
       <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
