@@ -533,6 +533,76 @@ public class SysResourcesExample {
             return (Criteria) this;
         }
 
+        public Criteria andResIconIsNull() {
+            addCriterion("res_icon is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconIsNotNull() {
+            addCriterion("res_icon is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconEqualTo(String value) {
+            addCriterion("res_icon =", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconNotEqualTo(String value) {
+            addCriterion("res_icon <>", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconGreaterThan(String value) {
+            addCriterion("res_icon >", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconGreaterThanOrEqualTo(String value) {
+            addCriterion("res_icon >=", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconLessThan(String value) {
+            addCriterion("res_icon <", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconLessThanOrEqualTo(String value) {
+            addCriterion("res_icon <=", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconLike(String value) {
+            addCriterion("res_icon like", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconNotLike(String value) {
+            addCriterion("res_icon not like", value, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconIn(List<String> values) {
+            addCriterion("res_icon in", values, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconNotIn(List<String> values) {
+            addCriterion("res_icon not in", values, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconBetween(String value1, String value2) {
+            addCriterion("res_icon between", value1, value2, "resIcon");
+            return (Criteria) this;
+        }
+
+        public Criteria andResIconNotBetween(String value1, String value2) {
+            addCriterion("res_icon not between", value1, value2, "resIcon");
+            return (Criteria) this;
+        }
+
         public Criteria andResUrlIsNull() {
             addCriterion("res_url is null");
             return (Criteria) this;
