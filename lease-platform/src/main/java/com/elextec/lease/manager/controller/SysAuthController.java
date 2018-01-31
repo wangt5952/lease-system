@@ -153,7 +153,7 @@ public class SysAuthController extends BaseController {
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
                         }
                         // 验证码不一致报错
-                        if (!cc.equals(loginParam.getCaptcha())) {
+                        if (!cc.equalsIgnoreCase(loginParam.getCaptcha())) {
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
                         }
                     }
@@ -350,7 +350,7 @@ public class SysAuthController extends BaseController {
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
                         }
                         // 验证码不一致报错
-                        if (!cc.equals(smsParam.getCaptcha())) {
+                        if (!cc.equalsIgnoreCase(smsParam.getCaptcha())) {
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
                         }
                     }
@@ -418,7 +418,7 @@ public class SysAuthController extends BaseController {
                     throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
                 }
                 // 验证码不一致报错
-                if (!vCode.equals(resetParam.getSmsVCode())) {
+                if (!vCode.equalsIgnoreCase(resetParam.getSmsVCode())) {
                     throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
                 }
             } catch (Exception ex) {
