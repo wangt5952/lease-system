@@ -230,4 +230,17 @@ public class WzFileUtil {
         reqUrl.append(usedFileName);
         return reqUrl.toString();
     }
+
+    /**
+     * 删除文件.
+     * @param delDir 删除文件所在目录
+     * @param fileName 删除文件名
+     */
+    public static void deleteFile(String delDir, String fileName) {
+        String delPath = makeFilePath(delDir, "", fileName);
+        File delFile  = new File(delPath);
+        if (delFile.exists()) {
+            delFile.delete();
+        }
+    }
 }

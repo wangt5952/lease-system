@@ -5,7 +5,7 @@
         <result column="org_code" jdbcType="VARCHAR" property="orgCode" />
         <result column="org_name" jdbcType="VARCHAR" property="orgName" />
     </resultMap>
-    <select id="login" parameterType="com.elextec.persist.model.mybatis.SysUserExample" resultMap="SysUserExtResultMap">
+    <select id="selectExtByExample" parameterType="com.elextec.persist.model.mybatis.SysUserExample" resultMap="SysUserExtResultMap">
         <include refid="Pageable_Prefix" />
         SELECT
         <if test="distinct">

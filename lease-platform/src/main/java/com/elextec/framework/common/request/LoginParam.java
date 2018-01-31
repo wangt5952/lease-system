@@ -13,6 +13,12 @@ public class LoginParam extends BaseModel {
     private String loginAuthStr;
     /** 登录时间的毫秒数. */
     private Long loginTime;
+    /** 是否需要验证码，仅true时需要. */
+    private String needCaptcha;
+    /** 验证码Token. */
+    private String captchaToken;
+    /** 验证码内容. */
+    private String captcha;
 
     /*
      * Getter 和 Setter 方法.
@@ -39,5 +45,29 @@ public class LoginParam extends BaseModel {
 
     public void setLoginTime(Long loginTime) {
         this.loginTime = loginTime;
+    }
+
+    public String getCaptchaToken() {
+        return captchaToken;
+    }
+
+    public void setCaptchaToken(String captchaToken) {
+        this.captchaToken = captchaToken;
+    }
+
+    public String getCaptcha() {
+        return captcha;
+    }
+
+    public void setCaptcha(String captcha) {
+        this.captcha = captcha;
+    }
+
+    public String getNeedCaptcha() {
+        return needCaptcha;
+    }
+
+    public void setNeedCaptcha(String needCaptcha) {
+        this.needCaptcha = needCaptcha;
     }
 }

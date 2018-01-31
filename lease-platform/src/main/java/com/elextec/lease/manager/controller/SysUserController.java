@@ -17,6 +17,7 @@ import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.hibernate.jpa.event.internal.jpa.CallbackRegistryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
@@ -231,6 +233,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 修改用户信息.
+     * @param request HttpServletRequest
      * @param modifyParam 修改参数JSON
      * <pre>
      *     {
@@ -257,12 +260,33 @@ public class SysUserController extends BaseController {
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:""
+     *         respData:{
+     *             id:ID,
+     *             loginName:登录用户名,
+     *             userMobile:手机号码,
+     *             userType:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）,
+     *             userIcon:Icon路径,
+     *             nickName:昵称,
+     *             userName:名称,
+     *             userRealNameAuthFlag:是否已实名认证,
+     *             userPid:身份证号,
+     *             userIcFront:身份证正面照路径,
+     *             userIcBack:身份证背面照路径,
+     *             userIcGroup:本人于身份证合照路径,
+     *             orgId:所属企业ID,
+     *             orgCode:企业Code,
+     *             orgName:企业名,
+     *             userStatus:用户状态（NORMAL-正常、FREEZE-冻结/维保、INVALID-作废）,
+     *             createUser:创建人,
+     *             createTime:创建时间,
+     *             updateUser:更新人,
+     *             updateTime:更新时间
+     *         }
      *     }
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modify(@RequestBody String modifyParam) {
+    public MessageResponse modify(@RequestBody String modifyParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -283,8 +307,14 @@ public class SysUserController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             sysUserService.updateSysUser(userInfo);
+            // 更新登录信息
+            SysUserExample reListParam  = new SysUserExample();
+            SysUserExample.Criteria reListCri = reListParam.createCriteria();
+            reListCri.andIdEqualTo(userInfo.getId());
+            SysUserExt uExt = sysUserService.getExtById(reListParam);
+            resetPcLoginUserInfo(request, uExt);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, uExt);
             return mr;
         }
     }

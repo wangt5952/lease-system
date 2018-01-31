@@ -12,6 +12,7 @@ import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,5 +161,17 @@ public class SysUserServcieImpl implements SysUserService {
             throw new BizException(RunningResult.NO_USER);
         }
         return data;
+    }
+
+    @Override
+    public SysUserExt getExtById(SysUserExample example) {
+        List<SysUserExt> datas = sysUserMapperExt.selectExtByExample(example);
+        if (null == datas || 0 == datas.size()) {
+            throw new BizException(RunningResult.NO_USER);
+        }
+        if (1 != datas.size()) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "查询到重复用户信息");
+        }
+        return datas.get(0);
     }
 }
