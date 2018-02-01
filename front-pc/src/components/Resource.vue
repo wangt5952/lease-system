@@ -5,16 +5,22 @@
       <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加资源</el-button>
     </div>
 
-    <el-table :data="list" height="100%" style="width: 100%;margin-top:10px;">
-      <el-table-column prop="resCode" label="编码"></el-table-column>
+    <el-table :data="tableTree" row-key="id" height="100%" style="width: 100%;margin-top:10px;">
+      <el-table-column width="80">
+        <template slot-scope="{row}">
+          <template v-if="row.children && row.children.length">
+            <i v-if="!row.showChildren" @click="showChildren(row.id, true)" class="el-icon-arrow-right" style="cursor:pointer;" :style="{marginLeft:`${(row.tabs - 1) * 10}px`}"></i>
+            <i v-else @click="showChildren(row.id, false)" class="el-icon-arrow-down" style="cursor:pointer;" :style="{marginLeft:`${(row.tabs - 1) * 10}px`}"></i>
+          </template>
+        </template>
+      </el-table-column>
+      <el-table-column prop="resCode" label="编码" width="100"></el-table-column>
       <el-table-column prop="resName" label="资源名"></el-table-column>
       <el-table-column prop="resTypeText" label="类型"></el-table-column>
       <el-table-column prop="resUrl" label="请求URL"></el-table-column>
       <el-table-column prop="groupSort" label="分组排序"></el-table-column>
       <el-table-column prop="resSort" label="组内排序"></el-table-column>
       <el-table-column prop="showFlagText" label="显示标志"></el-table-column>
-      <el-table-column prop="parent" label="上级资源"></el-table-column>
-      <el-table-column prop="level" label="级别"></el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
@@ -24,16 +30,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <el-pagination v-if="total" style="margin-top:10px;"
-      @size-change="handleSizeChange"
-      @current-change="reload"
-      :current-page.sync="currentPage"
-      :page-sizes="pageSizes"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total">
-    </el-pagination>
 
     <el-dialog title="资源信息" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form :model="form" ref="form" size="medium">
@@ -110,11 +106,6 @@ export default {
       loading: false,
       list: [],
 
-      pageSizes: [10, 50, 100, 200],
-      currentPage: 1,
-      pageSize: 10,
-      total: 0,
-
       formVisible: false,
       form: {},
 
@@ -134,6 +125,33 @@ export default {
     ...mapState({
       key_user_info: state => state.key_user_info,
     }),
+
+    tableList() {
+      return this.list;
+    },
+
+    tree() {
+      const { list } = this;
+
+      const buildChildren = (parent, tabs) => {
+        const childrenList = parent ? _.filter(list, { parent }) : _.filter(list, o => !o.parent);
+        if (!childrenList.length) return null;
+        return _.map(childrenList, (o) => {
+          const children = buildChildren(o.id, tabs + 1);
+          if (!children) return { ...o, tabs };
+          return { ...o, children, tabs };
+        });
+      };
+
+      return buildChildren(null, 0);
+    },
+
+    tableTree() {
+      const { tree } = this;
+      if (!tree || !tree.length) return [];
+      const flattenChildren = arr => _.map(arr, o => (o.showChildren ? [o, ...flattenChildren(o.children)] : o));
+      return _.flattenDeep(flattenChildren(tree[0].children));
+    },
   },
   watch: {
     formVisible(v) {
@@ -144,22 +162,22 @@ export default {
     },
   },
   methods: {
-    async handleSizeChange(pageSize) {
-      this.pageSize = pageSize;
-      await this.reload();
+    showChildren(id, value) {
+      this.list = _.map(this.list, o => ({ ...o, showChildren: id === o.id ? value : o.showChildren }));
     },
 
     async reload() {
       this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
-          currPage: this.currentPage, pageSize: this.pageSize,
+          currPage: 1, pageSize: 999,
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
         this.list = _.map(rows, o => ({
           ...o,
+          showChildren: false,
           resTypeText: (_.find(this.typeList, { id: o.resType }) || { name: o.resType }).name,
           showFlagText: (_.find(this.showFlagList, { id: o.showFlag }) || {}).name,
         }));

@@ -110,16 +110,16 @@ export default {
       const { resList: list } = this;
 
       const buildChildren = (parent) => {
-        const childrenList = parent ? _.filter(list, {parent}) : _.filter(list, o => !o.parent);
-        if(!childrenList.length) return null;
-        return _.map(childrenList, o => {
-          const children = buildChildren(o.id)
-          if(!children) return o;
+        const childrenList = parent ? _.filter(list, { parent }) : _.filter(list, o => !o.parent);
+        if (!childrenList.length) return null;
+        return _.map(childrenList, (o) => {
+          const children = buildChildren(o.id);
+          if (!children) return o;
           return { ...o, children };
-        })
+        });
       };
 
-      return buildChildren(null)
+      return buildChildren(null);
     },
   },
   watch: {
@@ -214,8 +214,6 @@ export default {
 
     async showAssignResForm({ id, roleName }) {
       this.assignResFormVisible = true;
-
-      //this.assignResForm = _(this.resTypeList).groupBy('id').mapValues(() => []).value();
       this.assignResForm.id = id;
       this.assignResForm.name = roleName;
 
@@ -234,9 +232,13 @@ export default {
     },
     async saveAssignResForm() {
       try {
-        const { id, name, ...form } = this.assignResForm;
+        const { id } = this.assignResForm;
+
         const resources = this.$refs.resTree.getCheckedKeys().join(',');
-        if(!resources) throw new Error('请至少选择一个资源')
+        if (!resources) throw new Error('请至少选择一个资源');
+
+        // 你要加清除角色资源的接口，我这里就if resources 判断是使用设置资源接口还是清除资源接口
+
         const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resources })).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('分配成功');

@@ -56,10 +56,10 @@ const store = new Vuex.Store({
   },
 });
 
-const whiteList = ['/login']
+const whiteList = ['/login'];
 router.beforeEach(async (to, from, next) => {
   const { key_login_token } = store.state;
-  if(!key_login_token && whiteList.indexOf(to.path) === -1) return next({path: '/login'})
+  if (!key_login_token && whiteList.indexOf(to.path) === -1) return next({ path: '/login' });
   return next();
 });
 

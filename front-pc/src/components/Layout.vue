@@ -3,14 +3,14 @@
     <div style="width:200px;">
       <el-menu :router="true" unique-opened>
         <template v-for="(o, i) in menuTree">
-          <el-submenu v-if="o.children" :index="`${i}`">
+          <el-submenu v-if="o.children" :key="i" :index="`${i}`">
             <template slot="title">
               <i :class="o.icon"></i>
               <span>{{o.name}}</span>
             </template>
-            <el-menu-item v-for="p in o.children" :index="p.path">{{p.name}}</el-menu-item>
+            <el-menu-item v-for="(p, j) in o.children" :key="j" :index="p.path">{{p.name}}</el-menu-item>
           </el-submenu>
-          <el-menu-item v-else :index="`${i}`">
+          <el-menu-item v-else :key="i" :index="`${i}`">
             <template slot="title">
               <i :class="o.icon"></i>
               <span>{{o.name}}</span>
@@ -46,18 +46,21 @@ import {
 const menuTree = [
   { name: '监控',
     icon: 'lt lt-jiankong',
-      children: [
+    children: [
       { id: '', name: '车辆监控', path: '/monitor', resCode: 'vehicle_monitor' },
     ],
   },
-  { name: '车辆', icon: 'lt lt-diandongche', children: [
-    { name: ''}
-  ]},
+  { name: '车辆',
+    icon: 'lt lt-diandongche',
+    children: [
+      { name: '' },
+    ],
+  },
   { name: '电池及配件', icon: 'lt lt-iconset0250', resCode: 'battery_parts' },
   { name: '制造商', icon: 'lt lt-scsxx' },
   { name: '企业',
     icon: 'lt lt-web-icon-',
-      children: [
+    children: [
       { id: '', name: '企业管理', path: '/organization' },
     ],
   },
@@ -84,17 +87,14 @@ export default {
     }),
 
     menuTree() {
-
       const resList = _.map(this.key_res_info, 'resCode');
 
-      const travTree = (root) => {
-        return _.filter(_.map(root, ({ children, ...o}) => {
-          if(children && children.length && (!o.resCode || resList.indexOf(o.resCode) !== -1)){
-            return { ...o, children: travTree(children) }
-          }
-          return o;
-        }), o => (o.resCode && resList.indexOf(o.resCode)) || (o.children && o.children.length))
-      }
+      const travTree = root => _.filter(_.map(root, ({ children, ...o }) => {
+        if (children && children.length && (!o.resCode || resList.indexOf(o.resCode) !== -1)) {
+          return { ...o, children: travTree(children) };
+        }
+        return o;
+      }), o => (o.resCode && resList.indexOf(o.resCode)) || (o.children && o.children.length));
 
       return travTree(menuTree);
     },
