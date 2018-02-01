@@ -54,12 +54,8 @@
     <el-dialog :title="`分配资源 ( ${assignResForm.name} ) `" :visible.sync="assignResFormVisible" :close-on-click-modal="false">
       <el-form :model="form" ref="form" size="medium" v-loading="loading && assignResFormVisible">
         <el-row :gutter="10">
-          <el-col :span="24" v-for="p in resTypeList" :key="p.id">
-            <el-form-item :label="p.name">
-              <el-select v-model="assignResForm[p.id]" :placeholder="`请选择${p.name}`" style="width:100%;" multiple>
-                <el-option v-for="o in resList" :key="o.id" v-if="o.resType == p.id" :label="o.resName" :value="o.id"></el-option>
-              </el-select>
-            </el-form-item>
+          <el-col :span="24">
+            <el-tree :data="resTree" ref="resTree" node-key="id" :props="{label: 'resName'}" show-checkbox></el-tree>
           </el-col>
         </el-row>
       </el-form>
@@ -93,7 +89,8 @@ export default {
       form: {},
 
       assignResFormVisible: false,
-      assignResForm: {},
+      assignResForm: {
+      },
 
       resList: [],
       resTypeList: [
@@ -108,6 +105,22 @@ export default {
     ...mapState({
       key_user_info: state => state.key_user_info,
     }),
+
+    resTree() {
+      const { resList: list } = this;
+
+      const buildChildren = (parent) => {
+        const childrenList = parent ? _.filter(list, {parent}) : _.filter(list, o => !o.parent);
+        if(!childrenList.length) return null;
+        return _.map(childrenList, o => {
+          const children = buildChildren(o.id)
+          if(!children) return o;
+          return { ...o, children };
+        })
+      };
+
+      return buildChildren(null)
+    },
   },
   watch: {
     formVisible(v) {
@@ -202,20 +215,19 @@ export default {
     async showAssignResForm({ id, roleName }) {
       this.assignResFormVisible = true;
 
-      this.assignResForm = _(this.resTypeList).groupBy('id').mapValues(() => []).value();
+      //this.assignResForm = _(this.resTypeList).groupBy('id').mapValues(() => []).value();
       this.assignResForm.id = id;
       this.assignResForm.name = roleName;
 
       this.loading = true;
       const { code, respData } = (await this.$http.post('/api/manager/role/getbypk', [id])).body;
-      this.loading = false;
+      let keys = [];
       if (code === '200') {
         const { key_res_info } = respData;
-        this.assignResForm = {
-          ...this.assignResForm,
-          ..._(this.resTypeList).groupBy('id').mapValues((o, resType) => _(key_res_info).filter({ resType }).map('id').value()).value(),
-        };
+        keys = _.map(key_res_info, 'id');
       }
+      this.$refs.resTree.setCheckedKeys(keys);
+      this.loading = false;
     },
     closeAssignResForm() {
       this.assignResFormVisible = false;
@@ -223,7 +235,8 @@ export default {
     async saveAssignResForm() {
       try {
         const { id, name, ...form } = this.assignResForm;
-        const resources = _(form).values().flatten().join(',');
+        const resources = this.$refs.resTree.getCheckedKeys().join(',');
+        if(!resources) throw new Error('请至少选择一个资源')
         const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resources })).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('分配成功');
