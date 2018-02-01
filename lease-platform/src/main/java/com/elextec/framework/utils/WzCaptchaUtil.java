@@ -54,7 +54,7 @@ public class WzCaptchaUtil {
         // 绘制随机线条，为图像添加噪音
         Random random = new Random();
         for (int i = 0; i < 80; i++) {
-            localGraphics.setColor(getRandColor(200, 250));
+            localGraphics.setColor(getRandColor(160, 200));
             int x = random.nextInt(usedWidthPx);
             int y = random.nextInt(usedHeightPx);
             int xl = random.nextInt(15);
@@ -115,7 +115,7 @@ public class WzCaptchaUtil {
         // 绘制随机线条，为图像添加噪音
         Random random = new Random();
         for (int i = 0; i < 80; i++) {
-            localGraphics.setColor(getRandColor(200, 250));
+            localGraphics.setColor(getRandColor(160, 200));
             int x = random.nextInt(usedWidthPx);
             int y = random.nextInt(usedHeightPx);
             int xl = random.nextInt(15);
