@@ -107,22 +107,23 @@ public class WzCaptchaUtil {
             usedHeightPx = heightPx;
         }
         // 创建图片
-        BufferedImage bi = new BufferedImage(usedWidthPx, usedWidthPx, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bi = new BufferedImage(usedWidthPx, usedHeightPx, BufferedImage.TYPE_INT_RGB);
         // 获得图片
         Graphics localGraphics = bi.getGraphics();
         // 设置背景色
         localGraphics.setColor(getRandColor(200, 250));
         localGraphics.fillRect(0, 0, usedWidthPx, usedHeightPx);
         // 设置边框
-        localGraphics.setColor(Color.BLUE);
-        localGraphics.drawRect(1, 1, usedWidthPx - 2, usedHeightPx - 2);
+//        localGraphics.setColor(Color.BLUE);
+//        localGraphics.drawRect(1, 1, usedWidthPx - 2, usedHeightPx - 2);
         // 绘制随机线条，为图像添加噪音
         Random random = new Random();
-        for (int i = 0; i < 155; i++) {
+        for (int i = 0; i < 100; i++) {
+            localGraphics.setColor(new Color(20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110)));
             int x = random.nextInt(usedWidthPx);
             int y = random.nextInt(usedHeightPx);
-            int xl = random.nextInt(12);
-            int yl = random.nextInt(12);
+            int xl = random.nextInt(15);
+            int yl = random.nextInt(15);
             localGraphics.drawLine(x, y, x + xl, y + yl);
         }
         // 写字
@@ -130,7 +131,7 @@ public class WzCaptchaUtil {
             String ch = captchaCode.substring(i, i + 1);
             localGraphics.setColor(new Color(20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110)));
             localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
-            localGraphics.drawString(ch, 20 * i + 6, 20);
+            localGraphics.drawString(ch, 20 * i + 15, 30);
         }
         // 返回Base64
         ByteArrayOutputStream out = new ByteArrayOutputStream();
