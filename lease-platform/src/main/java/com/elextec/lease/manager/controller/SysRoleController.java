@@ -282,8 +282,9 @@ public class SysRoleController extends BaseController {
      * @param roleAndResources 角色及资源列表JSON
      * <pre>
      *     {
+     *         deleteAllFlg:清空标志（仅为true时有效）,
      *         roleId:角色ID,
-     *         resources:资源ID，多个以逗号隔开，例：资源Id1,资源Id2,资源Id3
+     *         resourceIds:资源ID，多个以逗号隔开，例：资源Id1,资源Id2,资源Id3
      *     }
      * </pre>
      * @return 处理结果
@@ -307,8 +308,14 @@ public class SysRoleController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(roleAndResources, "utf-8");
                 rr = JSON.parseObject(paramStr, RefRoleResourceParam.class);
-                if (null == rr || WzStringUtil.isBlank(rr.getRoleId()) || WzStringUtil.isBlank(rr.getResources())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                if (null == rr || WzStringUtil.isBlank(rr.getRoleId())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数解析失败或未获得被授权角色");
+                }
+                if ((WzStringUtil.isBlank(rr.getDeleteAllFlg()) || !"true".equals(rr.getDeleteAllFlg().toLowerCase()))) {
+                    rr.setDeleteAllFlg("false");
+                    if (WzStringUtil.isBlank(rr.getResourceIds())) {
+                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "授权资源不能为空");
+                    }
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
