@@ -60,14 +60,14 @@ const menuTree = [
     icon: 'lt lt-iconset0250',
     children: [
       { name: '电池管理', path: '/battery', resCode: 'battery_manager' },
-      { name: '配件管理', path: '/parts', resCode: 'parts_manager'},
+      { name: '配件管理', path: '/parts', resCode: 'parts_manager' },
     ],
   },
   { name: '制造商',
     icon: 'lt lt-scsxx',
     children: [
-      { name: '制造商管理', path: '/mfrs', resCode: 'mfrs_manager'}
-    ]
+      { name: '制造商管理', path: '/mfrs', resCode: 'mfrs_manager' },
+    ],
   },
   { name: '企业',
     icon: 'lt lt-web-icon-',
@@ -106,7 +106,7 @@ export default {
           return { ...o, children: travTree(children) };
         }
         return o;
-      }), o => (o.resCode && resList.indexOf(o.resCode) !== -1 )  || (o.children && o.children.length));
+      }), o => (o.resCode && resList.indexOf(o.resCode) !== -1) || (o.children && o.children.length));
 
       return travTree(menuTree);
     },

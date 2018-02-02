@@ -150,7 +150,7 @@ export default {
       if (!tree || !tree.length) return [];
       const flattenChildren = arr => _.map(arr, o => (this.expandItem.indexOf(o.id) !== -1 ? [o, ...flattenChildren(o.children)] : o));
 
-      if(tree.length > 1) return _.flattenDeep(flattenChildren(tree));
+      if (tree.length > 1) return _.flattenDeep(flattenChildren(tree));
       return _.flattenDeep(flattenChildren(tree[0].children));
     },
   },
@@ -165,11 +165,9 @@ export default {
   },
   methods: {
     showChildren(id, value) {
-      if(value){
-        if(this.expandItem.indexOf(id) === -1) this.expandItem.push(id)
-      }else{
-        if(this.expandItem.indexOf(id) !== -1) this.expandItem = _.without(this.expandItem, id);
-      }
+      if (value) {
+        if (this.expandItem.indexOf(id) === -1) this.expandItem.push(id);
+      } else if (this.expandItem.indexOf(id) !== -1) this.expandItem = _.without(this.expandItem, id);
     },
 
     async reload() {
@@ -207,7 +205,6 @@ export default {
     },
 
     showForm(form = { }) {
-
       this.form = _.pick(form, [
         'id',
         'resCode',
@@ -220,7 +217,7 @@ export default {
         'parent',
         'level',
       ]);
-      if(!this.form.parent){
+      if (!this.form.parent) {
         this.form.parent = this.tree[0].id;
       }
       this.formVisible = true;
