@@ -26,6 +26,8 @@ public class WzConstants {
     public static final String KEY_RES_INFO = "key_res_info";
     /** 登录用户关联的角色信息. */
     public static final String KEY_ROLE_INFO = "key_role_info";
+    /**登录用户关联车辆信息.*/
+    public static final String KEY_VEHICLE_INFO = "key_vehicle_info";
 
     /*
      * 短信相关Key.

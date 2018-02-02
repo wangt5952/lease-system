@@ -1,6 +1,7 @@
 package com.elextec.persist.dao.mybatis;
 
 import com.elextec.persist.model.mybatis.BizParts;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 
 import java.util.List;
 
@@ -11,6 +12,6 @@ public interface BizPartsMapperExt extends BizPartsMapper {
      * @param id
      * @return
      */
-    public List<BizParts> getById(String id);
+    public List<BizPartsExt> getById(String id);
 
 }
