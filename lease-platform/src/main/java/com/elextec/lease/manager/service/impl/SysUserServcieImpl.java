@@ -7,6 +7,10 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.SysUserService;
+import com.elextec.lease.model.BizVehicleBatteryParts;
+import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
+import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
+import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
 import com.elextec.persist.dao.mybatis.SysUserMapperExt;
 import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysRole;
@@ -34,6 +38,15 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Autowired
     private SysUserMapperExt sysUserMapperExt;
+
+    @Autowired
+    private BizVehicleMapperExt bizVehicleMapperExt;
+
+    @Autowired
+    private BizBatteryMapperExt bizBatteryMapperExt;
+
+    @Autowired
+    private BizPartsMapperExt bizPartsMapperExt;
 
     @Override
     public PageResponse<SysUser> list(boolean needPaging, PageRequest pr) {
@@ -173,5 +186,10 @@ public class SysUserServcieImpl implements SysUserService {
             throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "查询到重复用户信息");
         }
         return datas.get(0);
+    }
+
+    @Override
+    public List<BizVehicleBatteryParts> getVehiclePartsById(String userId) {
+        return null;
     }
 }
