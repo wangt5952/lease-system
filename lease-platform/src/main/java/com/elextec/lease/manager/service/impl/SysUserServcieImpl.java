@@ -156,10 +156,12 @@ public class SysUserServcieImpl implements SysUserService {
             try{
                 //删除用户原来的ROLE
                 sysUserMapperExt.deleteUserAndRoles(userId);
-                for(; i<rolesIds.length; i++){
-                    sysRefUserRoleKey.setUserId(userId);
-                    sysRefUserRoleKey.setRoleId(rolesIds[i]);
-                    sysUserMapperExt.refUserAndRoles(sysRefUserRoleKey);
+                if (!"true".equals(params.getDeleteAllFlg().toLowerCase())) {
+                    for (; i < rolesIds.length; i++) {
+                        sysRefUserRoleKey.setUserId(userId);
+                        sysRefUserRoleKey.setRoleId(rolesIds[i]);
+                        sysUserMapperExt.refUserAndRoles(sysRefUserRoleKey);
+                    }
                 }
             }catch(Exception ex){
                 throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
