@@ -54,12 +54,15 @@ public class WzConstants {
     /** 全局Key 设备PK列表. */
     public static final String GK_DEVICE_PK_SET = "gk_device_pk_set";
 
-    /** 全局Key 设备定位. */
+    /** 全局Key 设备定位Map. */
     public static final String GK_DEVICE_LOC_MAP = "gk_device_loc_map";
 
     /** 全局Key 设备轨迹前缀. */
     public static final String GK_DEVICE_TRACK = "gk_device_track:";
 
-    /** 全局Key 设备参数前缀. */
-    public static final String GK_DEVICE_PARAM = "gk_device_param:";
+    /** 全局Key 设备电量情况Map. */
+    public static final String GK_DEVIE_POWER_MAP = "gk_device_power_map";
+
+    /** 全局Key 设备参数Map. */
+    public static final String GK_DEVICE_PARAM_MAP = "gk_device_param_map";
 }
