@@ -10,6 +10,7 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.service.SysResourceService;
+import com.elextec.lease.model.SysResourcesIcon;
 import com.elextec.persist.field.enums.ResourceType;
 import com.elextec.persist.model.mybatis.SysResources;
 import org.slf4j.Logger;
