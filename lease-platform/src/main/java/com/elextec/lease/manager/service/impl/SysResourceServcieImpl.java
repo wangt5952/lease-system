@@ -4,17 +4,22 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzFileUtil;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.SysResourceService;
+import com.elextec.lease.model.SysResourcesIcon;
 import com.elextec.persist.dao.mybatis.SysResourcesMapperExt;
 import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysResourcesExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +32,12 @@ import java.util.List;
 public class SysResourceServcieImpl implements SysResourceService {
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SysResourceServcieImpl.class);
+
+    @Value("${localsetting.upload-res-icon-root}")
+    private String uploadResIconRoot;
+
+    @Value("${localsetting.download-res-icon-prefix}")
+    private String downloadResIconPrefix;
 
     @Autowired
     private SysResourcesMapperExt sysResourcesMapperExt;
@@ -134,5 +145,33 @@ public class SysResourceServcieImpl implements SysResourceService {
             throw new BizException(RunningResult.NO_RESOURCE);
         }
         return datas;
+    }
+
+    @Override
+    public List<SysResourcesIcon> listSysResourceIcons() {
+        if (WzStringUtil.isBlank(uploadResIconRoot)) {
+            throw new BizException(RunningResult.NO_DIRECTORY);
+        }
+        if (WzStringUtil.isBlank(downloadResIconPrefix)) {
+            throw new BizException(RunningResult.NOT_FOUND);
+        }
+        File iconDir = new File(uploadResIconRoot);
+        if (iconDir.exists() && iconDir.isDirectory()) {
+            File[] iconFiles = iconDir.listFiles();
+            List<SysResourcesIcon> iconLs = new ArrayList<SysResourcesIcon>();
+            SysResourcesIcon iconVo = null;
+            for (int i = 0; i < iconFiles.length; i++) {
+                iconVo = new SysResourcesIcon();
+                iconVo.setIconName(iconFiles[i].getName());
+                iconVo.setIconUrl(WzFileUtil.makeRequestUrl(uploadResIconRoot, "", iconFiles[i].getName()));
+                iconLs.add(iconVo);
+            }
+            if (0 == iconLs.size()) {
+                throw new BizException(RunningResult.NOT_FOUND.code(), "未获得ICON文件");
+            }
+            return iconLs;
+        } else {
+            throw new BizException(RunningResult.NO_DIRECTORY);
+        }
     }
 }

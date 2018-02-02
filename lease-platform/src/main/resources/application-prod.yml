@@ -63,3 +63,5 @@ localsetting:
   download-user-icon-prefix: http://106.14.172.38:8990/leaseupload/usericon
   upload-user-realname-root: /root/tomcat-8990/webapps/leaseupload/userrealname
   download-user-realname-prefix: http://106.14.172.38:8990/leaseupload/userrealname
+  upload-res-icon-root: /root/tomcat-8990/webapps/leaseuploadresicon
+  download-res-icon-prefix: http://106.14.172.38:8990/leaseupload/resicon

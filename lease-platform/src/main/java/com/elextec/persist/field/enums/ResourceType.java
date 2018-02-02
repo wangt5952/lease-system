@@ -7,7 +7,6 @@ package com.elextec.persist.field.enums;
 public enum ResourceType {
     CATALOG("目录"),
     MENU("菜单"),
-    PAGE("页面"),
     FUNCTION("功能");
 
     /** Value. */
