@@ -7,6 +7,9 @@ import com.elextec.framework.BaseModel;
  * Created by wangtao on 2018/1/22.
  */
 public class SmsParam extends BaseModel {
+    /** SV-UID. */
+    private static final long serialVersionUID = 4153180202013235297L;
+
     /** 手机号码. */
     private String mobile;
     /** 发送短信用图形验证码. */

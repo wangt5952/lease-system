@@ -7,6 +7,9 @@ import com.elextec.framework.BaseModel;
  * Created by wangtao on 2018/1/22.
  */
 public class LoginParam extends BaseModel {
+
+    /** SV-UID. */
+    private static final long serialVersionUID = -663106961546272341L;
     /** 用户名. */
     private String loginName;
     /** 验证字符串 MD5(loginName+MD5(登录密码).upper()+loginTime).upper(). */

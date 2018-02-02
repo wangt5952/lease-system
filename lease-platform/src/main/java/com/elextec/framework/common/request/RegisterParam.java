@@ -1,19 +1,33 @@
 package com.elextec.framework.common.request;
 
+import com.elextec.framework.BaseModel;
+
 /**
  * Created by js_gg on 2018/1/31.
  */
-public class RegisterParam {
+public class RegisterParam extends BaseModel {
+
+    /** SV-UID. */
+    private static final long serialVersionUID = -9099217751993988449L;
+
+    /** 登录名. */
     private String loginName;
+    /** 手机号. */
     private String userMobile;
+    /** 密码. */
     private String password;
+    /** 创建用户. */
     private String createUser;
+    /** 更新用户. */
     private String updateUser;
     /** 短信验证码验证码. */
     private String smsToken;
     /** 短信验证码. */
     private String smsVCode;
 
+    /*
+     * Getter 和 Setter 方法.
+     */
     public String getLoginName() {
         return loginName;
     }
