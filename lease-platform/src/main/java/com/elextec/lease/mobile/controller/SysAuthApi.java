@@ -737,15 +737,15 @@ public class SysAuthApi extends BaseController {
                         }
                         //将身份证正面照片保存到图片服务器中
                         String frontImageName = WzUniqueValUtil.makeUniqueTimes();
-                        WzFileUtil.save(resetParam.getUserIcFront(), uploadUserIconRoot, "", frontImageName, WzFileUtil.EXT_JPG);
+                        WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", frontImageName, WzFileUtil.EXT_JPG);
 //                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                         //将身份证背面照片保存到图片服务器中
                         String backImageName = WzUniqueValUtil.makeUniqueTimes();
-                        WzFileUtil.save(resetParam.getUserIcFront(), uploadUserIconRoot, "", backImageName, WzFileUtil.EXT_JPG);
+                        WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", backImageName, WzFileUtil.EXT_JPG);
 //                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                         //将用户手持身份证的照片保存到图片服务器中
                         String groupImageName = WzUniqueValUtil.makeUniqueTimes();
-                        WzFileUtil.save(resetParam.getUserIcFront(), uploadUserIconRoot, "", groupImageName, WzFileUtil.EXT_JPG);
+                        WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", groupImageName, WzFileUtil.EXT_JPG);
 //                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
 
                         userTemp.setUserPid(resetParam.getUserPid());
