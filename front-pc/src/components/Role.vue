@@ -235,12 +235,17 @@ export default {
         const { id } = this.assignResForm;
 
         const resources = this.$refs.resTree.getCheckedKeys().join(',');
-        if (!resources) throw new Error('请至少选择一个资源');
+        if (resources){
+          const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resources })).body;
+          if (code !== '200') throw new Error(message);
+        } else {
+          const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, deleteAllFlg:true })).body;
+          if (code !== '200') throw new Error(message);
+        }
 
         // 你要加清除角色资源的接口，我这里就if resources 判断是使用设置资源接口还是清除资源接口
 
-        const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resources })).body;
-        if (code !== '200') throw new Error(message);
+
         this.$message.success('分配成功');
         this.closeAssignResForm();
       } catch (e) {
