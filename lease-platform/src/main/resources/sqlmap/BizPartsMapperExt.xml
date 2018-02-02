@@ -2,55 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.BizPartsMapperExt">
 
-    <!--对象关系映射 column=数据库字段，property=对象字段-->
-    <resultMap id="parts" type="com.elextec.persist.model.mybatis.BizParts">
-        <id column="id" property="id"/>
-        <result column="parts_code" property="partsCode"/>
-        <result column="parts_name" property="partsName"/>
-        <result column="parts_brand" property="partsBrand"/>
-        <result column="parts_pn" property="partsPn"/>
-        <result column="parts_type" property="partsType"/>
-        <result column="parts_status" property="partsStatus"/>
-        <result column="create_user" property="createUser"/>
-        <result column="create_time" property="createTime"/>
-        <result column="update_user" property="updateUser"/>
-        <result column="update_time" property="updateTime"/>
-        <result column="parts_parameters" property="partsParameters"/>
-        <!--多对一关联 property=数据库字段 javaType=对应实体类字段的类型-->
-        <association property="mfrs_id" javaType="BizManufacturer">
-            <id column="id" property="id"/>
-            <result column="mfrs_name" property="mfrsName"/>
-            <result column="mfrs_type" property="mfrsType"/>
-            <result column="mfrs_introduce" property="mfrsIntroduce"/>
-            <result column="mfrs_address" property="mfrsAddress"/>
-            <result column="mfrs_contacts" property="mfrsContacts"/>
-            <result column="mfrs_phone" property="mfrsPhone"/>
-            <result column="mfrs_status" property="mfrsStatus"/>
-            <result column="create_user" property="createUser"/>
-            <result column="create_time" property="createTime"/>
-            <result column="update_user" property="updateUser"/>
-            <result column="update_time" property="updateTime"/>
-        </association>
+    <resultMap extends="BaseResultMap" id="SysPartsExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizPartsExt">
+        <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
     </resultMap>
 
-    <select id="getById" parameterType="java.lang.String" resultMap="parts">
-        SELECT biz_parts.id,
-				biz_parts.parts_code,
-				biz_parts.parts_name,
-				biz_parts.parts_brand,
-				biz_parts.parts_pn,
-				biz_parts.parts_type,
-				biz_parts.parts_parameters,
-				biz_manufacturer.mfrs_name,
-				biz_parts.parts_status,
-				biz_parts.create_user,
-				biz_parts.create_time,
-				biz_parts.update_user,
-				biz_parts.update_time
-        FROM biz_parts
-        LEFT JOIN biz_ref_vehicle_parts ON biz_ref_vehicle_parts.parts_id = biz_parts.id
-        LEFT JOIN biz_manufacturer ON biz_manufacturer.id = biz_parts.mfrs_id
-        WHERE biz_ref_vehicle_parts.vehicle_id = #{id,jdbcType=VARCHAR}
+    <select id="getById" parameterType="java.lang.String" resultType="SysPartsExtResultMap">
+        SELECT
+				p.id,
+				p.parts_code,
+				p.parts_name,
+				p.parts_brand,
+				p.parts_pn,
+				p.parts_type,
+				p.parts_parameters,
+				m.mfrs_name,
+				p.parts_status,
+				p.create_user,
+				p.create_time,
+				p.update_user,
+				p.update_time
+        FROM biz_ref_vehicle_parts r
+        LEFT JOIN biz_parts p ON p.id = r.parts_id
+        LEFT JOIN biz_manufacturer m ON m.id = p.mfrs_id
+        WHERE r.vehicle_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
     </select>
 
 </mapper>
