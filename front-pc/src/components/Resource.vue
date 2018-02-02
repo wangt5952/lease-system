@@ -2,14 +2,14 @@
   <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
 
     <div>
-      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加资源</el-button>
+      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm({resType:'CATALOG'})">添加目录</el-button>
     </div>
 
     <el-table :data="tableTree" row-key="id" height="100%" style="width: 100%;margin-top:10px;">
       <el-table-column width="80">
         <template slot-scope="{row}">
           <template v-if="row.children && row.children.length">
-            <i v-if="!row.showChildren" @click="showChildren(row.id, true)" class="el-icon-arrow-right" style="cursor:pointer;" :style="{marginLeft:`${(row.tabs - 1) * 10}px`}"></i>
+            <i v-if="expandItem.indexOf(row.id) === -1" @click="showChildren(row.id, true)" class="el-icon-arrow-right" style="cursor:pointer;" :style="{marginLeft:`${(row.tabs - 1) * 10}px`}"></i>
             <i v-else @click="showChildren(row.id, false)" class="el-icon-arrow-down" style="cursor:pointer;" :style="{marginLeft:`${(row.tabs - 1) * 10}px`}"></i>
           </template>
         </template>
@@ -21,9 +21,11 @@
       <el-table-column prop="groupSort" label="分组排序"></el-table-column>
       <el-table-column prop="resSort" label="组内排序"></el-table-column>
       <el-table-column prop="showFlagText" label="显示标志"></el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="200">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+          <el-button v-if="row.resType == 'CATALOG'" icon="el-icon-edit" size="mini" type="text" @click="showForm({resType:'MENU', parent:row.id})">添加菜单</el-button>
+          <el-button v-if="row.resType == 'MENU'" icon="el-icon-edit" size="mini" type="text" @click="showForm({resType:'FUNCTION', parent:row.id})">添加功能</el-button>
           <el-tooltip content="删除" placement="top">
             <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
           </el-tooltip>
@@ -46,7 +48,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item prop="resType" :rules="[{required:true, message:'请选择类型'}]" label="类型">
-              <el-select v-model="form.resType" placeholder="请选择类型" style="width:100%;">
+              <el-select disabled v-model="form.resType" placeholder="请选择类型" style="width:100%;">
                 <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
@@ -71,11 +73,6 @@
               <el-select v-model="form.showFlag" placeholder="请选择显示标志" style="width:100%;">
                 <el-option v-for="o in showFlagList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="上级资源">
-              <el-input v-model="form.parent" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -119,6 +116,8 @@ export default {
         { id: 'SHOW', name: '显示' },
         { id: 'HIDDEN', name: '隐藏' },
       ],
+
+      expandItem: [],
     };
   },
   computed: {
@@ -149,13 +148,16 @@ export default {
     tableTree() {
       const { tree } = this;
       if (!tree || !tree.length) return [];
-      const flattenChildren = arr => _.map(arr, o => (o.showChildren ? [o, ...flattenChildren(o.children)] : o));
+      const flattenChildren = arr => _.map(arr, o => (this.expandItem.indexOf(o.id) !== -1 ? [o, ...flattenChildren(o.children)] : o));
+
+      if(tree.length > 1) return _.flattenDeep(flattenChildren(tree));
       return _.flattenDeep(flattenChildren(tree[0].children));
     },
   },
   watch: {
     formVisible(v) {
       if (!v) {
+        this.form = {};
         const $form = this.$refs.form;
         $form.resetFields();
       }
@@ -163,7 +165,11 @@ export default {
   },
   methods: {
     showChildren(id, value) {
-      this.list = _.map(this.list, o => ({ ...o, showChildren: id === o.id ? value : o.showChildren }));
+      if(value){
+        if(this.expandItem.indexOf(id) === -1) this.expandItem.push(id)
+      }else{
+        if(this.expandItem.indexOf(id) !== -1) this.expandItem = _.without(this.expandItem, id);
+      }
     },
 
     async reload() {
@@ -177,7 +183,6 @@ export default {
         this.total = total;
         this.list = _.map(rows, o => ({
           ...o,
-          showChildren: false,
           resTypeText: (_.find(this.typeList, { id: o.resType }) || { name: o.resType }).name,
           showFlagText: (_.find(this.showFlagList, { id: o.showFlag }) || {}).name,
         }));
@@ -202,6 +207,7 @@ export default {
     },
 
     showForm(form = { }) {
+
       this.form = _.pick(form, [
         'id',
         'resCode',
@@ -214,10 +220,12 @@ export default {
         'parent',
         'level',
       ]);
+      if(!this.form.parent){
+        this.form.parent = this.tree[0].id;
+      }
       this.formVisible = true;
     },
     closeForm() {
-      this.form = {};
       this.formVisible = false;
     },
     async saveForm() {

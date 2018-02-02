@@ -15,7 +15,11 @@ export default new Router({
         { path: '/role', component: () => import('@/components/Role') },
         { path: '/user', component: () => import('@/components/User') },
         { path: '/user', component: () => import('@/components/User') },
-        { path: '/manufacturer', component: () => import('@/components/Manufacturer') },
+        { path: '/mfrs', component: () => import('@/components/Manufacturer') },
+        { path: '/vehicle', component: () => import('@/components/Vehicle') },
+        { path: '/battery', component: () => import('@/components/Battery') },
+        { path: '/parts', component: () => import('@/components/Parts') },
+
         { path: '/monitor', component: () => import('@/components/Monitor') },
       ],
     },

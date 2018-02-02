@@ -47,21 +47,32 @@ const menuTree = [
   { name: '监控',
     icon: 'lt lt-jiankong',
     children: [
-      { id: '', name: '车辆监控', path: '/monitor', resCode: 'vehicle_monitor' },
+      { name: '车辆监控', path: '/monitor', resCode: 'vehicle_monitor' },
     ],
   },
   { name: '车辆',
     icon: 'lt lt-diandongche',
     children: [
-      { name: '' },
+      { name: '车辆管理', path: '/vehicle', resCode: 'vehicle_manager' },
     ],
   },
-  { name: '电池及配件', icon: 'lt lt-iconset0250', resCode: 'battery_parts' },
-  { name: '制造商', icon: 'lt lt-scsxx' },
+  { name: '电池及配件',
+    icon: 'lt lt-iconset0250',
+    children: [
+      { name: '电池管理', path: '/battery', resCode: 'battery_manager' },
+      { name: '配件管理', path: '/parts', resCode: 'parts_manager'},
+    ],
+  },
+  { name: '制造商',
+    icon: 'lt lt-scsxx',
+    children: [
+      { name: '制造商管理', path: '/mfrs', resCode: 'mfrs_manager'}
+    ]
+  },
   { name: '企业',
     icon: 'lt lt-web-icon-',
     children: [
-      { id: '', name: '企业管理', path: '/organization' },
+      { name: '企业管理', path: '/organization', resCode: 'org_manager' },
     ],
   },
   { name: '权限',
@@ -88,13 +99,14 @@ export default {
 
     menuTree() {
       const resList = _.map(this.key_res_info, 'resCode');
+      console.log(resList);
 
       const travTree = root => _.filter(_.map(root, ({ children, ...o }) => {
         if (children && children.length && (!o.resCode || resList.indexOf(o.resCode) !== -1)) {
           return { ...o, children: travTree(children) };
         }
         return o;
-      }), o => (o.resCode && resList.indexOf(o.resCode)) || (o.children && o.children.length));
+      }), o => (o.resCode && resList.indexOf(o.resCode) !== -1 )  || (o.children && o.children.length));
 
       return travTree(menuTree);
     },
