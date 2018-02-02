@@ -15,6 +15,7 @@ import com.elextec.framework.utils.*;
 import com.elextec.lease.manager.controller.SysAuthController;
 import com.elextec.lease.manager.service.SysAuthService;
 import com.elextec.lease.manager.service.SysUserService;
+import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -123,6 +125,57 @@ public class SysAuthApi extends BaseController {
      *                     update_time:更新时间
      *                 },
      *                 ... ...
+     *             ],
+     *             key_vehicle_info:[
+     *                 {
+     *                     id:ID,
+     *                     vehicleCode:车辆编号,
+     *                     vehiclePn:车辆型号,
+     *                     vehicleBrand:车辆品牌,
+     *                     vehicleMadeIn:车辆产地,
+     *                     mfrsName:生产商名称,
+     *                     vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                     createUser:创建人,
+     *                     createTime:创建时间,
+     *                     updateUser:更新人,
+     *                     updateTime:更新时间,
+     *                     bizBatteries:[电池信息
+     *                         {
+     *                              id:ID,
+     *                              batteryCode:电池编号,
+     *                              batteryName:电池货名,
+     *                              batteryBrand:电池品牌,
+     *                              batteryPn:电池型号,
+     *                              batteryParameters:电池参数,
+     *                              mfrsName:生产商名称,
+     *                              batteryStatus:电池状态（正常、冻结、作废）,
+     *                              createUser:创建人,
+     *                              createTime:创建时间,
+     *                              updateUser:更新人,
+     *                              updateTime:更新时间
+     *                         },
+     *                         ........
+     *                     ],
+     *                     bizPartss:[配件信息
+     *                         {
+     *                             id:ID,
+     *                             partsCode:配件编码,
+     *                             partsName:配件货名,
+     *                             partsBrand:配件品牌,
+     *                             partsPn:配件型号,
+     *                             partsType:配件类别（）,
+     *                             partsParameters:配件参数,
+     *                             mfrsName:生产商名称,
+     *                             partsStatus:配件状态（正常、冻结、作废）,
+     *                             createUser:创建人,
+     *                             createTime:创建时间,
+     *                             updateUser:更新人,
+     *                             updateTime:更新时间
+     *                         },
+     *                         .........
+     *                     ]
+     *                 },
+     *                 .......
      *             ]
      *         }
      *     }
@@ -174,6 +227,11 @@ public class SysAuthApi extends BaseController {
 
             // 验证用户并返回用户信息
             Map<String, Object> loginVo = sysAuthService.login(loginParam.getLoginName(), loginParam.getLoginAuthStr(), loginParam.getLoginTime());
+
+            //获取用户关联车辆信息
+            SysUserExt user = (SysUserExt)loginVo.get(WzConstants.KEY_USER_INFO);
+            List<BizVehicleBatteryParts> vehicleBatteryPartss = sysUserService.getVehiclePartsById(user.getId());
+
             // 组织登录返回信息
             Map<String, Object> loginInfo = new HashMap<String, Object>();
             // 登录Token
@@ -183,6 +241,7 @@ public class SysAuthApi extends BaseController {
             // 设置登录信息
             loginInfo.put(WzConstants.KEY_USER_INFO, loginVo.get(WzConstants.KEY_USER_INFO));
             loginInfo.put(WzConstants.KEY_RES_INFO, loginVo.get(WzConstants.KEY_RES_INFO));
+            loginInfo.put(WzConstants.KEY_VEHICLE_INFO,vehicleBatteryPartss);
             // 设置超时时间
             Integer overtime = 5;
             if (WzStringUtil.isNumeric(loginOvertime)) {

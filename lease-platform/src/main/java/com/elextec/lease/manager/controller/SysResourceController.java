@@ -4,19 +4,15 @@ package com.elextec.lease.manager.controller;
 import com.alibaba.fastjson.JSON;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
-import com.elextec.framework.common.constants.WzConstants;
-import com.elextec.framework.common.request.LoginParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
-import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.SysResourceService;
-import com.elextec.persist.field.enums.DeviceType;
+import com.elextec.lease.model.SysResourcesIcon;
 import com.elextec.persist.field.enums.ResourceType;
 import com.elextec.persist.model.mybatis.SysResources;
-import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 资源管理Controller.
@@ -62,7 +55,8 @@ public class SysResourceController extends BaseController {
      *                 id:ID,
      *                 resCode:资源编码,
      *                 resName:资源名,
-     *                 resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 resIcon:资源Icon路径,
+     *                 resType:资源类型（目录、菜单、功能或按钮）,
      *                 resUrl:资源请求URL,
      *                 groupSort:分组排序,
      *                 resSort:组内排序,
@@ -112,7 +106,8 @@ public class SysResourceController extends BaseController {
      *         {
      *             resCode:资源编码（必填）,
      *             resName:资源名（必填）,
-     *             resType:资源类型（目录、菜单、页面、功能或按钮）（必填）,
+     *             resIcon:资源Icon路径（非必填）,
+     *             resType:资源类型（目录、菜单、功能或按钮）（必填）,
      *             resUrl:资源请求URL（非必填）,
      *             groupSort:分组排序（必填）,
      *             resSort:组内排序（必填）,
@@ -166,7 +161,8 @@ public class SysResourceController extends BaseController {
      *         {
      *             resCode:资源编码（必填）,
      *             resName:资源名（必填）,
-     *             resType:资源类型（目录、菜单、页面、功能或按钮）（必填）,
+     *             resIcon:资源Icon名称（非必填）,
+     *             resType:资源类型（目录、菜单、功能或按钮）（必填）,
      *             resUrl:资源请求URL（非必填）,
      *             groupSort:分组排序（必填）,
      *             resSort:组内排序（必填）,
@@ -214,7 +210,6 @@ public class SysResourceController extends BaseController {
                 }
                 if (!resInfo.getResType().toString().equals(ResourceType.CATALOG.toString())
                         && !resInfo.getResType().toString().equals(ResourceType.MENU.toString())
-                        && !resInfo.getResType().toString().equals(ResourceType.PAGE.toString())
                         && !resInfo.getResType().toString().equals(ResourceType.FUNCTION.toString())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的资源类别");
                 }
@@ -237,7 +232,8 @@ public class SysResourceController extends BaseController {
      *         id:ID,
      *         resCode:资源编码,
      *         resName:资源名,
-     *         resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *         resIcon:资源Icon名,
+     *         resType:资源类型（目录、菜单、功能或按钮）,
      *         resUrl:资源请求URL,
      *         groupSort:分组排序,
      *         resSort:组内排序,
@@ -339,7 +335,8 @@ public class SysResourceController extends BaseController {
      *                 id:ID,
      *                 resCode:资源编码,
      *                 resName:资源名,
-     *                 resType:资源类型（目录、菜单、页面、功能或按钮）,
+     *                 resIcon:资源Icon路径,
+     *                 resType:资源类型（目录、菜单、功能或按钮）,
      *                 resUrl:资源请求URL,
      *                 resSort:组内排序,
      *                 groupSort:分组排序,
@@ -378,5 +375,30 @@ public class SysResourceController extends BaseController {
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, res);
             return mr;
         }
+    }
+
+    /**
+     * 列出资源Icon列表.
+     * @return Icon列表
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 iconName:icon文件名,
+     *                 iconUrl:icon访问URL
+     *             },
+     *             ......
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/listicon")
+    public MessageResponse listIcon() {
+        List<SysResourcesIcon> icons  = sysResourceService.listSysResourceIcons();
+        // 组织返回结果并返回
+        MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, icons);
+        return mr;
     }
 }

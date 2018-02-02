@@ -7,6 +7,10 @@ import com.elextec.framework.BaseModel;
  * Created by wangtao on 2018/1/22.
  */
 public class ModifyPasswordParam extends BaseModel {
+
+    /** SV-UID. */
+    private static final long serialVersionUID = 1854945029079561421L;
+
     /** 用户身份验证字符串. */
     private String oldAuthStr;
     /** 登录时间的毫秒数. */

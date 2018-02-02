@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.BizVehicleMapperExt">
+    <resultMap extends="BaseResultMap" id="BizVehicleExtResultMap" type="com.elextec.lease.model.BizVehicleBatteryParts">
+        <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
+    </resultMap>
+    <select id="getVehicleInfoByUserId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
+        select
+        v.id vehicleId,
+        v.vehicle_code,
+        v.vehicle_pn,
+        v.vehicle_brand,
+        v.vehicle_made_in,
+        v.vehicle_status,
+        v.create_user,
+        v.create_time,
+        v.update_user,
+        v.update_time,
+        m.mfrs_name mfrs_name
+        from biz_ref_user_vehicle r
+        LEFT JOIN biz_vehicle v ON r.vehicle_id = v.id
+        LEFT JOIN biz_manufacturer m ON v.mfrs_id = m.id
+        where r.user_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
+    </select>
+
     <select id="getVehicleInfoById" parameterType="java.lang.String" resultType="java.util.Map">
         select
         v.id vehicleId,

@@ -364,6 +364,7 @@ public class SysUserController extends BaseController {
      * @param userAndRoles 用户及角色列表JSON
      * <pre>
      *     {
+     *         deleteAllFlg:清空标志（仅为true时有效）,
      *         userId:用户ID,
      *         roleIds:角色ID，多个以逗号隔开，例：角色Id1,角色Id2,角色Id3
      *     }
@@ -390,7 +391,13 @@ public class SysUserController extends BaseController {
                 String paramStr = URLDecoder.decode(userAndRoles, "utf-8");
                 ur = JSON.parseObject(paramStr, RefUserRolesParam.class);
                 if (null == ur || WzStringUtil.isBlank(ur.getUserId()) || WzStringUtil.isBlank(ur.getRoleIds())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数解析失败或未获得被授权用户");
+                }
+                if (WzStringUtil.isBlank(ur.getDeleteAllFlg()) || !"true".equals(ur.getDeleteAllFlg().toLowerCase())) {
+                    ur.setDeleteAllFlg("false");
+                    if (WzStringUtil.isBlank(ur.getRoleIds())) {
+                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "授权角色不能为空");
+                    }
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);

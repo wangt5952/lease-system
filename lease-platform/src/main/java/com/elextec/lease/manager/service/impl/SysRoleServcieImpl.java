@@ -124,16 +124,18 @@ public class SysRoleServcieImpl implements SysRoleService {
     public void refSysRoleAndResource(RefRoleResourceParam params){
         int i = 0;
         String roleId = params.getRoleId();
-        String[] resourceIds = params.getResources().split(",");
+        String[] resIds = params.getResourceIds().split(",");
         SysRefRoleResourcesKey sysRefRoleResourcesKey = new SysRefRoleResourcesKey();
-        if(resourceIds.length > 0){
+        if(0 < resIds.length){
             try{
                 //删除角色原来的Resources
                 sysRoleMapperExt.deleteRoleAndResources(roleId);
-                for(; i<resourceIds.length; i++){
-                    sysRefRoleResourcesKey.setRoleId(roleId);
-                    sysRefRoleResourcesKey.setResId(resourceIds[i]);
-                    sysRoleMapperExt.refRoleAndResources(sysRefRoleResourcesKey);
+                if (!"true".equals(params.getDeleteAllFlg().toLowerCase())) {
+                    for(; i<resIds.length; i++){
+                        sysRefRoleResourcesKey.setRoleId(roleId);
+                        sysRefRoleResourcesKey.setResId(resIds[i]);
+                        sysRoleMapperExt.refRoleAndResources(sysRefRoleResourcesKey);
+                    }
                 }
             }catch(Exception ex){
                 throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);

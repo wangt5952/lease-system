@@ -6,7 +6,7 @@
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
     </resultMap>
 
-    <select id="getById" parameterType="java.lang.String" resultType="SysPartsExtResultMap">
+    <select id="getById" parameterType="java.lang.String" resultMap="SysPartsExtResultMap">
         SELECT
 				p.id,
 				p.parts_code,

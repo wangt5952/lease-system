@@ -16,6 +16,8 @@ import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,10 +158,12 @@ public class SysUserServcieImpl implements SysUserService {
             try{
                 //删除用户原来的ROLE
                 sysUserMapperExt.deleteUserAndRoles(userId);
-                for(; i<rolesIds.length; i++){
-                    sysRefUserRoleKey.setUserId(userId);
-                    sysRefUserRoleKey.setRoleId(rolesIds[i]);
-                    sysUserMapperExt.refUserAndRoles(sysRefUserRoleKey);
+                if (!"true".equals(params.getDeleteAllFlg().toLowerCase())) {
+                    for (; i < rolesIds.length; i++) {
+                        sysRefUserRoleKey.setUserId(userId);
+                        sysRefUserRoleKey.setRoleId(rolesIds[i]);
+                        sysUserMapperExt.refUserAndRoles(sysRefUserRoleKey);
+                    }
                 }
             }catch(Exception ex){
                 throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
@@ -190,6 +194,19 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     public List<BizVehicleBatteryParts> getVehiclePartsById(String userId) {
-        return null;
+
+        List<BizVehicleBatteryParts> datas = bizVehicleMapperExt.getVehicleInfoByUserId(userId);
+
+        if(datas.size() > 0){
+            for(int i=0;i<datas.size();i++){
+                //根据车辆ID获取电池信息
+                List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(datas.get(i).getId());
+                datas.get(i).setBizBatteries(batteryDatas);
+                //根据车辆ID获取配件信息
+                List<BizPartsExt> partsDatas = bizPartsMapperExt.getById(datas.get(i).getId());
+                datas.get(i).setBizPartss(partsDatas);
+            }
+        }
+        return datas;
     }
 }

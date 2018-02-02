@@ -3,9 +3,8 @@ package com.elextec.lease.manager.service;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.model.SysResourcesIcon;
 import com.elextec.persist.model.mybatis.SysResources;
-import com.elextec.persist.model.mybatis.SysRole;
-import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
 import java.util.List;
 
@@ -61,4 +60,10 @@ public interface SysResourceService {
      * @return 资源列表
      */
     public List<SysResources> listSysResourcesByRoleId(String roleId);
+
+    /**
+     * 查询资源Icon列表.
+     * @return 资源Icon列表
+     */
+    public List<SysResourcesIcon> listSysResourceIcons();
 }
