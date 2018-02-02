@@ -1,11 +1,9 @@
 package com.elextec.lease.manager.service;
 
 import com.elextec.framework.common.request.RefUserRolesParam;
-import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
-import com.elextec.persist.model.mybatis.SysResources;
-import com.elextec.persist.model.mybatis.SysRole;
+import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
@@ -67,4 +65,9 @@ public interface SysUserService {
      * @return 用户扩展信息
      */
     public SysUserExt getExtById(SysUserExample example);
+
+    /**
+     * 根据用户ID查询车辆、电池以及配件信息
+     * */
+    public List<BizVehicleBatteryParts> getVehiclePartsById(String userId);
 }

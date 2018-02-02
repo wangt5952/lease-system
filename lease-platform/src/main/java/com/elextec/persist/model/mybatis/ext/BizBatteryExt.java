@@ -1,17 +1,12 @@
 package com.elextec.persist.model.mybatis.ext;
 
 import com.elextec.persist.model.mybatis.BizBattery;
-import com.elextec.persist.model.mybatis.BizParts;
-import com.elextec.persist.model.mybatis.BizVehicle;
-import com.elextec.persist.model.mybatis.SysUser;
-
-import java.util.List;
 
 /**
- * 车辆扩展类.
- * Created by wangtao on 2018/1/16.
+ * 电池扩展类
+ * Created by js_gg on 2018/2/2.
  */
-public class BizVehicleExt extends BizVehicle {
+public class BizBatteryExt extends BizBattery {
 
     //制商名称
     private String mfrsName;

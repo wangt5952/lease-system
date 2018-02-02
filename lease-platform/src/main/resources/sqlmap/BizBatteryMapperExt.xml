@@ -1,3 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.elextec.persist.dao.mybatis.BizBatteryMapperExt" />
+<mapper namespace="com.elextec.persist.dao.mybatis.BizBatteryMapperExt">
+    <resultMap extends="BaseResultMap" id="SysBatteryExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizBatteryExt">
+        <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
+    </resultMap>
+    <select id="getBatteryInfoByVehicleId" parameterType="java.lang.String" resultType="SysBatteryExtResultMap">
+        select
+            b.id batteryId,
+            b.battery_code,
+            b.battery_name,
+            b.battery_brand,
+            b.battery_pn,
+            b.battery_parameters,
+            m.mfrs_name mfrs_name,
+            b.battery_status
+        from biz_ref_vehicle_battery r
+        LEFT JOIN biz_battery b ON r.battery_id = b.id
+        LEFT JOIN biz_manufacturer m ON b.mfrs_id = m.id
+        where r.vehicle_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
+    </select>
+</mapper>
