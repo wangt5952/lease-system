@@ -1,10 +1,344 @@
 package com.elextec.lease.manager.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.elextec.framework.BaseController;
+import com.elextec.framework.common.constants.RunningResult;
+import com.elextec.framework.common.response.MessageResponse;
+import com.elextec.framework.exceptions.BizException;
+import com.elextec.framework.plugins.paging.PageRequest;
+import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.service.BizPartsService;
+import com.elextec.persist.model.mybatis.BizParts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URLDecoder;
+import java.util.List;
 
 /**
  * 配件管理Controller.
  * Created by wangtao on 2018/1/19.
  */
+@RestController
+@RequestMapping(value = "/manager/parts")
 public class BizPartsController extends BaseController {
+
+    /*日志*/
+    private final Logger logger = LoggerFactory.getLogger(BizPartsController.class);
+
+    @Autowired
+    private BizPartsService bizPartsService;
+
+    /**
+     * 查询配件信息.
+     * @param paramAndPaging 查询及分页参数JSON
+     * <pre>
+     *     {
+     *         currPage:当前页,
+     *         pageSize:每页记录数
+     *     }
+     * </pre>
+     * @return 查询结果列表
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 partsCode:配件编码,
+     *                 partsName:配件货名,
+     *                 partsBrand:配件品牌,
+     *                 partsPn:配件型号,
+     *                 partsType:配件类别（）,
+     *                 partsParameters:配件参数,
+     *                 mfrsId:生产商ID,
+     *                 partsStatus:配件状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/list",method = RequestMethod.POST)
+    public MessageResponse list(@RequestBody String paramAndPaging) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(paramAndPaging)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            PageRequest pagingParam = null;
+            try {
+                String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
+                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+                if (null == pagingParam) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            PageResponse<BizParts> orgPageResp = bizPartsService.list(true, pagingParam);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, orgPageResp);
+            return mr;
+        }
+    }
+
+    /**
+     * 批量增加配件信息.
+     * @param addParam 批量新增参数列表JSON
+     * <pre>
+     *     [
+     *         {
+     *            partsCode:配件编码,
+     *            partsName:配件货名,
+     *            partsBrand:配件品牌,
+     *            partsPn:配件型号,
+     *            partsParameters:配件参数,
+     *            mfrsId:生产商ID,
+     *            createUser:创建人,
+     *            updateUser:更新人
+     *         },
+     *         ... ...
+     *     ]
+     * </pre>
+     * @return 批量新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    public MessageResponse add(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<BizParts> bizPartsInfos = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                bizPartsInfos = JSON.parseArray(paramStr, BizParts.class);
+                if (null == bizPartsInfos || 0 == bizPartsInfos.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizPartsService.insertBizParts(bizPartsInfos);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 增加配件资源.
+     * @param addParam 批量新增参数JSON
+     * <pre>
+     *
+     *         {
+     *            partsCode:配件编码,
+     *            partsName:配件货名,
+     *            partsBrand:配件品牌,
+     *            partsPn:配件型号,
+     *            partsParameters:配件参数,
+     *            mfrsId:生产商ID,
+     *            createUser:创建人,
+     *            updateUser:更新人
+     *         }
+     *
+     * </pre>
+     * @return 新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/addone",method = RequestMethod.POST)
+    public MessageResponse addone(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            BizParts bizParts = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                bizParts = JSON.parseObject(paramStr, BizParts.class);
+                if (null == bizParts) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizPartsService.insertBizParts(bizParts);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 修改配件信息.
+     * @param modifyParam 修改参数JSON
+     * <pre>
+     *     {
+     *         id:ID,
+     *         partsName:配件货名,
+     *         partsBrand:配件品牌,
+     *         partsPn:配件型号,
+     *         partsParameters:配件参数,
+     *         updateUser:更新人,
+     *     }
+     * </pre>
+     * @return 修改结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/modify",method = RequestMethod.POST)
+    public MessageResponse modify(@RequestBody String modifyParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(modifyParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误
+            BizParts bizParts = null;
+            try {
+                String paramStr = URLDecoder.decode(modifyParam, "utf-8");
+                bizParts = JSON.parseObject(paramStr, BizParts.class);
+                if (null == bizParts) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizPartsService.updateBizParts(bizParts);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 批量删除配件信息.
+     * @param deleteParam 删除ID列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
+     * @return 批量删除结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/delete",method = RequestMethod.POST)
+    public MessageResponse delete(@RequestBody String deleteParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(deleteParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> bizPartsIds = null;
+            try {
+                String paramStr = URLDecoder.decode(deleteParam, "utf-8");
+                bizPartsIds = JSON.parseArray(paramStr, String.class);
+                if (null == bizPartsIds || 0 == bizPartsIds.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizPartsService.deleteBizParts(bizPartsIds);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 根据id查询配件信息.
+     * @param id 查询ID
+     * <pre>
+     *     [id]
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:
+     *         {
+     *                 id:ID,
+     *                 partsCode:配件编码,
+     *                 partsName:配件货名,
+     *                 partsBrand:配件品牌,
+     *                 partsPn:配件型号,
+     *                 partsType:配件类别（）,
+     *                 partsParameters:配件参数,
+     *                 mfrsId:生产商ID,
+     *                 partsStatus:配件状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
+    public MessageResponse getByPK(@RequestBody String id) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(id)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> bizPartsId = null;
+            try {
+                String paramStr = URLDecoder.decode(id, "utf-8");
+                bizPartsId = JSON.parseArray(paramStr, String.class);
+                if (null == bizPartsId || 0 == bizPartsId.size() || WzStringUtil.isBlank(bizPartsId.get(0))) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+
+            BizParts bizParts = bizPartsService.getBizPartsByPrimaryKey(bizPartsId.get(0));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, bizParts);
+            return mr;
+        }
+    }
+
 }

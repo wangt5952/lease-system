@@ -13,6 +13,7 @@ import java.util.List;
  * Created by wangtao on 2018/1/16.
  */
 public interface BizPartsService {
+
     /**
      * 获得配件列表.
      * @param needPaging 是否需要分页
@@ -25,7 +26,7 @@ public interface BizPartsService {
      * 批量插入配件.
      * @param partsInfos 配件信息
      */
-    public void insertBizPartses(List<BizParts> partsInfos);
+    public void insertBizParts(List<BizParts> partsInfos);
 
     /**
      * 插入配件.
@@ -50,4 +51,5 @@ public interface BizPartsService {
      * @param id 配件ID
      * */
     public BizParts getBizPartsByPrimaryKey(String id);
+
 }
