@@ -152,21 +152,23 @@ public class SysUserServcieImpl implements SysUserService {
     public void refSysUserAndRoles(RefUserRolesParam params){
         int i = 0;
         String userId = params.getUserId();
-        String[] rolesIds = params.getRoleIds().split(",");
-        SysRefUserRoleKey sysRefUserRoleKey = new SysRefUserRoleKey();
-        if(rolesIds.length > 0){
-            try{
-                //删除用户原来的ROLE
-                sysUserMapperExt.deleteUserAndRoles(userId);
-                if (!"true".equals(params.getDeleteAllFlg().toLowerCase())) {
+        if ("true".equals(params.getDeleteAllFlg().toLowerCase())) {
+            sysUserMapperExt.deleteUserAndRoles(userId);
+        } else {
+            String[] rolesIds = params.getRoleIds().split(",");
+            SysRefUserRoleKey sysRefUserRoleKey = new SysRefUserRoleKey();
+            if(rolesIds.length > 0){
+                try{
+                    //删除用户原来的ROLE
+                    sysUserMapperExt.deleteUserAndRoles(userId);
                     for (; i < rolesIds.length; i++) {
                         sysRefUserRoleKey.setUserId(userId);
                         sysRefUserRoleKey.setRoleId(rolesIds[i]);
                         sysUserMapperExt.refUserAndRoles(sysRefUserRoleKey);
                     }
+                }catch(Exception ex){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
                 }
-            }catch(Exception ex){
-                throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
             }
         }
     }
