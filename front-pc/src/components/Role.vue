@@ -234,9 +234,9 @@ export default {
       try {
         const { id } = this.assignResForm;
 
-        const resources = this.$refs.resTree.getCheckedKeys().join(',');
-        if (resources){
-          const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resources })).body;
+        const resourceIds = this.$refs.resTree.getCheckedKeys().join(',');
+        if (resourceIds){
+          const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resourceIds })).body;
           if (code !== '200') throw new Error(message);
         } else {
           const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, deleteAllFlg:true })).body;
