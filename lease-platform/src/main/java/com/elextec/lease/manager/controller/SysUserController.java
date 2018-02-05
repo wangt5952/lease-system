@@ -11,6 +11,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysRoleService;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.persist.model.mybatis.SysResources;
@@ -98,10 +99,10 @@ public class SysUserController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            PageRequest pagingParam = null;
+            SysUserParam pagingParam = null;
             try {
                 String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
-                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+                pagingParam = JSON.parseObject(paramStr, SysUserParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }

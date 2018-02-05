@@ -1,6 +1,8 @@
 package com.elextec.persist.dao.mybatis;
 
+import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
+import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
@@ -25,4 +27,11 @@ public interface SysUserMapperExt extends SysUserMapper {
      * @param userId 用户ID
      */
     void deleteUserAndRoles(String userId);
+
+    /**
+     * 根据条件查找用户列表
+     * */
+    List<SysUser> selectListByPrimary(SysUserParam param);
+
+    int selectCountByPrimary(SysUserParam param);
 }

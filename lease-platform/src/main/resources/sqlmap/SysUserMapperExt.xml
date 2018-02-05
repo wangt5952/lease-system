@@ -90,4 +90,62 @@
         delete from sys_ref_user_role
         where user_id = #{userId,jdbcType=VARCHAR}
     </delete>
+
+    <select id="selectListByPrimary" resultMap="BaseResultMap" parameterType="com.elextec.lease.manager.request.SysUserParam" >
+        select
+        <include refid="Base_Column_List" />
+        from sys_user
+        <where>
+            <if test="objName != null and objName != ''" >
+                and (login_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
+                OR nick_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
+                OR user_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="userMobile != null and userMobile != ''" >
+                and user_mobile LIKE concat('%', #{userMobile,jdbcType=VARCHAR} ,'%')
+            </if>
+            <if test="userType != null and userType != ''" >
+                and user_type = #{userType,jdbcType=VARCHAR}
+            </if>
+            <if test="userPid != null and userPid != ''" >
+                and user_pid LIKE concat('%', #{userPid,jdbcType=VARCHAR} ,'%')
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
+            <if test="userStatus != null and userStatus != ''" >
+                and user_status = #{userStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+        limit #{pageBegin} , #{pageSize}
+    </select>
+
+    <select id="selectCountByPrimary" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.SysUserParam" >
+        select
+        COUNT(1)
+        from sys_user
+        <where>
+            <if test="objName != null and objName != ''" >
+                and (login_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
+                      OR nick_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
+                      OR user_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="userMobile != null and userMobile != ''" >
+                and user_mobile LIKE concat('%', #{userMobile,jdbcType=VARCHAR} ,'%')
+            </if>
+            <if test="userType != null and userType != ''" >
+                and user_type = #{userType,jdbcType=VARCHAR}
+            </if>
+            <if test="userPid != null and userPid != ''" >
+                and user_pid LIKE concat('%', #{userPid,jdbcType=VARCHAR} ,'%')
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
+            <if test="userStatus != null and userStatus != ''" >
+                and user_status = #{userStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
 </mapper>

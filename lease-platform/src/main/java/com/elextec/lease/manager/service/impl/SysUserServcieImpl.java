@@ -5,7 +5,9 @@ import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
@@ -51,24 +53,69 @@ public class SysUserServcieImpl implements SysUserService {
     private BizPartsMapperExt bizPartsMapperExt;
 
     @Override
-    public PageResponse<SysUser> list(boolean needPaging, PageRequest pr) {
+    public PageResponse<SysUser> list(boolean needPaging, SysUserParam pr) {
         // 查询总记录数
         int resTotal = 0;
         if (0 < pr.getTotal()) {
             resTotal = pr.getTotal();
         } else {
-            SysUserExample sysUserCountExample = new SysUserExample();
-            sysUserCountExample.setDistinct(true);
-            resTotal = sysUserMapperExt.countByExample(sysUserCountExample);
+//            SysUserExample sysUserCountExample = new SysUserExample();
+//            SysUserExample.Criteria lnCountCriteria = sysUserCountExample.createCriteria();
+//            if(WzStringUtil.isNotBlank(pr.getLoginName())){
+//                lnCountCriteria.andLoginNameLike("%" + pr.getLoginName() + "%");
+//            }
+//            if(WzStringUtil.isNotBlank(pr.getUserMobile())){
+//                lnCountCriteria.andUserMobileLike("%" + pr.getUserMobile() + "%");
+//            }
+//            if(WzStringUtil.isNotBlank(pr.getNickName())){
+//                lnCountCriteria.andNickNameLike("%" + pr.getNickName() + "%");
+//            }
+//            if(WzStringUtil.isNotBlank(pr.getUserPid())){
+//                lnCountCriteria.andUserPidLike("%" + pr.getUserPid() + "%");
+//            }
+//            if(WzStringUtil.isNotBlank(pr.getOrgId())){
+//                lnCountCriteria.andOrgIdEqualTo(pr.getOrgId());
+//            }
+//            if(WzStringUtil.isNotBlank(pr.getUserStatus().getInfo())){
+//                lnCountCriteria.andUserStatusEqualTo(pr.getUserStatus());
+//            }
+//            if(WzStringUtil.isNotBlank(pr.getUserType().getInfo())){
+//                lnCountCriteria.andUserTypeEqualTo(pr.getUserType());
+//            }
+//            sysUserCountExample.setDistinct(true);
+//            resTotal = sysUserMapperExt.countByExample(sysUserCountExample);
+//        }
+//        // 分页查询
+//        SysUserExample sysUsersExample = new SysUserExample();
+//        SysUserExample.Criteria lnUserCriteria = sysUsersExample.createCriteria();
+//        if(WzStringUtil.isNotBlank(pr.getLoginName())){
+//            lnUserCriteria.andLoginNameLike("%" + pr.getLoginName() + "%");
+//        }
+//        if(WzStringUtil.isNotBlank(pr.getUserMobile())){
+//            lnUserCriteria.andUserMobileLike("%" + pr.getUserMobile() + "%");
+//        }
+//        if(WzStringUtil.isNotBlank(pr.getNickName())){
+//            lnUserCriteria.andNickNameLike("%" + pr.getNickName() + "%");
+//        }
+//        if(WzStringUtil.isNotBlank(pr.getUserPid())){
+//            lnUserCriteria.andUserPidLike("%" + pr.getUserPid() + "%");
+//        }
+//        if(WzStringUtil.isNotBlank(pr.getOrgId())){
+//            lnUserCriteria.andOrgIdEqualTo(pr.getOrgId());
+//        }
+//        if(WzStringUtil.isNotBlank(pr.getUserStatus().getInfo())){
+//            lnUserCriteria.andUserStatusEqualTo(pr.getUserStatus());
+//        }
+//        if(WzStringUtil.isNotBlank(pr.getUserType().getInfo())){
+//            lnUserCriteria.andUserTypeEqualTo(pr.getUserType());
+//        }
+//        sysUsersExample.setDistinct(true);
+//        if (needPaging) {
+//            sysUsersExample.setPageBegin(pr.getPageBegin());
+//            sysUsersExample.setPageSize(pr.getPageSize());
         }
-        // 分页查询
-        SysUserExample sysUsersExample = new SysUserExample();
-        sysUsersExample.setDistinct(true);
-        if (needPaging) {
-            sysUsersExample.setPageBegin(pr.getPageBegin());
-            sysUsersExample.setPageSize(pr.getPageSize());
-        }
-        List<SysUser> resLs = sysUserMapperExt.selectByExample(sysUsersExample);
+        List<SysUser> resLs = sysUserMapperExt.selectListByPrimary(pr);
+        resTotal = sysUserMapperExt.selectCountByPrimary(pr);
         // 组织并返回结果
         PageResponse<SysUser> presp = new PageResponse<SysUser>();
         presp.setCurrPage(pr.getCurrPage());

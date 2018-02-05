@@ -3,6 +3,7 @@ package com.elextec.lease.manager.service;
 import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
@@ -21,7 +22,7 @@ public interface SysUserService {
      * @param pr 分页参数
      * @return 用户列表
      */
-    public PageResponse<SysUser> list(boolean needPaging, PageRequest pr);
+    public PageResponse<SysUser> list(boolean needPaging, SysUserParam pr);
 
     /**
      * 批量插入用户.
