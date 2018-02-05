@@ -13,7 +13,6 @@ import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
 import com.elextec.persist.dao.mybatis.SysUserMapperExt;
 import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
-import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;

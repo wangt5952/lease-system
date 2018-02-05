@@ -1,16 +1,14 @@
 package com.elextec.lease.manager.service.impl;
 
 import com.elextec.framework.common.constants.RunningResult;
-import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.BizBatteryService;
-import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
-import com.elextec.persist.dao.mybatis.SysUserMapperExt;
-import com.elextec.persist.model.mybatis.*;
+import com.elextec.persist.model.mybatis.BizBattery;
+import com.elextec.persist.model.mybatis.BizBatteryExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

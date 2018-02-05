@@ -1,8 +1,6 @@
 package com.elextec.lease.manager.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
@@ -10,13 +8,8 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
-import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.BizManufacturerService;
-import com.elextec.persist.field.enums.MfrsType;
-import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizManufacturer;
-import com.elextec.persist.model.mybatis.SysResources;
-import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 制造商管理Controller.

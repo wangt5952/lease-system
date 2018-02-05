@@ -1,8 +1,5 @@
 package com.elextec.lease.manager.service;
 
-import com.elextec.framework.exceptions.BizException;
-import com.elextec.persist.model.mybatis.ext.SysUserExt;
-
 import java.util.Map;
 
 /**

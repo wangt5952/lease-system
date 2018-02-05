@@ -1,10 +1,8 @@
 package com.elextec.lease.manager.service;
 
-import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.persist.model.mybatis.BizParts;
-import com.elextec.persist.model.mybatis.SysUser;
 
 import java.util.List;
 
