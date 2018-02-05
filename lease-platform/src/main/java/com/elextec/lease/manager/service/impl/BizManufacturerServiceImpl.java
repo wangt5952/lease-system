@@ -1,7 +1,6 @@
 package com.elextec.lease.manager.service.impl;
 
 import com.elextec.framework.common.constants.RunningResult;
-import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
@@ -10,7 +9,8 @@ import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
 import com.elextec.persist.field.enums.MfrsType;
 import com.elextec.persist.field.enums.RecordStatus;
-import com.elextec.persist.model.mybatis.*;
+import com.elextec.persist.model.mybatis.BizManufacturer;
+import com.elextec.persist.model.mybatis.BizManufacturerExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
