@@ -53,6 +53,12 @@ public class SysUserController extends BaseController {
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
+     *         objName:用户名，登录名，昵称的综合名称，模糊查询，代入后会查找出三个名称中所有包含该字符的数据，可为空,
+     *         userMobile:用户电话，可为空，模糊查询,
+     *         userType:用户类型，可为空,
+     *         userPid:身份证号，可为空，模糊查询,
+     *         orgId:部门ID，可为空,
+     *         userStatus:用户状态，可为空,
      *         currPage:当前页,
      *         pageSize:每页记录数
      *     }
