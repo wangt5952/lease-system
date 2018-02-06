@@ -91,61 +91,75 @@
         where user_id = #{userId,jdbcType=VARCHAR}
     </delete>
 
-    <select id="selectListByPrimary" resultMap="BaseResultMap" parameterType="com.elextec.lease.manager.request.SysUserParam" >
-        select
-        <include refid="Base_Column_List" />
-        from sys_user
+    <select id="selectExtByParam" resultMap="BaseResultMap" parameterType="com.elextec.lease.manager.request.SysUserParam" >
+        SELECT distinct
+        a.id id,
+        a.login_name login_name,
+        a.user_mobile user_mobile,
+        a.user_type user_type,
+        a.user_icon user_icon,
+        a.password password,
+        a.nick_name nick_name,
+        a.user_name user_name,
+        a.user_real_name_auth_flag user_real_name_auth_flag,
+        a.user_pid user_pid,
+        a.user_ic_front user_ic_front,
+        a.user_ic_back user_ic_back,
+        a.user_ic_group user_ic_group,
+        a.user_status user_status,
+        a.create_user create_user,
+        a.create_time create_time,
+        a.update_user update_user,
+        a.update_time update_time,
+        a.org_id org_id,
+        b.org_code org_code,
+        b.org_name org_name
+        FROM
+        sys_user a
+        LEFT JOIN biz_organization b ON a.org_id=b.id
         <where>
-            <if test="objName != null and objName != ''" >
-                and (login_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
-                OR nick_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
-                OR user_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%'))
-            </if>
-            <if test="userMobile != null and userMobile != ''" >
-                and user_mobile LIKE concat('%', #{userMobile,jdbcType=VARCHAR} ,'%')
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.login_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.user_mobile like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.nick_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.user_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.user_pid like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.org_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.org_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
             </if>
             <if test="userType != null and userType != ''" >
-                and user_type = #{userType,jdbcType=VARCHAR}
-            </if>
-            <if test="userPid != null and userPid != ''" >
-                and user_pid LIKE concat('%', #{userPid,jdbcType=VARCHAR} ,'%')
-            </if>
-            <if test="orgId != null and orgId != ''" >
-                and org_id = #{orgId,jdbcType=VARCHAR}
+                and a.user_type = #{userType,jdbcType=VARCHAR}
             </if>
             <if test="userStatus != null and userStatus != ''" >
-                and user_status = #{userStatus,jdbcType=VARCHAR}
+                and a.user_status = #{userStatus,jdbcType=VARCHAR}
             </if>
         </where>
         limit #{pageBegin} , #{pageSize}
     </select>
 
-    <select id="selectCountByPrimary" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.SysUserParam" >
-        select
-        COUNT(1)
-        from sys_user
+    <select id="countExtByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.SysUserParam" >
+        SELECT count(distinct a.id)
+        FROM
+        sys_user a
+        LEFT JOIN biz_organization b ON a.org_id=b.id
         <where>
-            <if test="objName != null and objName != ''" >
-                and (login_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
-                      OR nick_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%')
-                      OR user_name LIKE concat('%', #{objName,jdbcType=VARCHAR} ,'%'))
-            </if>
-            <if test="userMobile != null and userMobile != ''" >
-                and user_mobile LIKE concat('%', #{userMobile,jdbcType=VARCHAR} ,'%')
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.login_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.user_mobile like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.nick_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.user_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.user_pid like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.org_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.org_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
             </if>
             <if test="userType != null and userType != ''" >
-                and user_type = #{userType,jdbcType=VARCHAR}
-            </if>
-            <if test="userPid != null and userPid != ''" >
-                and user_pid LIKE concat('%', #{userPid,jdbcType=VARCHAR} ,'%')
-            </if>
-            <if test="orgId != null and orgId != ''" >
-                and org_id = #{orgId,jdbcType=VARCHAR}
+                and a.user_type = #{userType,jdbcType=VARCHAR}
             </if>
             <if test="userStatus != null and userStatus != ''" >
-                and user_status = #{userStatus,jdbcType=VARCHAR}
+                and a.user_status = #{userStatus,jdbcType=VARCHAR}
             </if>
         </where>
     </select>
-
 </mapper>

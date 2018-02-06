@@ -21,10 +21,7 @@
     </select>
 
     <select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.BizBatteryParam" resultMap="BizBatteryExtResultMap">
-        SELECT
-        <if test="distinct">
-            distinct
-        </if>
+        SELECT distinct
         a.id id,
         a.battery_code battery_code,
         a.battery_name battery_name,

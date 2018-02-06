@@ -37,7 +37,7 @@ public class BizBatteryServcieImpl implements BizBatteryService {
     public PageResponse<BizBattery> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int resTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             resTotal = pr.getTotal();
         } else {
             BizBatteryExample bizBatteryExample = new BizBatteryExample();
@@ -66,10 +66,10 @@ public class BizBatteryServcieImpl implements BizBatteryService {
     }
 
     @Override
-    public PageResponse<BizBatteryExt> listExt(boolean needPaging, BizBatteryParam pr) {
+    public PageResponse<BizBatteryExt> listExtByParam(boolean needPaging, BizBatteryParam pr) {
         // 查询总记录数
         int batteryTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             batteryTotal = pr.getTotal();
         } else {
             batteryTotal = bizBatteryMapperExt.countExtByParam(pr);

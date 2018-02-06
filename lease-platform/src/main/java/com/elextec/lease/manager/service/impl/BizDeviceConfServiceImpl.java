@@ -33,7 +33,7 @@ public class BizDeviceConfServiceImpl implements BizDeviceConfService {
     public PageResponse<BizDeviceConf> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int devTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             devTotal = pr.getTotal();
         } else {
             BizDeviceConfExample devCountExample = new BizDeviceConfExample();

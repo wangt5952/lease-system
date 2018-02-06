@@ -46,7 +46,7 @@ public class SysResourceServcieImpl implements SysResourceService {
     public PageResponse<SysResources> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int resTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             resTotal = pr.getTotal();
         } else {
             SysResourcesExample sysResourcesCountExample = new SysResourcesExample();

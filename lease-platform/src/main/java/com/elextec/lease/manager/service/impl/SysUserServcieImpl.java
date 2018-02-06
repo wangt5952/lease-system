@@ -36,6 +36,7 @@ import java.util.List;
  */
 @Service
 public class SysUserServcieImpl implements SysUserService {
+
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SysUserServcieImpl.class);
 
@@ -52,78 +53,60 @@ public class SysUserServcieImpl implements SysUserService {
     private BizPartsMapperExt bizPartsMapperExt;
 
     @Override
-    public PageResponse<SysUser> list(boolean needPaging, SysUserParam pr) {
+    public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr) {
         // 查询总记录数
-        int resTotal = 0;
-        if (0 < pr.getTotal()) {
-            resTotal = pr.getTotal();
+        int userTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            userTotal = pr.getTotal();
         } else {
-//            SysUserExample sysUserCountExample = new SysUserExample();
-//            SysUserExample.Criteria lnCountCriteria = sysUserCountExample.createCriteria();
-//            if(WzStringUtil.isNotBlank(pr.getLoginName())){
-//                lnCountCriteria.andLoginNameLike("%" + pr.getLoginName() + "%");
-//            }
-//            if(WzStringUtil.isNotBlank(pr.getUserMobile())){
-//                lnCountCriteria.andUserMobileLike("%" + pr.getUserMobile() + "%");
-//            }
-//            if(WzStringUtil.isNotBlank(pr.getNickName())){
-//                lnCountCriteria.andNickNameLike("%" + pr.getNickName() + "%");
-//            }
-//            if(WzStringUtil.isNotBlank(pr.getUserPid())){
-//                lnCountCriteria.andUserPidLike("%" + pr.getUserPid() + "%");
-//            }
-//            if(WzStringUtil.isNotBlank(pr.getOrgId())){
-//                lnCountCriteria.andOrgIdEqualTo(pr.getOrgId());
-//            }
-//            if(WzStringUtil.isNotBlank(pr.getUserStatus().getInfo())){
-//                lnCountCriteria.andUserStatusEqualTo(pr.getUserStatus());
-//            }
-//            if(WzStringUtil.isNotBlank(pr.getUserType().getInfo())){
-//                lnCountCriteria.andUserTypeEqualTo(pr.getUserType());
-//            }
-//            sysUserCountExample.setDistinct(true);
-//            resTotal = sysUserMapperExt.countByExample(sysUserCountExample);
-//        }
-//        // 分页查询
-//        SysUserExample sysUsersExample = new SysUserExample();
-//        SysUserExample.Criteria lnUserCriteria = sysUsersExample.createCriteria();
-//        if(WzStringUtil.isNotBlank(pr.getLoginName())){
-//            lnUserCriteria.andLoginNameLike("%" + pr.getLoginName() + "%");
-//        }
-//        if(WzStringUtil.isNotBlank(pr.getUserMobile())){
-//            lnUserCriteria.andUserMobileLike("%" + pr.getUserMobile() + "%");
-//        }
-//        if(WzStringUtil.isNotBlank(pr.getNickName())){
-//            lnUserCriteria.andNickNameLike("%" + pr.getNickName() + "%");
-//        }
-//        if(WzStringUtil.isNotBlank(pr.getUserPid())){
-//            lnUserCriteria.andUserPidLike("%" + pr.getUserPid() + "%");
-//        }
-//        if(WzStringUtil.isNotBlank(pr.getOrgId())){
-//            lnUserCriteria.andOrgIdEqualTo(pr.getOrgId());
-//        }
-//        if(WzStringUtil.isNotBlank(pr.getUserStatus().getInfo())){
-//            lnUserCriteria.andUserStatusEqualTo(pr.getUserStatus());
-//        }
-//        if(WzStringUtil.isNotBlank(pr.getUserType().getInfo())){
-//            lnUserCriteria.andUserTypeEqualTo(pr.getUserType());
-//        }
-//        sysUsersExample.setDistinct(true);
-//        if (needPaging) {
-//            sysUsersExample.setPageBegin(pr.getPageBegin());
-//            sysUsersExample.setPageSize(pr.getPageSize());
+            SysUserExample sysUserCountExample = new SysUserExample();
+            sysUserCountExample.setDistinct(true);
+            userTotal = sysUserMapperExt.countByExample(sysUserCountExample);
         }
-        List<SysUser> resLs = sysUserMapperExt.selectListByPrimary(pr);
-        resTotal = sysUserMapperExt.selectCountByPrimary(pr);
+        // 分页查询
+        SysUserExample sysUserLsExample = new SysUserExample();
+        sysUserLsExample.setDistinct(true);
+        if (needPaging) {
+            sysUserLsExample.setPageBegin(pr.getPageBegin());
+            sysUserLsExample.setPageSize(pr.getPageSize());
+        }
+        List<SysUserExt> userLs = sysUserMapperExt.selectExtByExample(sysUserLsExample);
         // 组织并返回结果
-        PageResponse<SysUser> presp = new PageResponse<SysUser>();
+        PageResponse<SysUserExt> presp = new PageResponse<SysUserExt>();
         presp.setCurrPage(pr.getCurrPage());
         presp.setPageSize(pr.getPageSize());
-        presp.setTotal(resTotal);
-        if (null == resLs) {
-            presp.setRows(new ArrayList<SysUser>());
+        presp.setTotal(userTotal);
+        if (null == userLs) {
+            presp.setRows(new ArrayList<SysUserExt>());
         } else {
-            presp.setRows(resLs);
+            presp.setRows(userLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<SysUserExt> listExtByParam(boolean needPaging, SysUserParam pr) {
+        // 查询总记录数
+        int userTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            userTotal = pr.getTotal();
+        } else {
+            userTotal = sysUserMapperExt.countExtByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<SysUserExt> userLs = sysUserMapperExt.selectExtByParam(pr);
+        // 组织并返回结果
+        PageResponse<SysUserExt> presp = new PageResponse<SysUserExt>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(userTotal);
+        if (null == userLs) {
+            presp.setRows(new ArrayList<SysUserExt>());
+        } else {
+            presp.setRows(userLs);
         }
         return presp;
     }

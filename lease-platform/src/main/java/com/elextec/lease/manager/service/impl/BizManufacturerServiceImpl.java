@@ -34,7 +34,7 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     public PageResponse<BizManufacturer> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int mfrsTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             mfrsTotal = pr.getTotal();
         } else {
             BizManufacturerExample bizManufacturerCountExample = new BizManufacturerExample();
