@@ -8,8 +8,10 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.request.BizPartsParam;
 import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.persist.model.mybatis.BizParts;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,10 @@ public class BizPartsController extends BaseController {
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
+     *         keyStr:查询关键字(非必填，模糊查询，可填写配件编码、配件货名、配件品牌、配件型号、配件参数、生产商ID、生产商名称)，
+     *         partsType:配件类别（非必填，SEATS，FRAME，HANDLEBAR，BELL，TYRE，PEDAL，DASHBOARD）,
+     *         partsStatus：配件状态（非必填，NORMAL、FREEZE、INVALID），
+     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
      *         currPage:当前页,
      *         pageSize:每页记录数
      *     }
@@ -56,7 +62,7 @@ public class BizPartsController extends BaseController {
      *                 partsName:配件货名,
      *                 partsBrand:配件品牌,
      *                 partsPn:配件型号,
-     *                 partsType:配件类别（）,
+     *                 partsType:配件类别（车座、车架、车把、车铃、轮胎、脚蹬、仪表盘）,
      *                 partsParameters:配件参数,
      *                 mfrsId:生产商ID,
      *                 partsStatus:配件状态（正常、冻结、作废）,
@@ -78,17 +84,29 @@ public class BizPartsController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            PageRequest pagingParam = null;
+//            PageRequest pagingParam = null;
+            BizPartsParam bizPartsParam = null;
             try {
                 String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
-                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
-                if (null == pagingParam) {
+//                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+                bizPartsParam = JSON.parseObject(paramStr,BizPartsParam.class);
+                if (null == bizPartsParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                //仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
+                if (WzStringUtil.isNotBlank(bizPartsParam.getNeedPaging()) && "false".equals(bizPartsParam.getNeedPaging().toLowerCase())) {
+                    bizPartsParam.setNeedPaging("false");
+                } else {
+                    if (null == bizPartsParam.getCurrPage() || null == bizPartsParam.getPageSize()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "需要分页参数");
+                    }
+                    bizPartsParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<BizParts> orgPageResp = bizPartsService.list(true, pagingParam);
+            //PageResponse<BizParts> orgPageResp = bizPartsService.list(true, bizPartsParam);
+            PageResponse<BizPartsExt> orgPageResp = bizPartsService.listExtByParam(Boolean.valueOf(bizPartsParam.getNeedPaging()),bizPartsParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, orgPageResp);
             return mr;

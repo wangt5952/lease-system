@@ -2,7 +2,9 @@ package com.elextec.lease.manager.service;
 
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.BizPartsParam;
 import com.elextec.persist.model.mybatis.BizParts;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 
 import java.util.List;
 
@@ -21,7 +23,15 @@ public interface BizPartsService {
     public PageResponse<BizParts> list(boolean needPaging, PageRequest pr);
 
     /**
-     * 批量插入配件.
+     * 获得配件列表（附带扩展信息）.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 配件列表
+     */
+    public PageResponse<BizPartsExt> listExtByParam(boolean needPaging, BizPartsParam pr);
+
+    /**
+     * 批量插入配件
      * @param partsInfos 配件信息
      */
     public void insertBizParts(List<BizParts> partsInfos);

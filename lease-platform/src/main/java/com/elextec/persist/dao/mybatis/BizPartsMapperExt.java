@@ -1,5 +1,6 @@
 package com.elextec.persist.dao.mybatis;
 
+import com.elextec.lease.manager.request.BizPartsParam;
 import com.elextec.persist.model.mybatis.BizParts;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 
@@ -13,5 +14,19 @@ public interface BizPartsMapperExt extends BizPartsMapper {
      * @return
      */
     public List<BizPartsExt> getById(String id);
+
+    /**
+     * 查询配件扩展信息列表
+     * @param partsParam 查询条件
+     * @return 配件扩展信息列表
+     */
+    public List<BizPartsExt> selectExtByParam(BizPartsParam partsParam);
+
+    /**
+     * 查询配件扩展信息记录数
+     * @param partsParam 查询条件
+     * @return 配件扩展信息记录数
+     */
+    public int countExtByParam(BizPartsParam partsParam);
 
 }
