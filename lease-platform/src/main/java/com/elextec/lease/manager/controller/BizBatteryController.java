@@ -103,7 +103,7 @@ public class BizBatteryController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 //            PageResponse<BizBattery> batteryPageResp = bizBatteryService.list(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
-            PageResponse<BizBatteryExt> batteryPageResp = bizBatteryService.listExt(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
+            PageResponse<BizBatteryExt> batteryPageResp = bizBatteryService.listExtByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, batteryPageResp);
             return mr;

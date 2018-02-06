@@ -28,7 +28,7 @@ public interface BizBatteryService {
      * @param pr 带条件的分页参数
      * @return 电池列表
      */
-    public PageResponse<BizBatteryExt> listExt(boolean needPaging, BizBatteryParam pr);
+    public PageResponse<BizBatteryExt> listExtByParam(boolean needPaging, BizBatteryParam pr);
 
     /**
      * 批量插入电池.

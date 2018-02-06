@@ -7,8 +7,6 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
-import com.elextec.persist.field.enums.MfrsType;
-import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizParts;
 import com.elextec.persist.model.mybatis.BizPartsExample;
 import org.slf4j.Logger;

@@ -34,7 +34,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     public PageResponse<BizOrganization> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int mfrsTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             mfrsTotal = pr.getTotal();
         } else {
             BizOrganizationExample bizOrganizationExample = new BizOrganizationExample();

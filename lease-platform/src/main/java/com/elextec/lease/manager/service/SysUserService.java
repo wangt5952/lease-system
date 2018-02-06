@@ -22,7 +22,15 @@ public interface SysUserService {
      * @param pr 分页参数
      * @return 用户列表
      */
-    public PageResponse<SysUser> list(boolean needPaging, SysUserParam pr);
+    public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr);
+
+    /**
+     * 获得用户列表（附带扩展信息）.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 用户列表
+     */
+    public PageResponse<SysUserExt> listExtByParam(boolean needPaging, SysUserParam pr);
 
     /**
      * 批量插入用户.

@@ -8,22 +8,22 @@ import com.elextec.persist.field.enums.RecordStatus;
  * Created by js_gg on 2018/2/5.
  */
 public class SysUserParam extends PageRequest {
-//    private String loginName;
-    private String userMobile;
+    /** 关键字，包括login_name、user_mobile、nick_name、user_name、user_pid、org_name、org_code. */
+    private String keyStr;
+    /** 用户类别. */
     private String userType;
-    private String objName;
-//    private String userName;
-    private String userPid;
-    private String orgId;
+    /** 用户状态. */
     private String userStatus;
 
-
-    public String getUserMobile() {
-        return userMobile;
+    /*
+     * Getter 和 Setter 方法.
+     */
+    public String getKeyStr() {
+        return keyStr;
     }
 
-    public void setUserMobile(String userMobile) {
-        this.userMobile = userMobile;
+    public void setKeyStr(String keyStr) {
+        this.keyStr = keyStr;
     }
 
     public String getUserType() {
@@ -34,22 +34,6 @@ public class SysUserParam extends PageRequest {
         this.userType = userType;
     }
 
-    public String getUserPid() {
-        return userPid;
-    }
-
-    public void setUserPid(String userPid) {
-        this.userPid = userPid;
-    }
-
-    public String getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(String orgId) {
-        this.orgId = orgId;
-    }
-
     public String getUserStatus() {
         return userStatus;
     }
@@ -58,11 +42,4 @@ public class SysUserParam extends PageRequest {
         this.userStatus = userStatus;
     }
 
-    public String getObjName() {
-        return objName;
-    }
-
-    public void setObjName(String objName) {
-        this.objName = objName;
-    }
 }

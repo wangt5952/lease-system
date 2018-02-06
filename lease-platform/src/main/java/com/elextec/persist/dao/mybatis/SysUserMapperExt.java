@@ -29,9 +29,16 @@ public interface SysUserMapperExt extends SysUserMapper {
     void deleteUserAndRoles(String userId);
 
     /**
-     * 根据条件查找用户列表
-     * */
-    List<SysUser> selectListByPrimary(SysUserParam param);
+     * 查询用户扩展信息列表.
+     * @param sysUserParam 查询条件
+     * @return 用户扩展信息列表
+     */
+    List<SysUserExt> selectExtByParam(SysUserParam sysUserParam);
 
-    int selectCountByPrimary(SysUserParam param);
+    /**
+     * 查询用户扩展信息记录数.
+     * @param sysUserParam 查询条件
+     * @return 用户扩展信息记录数
+     */
+    int countExtByParam(SysUserParam sysUserParam);
 }

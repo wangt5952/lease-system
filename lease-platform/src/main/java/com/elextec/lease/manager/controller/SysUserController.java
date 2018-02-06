@@ -8,7 +8,6 @@ import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysUserParam;
@@ -53,14 +52,12 @@ public class SysUserController extends BaseController {
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
-     *         objName:用户名，登录名，昵称的综合名称，模糊查询，代入后会查找出三个名称中所有包含该字符的数据，可为空,
-     *         userMobile:用户电话，可为空，模糊查询,
-     *         userType:用户类型，可为空,
-     *         userPid:身份证号，可为空，模糊查询,
-     *         orgId:部门ID，可为空,
-     *         userStatus:用户状态，可为空,
-     *         currPage:当前页,
-     *         pageSize:每页记录数
+     *         keyStr:查询关键字（非必填，模糊查询，可填写登录名、手机号码、昵称、姓名、身份证号、所属企业Code、所属企业名）,
+     *         userType:用户类别（非必填，包括PLATFORM、ENTERPRISE、INDIVIDUAL）,
+     *         userStatus:用户状态（非必填，包括NORMAL、FREEZE、INVALID）,
+     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *         currPage:当前页（needPaging不为false时必填）,
+     *         pageSize:每页记录数（needPaging不为false时必填）
      *     }
      * </pre>
      * @return 查询结果列表
@@ -103,19 +100,32 @@ public class SysUserController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
+//            PageRequest pagingParam = null;
             SysUserParam pagingParam = null;
             try {
                 String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
+//                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
                 pagingParam = JSON.parseObject(paramStr, SysUserParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
+                if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging())
+                        && "false".equals(pagingParam.getNeedPaging().toLowerCase())) {
+                    pagingParam.setNeedPaging("false");
+                } else {
+                    if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "需要分页参数");
+                    }
+                    pagingParam.setNeedPaging("true");
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<SysUser> userPageResp = sysUserService.list(true, pagingParam);
+//            PageResponse<SysUserExt> sysUserPageResp = sysUserService.list(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
+            PageResponse<SysUserExt> sysUserPageResp = sysUserService.listExtByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, userPageResp);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, sysUserPageResp);
             return mr;
         }
     }
