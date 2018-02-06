@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.BizPartsMapperExt">
 
-    <resultMap extends="BaseResultMap" id="SysPartsExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizPartsExt">
+    <resultMap extends="BaseResultMap" id="BizPartsExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizPartsExt">
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
     </resultMap>
 
-    <select id="getById" parameterType="java.lang.String" resultMap="SysPartsExtResultMap">
+    <select id="getById" parameterType="java.lang.String" resultMap="BizPartsExtResultMap">
         SELECT
 				p.id,
 				p.parts_code,
@@ -28,7 +28,7 @@
     </select>
 
 	<!--查询拓展信息-->
-	<select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultMap="SysPartsExtResultMap">
+	<select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultMap="BizPartsExtResultMap">
 		SELECT
 		<if test="distinct">
 			distinct

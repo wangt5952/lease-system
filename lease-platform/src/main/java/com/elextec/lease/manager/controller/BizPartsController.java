@@ -5,7 +5,6 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizPartsParam;
@@ -65,6 +64,7 @@ public class BizPartsController extends BaseController {
      *                 partsType:配件类别（车座、车架、车把、车铃、轮胎、脚蹬、仪表盘）,
      *                 partsParameters:配件参数,
      *                 mfrsId:生产商ID,
+     *                 mfrsName:生产商名,
      *                 partsStatus:配件状态（正常、冻结、作废）,
      *                 createUser:创建人,
      *                 createTime:创建时间,
@@ -76,7 +76,7 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/list",method = RequestMethod.POST)
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
     public MessageResponse list(@RequestBody String paramAndPaging) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
@@ -106,7 +106,7 @@ public class BizPartsController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             //PageResponse<BizParts> orgPageResp = bizPartsService.list(true, bizPartsParam);
-            PageResponse<BizPartsExt> orgPageResp = bizPartsService.listExtByParam(Boolean.valueOf(bizPartsParam.getNeedPaging()),bizPartsParam);
+            PageResponse<BizPartsExt> orgPageResp = bizPartsService.listExtByParam(Boolean.valueOf(bizPartsParam.getNeedPaging()), bizPartsParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, orgPageResp);
             return mr;

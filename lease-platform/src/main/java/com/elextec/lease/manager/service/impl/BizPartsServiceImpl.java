@@ -10,7 +10,6 @@ import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
 import com.elextec.persist.model.mybatis.BizParts;
 import com.elextec.persist.model.mybatis.BizPartsExample;
-import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +66,7 @@ public class BizPartsServiceImpl implements BizPartsService {
     public PageResponse<BizPartsExt> listExtByParam(boolean needPaging, BizPartsParam pr) {
         // 查询总记录数
         int partsTotal = 0;
-        System.err.println(pr.getTotal());
-        if (0 < pr.getTotal() && pr.getTotal() != null) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             partsTotal = pr.getTotal();
         } else {
             partsTotal = bizPartsMapperExt.countExtByParam(pr);
