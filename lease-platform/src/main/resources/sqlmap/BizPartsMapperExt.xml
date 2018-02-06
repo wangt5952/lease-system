@@ -27,4 +27,70 @@
         WHERE r.vehicle_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
     </select>
 
+	<select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultMap="SysPartsExtResultMap">
+		SELECT
+		<if test="distinct">
+			distinct
+		</if>
+		a.id id,
+		a.parts_code parts_code,
+		a.parts_name parts_name,
+		a.parts_brand parts_brand,
+		a.parts_pn parts_pn,
+		a.parts_type parts_type,
+		a.parts_parameters parts_parameters,
+		a.mfrs_id mfrs_id,
+		a.parts_status parts_status,
+		a.create_user create_user,
+		a.create_time create_time,
+		a.update_user update_user,
+		a.update_time update_time,
+		b.mfrs_name mfrs_name
+		FROM biz_parts a
+		LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+		<where>
+			1=1
+			<if test="keyStr != null and keyStr != ''" >
+				AND (a.parts_code LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_brand LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_pn LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_parameters LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.mfrs_id LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="partsType != null and partsType != ''" >
+				AND a.partsType = #{parts_type,jdbcType=VARCHAR}
+			</if>
+			<if test="partsStatus != null and partsStatus != ''" >
+				AND a.partsStatus = #{parts_status,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by a.update_time desc,a.create_time desc
+		limit #{pageBegin} , #{pageSize}
+	</select>
+
+	<select id="countExtByParam " parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
+		SELECT count(distinct a.id) FROM biz_parts a
+		LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+		<where>
+			1=1
+			<if test="keyStr != null and keyStr != ''" >
+				AND (a.parts_code LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_brand LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_pn LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.parts_parameters LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR a.mfrs_id LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+				OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="partsType != null and partsType != ''" >
+				AND a.partsType = #{parts_type,jdbcType=VARCHAR}
+			</if>
+			<if test="partsStatus != null and partsStatus != ''" >
+				AND a.partsStatus = #{parts_status,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+
 </mapper>
