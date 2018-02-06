@@ -81,6 +81,8 @@ public class SysUserController extends BaseController {
      *                 userIcBack:身份证背面照片路径,
      *                 userIcGroup:用户手举身份证合照路径,
      *                 orgId:所属组织ID,
+     *                 orgCode:组织单位Code,
+     *                 orgName:组织单位名,
      *                 userStatus:用户状态（正常、冻结、作废）,
      *                 createUser:创建人,
      *                 createTime:创建时间,

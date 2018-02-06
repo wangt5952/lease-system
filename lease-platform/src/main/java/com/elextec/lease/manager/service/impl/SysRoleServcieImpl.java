@@ -68,7 +68,7 @@ public class SysRoleServcieImpl implements SysRoleService {
     }
 
     @Override
-    public PageResponse<SysRole> listExtByParam(boolean needPaging, SysRoleParam pr) {
+    public PageResponse<SysRole> listByParam(boolean needPaging, SysRoleParam pr) {
         // 查询总记录数
         int roleTotal = 0;
         if (null != pr.getTotal() && 0 < pr.getTotal()) {

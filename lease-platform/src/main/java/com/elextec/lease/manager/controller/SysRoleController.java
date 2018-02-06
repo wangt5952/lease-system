@@ -105,7 +105,7 @@ public class SysRoleController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<SysRole> rolePageResp = sysRoleService.list(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
+            PageResponse<SysRole> rolePageResp = sysRoleService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, rolePageResp);
             return mr;

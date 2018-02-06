@@ -61,6 +61,7 @@ public class BizBatteryController extends BaseController {
      *                 batteryPn:电池型号,
      *                 batteryParameters:电池参数,
      *                 mfrsId:生产商ID,
+     *                 mfrsName:生产商名,
      *                 batteryStatus:电池状态（正常、冻结、作废）,
      *                 createUser:创建人,
      *                 createTime:创建时间,

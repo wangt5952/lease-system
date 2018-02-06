@@ -4,6 +4,8 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.request.BizDeviceConfParam;
 import com.elextec.lease.manager.service.BizDeviceConfService;
 import com.elextec.persist.dao.mybatis.BizDeviceConfMapperExt;
 import com.elextec.persist.model.mybatis.BizDeviceConf;
@@ -43,6 +45,52 @@ public class BizDeviceConfServiceImpl implements BizDeviceConfService {
         // 分页查询
         BizDeviceConfExample devLsExample = new BizDeviceConfExample();
         devLsExample.setDistinct(true);
+        if (needPaging) {
+            devLsExample.setPageBegin(pr.getPageBegin());
+            devLsExample.setPageSize(pr.getPageSize());
+        }
+        List<BizDeviceConf> devLs = bizDeviceConfMapperExt.selectByExample(devLsExample);
+        // 组织并返回结果
+        PageResponse<BizDeviceConf> presp = new PageResponse<BizDeviceConf>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(devTotal);
+        if (null == devLs) {
+            presp.setRows(new ArrayList<BizDeviceConf>());
+        } else {
+            presp.setRows(devLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<BizDeviceConf> listByParam(boolean needPaging, BizDeviceConfParam pr) {
+        // 查询总记录数
+        int devTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            devTotal = pr.getTotal();
+        } else {
+            BizDeviceConfExample devCountExample = new BizDeviceConfExample();
+            devCountExample.setDistinct(true);
+            BizDeviceConfExample.Criteria devCountCri = devCountExample.createCriteria();
+            if (WzStringUtil.isNotBlank(pr.getKeyStr())) {
+                devCountCri.andDeviceIdLike("%" + pr.getKeyStr() + "%");
+            }
+            if (WzStringUtil.isNotBlank(pr.getDeviceType())) {
+                devCountCri.andDeviceIdEqualTo(pr.getDeviceType());
+            }
+            devTotal = bizDeviceConfMapperExt.countByExample(devCountExample);
+        }
+        // 分页查询
+        BizDeviceConfExample devLsExample = new BizDeviceConfExample();
+        devLsExample.setDistinct(true);
+        BizDeviceConfExample.Criteria devLsCri = devLsExample.createCriteria();
+        if (WzStringUtil.isNotBlank(pr.getKeyStr())) {
+            devLsCri.andDeviceIdLike("%" + pr.getKeyStr() + "%");
+        }
+        if (WzStringUtil.isNotBlank(pr.getDeviceType())) {
+            devLsCri.andDeviceIdEqualTo(pr.getDeviceType());
+        }
         if (needPaging) {
             devLsExample.setPageBegin(pr.getPageBegin());
             devLsExample.setPageSize(pr.getPageSize());

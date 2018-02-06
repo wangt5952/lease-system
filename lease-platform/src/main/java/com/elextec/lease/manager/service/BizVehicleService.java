@@ -3,6 +3,7 @@ package com.elextec.lease.manager.service;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
@@ -23,6 +24,14 @@ public interface BizVehicleService {
      * @throws BizException 查询业务异常
      */
     public PageResponse<BizVehicle> list(boolean needPaging, PageRequest pr);
+
+    /**
+     * 获得车辆列表（附带扩展信息）.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 车辆列表
+     */
+    public PageResponse<BizVehicleExt> listExtByParam(boolean needPaging, BizVehicleParam pr);
 
     /**
      * 根据中心点经纬度及半径获得相关车辆信息.

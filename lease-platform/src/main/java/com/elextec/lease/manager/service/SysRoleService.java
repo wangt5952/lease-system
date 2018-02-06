@@ -29,7 +29,7 @@ public interface SysRoleService {
      * @param pr 带条件的分页参数
      * @return 角色列表
      */
-    public PageResponse<SysRole> listExtByParam(boolean needPaging, SysRoleParam pr);
+    public PageResponse<SysRole> listByParam(boolean needPaging, SysRoleParam pr);
 
     /**
      * 批量插入角色.

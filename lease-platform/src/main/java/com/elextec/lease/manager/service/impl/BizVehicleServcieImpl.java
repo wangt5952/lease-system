@@ -5,6 +5,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
@@ -70,6 +71,33 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             presp.setRows(new ArrayList<BizVehicle>());
         } else {
             presp.setRows(resLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<BizVehicleExt> listExtByParam(boolean needPaging, BizVehicleParam pr) {
+        // 查询总记录数
+        int vehicleTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            vehicleTotal = pr.getTotal();
+        } else {
+            vehicleTotal = bizVehicleMapperExt.countExtByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizVehicleExt> vehicleLs = bizVehicleMapperExt.selectExtByParam(pr);
+        // 组织并返回结果
+        PageResponse<BizVehicleExt> presp = new PageResponse<BizVehicleExt>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(vehicleTotal);
+        if (null == vehicleLs) {
+            presp.setRows(new ArrayList<BizVehicleExt>());
+        } else {
+            presp.setRows(vehicleLs);
         }
         return presp;
     }

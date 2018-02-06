@@ -54,4 +54,57 @@
         where v.id = #{id,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectExtByParam" resultMap="BizVehicleExtResultMap" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >
+        SELECT distinct
+        a.id id,
+        a.vehicle_code vehicle_code,
+        a.vehicle_pn vehicle_pn,
+        a.vehicle_brand vehicle_brand,
+        a.vehicle_made_in vehicle_made_in,
+        a.vehicle_status vehicle_status,
+        a.create_user create_user,
+        a.create_time create_time,
+        a.update_user update_user,
+        a.update_time update_time,
+        b.mfrs_name mfrs_name
+        FROM
+        biz_vehicle a
+        LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.vehicle_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_made_in like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.mfrs_id like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="vehicleStatus != null and vehicleStatus != ''" >
+                and a.vehicle_status = #{vehicleStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+        limit #{pageBegin} , #{pageSize}
+    </select>
+
+    <select id="countExtByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >
+        SELECT count(distinct a.id)
+        FROM
+        sys_user a
+        LEFT JOIN biz_organization b ON a.org_id=b.id
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.vehicle_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_made_in like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.mfrs_id like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="vehicleStatus != null and vehicleStatus != ''" >
+                and a.vehicle_status = #{vehicleStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
 </mapper>
