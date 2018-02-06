@@ -31,7 +31,7 @@ public interface BizPartsService {
     public PageResponse<BizPartsExt> listExtByParam(boolean needPaging, BizPartsParam pr);
 
     /**
-     * 批量插入配件.
+     * 批量插入配件
      * @param partsInfos 配件信息
      */
     public void insertBizParts(List<BizParts> partsInfos);

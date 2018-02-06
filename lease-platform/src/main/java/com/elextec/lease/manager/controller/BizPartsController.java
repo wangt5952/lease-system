@@ -84,16 +84,16 @@ public class BizPartsController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            //PageRequest pagingParam = null;
+//            PageRequest pagingParam = null;
             BizPartsParam bizPartsParam = null;
             try {
                 String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
-                //pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+//                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
                 bizPartsParam = JSON.parseObject(paramStr,BizPartsParam.class);
                 if (null == bizPartsParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
+                //仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
                 if (WzStringUtil.isNotBlank(bizPartsParam.getNeedPaging()) && "false".equals(bizPartsParam.getNeedPaging().toLowerCase())) {
                     bizPartsParam.setNeedPaging("false");
                 } else {

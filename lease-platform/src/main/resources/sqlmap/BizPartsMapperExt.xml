@@ -27,6 +27,7 @@
         WHERE r.vehicle_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
     </select>
 
+	<!--查询拓展信息-->
 	<select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultMap="SysPartsExtResultMap">
 		SELECT
 		<if test="distinct">
@@ -70,6 +71,7 @@
 		limit #{pageBegin} , #{pageSize}
 	</select>
 
+	<!--查询拓展信息记录数-->
 	<select id="countExtByParam " parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
 		SELECT count(distinct a.id) FROM biz_parts a
 		LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id

@@ -68,7 +68,7 @@ public class BizPartsServiceImpl implements BizPartsService {
         // 查询总记录数
         int partsTotal = 0;
         System.err.println(pr.getTotal());
-        if (0 < pr.getTotal() && pr.getTotal()!=null) {
+        if (0 < pr.getTotal() && pr.getTotal() != null) {
             partsTotal = pr.getTotal();
         } else {
             partsTotal = bizPartsMapperExt.countExtByParam(pr);

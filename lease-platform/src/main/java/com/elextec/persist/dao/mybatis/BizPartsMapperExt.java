@@ -16,14 +16,14 @@ public interface BizPartsMapperExt extends BizPartsMapper {
     public List<BizPartsExt> getById(String id);
 
     /**
-     * 查询配件扩展信息列表.
+     * 查询配件扩展信息列表
      * @param partsParam 查询条件
      * @return 配件扩展信息列表
      */
     public List<BizPartsExt> selectExtByParam(BizPartsParam partsParam);
 
     /**
-     * 查询配件扩展信息记录数.
+     * 查询配件扩展信息记录数
      * @param partsParam 查询条件
      * @return 配件扩展信息记录数
      */
