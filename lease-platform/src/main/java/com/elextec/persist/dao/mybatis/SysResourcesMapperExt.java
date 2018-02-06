@@ -1,8 +1,7 @@
 package com.elextec.persist.dao.mybatis;
 
-import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
+import com.elextec.lease.manager.request.SysResParam;
 import com.elextec.persist.model.mybatis.SysResources;
-import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -22,4 +21,18 @@ public interface SysResourcesMapperExt extends SysResourcesMapper {
      * @param roleId 角色ID
      */
     List<SysResources> selectByRoleId(@Param("roleId") String roleId);
+
+    /**
+     * 查询资源信息列表.
+     * @param sysResParam 查询条件
+     * @return 资源信息列表
+     */
+    List<SysResources> selectByParam(SysResParam sysResParam);
+
+    /**
+     * 查询资源信息记录数.
+     * @param sysResParam 查询条件
+     * @return 资源信息记录数
+     */
+    int countByParam(SysResParam sysResParam);
 }

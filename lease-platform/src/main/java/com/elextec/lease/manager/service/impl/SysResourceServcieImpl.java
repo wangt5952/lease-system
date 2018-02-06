@@ -7,6 +7,7 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzFileUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.SysResParam;
 import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.model.SysResourcesIcon;
 import com.elextec.persist.dao.mybatis.SysResourcesMapperExt;
@@ -61,6 +62,33 @@ public class SysResourceServcieImpl implements SysResourceService {
             sysResourcesExample.setPageSize(pr.getPageSize());
         }
         List<SysResources> resLs = sysResourcesMapperExt.selectByExample(sysResourcesExample);
+        // 组织并返回结果
+        PageResponse<SysResources> presp = new PageResponse<SysResources>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(resTotal);
+        if (null == resLs) {
+            presp.setRows(new ArrayList<SysResources>());
+        } else {
+            presp.setRows(resLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<SysResources> listByParam(boolean needPaging, SysResParam pr) {
+        // 查询总记录数
+        int resTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            resTotal = pr.getTotal();
+        } else {
+            resTotal = sysResourcesMapperExt.countByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<SysResources> resLs = sysResourcesMapperExt.selectByParam(pr);
         // 组织并返回结果
         PageResponse<SysResources> presp = new PageResponse<SysResources>();
         presp.setCurrPage(pr.getCurrPage());

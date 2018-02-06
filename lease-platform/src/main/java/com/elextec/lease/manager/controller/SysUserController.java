@@ -115,7 +115,7 @@ public class SysUserController extends BaseController {
                     pagingParam.setNeedPaging("false");
                 } else {
                     if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "需要分页参数");
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
                     }
                     pagingParam.setNeedPaging("true");
                 }

@@ -91,7 +91,7 @@
         where user_id = #{userId,jdbcType=VARCHAR}
     </delete>
 
-    <select id="selectExtByParam" resultMap="BaseResultMap" parameterType="com.elextec.lease.manager.request.SysUserParam" >
+    <select id="selectExtByParam" resultMap="SysUserExtResultMap" parameterType="com.elextec.lease.manager.request.SysUserParam" >
         SELECT distinct
         a.id id,
         a.login_name login_name,

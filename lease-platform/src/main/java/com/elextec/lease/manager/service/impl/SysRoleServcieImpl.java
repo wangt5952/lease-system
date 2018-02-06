@@ -5,7 +5,9 @@ import com.elextec.framework.common.request.RefRoleResourceParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.SysRoleParam;
 import com.elextec.lease.manager.service.SysRoleService;
 import com.elextec.persist.dao.mybatis.SysRoleMapperExt;
 import com.elextec.persist.model.mybatis.SysRefRoleResourcesKey;
@@ -36,13 +38,13 @@ public class SysRoleServcieImpl implements SysRoleService {
     @Override
     public PageResponse<SysRole> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
-        int resTotal = 0;
+        int roleTotal = 0;
         if (null != pr.getTotal() && 0 < pr.getTotal()) {
-            resTotal = pr.getTotal();
+            roleTotal = pr.getTotal();
         } else {
             SysRoleExample sysRoleCountExample = new SysRoleExample();
             sysRoleCountExample.setDistinct(true);
-            resTotal = sysRoleMapperExt.countByExample(sysRoleCountExample);
+            roleTotal = sysRoleMapperExt.countByExample(sysRoleCountExample);
         }
         // 分页查询
         SysRoleExample sysRolesExample = new SysRoleExample();
@@ -51,16 +53,56 @@ public class SysRoleServcieImpl implements SysRoleService {
             sysRolesExample.setPageBegin(pr.getPageBegin());
             sysRolesExample.setPageSize(pr.getPageSize());
         }
-        List<SysRole> resLs = sysRoleMapperExt.selectByExample(sysRolesExample);
+        List<SysRole> roleLs = sysRoleMapperExt.selectByExample(sysRolesExample);
         // 组织并返回结果
         PageResponse<SysRole> presp = new PageResponse<SysRole>();
         presp.setCurrPage(pr.getCurrPage());
         presp.setPageSize(pr.getPageSize());
-        presp.setTotal(resTotal);
-        if (null == resLs) {
+        presp.setTotal(roleTotal);
+        if (null == roleLs) {
             presp.setRows(new ArrayList<SysRole>());
         } else {
-            presp.setRows(resLs);
+            presp.setRows(roleLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<SysRole> listExtByParam(boolean needPaging, SysRoleParam pr) {
+        // 查询总记录数
+        int roleTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            roleTotal = pr.getTotal();
+        } else {
+            SysRoleExample sysRoleCountExample = new SysRoleExample();
+            sysRoleCountExample.setDistinct(true);
+            if (WzStringUtil.isNotBlank(pr.getKeyStr())) {
+                SysRoleExample.Criteria sysRoleCountCri = sysRoleCountExample.createCriteria();
+                sysRoleCountCri.andRoleNameLike("%" + pr.getKeyStr() + "%");
+            }
+            roleTotal = sysRoleMapperExt.countByExample(sysRoleCountExample);
+        }
+        // 分页查询
+        SysRoleExample sysRolesExample = new SysRoleExample();
+        sysRolesExample.setDistinct(true);
+        if (WzStringUtil.isNotBlank(pr.getKeyStr())) {
+            SysRoleExample.Criteria sysRoleSelCri = sysRolesExample.createCriteria();
+            sysRoleSelCri.andRoleNameLike("%" + pr.getKeyStr() + "%");
+        }
+        if (needPaging) {
+            sysRolesExample.setPageBegin(pr.getPageBegin());
+            sysRolesExample.setPageSize(pr.getPageSize());
+        }
+        List<SysRole> roleLs = sysRoleMapperExt.selectByExample(sysRolesExample);
+        // 组织并返回结果
+        PageResponse<SysRole> presp = new PageResponse<SysRole>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(roleTotal);
+        if (null == roleLs) {
+            presp.setRows(new ArrayList<SysRole>());
+        } else {
+            presp.setRows(roleLs);
         }
         return presp;
     }

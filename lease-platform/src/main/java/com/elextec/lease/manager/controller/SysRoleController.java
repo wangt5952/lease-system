@@ -11,6 +11,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.request.SysRoleParam;
 import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.manager.service.SysRoleService;
 import com.elextec.persist.model.mybatis.SysResources;
@@ -48,8 +49,10 @@ public class SysRoleController extends BaseController {
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
-     *         currPage:当前页,
-     *         pageSize:每页记录数
+     *         keyStr:查询关键字（非必填，模糊查询，可填写角色名）,
+     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *         currPage:当前页（needPaging不为false时必填）,
+     *         pageSize:每页记录数（needPaging不为false时必填）
      *     }
      * </pre>
      * @return 查询结果列表
@@ -80,17 +83,29 @@ public class SysRoleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            PageRequest pagingParam = null;
+//            PageRequest pagingParam = null;
+            SysRoleParam pagingParam = null;
             try {
                 String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
-                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+//                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+                pagingParam = JSON.parseObject(paramStr, SysRoleParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
+                if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging())
+                        && "false".equals(pagingParam.getNeedPaging().toLowerCase())) {
+                    pagingParam.setNeedPaging("false");
+                } else {
+                    if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
+                    }
+                    pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<SysRole> rolePageResp = sysRoleService.list(true, pagingParam);
+            PageResponse<SysRole> rolePageResp = sysRoleService.list(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, rolePageResp);
             return mr;

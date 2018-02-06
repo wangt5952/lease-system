@@ -1,10 +1,9 @@
 package com.elextec.lease.manager.request;
 
 import com.elextec.framework.plugins.paging.PageRequest;
-import com.elextec.persist.field.enums.OrgAndUserType;
-import com.elextec.persist.field.enums.RecordStatus;
 
 /**
+ * 用户查询条件.
  * Created by js_gg on 2018/2/5.
  */
 public class SysUserParam extends PageRequest {
