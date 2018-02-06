@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.BizBatteryMapperExt">
-    <resultMap extends="BaseResultMap" id="SysBatteryExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizBatteryExt">
+    <resultMap extends="BaseResultMap" id="BizBatteryExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizBatteryExt">
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
     </resultMap>
-    <select id="getBatteryInfoByVehicleId" parameterType="java.lang.String" resultMap="SysBatteryExtResultMap">
+    <select id="getBatteryInfoByVehicleId" parameterType="java.lang.String" resultMap="BizBatteryExtResultMap">
         select
             b.id batteryId,
             b.battery_code,
@@ -18,5 +18,66 @@
         LEFT JOIN biz_battery b ON r.battery_id = b.id
         LEFT JOIN biz_manufacturer m ON b.mfrs_id = m.id
         where r.vehicle_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
+    </select>
+
+    <select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.BizBatteryParam" resultMap="BizBatteryExtResultMap">
+        SELECT
+        <if test="distinct">
+            distinct
+        </if>
+        a.id id,
+        a.battery_code battery_code,
+        a.battery_name battery_name,
+        a.battery_brand battery_brand,
+        a.battery_pn battery_pn,
+        a.battery_parameters battery_parameters,
+        a.mfrs_id mfrs_id,
+        a.battery_status battery_status,
+        a.create_user create_user,
+        a.create_time create_time,
+        a.update_user update_user,
+        a.update_time update_time,
+        b.mfrs_name mfrs_name
+        FROM
+        biz_battery a
+        LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.battery_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.battery_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.battery_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.battery_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.mfrs_id like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="batteryStatus != null and batteryStatus != ''" >
+                and a.battery_status = #{batteryStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by a.update_time desc,a.create_time desc,a.battery_status
+        limit #{pageBegin} , #{pageSize}
+    </select>
+
+    <select id="countExtByParam" parameterType="com.elextec.lease.manager.request.BizBatteryParam" resultType="java.lang.Integer">
+        SELECT
+        count(distinct a.id)
+        FROM
+        biz_battery a
+        LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.battery_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.battery_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.battery_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.battery_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.mfrs_id like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="batteryStatus != null and batteryStatus != ''" >
+                and a.battery_status = #{batteryStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
     </select>
 </mapper>

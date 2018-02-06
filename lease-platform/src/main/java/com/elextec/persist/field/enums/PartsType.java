@@ -5,7 +5,14 @@ package com.elextec.persist.field.enums;
  * Created by wangtao on 2018/1/16.
  */
 public enum PartsType {
-    SEATS("车座");
+    SEATS("车座"),
+    FRAME("车架"),
+    HANDLEBAR("车把"),
+    BELL("车铃"),
+    TYRE("轮胎"),
+    PEDAL("脚蹬"),
+    DASHBOARD("仪表盘");
+
 
     /** Value. */
     private final String info;

@@ -5,10 +5,12 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizBatteryParam;
 import com.elextec.lease.manager.service.BizBatteryService;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
 import com.elextec.persist.model.mybatis.BizBattery;
 import com.elextec.persist.model.mybatis.BizBatteryExample;
+import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,33 @@ public class BizBatteryServcieImpl implements BizBatteryService {
             presp.setRows(new ArrayList<BizBattery>());
         } else {
             presp.setRows(resLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<BizBatteryExt> listExt(boolean needPaging, BizBatteryParam pr) {
+        // 查询总记录数
+        int batteryTotal = 0;
+        if (0 < pr.getTotal()) {
+            batteryTotal = pr.getTotal();
+        } else {
+            batteryTotal = bizBatteryMapperExt.countExtByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizBatteryExt> batteryLs = bizBatteryMapperExt.selectExtByParam(pr);
+        // 组织并返回结果
+        PageResponse<BizBatteryExt> presp = new PageResponse<BizBatteryExt>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(batteryTotal);
+        if (null == batteryLs) {
+            presp.setRows(new ArrayList<BizBatteryExt>());
+        } else {
+            presp.setRows(batteryLs);
         }
         return presp;
     }

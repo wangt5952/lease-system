@@ -64,7 +64,7 @@
             <columnOverride column="battery_status" property="batteryStatus" javaType="com.elextec.persist.field.enums.RecordStatus" jdbcType="VARCHAR"></columnOverride>
         </table>
         <table schema="" tableName="biz_parts" domainObjectName="BizParts">
-            <columnOverride column="parts_type" property="partsType" javaType="com.elextec.persist.field.enums.MfrsType" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="parts_type" property="partsType" javaType="com.elextec.persist.field.enums.PartsType" jdbcType="VARCHAR"></columnOverride>
             <columnOverride column="parts_status" property="partsStatus" javaType="com.elextec.persist.field.enums.RecordStatus" jdbcType="VARCHAR"></columnOverride>
         </table>
         <table schema="" tableName="biz_ref_vehicle_battery" domainObjectName="BizRefVehicleBattery">
