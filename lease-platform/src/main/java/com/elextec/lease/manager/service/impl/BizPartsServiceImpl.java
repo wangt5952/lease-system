@@ -71,8 +71,6 @@ public class BizPartsServiceImpl implements BizPartsService {
             for (; i < partsInfos.size(); i++) {
                 insertVo = partsInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
-                insertVo.setPartsStatus(RecordStatus.NORMAL);
-                insertVo.setPartsType(MfrsType.VEHICLE);
                 insertVo.setCreateTime(new Date());
                 bizPartsMapperExt.insertSelective(insertVo);
             }
@@ -93,8 +91,6 @@ public class BizPartsServiceImpl implements BizPartsService {
         }
         try {
             partsInfo.setId(WzUniqueValUtil.makeUUID());
-            partsInfo.setPartsStatus(RecordStatus.NORMAL);
-            partsInfo.setPartsType(MfrsType.VEHICLE);
             partsInfo.setCreateTime(new Date());
             bizPartsMapperExt.insertSelective(partsInfo);
         } catch (Exception ex) {
