@@ -9,6 +9,8 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.service.BizOrganizationService;
+import com.elextec.persist.field.enums.OrgAndUserType;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizOrganization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,10 +162,105 @@ public class BizOrgController extends BaseController {
                 if (null == orgInfos || 0 == orgInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                BizOrganization insOrgVo = null;
+                for (int i = 0; i < orgInfos.size(); i++) {
+                    insOrgVo = orgInfos.get(i);
+                    if (WzStringUtil.isBlank(insOrgVo.getOrgCode())
+                            || WzStringUtil.isBlank(insOrgVo.getOrgName())
+                            || null == insOrgVo.getOrgType()
+                            || null == insOrgVo.getOrgStatus()
+                            || WzStringUtil.isBlank(insOrgVo.getCreateUser())
+                            || WzStringUtil.isBlank(insOrgVo.getUpdateUser())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业参数有误");
+                    }
+                    if (!insOrgVo.getOrgType().toString().equals(OrgAndUserType.PLATFORM.toString())
+                            && !insOrgVo.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
+                            && !insOrgVo.getOrgType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业类别无效");
+                    }
+                    if (!insOrgVo.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
+                            && !insOrgVo.getOrgStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !insOrgVo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业状态无效");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             bizOrganizationService.insertBizOrganization(orgInfos);
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 增加公司组织资源.
+     * @param addParam 批量新增参数JSON
+     * <pre>
+     *
+     *         {
+     *            orgCode:组织Code,
+     *            orgName:组织名称,
+     *            orgIntroduce:组织介绍,
+     *            orgAddress:组织地址,
+     *            orgContacts:联系人（多人用 , 分割）,
+     *            orgPhone:联系电话（多个电话用 , 分割）,
+     *            orgBusinessLicences:营业执照号码,
+     *            orgBusinessLicenceFront:营业执照正面照片路径,
+     *            orgBusinessLicenceBack:营业执照背面照片路径,
+     *            orgStatus:组织状态（正常、冻结、作废）,
+     *            createUser:创建人
+     *            updateUser:更新人
+     *         }
+     *
+     * </pre>
+     * @return 新增结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/addone",method = RequestMethod.POST)
+    public MessageResponse addone(@RequestBody String addParam) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(addParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            BizOrganization orgInfo = null;
+            try {
+                String paramStr = URLDecoder.decode(addParam, "utf-8");
+                orgInfo = JSON.parseObject(paramStr, BizOrganization.class);
+                if (null == orgInfo) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(orgInfo.getOrgCode())
+                        || WzStringUtil.isBlank(orgInfo.getOrgName())
+                        || null == orgInfo.getOrgType()
+                        || null == orgInfo.getOrgStatus()
+                        || WzStringUtil.isBlank(orgInfo.getCreateUser())
+                        || WzStringUtil.isBlank(orgInfo.getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "企业参数有误");
+                }
+                if (!orgInfo.getOrgType().toString().equals(OrgAndUserType.PLATFORM.toString())
+                        && !orgInfo.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
+                        && !orgInfo.getOrgType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业类别");
+                }
+                if (!orgInfo.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
+                        && !orgInfo.getOrgStatus().toString().equals(RecordStatus.FREEZE.toString())
+                        && !orgInfo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizOrganizationService.insertBizOrganization(orgInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -212,65 +309,13 @@ public class BizOrgController extends BaseController {
                 if (null == org) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-            } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
-            }
-            bizOrganizationService.updateBizOrganization(org);
-            // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
-            return mr;
-        }
-    }
-
-    /**
-     * 增加公司组织资源.
-     * @param addParam 批量新增参数JSON
-     * <pre>
-     *
-     *         {
-     *            orgCode:组织Code,
-     *            orgName:组织名称,
-     *            orgIntroduce:组织介绍,
-     *            orgAddress:组织地址,
-     *            orgContacts:联系人（多人用 , 分割）,
-     *            orgPhone:联系电话（多个电话用 , 分割）,
-     *            orgBusinessLicences:营业执照号码,
-     *            orgBusinessLicenceFront:营业执照正面照片路径,
-     *            orgBusinessLicenceBack:营业执照背面照片路径,
-     *            orgStatus:组织状态（正常、冻结、作废）,
-     *            createUser:创建人
-     *            updateUser:更新人
-     *         }
-     *
-     * </pre>
-     * @return 新增结果
-     * <pre>
-     *     {
-     *         code:返回Code,
-     *         message:返回消息,
-     *         respData:""
-     *     }
-     * </pre>
-     */
-    @RequestMapping(value = "/addone",method = RequestMethod.POST)
-    public MessageResponse addone(@RequestBody String addParam) {
-        // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(addParam)) {
-            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
-            return mr;
-        } else {
-            // 参数解析错误报“参数解析错误”
-            BizOrganization org = null;
-            try {
-                String paramStr = URLDecoder.decode(addParam, "utf-8");
-                org = JSON.parseObject(paramStr, BizOrganization.class);
-                if (null == org) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                if (WzStringUtil.isBlank(org.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.insertBizOrganization(org);
+            bizOrganizationService.updateBizOrganization(org);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

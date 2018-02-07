@@ -9,6 +9,8 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizMfrsParam;
 import com.elextec.lease.manager.service.BizManufacturerService;
+import com.elextec.persist.field.enums.MfrsType;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizManufacturer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,6 +153,27 @@ public class BizMfrsController extends BaseController {
                 if (null == mfrsInfos || 0 == mfrsInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                BizManufacturer insMfrsVo = null;
+                for (int i = 0; i < mfrsInfos.size(); i++) {
+                    insMfrsVo = mfrsInfos.get(i);
+                    if (WzStringUtil.isBlank(insMfrsVo.getMfrsName())
+                            || null == insMfrsVo.getMfrsType()
+                            || null == insMfrsVo.getMfrsStatus()
+                            || WzStringUtil.isBlank(insMfrsVo.getCreateUser())
+                            || WzStringUtil.isBlank(insMfrsVo.getUpdateUser())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录制造商参数有误");
+                    }
+                    if (!insMfrsVo.getMfrsType().toString().equals(MfrsType.VEHICLE.toString())
+                            && !insMfrsVo.getMfrsType().toString().equals(MfrsType.BATTERY.toString())
+                            && !insMfrsVo.getMfrsType().toString().equals(MfrsType.PARTS.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录制造商类别无效");
+                    }
+                    if (!insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
+                            && !insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录制造商状态无效");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -192,17 +215,34 @@ public class BizMfrsController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            BizManufacturer mfrs = null;
+            BizManufacturer mfrsInfo = null;
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
-                mfrs = JSON.parseObject(paramStr, BizManufacturer.class);
-                if (null == mfrs) {
+                mfrsInfo = JSON.parseObject(paramStr, BizManufacturer.class);
+                if (null == mfrsInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(mfrsInfo.getMfrsName())
+                        || null == mfrsInfo.getMfrsType()
+                        || null == mfrsInfo.getMfrsStatus()
+                        || WzStringUtil.isBlank(mfrsInfo.getCreateUser())
+                        || WzStringUtil.isBlank(mfrsInfo.getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "制造商参数有误");
+                }
+                if (!mfrsInfo.getMfrsType().toString().equals(MfrsType.VEHICLE.toString())
+                        && !mfrsInfo.getMfrsType().toString().equals(MfrsType.BATTERY.toString())
+                        && !mfrsInfo.getMfrsType().toString().equals(MfrsType.PARTS.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的制造商类别");
+                }
+                if (!mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
+                        && !mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
+                        && !mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的制造商状态");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizManufacturerService.insertBizManufacturers(mfrs);
+            bizManufacturerService.insertBizManufacturers(mfrsInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -246,6 +286,9 @@ public class BizMfrsController extends BaseController {
                 mfrs = JSON.parseObject(paramStr, BizManufacturer.class);
                 if (null == mfrs) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(mfrs.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
