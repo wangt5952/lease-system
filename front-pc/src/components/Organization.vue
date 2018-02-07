@@ -2,19 +2,19 @@
   <div v-loading="loading" style="padding:10px;">
 
     <div>
-      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加资源</el-button>
+      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加组织</el-button>
     </div>
 
     <el-table :data="list" style="width: 100%;margin-top:10px;">
-      <el-table-column prop="resCode" label="编码"></el-table-column>
-      <el-table-column prop="resName" label="资源名"></el-table-column>
-      <el-table-column prop="resTypeText" label="类型"></el-table-column>
-      <el-table-column prop="resUrl" label="请求URL"></el-table-column>
-      <el-table-column prop="groupSort" label="分组排序"></el-table-column>
-      <el-table-column prop="resSort" label="组内排序"></el-table-column>
-      <el-table-column prop="showFlagText" label="显示标志"></el-table-column>
-      <el-table-column prop="parent" label="上级资源"></el-table-column>
-      <el-table-column prop="level" label="级别"></el-table-column>
+      <el-table-column prop="orgCode" label="编码"></el-table-column>
+      <el-table-column prop="orgName" label="组织名称"></el-table-column>
+      <el-table-column prop="orgTypeText" label="类别"></el-table-column>
+      <el-table-column prop="orgIntroduce" label="介绍"></el-table-column>
+      <el-table-column prop="orgAddress" label="地址"></el-table-column>
+      <el-table-column prop="orgContacts" label="联系人"></el-table-column>
+      <el-table-column prop="orgPhone" label="联系电话"></el-table-column>
+      <el-table-column prop="orgBusinessLicences" label="营业执照号码"></el-table-column>
+      <el-table-column prop="orgStatusText" label="状态"></el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
@@ -35,56 +35,56 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="资源信息" :visible.sync="formVisible" :close-on-click-modal="false">
+    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form :model="form" ref="form" size="medium">
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item prop="resCode" :rules="[{required:true, message:'请填写编码'}]" label="编码">
-              <el-input v-model="form.resCode" auto-complete="off"></el-input>
+            <el-form-item prop="orgCode" :rules="[{required:true, message:'请填写编码'}]" label="编码">
+              <el-input v-model="form.orgCode" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="resName" :rules="[{required:true, message:'请填写资源名'}]" label="资源名">
-              <el-input v-model="form.resName" auto-complete="off"></el-input>
+            <el-form-item prop="orgName" :rules="[{required:true, message:'请填写组织名称'}]" label="组织名称">
+              <el-input v-model="form.orgName" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="resType" :rules="[{required:true, message:'请选择类型'}]" label="类型">
-              <el-select v-model="form.resType" placeholder="请选择类型" style="width:100%;">
+            <el-form-item prop="orgType" :rules="[{required:true, message:'请选择类型'}]" label="类型">
+              <el-select v-model="form.orgType" placeholder="请选择类型" style="width:100%;">
                 <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="请求URL">
-              <el-input v-model="form.resUrl" auto-complete="off"></el-input>
+            <el-form-item label="介绍">
+              <el-input v-model="form.orgIntroduce" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="groupSort" label="分组排序" :rules="[{required:true, message:'请填写分组排序'}]">
-              <el-input v-model="form.groupSort" auto-complete="off"></el-input>
+            <el-form-item prop="orgAddress" label="地址">
+              <el-input v-model="form.orgAddress" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="组内排序">
-              <el-input v-model="form.resSort" auto-complete="off"></el-input>
+            <el-form-item label="联系人">
+              <el-input v-model="form.orgContacts" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="resType" :rules="[{required:true, message:'请选择显示标志'}]" label="显示标志">
-              <el-select v-model="form.showFlag" placeholder="请选择显示标志" style="width:100%;">
-                <el-option v-for="o in showFlagList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+            <el-form-item label="联系电话">
+              <el-input v-model="form.orgPhone" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="营业执照号码">
+              <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="orgStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
+              <el-select v-model="form.orgStatus" placeholder="请选择状态" style="width:100%;">
+                <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="上级资源">
-              <el-input v-model="form.parent" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="level" :rules="[{required:true, message:'请填写级别'}]" label="级别">
-              <el-input v-model="form.level" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -119,14 +119,13 @@ export default {
       form: {},
 
       typeList: [
-        { id: 'CATALOG', name: '目录' },
-        { id: 'MENU', name: '菜单' },
-        { id: 'PAGE', name: '页面' },
-        { id: 'FUNCTION', name: '功能' },
+        { id: 'PLATFORM', name: '平台' },
+        { id: 'ENTERPRISE', name: '企业' },
       ],
-      showFlagList: [
-        { id: 'SHOW', name: '显示' },
-        { id: 'HIDDEN', name: '隐藏' },
+      statusList: [
+        { id: 'NORMAL', name: '正常' },
+        { id: 'FREEZE', name: '冻结/维保' },
+        { id: 'INVALID', name: '作废' },
       ],
     };
   },
@@ -159,8 +158,8 @@ export default {
         this.total = total;
         this.list = _.map(rows, o => ({
           ...o,
-          resTypeText: (_.find(this.typeList, { id: o.resType }) || { name: o.resType }).name,
-          showFlagText: (_.find(this.showFlagList, { id: o.showFlag }) || {}).name,
+          orgTypeText: (_.find(this.typeList, { id: o.orgType }) || { name: o.orgType }).name,
+          orgStatusText: (_.find(this.statusList, { id: o.orgStatus }) || { name: o.orgStatus }).name,
         }));
       } catch (e) {
         const message = e.statusText || e.message;
@@ -183,15 +182,15 @@ export default {
     showForm(form = { }) {
       this.form = _.pick(form, [
         'id',
-        'resCode',
-        'resName',
-        'resType',
-        'resUrl',
-        'groupSort',
-        'resSort',
-        'showFlag',
-        'parent',
-        'level',
+        'orgCode',
+        'orgName',
+        'orgType',
+        'orgIntroduce',
+        'orgAddress',
+        'orgContacts',
+        'orgPhone',
+        'orgBusinessLicences',
+        'orgStatus',
       ]);
       this.formVisible = true;
     },

@@ -239,7 +239,7 @@ export default {
           const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resourceIds })).body;
           if (code !== '200') throw new Error(message);
         } else {
-          const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, deleteAllFlg:true })).body;
+          const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, deleteAllFlg: true })).body;
           if (code !== '200') throw new Error(message);
         }
 
