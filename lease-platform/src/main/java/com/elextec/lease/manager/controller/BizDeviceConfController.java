@@ -147,6 +147,24 @@ public class BizDeviceConfController extends BaseController {
                 if (null == devConfInfos || 0 == devConfInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                BizDeviceConf insDevVo = null;
+                for (int i = 0; i < devConfInfos.size(); i++) {
+                    insDevVo = devConfInfos.get(i);
+                    if (WzStringUtil.isBlank(insDevVo.getDeviceId())
+                            || null == insDevVo.getDeviceType()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录设备ID及类别不能为空");
+                    }
+                    if (!insDevVo.getDeviceType().toString().equals(DeviceType.BATTERY.toString())
+                            && !insDevVo.getDeviceType().toString().equals(DeviceType.VEHICLE.toString())
+                            && !insDevVo.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录设备类别无效");
+                    }
+                    if (null == insDevVo.getPerSet()
+                            && null == insDevVo.getReset()
+                            && null == insDevVo.getRequest()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录无需更新");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -195,17 +213,17 @@ public class BizDeviceConfController extends BaseController {
                 }
                 if (WzStringUtil.isBlank(devConfInfo.getDeviceId())
                         || null == devConfInfo.getDeviceType()) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "设备ID不能为空");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "设备ID及类别不能为空");
                 }
                 if (!devConfInfo.getDeviceType().toString().equals(DeviceType.BATTERY.toString())
                         && !devConfInfo.getDeviceType().toString().equals(DeviceType.VEHICLE.toString())
                         && !devConfInfo.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的设备类别");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的设备类别");
                 }
                 if (null == devConfInfo.getPerSet()
                         && null == devConfInfo.getReset()
                         && null == devConfInfo.getRequest()) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无需更新");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无需更新");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
@@ -255,17 +273,17 @@ public class BizDeviceConfController extends BaseController {
                 }
                 if (WzStringUtil.isBlank(devConfInfo.getDeviceId())
                         || null == devConfInfo.getDeviceType()) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "设备ID不能为空");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "设备ID及类别不能为空");
                 }
                 if (!devConfInfo.getDeviceType().toString().equals(DeviceType.BATTERY.toString())
                         && !devConfInfo.getDeviceType().toString().equals(DeviceType.VEHICLE.toString())
                         && !devConfInfo.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的设备类别");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的设备类别");
                 }
                 if (null == devConfInfo.getPerSet()
                         && null == devConfInfo.getReset()
                         && null == devConfInfo.getRequest()) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无需更新");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无需更新");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
