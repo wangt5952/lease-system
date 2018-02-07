@@ -13,6 +13,7 @@ import com.elextec.lease.manager.request.SysResParam;
 import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.model.SysResourcesIcon;
 import com.elextec.persist.field.enums.ResourceType;
+import com.elextec.persist.field.enums.ShowFlag;
 import com.elextec.persist.model.mybatis.SysResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +162,30 @@ public class SysResourceController extends BaseController {
                 if (null == resInfos || 0 == resInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                SysResources insResChkVo = null;
+                for (int i = 0; i < resInfos.size(); i++) {
+                    insResChkVo = resInfos.get(i);
+                    if (WzStringUtil.isBlank(insResChkVo.getResCode())
+                            || WzStringUtil.isBlank(insResChkVo.getResName())
+                            || null == insResChkVo.getResType()
+                            || null == insResChkVo.getShowFlag()
+                            || null == insResChkVo.getLevel()
+                            || null == insResChkVo.getResSort()
+                            || null == insResChkVo.getGroupSort()
+                            || WzStringUtil.isBlank(insResChkVo.getCreateUser())
+                            || WzStringUtil.isBlank(insResChkVo.getUpdateUser())) {
+                        return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "资源参数有误");
+                    }
+                    if (!insResChkVo.getResType().toString().equals(ResourceType.CATALOG.toString())
+                            && !insResChkVo.getResType().toString().equals(ResourceType.MENU.toString())
+                            && !insResChkVo.getResType().toString().equals(ResourceType.FUNCTION.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的资源类别");
+                    }
+                    if (!insResChkVo.getShowFlag().toString().equals(ShowFlag.SHOW.toString())
+                            && !insResChkVo.getShowFlag().toString().equals(ShowFlag.HIDDEN.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的显示标志");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -219,6 +244,7 @@ public class SysResourceController extends BaseController {
                 if (WzStringUtil.isBlank(resInfo.getResCode())
                         || WzStringUtil.isBlank(resInfo.getResName())
                         || null == resInfo.getResType()
+                        || null == resInfo.getShowFlag()
                         || null == resInfo.getLevel()
                         || null == resInfo.getResSort()
                         || null == resInfo.getGroupSort()
@@ -230,6 +256,10 @@ public class SysResourceController extends BaseController {
                         && !resInfo.getResType().toString().equals(ResourceType.MENU.toString())
                         && !resInfo.getResType().toString().equals(ResourceType.FUNCTION.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的资源类别");
+                }
+                if (!resInfo.getShowFlag().toString().equals(ShowFlag.SHOW.toString())
+                        && !resInfo.getShowFlag().toString().equals(ShowFlag.HIDDEN.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的显示标志");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
@@ -286,7 +316,7 @@ public class SysResourceController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 if (WzStringUtil.isBlank(resInfo.getId())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);

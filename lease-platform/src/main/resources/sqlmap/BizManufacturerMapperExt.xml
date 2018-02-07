@@ -40,7 +40,7 @@
         limit #{pageBegin} , #{pageSize}
     </select>
 
-    <select id="countByParam " parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
+    <select id="countByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
         SELECT count(distinct a.id) FROM biz_manufacturer b
         <where>
             1=1
