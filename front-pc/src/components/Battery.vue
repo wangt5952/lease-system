@@ -170,7 +170,7 @@ export default {
 
     showForm(form = { }) {
       const $form = this.$refs.form;
-      if($form) $form.resetFields();
+      if ($form) $form.resetFields();
       this.form = _.pick(form, [
         'id',
         'batteryCode',

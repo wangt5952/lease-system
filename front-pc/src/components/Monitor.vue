@@ -39,7 +39,7 @@
         <div style="flex:1;background:#fff;margin-left:10px;">
           可用车辆
           <div>
-            <img src="/static/half-ring.png" style="background:#e9457d;"/>
+            <img src="/static/half-ring-1.png" style="background:#e9457d;"/>
           </div>
         </div>
         <div style="flex:1;background:#fff;margin-left:10px;">待修车辆

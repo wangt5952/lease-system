@@ -235,7 +235,7 @@ export default {
         const { id } = this.assignResForm;
 
         const resourceIds = this.$refs.resTree.getCheckedKeys().join(',');
-        if (resourceIds){
+        if (resourceIds) {
           const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resourceIds })).body;
           if (code !== '200') throw new Error(message);
         } else {
