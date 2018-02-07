@@ -5,6 +5,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizMfrsParam;
 import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
 import com.elextec.persist.field.enums.MfrsType;
@@ -58,6 +59,33 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
             presp.setRows(new ArrayList<BizManufacturer>());
         } else {
             presp.setRows(mfrsLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<BizManufacturer> listByParam(boolean needPaging, BizMfrsParam pr) {
+        // 查询总记录数
+        int resTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            resTotal = pr.getTotal();
+        } else {
+            resTotal = bizManufacturerMapperExt.countByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizManufacturer> resLs = bizManufacturerMapperExt.selectByParam(pr);
+        // 组织并返回结果
+        PageResponse<BizManufacturer> presp = new PageResponse<BizManufacturer>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(resTotal);
+        if (null == resLs) {
+            presp.setRows(new ArrayList<BizManufacturer>());
+        } else {
+            presp.setRows(resLs);
         }
         return presp;
     }

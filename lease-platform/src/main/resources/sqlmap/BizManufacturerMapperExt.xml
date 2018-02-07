@@ -6,4 +6,57 @@
         SELECT * FROM biz_manufacturer WHERE mfrs_name = #{mfrsName,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectByParam" parameterType="com.elextec.lease.manager.request.BizMfrsParam" resultMap="BaseResultMap">
+        SELECT distinct
+        b.id,
+        b.mfrs_name,
+        b.mfrs_type,
+        b.mfrs_introduce,
+        b.mfrs_address,
+        b.mfrs_contacts,
+        b.mfrs_phone,
+        b.mfrs_status,
+        b.create_user,
+        b.create_time,
+        b.update_user,
+        b.update_time
+        FROM biz_manufacturer b
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                AND (b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_introduce LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_address LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_contacts LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_phone LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_status LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="partsType != null and partsType != ''" >
+                AND a.mfrs_type = #{partsType,jdbcType=VARCHAR}
+            </if>
+        </where>
+        ORDER BY a.update_time DESC,a.create_time DESC
+        limit #{pageBegin} , #{pageSize}
+    </select>
+
+    <select id="countByParam " parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
+        SELECT count(distinct a.id) FROM biz_manufacturer b
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                AND (b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_introduce LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_address LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_contacts LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_phone LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                OR b.mfrs_status LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="partsType != null and partsType != ''" >
+                AND a.mfrs_type = #{partsType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
 </mapper>
