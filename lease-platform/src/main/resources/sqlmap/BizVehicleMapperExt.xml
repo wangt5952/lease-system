@@ -61,6 +61,7 @@
         a.vehicle_pn vehicle_pn,
         a.vehicle_brand vehicle_brand,
         a.vehicle_made_in vehicle_made_in,
+        a.mfrs_id mfrs_id,
         a.vehicle_status vehicle_status,
         a.create_user create_user,
         a.create_time create_time,

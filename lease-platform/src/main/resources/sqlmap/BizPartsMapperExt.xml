@@ -72,7 +72,7 @@
 	</select>
 
 	<!--查询拓展信息记录数-->
-	<select id="countExtByParam " parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
+	<select id="countExtByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
 		SELECT count(distinct a.id) FROM biz_parts a
 		LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
 		<where>

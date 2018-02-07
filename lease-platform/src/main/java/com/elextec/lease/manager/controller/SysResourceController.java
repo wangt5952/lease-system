@@ -229,7 +229,7 @@ public class SysResourceController extends BaseController {
                 if (!resInfo.getResType().toString().equals(ResourceType.CATALOG.toString())
                         && !resInfo.getResType().toString().equals(ResourceType.MENU.toString())
                         && !resInfo.getResType().toString().equals(ResourceType.FUNCTION.toString())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的资源类别");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的资源类别");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);

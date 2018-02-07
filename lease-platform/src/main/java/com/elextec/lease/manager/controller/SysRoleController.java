@@ -147,7 +147,7 @@ public class SysRoleController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(addParam, "utf-8");
                 roleInfos = JSON.parseArray(paramStr, SysRole.class);
-                if (null == roleInfos) {
+                if (null == roleInfos || 0 == roleInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
