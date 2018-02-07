@@ -3,6 +3,7 @@ package com.elextec.lease.manager.service;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.SysResParam;
 import com.elextec.lease.model.SysResourcesIcon;
 import com.elextec.persist.model.mybatis.SysResources;
 
@@ -21,6 +22,14 @@ public interface SysResourceService {
      * @throws BizException 查询业务异常
      */
     public PageResponse<SysResources> list(boolean needPaging, PageRequest pr);
+
+    /**
+     * 获得资源列表.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 资源列表
+     */
+    public PageResponse<SysResources> listByParam(boolean needPaging, SysResParam pr);
 
     /**
      * 批量插入资源.

@@ -3,7 +3,9 @@ package com.elextec.lease.manager.service;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.BizBatteryParam;
 import com.elextec.persist.model.mybatis.BizBattery;
+import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 
 import java.util.List;
 
@@ -16,15 +18,21 @@ public interface BizBatteryService {
      * 获得电池列表.
      * @param needPaging 是否需要分页
      * @param pr 分页参数
-     * @return 用户列表
-     * @throws BizException 查询业务异常
+     * @return 电池列表
      */
     public PageResponse<BizBattery> list(boolean needPaging, PageRequest pr);
 
     /**
+     * 获得电池列表（附带扩展信息）.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 电池列表
+     */
+    public PageResponse<BizBatteryExt> listExtByParam(boolean needPaging, BizBatteryParam pr);
+
+    /**
      * 批量插入电池.
      * @param batteryInfos 电池信息
-     * @throws BizException 插入时异常，异常时全部数据回滚，日志记录出错记录号
      */
     public void insertBatterys(List<BizBattery> batteryInfos);
 

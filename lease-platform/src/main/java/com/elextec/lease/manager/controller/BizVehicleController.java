@@ -5,12 +5,13 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.persist.model.mybatis.BizVehicle;
+import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +37,15 @@ public class BizVehicleController extends BaseController {
     private BizVehicleService bizVehicleService;
 
     /**
-     * 查询车辆
+     * 查询车辆.
      * @param paramAndPaging 分页参数JSON
      * <pre>
      *     {
-     *         currPage:当前页,
-     *         pageSize:每页记录数
+     *         keyStr:查询关键字（非必填，模糊查询，可填写车辆编号、车辆型号、车辆品牌、车辆产地、生产商ID、生产商名）,
+     *         vehicleStatus:车辆状态（非必填，包括NORMAL、FREEZE、INVALID）,
+     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *         currPage:当前页（needPaging不为false时必填）,
+     *         pageSize:每页记录数（needPaging不为false时必填）
      *     }
      * </pre>
      * @return 车辆列表
@@ -57,6 +61,7 @@ public class BizVehicleController extends BaseController {
      *                 vehicleBrand:车辆品牌,
      *                 vehicleMadeIn:车辆产地,
      *                 mfrsId:生产商ID,
+     *                 mfrsName:生产商名,
      *                 vehicleStatus:车辆状态（正常、冻结、报废）,
      *                 createUser:创建人,
      *                 createTime:创建时间,
@@ -76,17 +81,30 @@ public class BizVehicleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            PageRequest pagingParam = null;
+//            PageRequest pagingParam = null;
+            BizVehicleParam pagingParam = null;
             try {
                 String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
-                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+//                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+                pagingParam = JSON.parseObject(paramStr, BizVehicleParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
+                if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging())
+                        && "false".equals(pagingParam.getNeedPaging().toLowerCase())) {
+                    pagingParam.setNeedPaging("false");
+                } else {
+                    if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
+                    }
+                    pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<BizVehicle> vehiclePageResp = bizVehicleService.list(true, pagingParam);
+//            PageResponse<BizVehicle> vehiclePageResp = bizVehicleService.list(true, pagingParam);
+            PageResponse<BizVehicleExt> vehiclePageResp = bizVehicleService.listExtByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, vehiclePageResp);
             return mr;

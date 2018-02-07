@@ -5,7 +5,9 @@ import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
@@ -13,7 +15,6 @@ import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
 import com.elextec.persist.dao.mybatis.SysUserMapperExt;
 import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
-import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
@@ -35,6 +36,7 @@ import java.util.List;
  */
 @Service
 public class SysUserServcieImpl implements SysUserService {
+
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SysUserServcieImpl.class);
 
@@ -51,33 +53,60 @@ public class SysUserServcieImpl implements SysUserService {
     private BizPartsMapperExt bizPartsMapperExt;
 
     @Override
-    public PageResponse<SysUser> list(boolean needPaging, PageRequest pr) {
+    public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr) {
         // 查询总记录数
-        int resTotal = 0;
-        if (0 < pr.getTotal()) {
-            resTotal = pr.getTotal();
+        int userTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            userTotal = pr.getTotal();
         } else {
             SysUserExample sysUserCountExample = new SysUserExample();
             sysUserCountExample.setDistinct(true);
-            resTotal = sysUserMapperExt.countByExample(sysUserCountExample);
+            userTotal = sysUserMapperExt.countByExample(sysUserCountExample);
         }
         // 分页查询
-        SysUserExample sysUsersExample = new SysUserExample();
-        sysUsersExample.setDistinct(true);
+        SysUserExample sysUserLsExample = new SysUserExample();
+        sysUserLsExample.setDistinct(true);
         if (needPaging) {
-            sysUsersExample.setPageBegin(pr.getPageBegin());
-            sysUsersExample.setPageSize(pr.getPageSize());
+            sysUserLsExample.setPageBegin(pr.getPageBegin());
+            sysUserLsExample.setPageSize(pr.getPageSize());
         }
-        List<SysUser> resLs = sysUserMapperExt.selectByExample(sysUsersExample);
+        List<SysUserExt> userLs = sysUserMapperExt.selectExtByExample(sysUserLsExample);
         // 组织并返回结果
-        PageResponse<SysUser> presp = new PageResponse<SysUser>();
+        PageResponse<SysUserExt> presp = new PageResponse<SysUserExt>();
         presp.setCurrPage(pr.getCurrPage());
         presp.setPageSize(pr.getPageSize());
-        presp.setTotal(resTotal);
-        if (null == resLs) {
-            presp.setRows(new ArrayList<SysUser>());
+        presp.setTotal(userTotal);
+        if (null == userLs) {
+            presp.setRows(new ArrayList<SysUserExt>());
         } else {
-            presp.setRows(resLs);
+            presp.setRows(userLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<SysUserExt> listExtByParam(boolean needPaging, SysUserParam pr) {
+        // 查询总记录数
+        int userTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            userTotal = pr.getTotal();
+        } else {
+            userTotal = sysUserMapperExt.countExtByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<SysUserExt> userLs = sysUserMapperExt.selectExtByParam(pr);
+        // 组织并返回结果
+        PageResponse<SysUserExt> presp = new PageResponse<SysUserExt>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(userTotal);
+        if (null == userLs) {
+            presp.setRows(new ArrayList<SysUserExt>());
+        } else {
+            presp.setRows(userLs);
         }
         return presp;
     }

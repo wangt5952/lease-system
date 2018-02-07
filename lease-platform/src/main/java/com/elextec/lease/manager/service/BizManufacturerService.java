@@ -2,6 +2,7 @@ package com.elextec.lease.manager.service;
 
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.BizMfrsParam;
 import com.elextec.persist.model.mybatis.BizManufacturer;
 
 import java.util.List;
@@ -19,6 +20,14 @@ public interface BizManufacturerService {
      * @return 制造商列表
      */
     public PageResponse<BizManufacturer> list(boolean needPaging, PageRequest pr);
+
+    /**
+     * 获得制造商列表
+     * @param needPaging 是否需要分页
+     * @param pr 分页参数
+     * @return 制造商列表
+     */
+    public PageResponse<BizManufacturer> listByParam(boolean needPaging, BizMfrsParam pr);
 
     /**
      * 批量插入制造商.

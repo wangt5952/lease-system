@@ -1,16 +1,17 @@
 package com.elextec.lease.manager.service.impl;
 
 import com.elextec.framework.common.constants.RunningResult;
-import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizMfrsParam;
 import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
 import com.elextec.persist.field.enums.MfrsType;
 import com.elextec.persist.field.enums.RecordStatus;
-import com.elextec.persist.model.mybatis.*;
+import com.elextec.persist.model.mybatis.BizManufacturer;
+import com.elextec.persist.model.mybatis.BizManufacturerExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     public PageResponse<BizManufacturer> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int mfrsTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             mfrsTotal = pr.getTotal();
         } else {
             BizManufacturerExample bizManufacturerCountExample = new BizManufacturerExample();
@@ -58,6 +59,33 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
             presp.setRows(new ArrayList<BizManufacturer>());
         } else {
             presp.setRows(mfrsLs);
+        }
+        return presp;
+    }
+
+    @Override
+    public PageResponse<BizManufacturer> listByParam(boolean needPaging, BizMfrsParam pr) {
+        // 查询总记录数
+        int resTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            resTotal = pr.getTotal();
+        } else {
+            resTotal = bizManufacturerMapperExt.countByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizManufacturer> resLs = bizManufacturerMapperExt.selectByParam(pr);
+        // 组织并返回结果
+        PageResponse<BizManufacturer> presp = new PageResponse<BizManufacturer>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(resTotal);
+        if (null == resLs) {
+            presp.setRows(new ArrayList<BizManufacturer>());
+        } else {
+            presp.setRows(resLs);
         }
         return presp;
     }

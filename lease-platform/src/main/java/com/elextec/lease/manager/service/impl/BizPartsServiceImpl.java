@@ -5,12 +5,12 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizPartsParam;
 import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
-import com.elextec.persist.field.enums.MfrsType;
-import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizParts;
 import com.elextec.persist.model.mybatis.BizPartsExample;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class BizPartsServiceImpl implements BizPartsService {
     public PageResponse<BizParts> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int mfrsTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             mfrsTotal = pr.getTotal();
         } else {
             BizPartsExample bizPartsExample = new BizPartsExample();
@@ -63,6 +63,33 @@ public class BizPartsServiceImpl implements BizPartsService {
     }
 
     @Override
+    public PageResponse<BizPartsExt> listExtByParam(boolean needPaging, BizPartsParam pr) {
+        // 查询总记录数
+        int partsTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            partsTotal = pr.getTotal();
+        } else {
+            partsTotal = bizPartsMapperExt.countExtByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizPartsExt> partsLs = bizPartsMapperExt.selectExtByParam(pr);
+        // 组织并返回结果
+        PageResponse<BizPartsExt> partsesp = new PageResponse<BizPartsExt>();
+        partsesp.setCurrPage(pr.getCurrPage());
+        partsesp.setPageSize(pr.getPageSize());
+        partsesp.setTotal(partsTotal);
+        if (null == partsLs) {
+            partsesp.setRows(new ArrayList<BizPartsExt>());
+        } else {
+            partsesp.setRows(partsLs);
+        }
+        return partsesp;
+    }
+
+    @Override
     @Transactional
     public void insertBizParts(List<BizParts> partsInfos) {
         int i = 0;
@@ -71,8 +98,6 @@ public class BizPartsServiceImpl implements BizPartsService {
             for (; i < partsInfos.size(); i++) {
                 insertVo = partsInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
-                insertVo.setPartsStatus(RecordStatus.NORMAL);
-                insertVo.setPartsType(MfrsType.VEHICLE);
                 insertVo.setCreateTime(new Date());
                 bizPartsMapperExt.insertSelective(insertVo);
             }
@@ -93,8 +118,6 @@ public class BizPartsServiceImpl implements BizPartsService {
         }
         try {
             partsInfo.setId(WzUniqueValUtil.makeUUID());
-            partsInfo.setPartsStatus(RecordStatus.NORMAL);
-            partsInfo.setPartsType(MfrsType.VEHICLE);
             partsInfo.setCreateTime(new Date());
             bizPartsMapperExt.insertSelective(partsInfo);
         } catch (Exception ex) {

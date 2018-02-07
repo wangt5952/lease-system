@@ -5,12 +5,18 @@ package com.elextec.framework.plugins.paging;
  * Created by wangtao on 2017/10/19.
  */
 public class PageRequest {
+    private static final Integer DEF_CURR_PAGE = 1;
+    private static final Integer DEF_PAGE_SIZE = 10;
     /** 当前页码（第一页为1）. */
-    private int currPage;
+    private Integer currPage;
     /** 每页显示记录条数. */
-    private int pageSize;
+    private Integer pageSize;
     /** 总记录数. */
-    private int total;
+    private Integer total;
+    /** 当页首记录下标. */
+    private Integer pageBegin;
+    /** 是否需要进行分页. */
+    private String needPaging;
 
     /**
      * 返回当前页首条记录下标.
@@ -31,37 +37,72 @@ public class PageRequest {
      * @return 当前页首条记录的下标
      */
     public int getPageBegin() {
-        if (0 >= this.currPage){
-            return 0;
+        if (null == currPage || 0 >= currPage){
+            this.pageBegin = 0;
         } else {
-            return (this.currPage - 1) * this.pageSize;
+            this.pageBegin =  (currPage - 1) * pageSize;
         }
+        return pageBegin;
     }
 
     /*
         以下为Getter和Setter方法.
      */
-    public int getCurrPage() {
+    public Integer getCurrPage() {
+        if (null == currPage) {
+            return DEF_CURR_PAGE;
+        }
         return currPage;
     }
 
-    public void setCurrPage(int currPage) {
-        this.currPage = currPage;
+    public void setCurrPage(Integer currPage) {
+        if (null == currPage) {
+            this.currPage = DEF_CURR_PAGE;
+        } else {
+            this.currPage = currPage;
+        }
     }
 
-    public int getPageSize() {
+    public Integer getPageSize() {
+        if (null == pageSize) {
+            return DEF_PAGE_SIZE;
+        }
         return pageSize;
     }
 
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
+    public void setPageSize(Integer pageSize) {
+        if (null == pageSize) {
+            this.pageSize = DEF_PAGE_SIZE;
+        } else {
+            this.pageSize = pageSize;
+        }
     }
 
-    public int getTotal() {
+    public Integer getTotal() {
         return total;
     }
 
-    public void setTotal(int total) {
+    public void setTotal(Integer total) {
         this.total = total;
+    }
+
+    public void setPageBegin(Integer pageBegin) {
+        this.pageBegin = pageBegin;
+    }
+
+    public void setPageBegin() {
+        if (0 >= this.currPage){
+            this.pageBegin =  0;
+        } else {
+            this.pageBegin = (this.currPage - 1) * this.pageSize;
+        }
+    }
+
+    public String getNeedPaging() {
+        return needPaging;
+    }
+
+    public void setNeedPaging(String needPaging) {
+        this.needPaging = needPaging;
     }
 }

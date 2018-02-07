@@ -5,6 +5,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.service.BizOrganizationService;
 import com.elextec.persist.dao.mybatis.BizOrganizationMapperExt;
 import com.elextec.persist.field.enums.OrgAndUserType;
@@ -34,7 +35,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     public PageResponse<BizOrganization> list(boolean needPaging, PageRequest pr) {
         // 查询总记录数
         int mfrsTotal = 0;
-        if (0 < pr.getTotal()) {
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
             mfrsTotal = pr.getTotal();
         } else {
             BizOrganizationExample bizOrganizationExample = new BizOrganizationExample();
@@ -60,6 +61,33 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
             presp.setRows(mfrsLs);
         }
         return presp;
+    }
+
+    @Override
+    public PageResponse<BizOrganization> listByParam(boolean needPaging, BizOrganizationParam pr) {
+        // 查询总记录数
+        int orgTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            orgTotal = pr.getTotal();
+        } else {
+            orgTotal = bizOrganizationMapperExt.countByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizOrganization> partsLs = bizOrganizationMapperExt.selectByParam(pr);
+        // 组织并返回结果
+        PageResponse<BizOrganization> partsesp = new PageResponse<BizOrganization>();
+        partsesp.setCurrPage(pr.getCurrPage());
+        partsesp.setPageSize(pr.getPageSize());
+        partsesp.setTotal(orgTotal);
+        if (null == partsLs) {
+            partsesp.setRows(new ArrayList<BizOrganization>());
+        } else {
+            partsesp.setRows(partsLs);
+        }
+        return partsesp;
     }
 
     @Override

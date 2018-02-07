@@ -1,6 +1,6 @@
 package com.elextec.persist.model.mybatis;
 
-import com.elextec.persist.field.enums.MfrsType;
+import com.elextec.persist.field.enums.PartsType;
 import com.elextec.persist.field.enums.RecordStatus;
 import java.util.ArrayList;
 import java.util.Date;
@@ -613,62 +613,62 @@ public class BizPartsExample {
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeEqualTo(MfrsType value) {
+        public Criteria andPartsTypeEqualTo(PartsType value) {
             addCriterion("parts_type =", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeNotEqualTo(MfrsType value) {
+        public Criteria andPartsTypeNotEqualTo(PartsType value) {
             addCriterion("parts_type <>", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeGreaterThan(MfrsType value) {
+        public Criteria andPartsTypeGreaterThan(PartsType value) {
             addCriterion("parts_type >", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeGreaterThanOrEqualTo(MfrsType value) {
+        public Criteria andPartsTypeGreaterThanOrEqualTo(PartsType value) {
             addCriterion("parts_type >=", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeLessThan(MfrsType value) {
+        public Criteria andPartsTypeLessThan(PartsType value) {
             addCriterion("parts_type <", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeLessThanOrEqualTo(MfrsType value) {
+        public Criteria andPartsTypeLessThanOrEqualTo(PartsType value) {
             addCriterion("parts_type <=", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeLike(MfrsType value) {
+        public Criteria andPartsTypeLike(PartsType value) {
             addCriterion("parts_type like", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeNotLike(MfrsType value) {
+        public Criteria andPartsTypeNotLike(PartsType value) {
             addCriterion("parts_type not like", value, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeIn(List<MfrsType> values) {
+        public Criteria andPartsTypeIn(List<PartsType> values) {
             addCriterion("parts_type in", values, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeNotIn(List<MfrsType> values) {
+        public Criteria andPartsTypeNotIn(List<PartsType> values) {
             addCriterion("parts_type not in", values, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeBetween(MfrsType value1, MfrsType value2) {
+        public Criteria andPartsTypeBetween(PartsType value1, PartsType value2) {
             addCriterion("parts_type between", value1, value2, "partsType");
             return (Criteria) this;
         }
 
-        public Criteria andPartsTypeNotBetween(MfrsType value1, MfrsType value2) {
+        public Criteria andPartsTypeNotBetween(PartsType value1, PartsType value2) {
             addCriterion("parts_type not between", value1, value2, "partsType");
             return (Criteria) this;
         }

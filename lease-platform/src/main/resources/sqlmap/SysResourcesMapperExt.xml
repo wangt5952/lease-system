@@ -47,4 +47,44 @@
         ORDER BY
         a.group_sort, a.level, a.res_sort
     </select>
+
+    <select id="selectByParam" resultMap="BaseResultMap" parameterType="com.elextec.lease.manager.request.SysResParam" >
+        SELECT distinct
+        <include refid="Base_Column_List" />
+        FROM
+        sys_resources
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (res_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or res_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="resType != null and resType != ''" >
+                and res_type = #{resType,jdbcType=VARCHAR}
+            </if>
+            <if test="showFlg != null and showFlg != ''" >
+                and show_flag = #{showFlg,jdbcType=VARCHAR}
+            </if>
+        </where>
+        limit #{pageBegin} , #{pageSize}
+    </select>
+
+    <select id="countByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.SysResParam" >
+        SELECT count(distinct id)
+        FROM
+        sys_resources
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (res_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or res_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="resType != null and resType != ''" >
+                and res_type = #{resType,jdbcType=VARCHAR}
+            </if>
+            <if test="showFlg != null and showFlg != ''" >
+                and show_flag = #{showFlg,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
 </mapper>

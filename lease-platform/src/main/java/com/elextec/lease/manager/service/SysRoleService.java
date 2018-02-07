@@ -4,6 +4,7 @@ import com.elextec.framework.common.request.RefRoleResourceParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.SysRoleParam;
 import com.elextec.persist.model.mybatis.SysRole;
 
 import java.util.List;
@@ -21,6 +22,14 @@ public interface SysRoleService {
      * @throws BizException 查询业务异常
      */
     public PageResponse<SysRole> list(boolean needPaging, PageRequest pr);
+
+    /**
+     * 获得角色列表.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 角色列表
+     */
+    public PageResponse<SysRole> listByParam(boolean needPaging, SysRoleParam pr);
 
     /**
      * 批量插入角色.
