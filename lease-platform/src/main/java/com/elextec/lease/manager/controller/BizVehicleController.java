@@ -10,6 +10,7 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import org.slf4j.Logger;
@@ -170,6 +171,31 @@ public class BizVehicleController extends BaseController {
                 if (null == vehicleInfos || 0 == vehicleInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                VehicleBatteryParam insResChkVo = null;
+                for (int i = 0; i < vehicleInfos.size(); i++) {
+                    insResChkVo = vehicleInfos.get(i);
+                    if (WzStringUtil.isBlank(insResChkVo.getFlag())
+                            || WzStringUtil.isBlank(insResChkVo.getBizVehicleInfo().getVehicleCode())
+                            || null == insResChkVo.getBizVehicleInfo().getVehicleStatus()
+                            || WzStringUtil.isBlank(insResChkVo.getBizVehicleInfo().getCreateUser())
+                            || WzStringUtil.isBlank(insResChkVo.getBizVehicleInfo().getUpdateUser())
+                            || WzStringUtil.isBlank(insResChkVo.getBatteryInfo().getBatteryCode())
+                            || null == insResChkVo.getBatteryInfo().getBatteryStatus()
+                            || WzStringUtil.isBlank(insResChkVo.getBatteryInfo().getCreateUser())
+                            || WzStringUtil.isBlank(insResChkVo.getBatteryInfo().getUpdateUser())) {
+                        return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "车辆信息参数有误");
+                    }
+                    if (!insResChkVo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !insResChkVo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.INVALID.toString())
+                            && !insResChkVo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的车辆状态");
+                    }
+                    if (!insResChkVo.getBatteryInfo().getBatteryStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !insResChkVo.getBatteryInfo().getBatteryStatus().toString().equals(RecordStatus.INVALID.toString())
+                            && !insResChkVo.getBatteryInfo().getBatteryStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -239,6 +265,27 @@ public class BizVehicleController extends BaseController {
                 if (null == vechcleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                if (WzStringUtil.isBlank(vechcleInfo.getFlag())
+                        || WzStringUtil.isBlank(vechcleInfo.getBizVehicleInfo().getVehicleCode())
+                        || null == vechcleInfo.getBizVehicleInfo().getVehicleStatus()
+                        || WzStringUtil.isBlank(vechcleInfo.getBizVehicleInfo().getCreateUser())
+                        || WzStringUtil.isBlank(vechcleInfo.getBizVehicleInfo().getUpdateUser())
+                        || WzStringUtil.isBlank(vechcleInfo.getBatteryInfo().getBatteryCode())
+                        || null == vechcleInfo.getBatteryInfo().getBatteryStatus()
+                        || WzStringUtil.isBlank(vechcleInfo.getBatteryInfo().getCreateUser())
+                        || WzStringUtil.isBlank(vechcleInfo.getBatteryInfo().getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "车辆信息参数有误");
+                }
+                if (!vechcleInfo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.FREEZE.toString())
+                        && !vechcleInfo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.INVALID.toString())
+                        && !vechcleInfo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的车辆状态");
+                }
+                if (!vechcleInfo.getBatteryInfo().getBatteryStatus().toString().equals(RecordStatus.FREEZE.toString())
+                        && !vechcleInfo.getBatteryInfo().getBatteryStatus().toString().equals(RecordStatus.INVALID.toString())
+                        && !vechcleInfo.getBatteryInfo().getBatteryStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -289,6 +336,9 @@ public class BizVehicleController extends BaseController {
                 vehicleInfo = JSON.parseObject(paramStr, BizVehicle.class);
                 if (null == vehicleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(vehicleInfo.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);

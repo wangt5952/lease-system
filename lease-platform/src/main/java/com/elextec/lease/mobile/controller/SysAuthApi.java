@@ -586,8 +586,8 @@ public class SysAuthApi extends BaseController {
                         userTemp.setUserName(resetParam.getUserName());
                         userTemp.setUpdateUser(resetParam.getUpdateUser());
                         //判断用户是否已实名认证，如果已实名认证，则不可修改身份证号码
-                        if(!RealNameAuthFlag.AUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo()) &&
-                                 !RealNameAuthFlag.TOAUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo())){
+                        if(!RealNameAuthFlag.AUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString()) &&
+                                 !RealNameAuthFlag.TOAUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString())){
                              //用户不是已认证或待认证状态，可以更改用户身份证号
                              userTemp.setUserPid(resetParam.getUserPid());
                         }else{
@@ -724,8 +724,8 @@ public class SysAuthApi extends BaseController {
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在");
                         }
                         //如果用户是已实名认证或待验证的状态，则不可更改信息
-                        if(RealNameAuthFlag.AUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo()) ||
-                                RealNameAuthFlag.TOAUTHORIZED.equals(userTemp.getUserRealNameAuthFlag().getInfo())){
+                        if(RealNameAuthFlag.AUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString()) ||
+                                RealNameAuthFlag.TOAUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString())){
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户已实名认证或待验证中");
                         }
                         //用户的身份证号与照片信息不可为空

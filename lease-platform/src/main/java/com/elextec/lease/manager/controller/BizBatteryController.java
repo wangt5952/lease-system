@@ -9,6 +9,7 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizBatteryParam;
 import com.elextec.lease.manager.service.BizBatteryService;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizBattery;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import org.slf4j.Logger;
@@ -153,6 +154,21 @@ public class BizBatteryController extends BaseController {
                 if (null == batteryInfos || 0 == batteryInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                BizBattery insResChkVo = null;
+                for (int i = 0; i < batteryInfos.size(); i++) {
+                    insResChkVo = batteryInfos.get(i);
+                    if (WzStringUtil.isBlank(insResChkVo.getBatteryCode())
+                            || null == insResChkVo.getBatteryStatus()
+                            || WzStringUtil.isBlank(insResChkVo.getCreateUser())
+                            || WzStringUtil.isBlank(insResChkVo.getUpdateUser())) {
+                        return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "电池信息参数有误");
+                    }
+                    if (!insResChkVo.getBatteryStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !insResChkVo.getBatteryStatus().toString().equals(RecordStatus.INVALID.toString())
+                            && !insResChkVo.getBatteryStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -202,6 +218,17 @@ public class BizBatteryController extends BaseController {
                 batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
                 if (null == batteryInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(batteryInfo.getBatteryCode())
+                        || null == batteryInfo.getBatteryStatus()
+                        || WzStringUtil.isBlank(batteryInfo.getCreateUser())
+                        || WzStringUtil.isBlank(batteryInfo.getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "电池信息参数有误");
+                }
+                if (!batteryInfo.getBatteryStatus().toString().equals(RecordStatus.FREEZE.toString())
+                        && !batteryInfo.getBatteryStatus().toString().equals(RecordStatus.INVALID.toString())
+                        && !batteryInfo.getBatteryStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
