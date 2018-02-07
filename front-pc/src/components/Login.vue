@@ -11,10 +11,10 @@
           </div>
           <el-form ref="form" :model="form" style="margin-top:40px;" >
             <el-form-item>
-              <el-input prefix-icon="lt lt-my" size="medium" v-model="form.loginName" placeholder="用户名"></el-input>
+              <el-input prefix-icon="lt lt-my" size="medium" v-model="form.loginName" placeholder="用户名" @keyup.enter.native="$refs.pwd.focus()"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-input prefix-icon="lt lt-lock" size="medium" v-model="form.password" type="password" placeholder="密码"></el-input>
+              <el-input ref="pwd" prefix-icon="lt lt-lock" size="medium" v-model="form.password" type="password" placeholder="密码" @keyup.enter.native="handleSubmit"></el-input>
             </el-form-item>
 
             <div style="cursor:pointer;background:#fff;border:2px solid #000;margin:40px 20px;text-align:center;padding:10px;border-radius:3px;" @click="handleSubmit" >登录</div>
