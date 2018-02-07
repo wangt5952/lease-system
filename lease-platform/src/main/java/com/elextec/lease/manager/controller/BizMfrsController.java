@@ -8,6 +8,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.manager.request.BizMfrsParam;
 import com.elextec.lease.manager.service.BizManufacturerService;
 import com.elextec.persist.model.mybatis.BizManufacturer;
 import org.slf4j.Logger;
@@ -40,6 +41,9 @@ public class BizMfrsController extends BaseController {
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
+     *         keyStr:查询关键字（非必填，模糊查询，可填写mfrs_name、mfrs_introduce、mfrs_address、mfrs_contacts、mfrs_phone、mfrs_status）,
+     *         mfrsType：制造商类型（非必填，包括VEHICLE、BATTERY、PARTS），
+     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
      *         currPage:当前页,
      *         pageSize:每页记录数
      *     }
@@ -77,17 +81,29 @@ public class BizMfrsController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            PageRequest pagingParam = null;
+//            PageRequest pagingParam = null;
+            BizMfrsParam pagingParam = null;
             try {
                 String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
-                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+//                pagingParam = JSON.parseObject(paramStr, PageRequest.class);
+                pagingParam = JSON.parseObject(paramStr,BizMfrsParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
+                if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging()) && "false".equals(pagingParam.getNeedPaging().toLowerCase())) {
+                    pagingParam.setNeedPaging("false");
+                } else {
+                    if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
+                    }
+                    pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.list(true, pagingParam);
+//            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.list(true, pagingParam);
+            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()),pagingParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, mfrsPageResp);
             return mr;

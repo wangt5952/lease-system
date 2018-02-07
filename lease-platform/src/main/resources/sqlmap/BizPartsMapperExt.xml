@@ -29,10 +29,7 @@
 
 	<!--查询拓展信息-->
 	<select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultMap="BizPartsExtResultMap">
-		SELECT
-		<if test="distinct">
-			distinct
-		</if>
+		SELECT distinct
 		a.id id,
 		a.parts_code parts_code,
 		a.parts_name parts_name,
@@ -61,10 +58,10 @@
 				OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
 			</if>
 			<if test="partsType != null and partsType != ''" >
-				AND a.partsType = #{parts_type,jdbcType=VARCHAR}
+				AND a.parts_type = #{partsType,jdbcType=VARCHAR}
 			</if>
 			<if test="partsStatus != null and partsStatus != ''" >
-				AND a.partsStatus = #{parts_status,jdbcType=VARCHAR}
+				AND a.parts_status = #{partsStatus,jdbcType=VARCHAR}
 			</if>
 		</where>
 		order by a.update_time desc,a.create_time desc
@@ -87,10 +84,10 @@
 				OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
 			</if>
 			<if test="partsType != null and partsType != ''" >
-				AND a.partsType = #{parts_type,jdbcType=VARCHAR}
+				AND a.parts_type = #{partsType,jdbcType=VARCHAR}
 			</if>
 			<if test="partsStatus != null and partsStatus != ''" >
-				AND a.partsStatus = #{parts_status,jdbcType=VARCHAR}
+				AND a.parts_status = #{partsStatus,jdbcType=VARCHAR}
 			</if>
 		</where>
 	</select>

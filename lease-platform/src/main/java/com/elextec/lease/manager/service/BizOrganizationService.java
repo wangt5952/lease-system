@@ -2,6 +2,7 @@ package com.elextec.lease.manager.service;
 
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.persist.model.mybatis.BizOrganization;
 
 import java.util.List;
@@ -19,6 +20,14 @@ public interface BizOrganizationService {
      * @return 公司组织列表
      */
     public PageResponse<BizOrganization> list(boolean needPaging, PageRequest pr);
+
+    /**
+     * 获得公司组织列表.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 公司组织列表.
+     */
+    public PageResponse<BizOrganization> listByParam(boolean needPaging, BizOrganizationParam pr);
 
     /**
      * 批量插入公司组织.
