@@ -1,36 +1,36 @@
 <template>
-  <div style="display:flex;height:100%;">
-    <div style="width:200px;">
-      <el-menu :router="true" unique-opened>
-        <template v-for="(o, i) in menuTree">
-          <el-submenu v-if="o.children" :key="i" :index="`${i}`">
-            <template slot="title">
-              <i :class="o.icon"></i>
-              <span>{{o.name}}</span>
-            </template>
-            <el-menu-item v-for="(p, j) in o.children" :key="j" :index="p.path">{{p.name}}</el-menu-item>
-          </el-submenu>
-          <el-menu-item v-else :key="i" :index="`${i}`">
-            <template slot="title">
-              <i :class="o.icon"></i>
-              <span>{{o.name}}</span>
-            </template>
-          </el-menu-item>
-        </template>
-      </el-menu>
-    </div>
+  <div style="display:flex;flex-direction:column;height:100%;">
 
-    <div style="flex:1;display:flex;flex-direction:column;">
-      <div style="background:#05002a;height:64px;display:flex;align-items:center;padding:0 10px;">
-        <div style="flex:1;"></div>
-        <el-dropdown @command="command => this[command]()">
-          <span class="el-dropdown-link" style="cursor:pointer;color:#fff;">
-            {{key_user_info.userName}} <i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="handleLogout">退出系统</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+    <div style="background:#05002a;height:64px;display:flex;align-items:center;padding:0 10px;">
+      <div style="flex:1;"></div>
+      <el-dropdown @command="command => this[command]()">
+        <span class="el-dropdown-link" style="cursor:pointer;color:#fff;">
+          {{key_user_info.userName}} <i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="handleLogout">退出系统</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </div>
+    <div style="display:flex;flex:1;">
+      <div style="width:250px;">
+        <el-menu :router="true" unique-opened>
+          <template v-for="(o, i) in menuTree">
+            <el-submenu v-if="o.children" :key="i" :index="`${i}`">
+              <template slot="title">
+                <i :class="o.icon"></i>
+                <span>{{o.name}}</span>
+              </template>
+              <el-menu-item v-for="(p, j) in o.children" :key="j" :index="p.path">{{p.name}}</el-menu-item>
+            </el-submenu>
+            <el-menu-item v-else :key="i" :index="`${i}`">
+              <template slot="title">
+                <i :class="o.icon"></i>
+                <span>{{o.name}}</span>
+              </template>
+            </el-menu-item>
+          </template>
+        </el-menu>
       </div>
       <router-view style="flex:1;" />
     </div>
@@ -123,5 +123,21 @@ export default {
 <style scoped>
 >>> .el-menu {
   height: 100%;
+  background: #1c2166;
+  border-right: 0;
+}
+
+>>> .el-menu .el-submenu .el-submenu__title,
+>>> .el-menu .el-submenu .el-submenu__title i,
+>>> .el-menu .el-menu-item {
+  color: #fff;
+}
+
+>>> .el-menu .el-submenu .el-submenu__title:hover,
+>>> .el-menu .el-submenu .el-submenu__title:hover i,
+>>> .el-menu .el-menu-item:hover,
+>>> .el-menu .el-menu-item.is-active {
+  background: #1a0d53;
+  color: #4ba4f3;
 }
 </style>

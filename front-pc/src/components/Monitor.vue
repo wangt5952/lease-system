@@ -35,12 +35,27 @@
       </baidu-map>
       <el-date-picker v-if="vehiclePathVisible" size="mini" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="position:absolute;top:120px;right:400px;"></el-date-picker>
 
-      <!-- <div style="display:flex;background:#eff5f8;height:180px;padding:10px 0;">
-        <div style="flex:1;background:#fff;margin-left:10px;">可用车辆</div>
-        <div style="flex:1;background:#fff;margin-left:10px;">待修车辆</div>
-        <div style="flex:1;background:#fff;margin-left:10px;">已用车辆</div>
-        <div style="flex:1;background:#fff;margin-left:10px;">平台车辆</div>
-      </div> -->
+      <div style="display:flex;background:#eff5f8;height:180px;padding:10px 0;">
+        <div style="flex:1;background:#fff;margin-left:10px;">
+          可用车辆
+          <div>
+            <img src="/static/half-ring.png" style="background:#e9457d;"/>
+          </div>
+        </div>
+        <div style="flex:1;background:#fff;margin-left:10px;">待修车辆
+          <div>
+            <img src="/static/half-ring.png" style="background:#7fd0b8;"/>
+          </div>
+        </div>
+        <div style="flex:1;background:#fff;margin-left:10px;">已用车辆
+          <img src="/static/half-ring.png" style="background:#f7af54;"/>
+        </div>
+        <div style="flex:1;background:#fff;margin-left:10px;">平台车辆
+          <div>
+            <img src="/static/half-ring.png" style="background:#4c85cf;"/>
+          </div>
+        </div>
+      </div>
     </div>
     <div style="display:flex;flex-direction:column;width:250px;background:#eff5f8;padding:10px 20px;">
       <div style="color:#9096ad;font-size:16px;">车辆列表（可用）</div>

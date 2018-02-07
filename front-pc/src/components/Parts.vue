@@ -12,7 +12,7 @@
       <el-table-column prop="partsPn" label="型号"></el-table-column>
       <el-table-column prop="partsTypeText" label="类别"></el-table-column>
       <el-table-column prop="partsParameters" label="参数"></el-table-column>
-      <el-table-column prop="mfrsId" label="生产商ID"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="partsStatusText" label="状态"></el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
@@ -34,7 +34,7 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false">
+    <el-dialog title="配件信息" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form :model="form" ref="form" size="medium">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -58,15 +58,23 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="partsType" :rules="[{required:true, message:'请选择类型'}]" label="类型">
+            <el-form-item prop="partsType" :rules="[{required:true, message:'请选择类别'}]" label="类别">
               <el-select v-model="form.partsType" placeholder="请选择类型" style="width:100%;">
                 <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="介绍">
+            <el-form-item prop="partsParameters" :rules="[{required:true, message:'请填写参数'}]" label="参数">
               <el-input v-model="form.partsParameters" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="8">
+            <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="生产商">
+              <el-select v-model="form.mfrsId" placeholder="请选择生产商" style="width:100%;">
+                <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
 
@@ -110,12 +118,19 @@ export default {
 
       typeList: [
         { id: 'SEATS', name: '车座' },
+        { id: 'FRAME', name: '车架' },
+        { id: 'HANDLEBAR', name: '车把' },
+        { id: 'BELL', name: '车铃' },
+        { id: 'TYRE', name: '轮胎' },
+        { id: 'PEDAL', name: '脚蹬' },
+        { id: 'DASHBOARD', name: '仪表盘' },
       ],
       statusList: [
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
+      mfrsList: [],
     };
   },
   computed: {
@@ -171,15 +186,14 @@ export default {
     showForm(form = { }) {
       this.form = _.pick(form, [
         'id',
-        'orgCode',
-        'orgName',
-        'orgType',
-        'orgIntroduce',
-        'orgAddress',
-        'orgContacts',
-        'orgPhone',
-        'orgBusinessLicences',
-        'orgStatus',
+        'partsCode',
+        'partsName',
+        'partsBrand',
+        'partsPn',
+        'partsType',
+        'partsParameters',
+        'mfrsId',
+        'partsStatus',
       ]);
       this.formVisible = true;
     },
@@ -219,6 +233,10 @@ export default {
     },
   },
   async mounted() {
+    const { code, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+      currPage: 1, pageSize: 999,
+    })).body;
+    if (code === '200') this.mfrsList = respData.rows;
     await this.reload();
   },
 };
