@@ -9,65 +9,50 @@
 
     <select id="selectByParam" parameterType="com.elextec.lease.manager.request.BizOrganizationParam" resultMap="BaseResultMap">
         SELECT distinct
-        o.id,
-        o.org_code,
-        o.org_name,
-        o.org_type,
-        o.org_introduce,
-        o.org_address,
-        o.org_contacts,
-        o.org_phone,
-        o.org_business_licences,
-        o.org_business_licence_front,
-        o.org_business_licence_back,
-        o.org_status,
-        o.create_user,
-        o.create_time,
-        o.update_user,
-        o.update_time
-        FROM biz_organization o
+        <include refid="Base_Column_List" />
+        FROM biz_organization
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >
-                AND (o.org_code LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-                OR o.org_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-                OR o.org_introduce LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-                OR o.org_address LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-                OR o.org_contacts LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-                OR o.org_phone LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-                OR o.org_business_licences LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
+                and (org_code like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                or org_name like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                or org_introduce like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                or org_address like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                or org_contacts like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                or org_phone like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+                or org_business_licences like concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
             </if>
             <if test="orgType != null and orgType != ''" >
-                AND o.org_type = #{orgType,jdbcType=VARCHAR}
+                and org_type = #{orgType,jdbcType=VARCHAR}
             </if>
             <if test="orgStatus != null and orgStatus != ''" >
-                AND o.org_status = #{orgStatus,jdbcType=VARCHAR}
+                and org_status = #{orgStatus,jdbcType=VARCHAR}
             </if>
         </where>
-        ORDER BY o.update_time DESC,o.create_time DESC
+        order by update_time desc,create_time desc
         limit #{pageBegin} , #{pageSize}
     </select>
 
     <select id="countByParam" parameterType="com.elextec.lease.manager.request.BizOrganizationParam" resultType="java.lang.Integer">
-      SELECT count(distinct o.id) FROM biz_organization o
+      SELECT count(distinct id)
+      FROM biz_organization
       <where>
           1=1
           <if test="keyStr != null and keyStr != ''" >
-              AND (o.org_code LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-              OR o.org_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-              OR o.org_introduce LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-              OR o.org_address LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-              OR o.org_contacts LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-              OR o.org_phone LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-              OR o.org_business_licences LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
+              and (org_code like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+              or org_name like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+              or org_introduce like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+              or org_address like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+              or org_contacts like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+              or org_phone like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
+              or org_business_licences like concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
           </if>
           <if test="orgType != null and orgType != ''" >
-              AND o.org_type = #{orgType,jdbcType=VARCHAR}
+              and org_type = #{orgType,jdbcType=VARCHAR}
           </if>
           <if test="orgStatus != null and orgStatus != ''" >
-              AND o.org_status = #{orgStatus,jdbcType=VARCHAR}
+              and org_status = #{orgStatus,jdbcType=VARCHAR}
           </if>
       </where>
     </select>
-
 </mapper>

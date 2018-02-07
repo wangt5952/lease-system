@@ -5,7 +5,6 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizOrganizationParam;
@@ -41,7 +40,7 @@ public class BizOrgController extends BaseController {
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
-     *         keyStr:查询关键字（非必填，模糊查询，可填写orgCode、orgName、orgIntroduce、orgAddress、orgContacts、orgPhone、orgBusinessLicences）,
+     *         keyStr:查询关键字（非必填，模糊查询，可填写组织Code、组织名称、组织介绍、组织地址、联系人、联系电话、营业执照号码）,
      *         orgType:组织类别（非必填，PLATFORM、ENTERPRISE、INDIVIDUAL）,
      *         orgStatus：组织状态（非必填，NORMAL、FREEZE、INVALID），
      *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
@@ -108,7 +107,7 @@ public class BizOrgController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             //PageResponse<BizOrganization> orgPageResp = bizOrganizationService.list(true, pagingParam);
-            PageResponse<BizOrganization> orgPageResp = bizOrganizationService.listByParam(true,pagingParam);
+            PageResponse<BizOrganization> orgPageResp = bizOrganizationService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, orgPageResp);
             return mr;

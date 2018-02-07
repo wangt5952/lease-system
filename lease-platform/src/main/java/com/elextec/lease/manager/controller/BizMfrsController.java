@@ -5,7 +5,6 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizMfrsParam;
@@ -41,8 +40,9 @@ public class BizMfrsController extends BaseController {
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
-     *         keyStr:查询关键字（非必填，模糊查询，可填写mfrs_name、mfrs_introduce、mfrs_address、mfrs_contacts、mfrs_phone、mfrs_status）,
-     *         mfrsType：制造商类型（非必填，包括VEHICLE、BATTERY、PARTS），
+     *         keyStr:查询关键字（非必填，模糊查询，可填写制造商名称、制造商介绍、制造商地址、联系人、联系电话）,
+     *         mfrsType:制造商类型（非必填，包括VEHICLE、BATTERY、PARTS）,
+     *         mfrsStatus:制造商状态（非必填，包括NORMAL、FREEZE、INVALID）,
      *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
      *         currPage:当前页,
      *         pageSize:每页记录数
@@ -103,7 +103,7 @@ public class BizMfrsController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 //            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.list(true, pagingParam);
-            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()),pagingParam);
+            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, mfrsPageResp);
             return mr;

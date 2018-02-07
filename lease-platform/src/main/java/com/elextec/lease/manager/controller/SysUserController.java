@@ -1,6 +1,5 @@
 package com.elextec.lease.manager.controller;
 
-
 import com.alibaba.fastjson.JSON;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;

@@ -15,16 +15,16 @@ public interface BizOrganizationMapperExt extends BizOrganizationMapper {
     public BizOrganization getByCode(String orgCode);
 
     /**
-     * 查询配件扩展信息列表
+     * 查询组织信息列表
      * @param bizOrganizationParam 查询条件
-     * @return 配件扩展信息列表
+     * @return 组织信息列表
      */
     public List<BizOrganization> selectByParam(BizOrganizationParam bizOrganizationParam);
 
     /**
-     * 查询配件扩展信息记录数
+     * 查询组织信息记录数
      * @param bizOrganizationParam 查询条件
-     * @return 配件扩展信息记录数
+     * @return 组织信息记录数
      */
     public int countByParam(BizOrganizationParam bizOrganizationParam);
 

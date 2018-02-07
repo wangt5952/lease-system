@@ -76,16 +76,16 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         if (needPaging) {
             pr.setPageBegin();
         }
-        List<BizOrganization> partsLs = bizOrganizationMapperExt.selectByParam(pr);
+        List<BizOrganization> orgLs = bizOrganizationMapperExt.selectByParam(pr);
         // 组织并返回结果
         PageResponse<BizOrganization> partsesp = new PageResponse<BizOrganization>();
         partsesp.setCurrPage(pr.getCurrPage());
         partsesp.setPageSize(pr.getPageSize());
         partsesp.setTotal(orgTotal);
-        if (null == partsLs) {
+        if (null == orgLs) {
             partsesp.setRows(new ArrayList<BizOrganization>());
         } else {
-            partsesp.setRows(partsLs);
+            partsesp.setRows(orgLs);
         }
         return partsesp;
     }

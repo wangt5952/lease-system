@@ -66,26 +66,26 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     @Override
     public PageResponse<BizManufacturer> listByParam(boolean needPaging, BizMfrsParam pr) {
         // 查询总记录数
-        int resTotal = 0;
+        int mfrsTotal = 0;
         if (null != pr.getTotal() && 0 < pr.getTotal()) {
-            resTotal = pr.getTotal();
+            mfrsTotal = pr.getTotal();
         } else {
-            resTotal = bizManufacturerMapperExt.countByParam(pr);
+            mfrsTotal = bizManufacturerMapperExt.countByParam(pr);
         }
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
         }
-        List<BizManufacturer> resLs = bizManufacturerMapperExt.selectByParam(pr);
+        List<BizManufacturer> mfrsLs = bizManufacturerMapperExt.selectByParam(pr);
         // 组织并返回结果
         PageResponse<BizManufacturer> presp = new PageResponse<BizManufacturer>();
         presp.setCurrPage(pr.getCurrPage());
         presp.setPageSize(pr.getPageSize());
-        presp.setTotal(resTotal);
-        if (null == resLs) {
+        presp.setTotal(mfrsTotal);
+        if (null == mfrsLs) {
             presp.setRows(new ArrayList<BizManufacturer>());
         } else {
-            presp.setRows(resLs);
+            presp.setRows(mfrsLs);
         }
         return presp;
     }

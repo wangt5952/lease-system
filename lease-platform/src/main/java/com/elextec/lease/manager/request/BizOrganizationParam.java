@@ -8,13 +8,13 @@ import com.elextec.framework.plugins.paging.PageRequest;
  */
 public class BizOrganizationParam extends PageRequest {
 
-    /*查询关键字org_code、org_name、org_introduce、org_address、org_contacts、org_phone、org_business_licences*/
+    /* 查询关键字org_code、org_name、org_introduce、org_address、org_contacts、org_phone、org_business_licences. */
     private String keyStr;
 
-    /*组织类别（平台、企业）*/
+    /* 组织类别. */
     private String orgType;
 
-    /*组织状态（正常、冻结、作废）*/
+    /* 组织状态. */
     private String orgStatus;
 
     /*
