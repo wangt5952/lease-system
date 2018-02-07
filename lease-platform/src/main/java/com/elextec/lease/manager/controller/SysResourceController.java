@@ -6,7 +6,6 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysResParam;
@@ -174,16 +173,16 @@ public class SysResourceController extends BaseController {
                             || null == insResChkVo.getGroupSort()
                             || WzStringUtil.isBlank(insResChkVo.getCreateUser())
                             || WzStringUtil.isBlank(insResChkVo.getUpdateUser())) {
-                        return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "资源参数有误");
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条资源信息参数有误");
                     }
                     if (!insResChkVo.getResType().toString().equals(ResourceType.CATALOG.toString())
                             && !insResChkVo.getResType().toString().equals(ResourceType.MENU.toString())
                             && !insResChkVo.getResType().toString().equals(ResourceType.FUNCTION.toString())) {
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的资源类别");
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条资源类别无效");
                     }
                     if (!insResChkVo.getShowFlag().toString().equals(ShowFlag.SHOW.toString())
                             && !insResChkVo.getShowFlag().toString().equals(ShowFlag.HIDDEN.toString())) {
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的显示标志");
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条资源显示标志无效");
                     }
                 }
             } catch (Exception ex) {
@@ -250,7 +249,7 @@ public class SysResourceController extends BaseController {
                         || null == resInfo.getGroupSort()
                         || WzStringUtil.isBlank(resInfo.getCreateUser())
                         || WzStringUtil.isBlank(resInfo.getUpdateUser())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "资源参数有误");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "资源参数有误");
                 }
                 if (!resInfo.getResType().toString().equals(ResourceType.CATALOG.toString())
                         && !resInfo.getResType().toString().equals(ResourceType.MENU.toString())

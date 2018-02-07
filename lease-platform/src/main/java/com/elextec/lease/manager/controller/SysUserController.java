@@ -13,6 +13,9 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysRoleService;
 import com.elextec.lease.manager.service.SysUserService;
+import com.elextec.persist.field.enums.OrgAndUserType;
+import com.elextec.persist.field.enums.RealNameAuthFlag;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.SysRole;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
@@ -181,6 +184,36 @@ public class SysUserController extends BaseController {
                 if (null == userInfos || 0 == userInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                SysUser insUserChkVo = null;
+                for (int i = 0; i < userInfos.size(); i++) {
+                    insUserChkVo = userInfos.get(i);
+                    if (WzStringUtil.isBlank(insUserChkVo.getLoginName())
+                            || WzStringUtil.isBlank(insUserChkVo.getUserMobile())
+                            || null == insUserChkVo.getUserType()
+                            || WzStringUtil.isBlank(insUserChkVo.getPassword())
+                            || null == insUserChkVo.getUserRealNameAuthFlag()
+                            || null == insUserChkVo.getUserStatus()
+                            || WzStringUtil.isBlank(insUserChkVo.getCreateUser())
+                            || WzStringUtil.isBlank(insUserChkVo.getUpdateUser())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户信息参数有误");
+                    }
+                    if (!insUserChkVo.getUserType().toString().equals(OrgAndUserType.PLATFORM.toString())
+                            && !insUserChkVo.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
+                            && !insUserChkVo.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户类别无效");
+                    }
+                    if (!insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.AUTHORIZED.toString())
+                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.UNAUTHORIZED.toString())
+                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.TOAUTHORIZED.toString())
+                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.REJECTAUTHORIZED.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户实名认证标志无效");
+                    }
+                    if (!insUserChkVo.getUserStatus().toString().equals(RecordStatus.NORMAL.toString())
+                            && !insUserChkVo.getUserStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !insUserChkVo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户状态无效");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -237,6 +270,32 @@ public class SysUserController extends BaseController {
                 userInfo = JSON.parseObject(paramStr, SysUser.class);
                 if (null == userInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(userInfo.getLoginName())
+                        || WzStringUtil.isBlank(userInfo.getUserMobile())
+                        || null == userInfo.getUserType()
+                        || WzStringUtil.isBlank(userInfo.getPassword())
+                        || null == userInfo.getUserRealNameAuthFlag()
+                        || null == userInfo.getUserStatus()
+                        || WzStringUtil.isBlank(userInfo.getCreateUser())
+                        || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "用户参数有误");
+                }
+                if (!userInfo.getUserType().toString().equals(OrgAndUserType.PLATFORM.toString())
+                        && !userInfo.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
+                        && !userInfo.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户类别");
+                }
+                if (!userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.AUTHORIZED.toString())
+                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.UNAUTHORIZED.toString())
+                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.TOAUTHORIZED.toString())
+                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.REJECTAUTHORIZED.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的实名认证标志");
+                }
+                if (!userInfo.getUserStatus().toString().equals(RecordStatus.NORMAL.toString())
+                        && !userInfo.getUserStatus().toString().equals(RecordStatus.FREEZE.toString())
+                        && !userInfo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户状态");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);

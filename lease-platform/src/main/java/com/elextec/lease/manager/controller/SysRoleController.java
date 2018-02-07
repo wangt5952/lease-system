@@ -8,7 +8,6 @@ import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.RefRoleResourceParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysRoleParam;
@@ -150,6 +149,15 @@ public class SysRoleController extends BaseController {
                 if (null == roleInfos || 0 == roleInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                SysRole insRoleChkVo = null;
+                for (int i = 0; i < roleInfos.size(); i++) {
+                    insRoleChkVo = roleInfos.get(i);
+                    if (WzStringUtil.isBlank(insRoleChkVo.getRoleName())
+                            || WzStringUtil.isBlank(insRoleChkVo.getCreateUser())
+                            || WzStringUtil.isBlank(insRoleChkVo.getUpdateUser())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录角色参数有误");
+                    }
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -197,6 +205,11 @@ public class SysRoleController extends BaseController {
                 if (null == roleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                if (WzStringUtil.isBlank(roleInfo.getRoleName())
+                        || WzStringUtil.isBlank(roleInfo.getCreateUser())
+                        || WzStringUtil.isBlank(roleInfo.getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "角色参数有误");
+                }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -241,6 +254,9 @@ public class SysRoleController extends BaseController {
                 roleInfo = JSON.parseObject(paramStr, SysRole.class);
                 if (null == roleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(roleInfo.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
