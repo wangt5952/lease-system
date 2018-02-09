@@ -12,27 +12,7 @@ public class BizVehicleParam extends PageRequest {
     /** 车辆状态. */
     private String vehicleStatus;
 
-    /**用户ID*/
-    private String userId;
 
-    /**企业ID*/
-    private String orgId;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(String orgId) {
-        this.orgId = orgId;
-    }
 
     /*
          * Getter 和 Setter 方法.

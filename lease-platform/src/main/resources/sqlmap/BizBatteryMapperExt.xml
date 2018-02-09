@@ -38,6 +38,9 @@
         FROM
         biz_battery a
         LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+        LEFT JOIN biz_ref_vehicle_battery v ON a.id = v.battery_id
+        LEFT JOIN biz_ref_user_vehicle r ON v.vehicle_id = r.vehicle_id
+        LEFT JOIN sys_user s on r.user_id = s.id
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >
@@ -50,6 +53,12 @@
             </if>
             <if test="batteryStatus != null and batteryStatus != ''" >
                 and a.battery_status = #{batteryStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="userId != null and userId != ''" >
+                and s.id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and s.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
         </where>
         order by a.update_time desc,a.create_time desc,a.battery_status
@@ -62,6 +71,9 @@
         FROM
         biz_battery a
         LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+        LEFT JOIN biz_ref_vehicle_battery v ON a.id = v.battery_id
+        LEFT JOIN biz_ref_user_vehicle r ON v.vehicle_id = r.vehicle_id
+        LEFT JOIN sys_user s on r.user_id = s.id
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >
@@ -74,6 +86,12 @@
             </if>
             <if test="batteryStatus != null and batteryStatus != ''" >
                 and a.battery_status = #{batteryStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="userId != null and userId != ''" >
+                and s.id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and s.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
         </where>
     </select>

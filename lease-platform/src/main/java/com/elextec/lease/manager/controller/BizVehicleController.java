@@ -13,6 +13,7 @@ import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizVehicle;
+import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,15 +102,21 @@ public class BizVehicleController extends BaseController {
                     if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
                     }
-                    //根据用户类型添加条件
-                    //个人用户需要添加userId为条件
-                    if(OrgAndUserType.INDIVIDUAL.toString().equals(getPcLoginUserInfo(request).getUserType())){
-                        pagingParam.setUserId(getPcLoginUserInfo(request).getId());
+                    SysUser userTemp = getPcLoginUserInfo(request);
+                    if(userTemp != null){
+                        //根据用户类型添加条件
+                        //个人用户需要添加userId为条件
+                        if(OrgAndUserType.INDIVIDUAL.toString().equals(getPcLoginUserInfo(request).getUserType())){
+                            pagingParam.setUserId(getPcLoginUserInfo(request).getId());
+                        }
+                        //企业用户需要添加orgId为条件
+                        if(OrgAndUserType.ENTERPRISE.toString().equals(getPcLoginUserInfo(request).getUserType())){
+                            pagingParam.setOrgId(getPcLoginUserInfo(request).getOrgId());
+                        }
+                    }else{
+                        return new MessageResponse(RunningResult.AUTH_OVER_TIME.code(),"登录信息已失效");
                     }
-                    //企业用户需要添加orgId为条件
-                    if(OrgAndUserType.ENTERPRISE.toString().equals(getPcLoginUserInfo(request).getUserType())){
-                        pagingParam.setOrgId(getPcLoginUserInfo(request).getOrgId());
-                    }
+
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
