@@ -1,12 +1,19 @@
 package com.elextec.framework.plugins.paging;
 
+import com.elextec.framework.common.request.DataPermissionRequest;
+
 /**
  * 分页请求参数类.
  * Created by wangtao on 2017/10/19.
  */
-public class PageRequest {
+public class PageRequest extends DataPermissionRequest {
+
+    /** SV-UID. */
+    private static final long serialVersionUID = 198900007718417487L;
+
     private static final Integer DEF_CURR_PAGE = 1;
     private static final Integer DEF_PAGE_SIZE = 10;
+
     /** 当前页码（第一页为1）. */
     private Integer currPage;
     /** 每页显示记录条数. */
