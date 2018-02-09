@@ -17,6 +17,39 @@ public class BizPartsParam extends PageRequest {
     /*配件状态（正常、冻结、作废）*/
     private String partsStatus;
 
+    /**用户ID*/
+    private String userId;
+
+    /**企业ID*/
+    private String orgId;
+
+    /**用户类型*/
+    private String userType;
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
     /*
      * Getter 和 Setter 方法.
      */

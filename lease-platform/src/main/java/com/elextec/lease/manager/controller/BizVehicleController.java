@@ -10,6 +10,7 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
+import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,7 @@ public class BizVehicleController extends BaseController {
      * @param paramAndPaging 分页参数JSON
      * <pre>
      *     {
+     *         userType:用户类型（必填，分PLATFORM("平台"),ENTERPRISE("企业"),INDIVIDUAL("个人")）
      *         keyStr:查询关键字（非必填，模糊查询，可填写车辆编号、车辆型号、车辆品牌、车辆产地、生产商ID、生产商名）,
      *         vehicleStatus:车辆状态（非必填，包括NORMAL、FREEZE、INVALID）,
      *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
@@ -75,7 +78,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/list")
-    public MessageResponse list(@RequestBody String paramAndPaging) {
+    public MessageResponse list(@RequestBody String paramAndPaging,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -98,6 +101,26 @@ public class BizVehicleController extends BaseController {
                 } else {
                     if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
+                    }
+                    //根据用户类型添加条件
+                    if(WzStringUtil.isBlank(pagingParam.getUserType())){
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得用户类型参数");
+                    }else{
+                        if(OrgAndUserType.INDIVIDUAL.toString().equals(pagingParam.getUserType())
+                                || OrgAndUserType.ENTERPRISE.toString().equals(pagingParam.getUserType())
+                                || OrgAndUserType.PLATFORM.toString().equals(pagingParam.getUserType()))
+                        {
+                            //个人用户需要添加userId为条件
+                            if(OrgAndUserType.INDIVIDUAL.toString().equals(pagingParam.getUserType())){
+                                pagingParam.setUserId(getPcLoginUserInfo(request).getId());
+                            }
+                            //企业用户需要添加orgId为条件
+                            if(OrgAndUserType.ENTERPRISE.toString().equals(pagingParam.getUserType())){
+                                pagingParam.setOrgId(getPcLoginUserInfo(request).getOrgId());
+                            }
+                        }else{
+                            return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "用户类型参数有误");
+                        }
                     }
                     pagingParam.setNeedPaging("true");
                 }
