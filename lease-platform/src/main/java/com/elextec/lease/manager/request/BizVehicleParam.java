@@ -18,17 +18,6 @@ public class BizVehicleParam extends PageRequest {
     /**企业ID*/
     private String orgId;
 
-    /**用户类型*/
-    private String userType;
-
-    public String getUserType() {
-        return userType;
-    }
-
-    public void setUserType(String userType) {
-        this.userType = userType;
-    }
-
     public String getUserId() {
         return userId;
     }

@@ -44,7 +44,6 @@ public class BizVehicleController extends BaseController {
      * @param paramAndPaging 分页参数JSON
      * <pre>
      *     {
-     *         userType:用户类型（必填，分PLATFORM("平台"),ENTERPRISE("企业"),INDIVIDUAL("个人")）
      *         keyStr:查询关键字（非必填，模糊查询，可填写车辆编号、车辆型号、车辆品牌、车辆产地、生产商ID、生产商名）,
      *         vehicleStatus:车辆状态（非必填，包括NORMAL、FREEZE、INVALID）,
      *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
@@ -103,24 +102,13 @@ public class BizVehicleController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
                     }
                     //根据用户类型添加条件
-                    if(WzStringUtil.isBlank(pagingParam.getUserType())){
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得用户类型参数");
-                    }else{
-                        if(OrgAndUserType.INDIVIDUAL.toString().equals(pagingParam.getUserType())
-                                || OrgAndUserType.ENTERPRISE.toString().equals(pagingParam.getUserType())
-                                || OrgAndUserType.PLATFORM.toString().equals(pagingParam.getUserType()))
-                        {
-                            //个人用户需要添加userId为条件
-                            if(OrgAndUserType.INDIVIDUAL.toString().equals(pagingParam.getUserType())){
-                                pagingParam.setUserId(getPcLoginUserInfo(request).getId());
-                            }
-                            //企业用户需要添加orgId为条件
-                            if(OrgAndUserType.ENTERPRISE.toString().equals(pagingParam.getUserType())){
-                                pagingParam.setOrgId(getPcLoginUserInfo(request).getOrgId());
-                            }
-                        }else{
-                            return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "用户类型参数有误");
-                        }
+                    //个人用户需要添加userId为条件
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(getPcLoginUserInfo(request).getUserType())){
+                        pagingParam.setUserId(getPcLoginUserInfo(request).getId());
+                    }
+                    //企业用户需要添加orgId为条件
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(getPcLoginUserInfo(request).getUserType())){
+                        pagingParam.setOrgId(getPcLoginUserInfo(request).getOrgId());
                     }
                     pagingParam.setNeedPaging("true");
                 }
