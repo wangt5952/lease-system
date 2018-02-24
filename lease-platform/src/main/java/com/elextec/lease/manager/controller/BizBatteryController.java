@@ -422,6 +422,7 @@ public class BizBatteryController extends BaseController {
      *         message:返回消息,
      *         respData:[
      *             {
+     *                 VehicleID:车辆ID,
      *                 BatteryID:电池ID,
      *                 DeviceID:设备ID,
      *                 DeviceType:设备类型,
@@ -477,6 +478,7 @@ public class BizBatteryController extends BaseController {
                         continue;
                     }
                 }
+                locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, "");
                 locData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, bId);
                 locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryInfo.getBatteryCode());
                 locData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());

@@ -504,6 +504,7 @@ public class BizVehicleController extends BaseController {
      *         respData:[
      *             {
      *                 VehicleID:车辆ID,
+     *                 BatteryID:电池ID,
      *                 DeviceID:设备ID,
      *                 DeviceType:设备类型,
      *                 LocTime:记录时间,
@@ -535,6 +536,7 @@ public class BizVehicleController extends BaseController {
             }
             // 循环获得车辆电池信息并获得定位信息
             Map<String,Object> vehicleInfo = null;
+            String batteryId = null;
             String batteryCode = null;
             String devicePk = null;
             JSONObject locData = null;
@@ -543,7 +545,8 @@ public class BizVehicleController extends BaseController {
             for (String vId : vehicleIds) {
                 if (WzStringUtil.isNotBlank(vId)) {
                     vehicleInfo = bizVehicleService.getByPrimaryKey(vId);
-                    batteryCode = (String) vehicleInfo.get("vehicleCode");
+                    batteryId = (String) vehicleInfo.get("batteryId");
+                    batteryCode = (String) vehicleInfo.get("batteryCode");
                     if (WzStringUtil.isBlank(batteryCode)) {
                         errMsgs.append("未查询到车辆[ID:" + vId + "]对应的设备;");
                         continue;
@@ -561,6 +564,7 @@ public class BizVehicleController extends BaseController {
                     }
                 }
                 locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, vId);
+                locData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, batteryId);
                 locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryCode);
                 locData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
                 locDatas.add(locData);
