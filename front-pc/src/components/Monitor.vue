@@ -35,7 +35,7 @@
       </baidu-map>
       <el-date-picker v-if="vehiclePathVisible" size="mini" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="position:absolute;top:120px;right:400px;"></el-date-picker>
 
-      <div style="display:flex;background:#eff5f8;height:180px;padding:10px 0;">
+      <div v-if="false" style="display:flex;background:#eff5f8;height:180px;padding:10px 0;">
         <div style="flex:1;background:#fff;margin-left:10px;">
           可用车辆
           <div>
