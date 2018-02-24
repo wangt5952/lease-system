@@ -55,7 +55,7 @@ export default {
         this.$message.success({
           message: `欢迎回来，${key_user_info.userName}`,
         });
-        this.$router.push('/');
+        this.$router.push('/monitor');
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);

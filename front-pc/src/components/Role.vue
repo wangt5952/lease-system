@@ -243,9 +243,6 @@ export default {
           if (code !== '200') throw new Error(message);
         }
 
-        // 你要加清除角色资源的接口，我这里就if resources 判断是使用设置资源接口还是清除资源接口
-
-
         this.$message.success('分配成功');
         this.closeAssignResForm();
       } catch (e) {
