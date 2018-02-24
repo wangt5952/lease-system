@@ -48,7 +48,7 @@ public class WzConstants {
     public static final String KEY_CAPTCHA_BASE64 = "key_captcha_base64";
 
     /*
-     * 设备设定参数控制相关Key.
+     * DeviceApi 设备设定参数控制相关Key.
      */
     /** 全局Key 设备控制设定前缀. */
     public static final String GK_DEVICE_CONF = "gk_device_conf:";

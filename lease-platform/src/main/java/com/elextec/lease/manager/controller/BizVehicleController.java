@@ -1,15 +1,19 @@
 package com.elextec.lease.manager.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
+import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
+import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizVehicle;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -486,64 +491,87 @@ public class BizVehicleController extends BaseController {
     }
 
     /**
-     * 根据ID获取车辆信息.
-     * @param id 车辆ID
+     * 根据车辆ID列表获取车辆信息列表.
+     * @param ids 车辆ID列表
      * <pre>
-     *     [id]
+     *     [id1,id2,...]
      * </pre>
-     * @return 根据ID获取车辆信息返回
+     * @return 根据ID获取设备定位信息
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:{
-     *                 vehicleId:ID,
-     *                 vehicleCode:车辆编号,
-     *                 vehiclePn:车辆型号,
-     *                 vehicleBrand:车辆品牌,
-     *                 vehicleMadeIn:车辆产地,
-     *                 vehicleMfrsId:车辆生产商ID,
-     *                 vehicleStatus:车辆状态（正常、冻结、报废）,
-     *                 vehicleMfrsName:车辆生产商名称,
-     *                 batteryId:电池ID,
-     *                 batteryCode:电池编号,
-     *                 batteryName:电池货名,
-     *                 batteryBrand:电池品牌,
-     *                 batteryPn:电池型号,
-     *                 batteryParameters:电池参数,
-     *                 batteryMfrsId:电池生产商ID,
-     *                 batteryMfrsName:电池生产商名称,
-     *                 batteryStatus:电池状态（正常、冻结、作废）,
-     *                 createUser:创建人,
-     *                 createTime:创建时间,
-     *                 updateUser:更新人,
-     *                 updateTime:更新时间
-     *             }
+     *         respData:[
+     *             {
+     *                 VehicleID:车辆ID,
+     *                 DeviceID:设备ID,
+     *                 DeviceType:设备类型,
+     *                 LocTime:记录时间,
+     *                 LAT:纬度,
+     *                 LON:经度
+     *             },
+     *             ... ...
+     *         ]
      *     }
      * </pre>
      */
     @RequestMapping(path = "/getlocbyvehiclepk")
-    public MessageResponse getLocByVehiclePK(@RequestBody String id) {
+    public MessageResponse getLocByVehiclePK(@RequestBody String ids) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(id)) {
+        if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> vehicleId = null;
+            List<String> vehicleIds = null;
             try {
-                String paramStr = URLDecoder.decode(id, "utf-8");
-                vehicleId = JSON.parseArray(paramStr, String.class);
-                if (null == vehicleId || 0 == vehicleId.size() || WzStringUtil.isBlank(vehicleId.get(0))) {
+                String paramStr = URLDecoder.decode(ids, "utf-8");
+                vehicleIds = JSON.parseArray(paramStr, String.class);
+                if (null == vehicleIds || 0 == vehicleIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-
-            Map<String,Object> vehicleInfo = bizVehicleService.getByPrimaryKey(vehicleId.get(0));
-            // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, vehicleInfo);
+            // 循环获得车辆电池信息并获得定位信息
+            Map<String,Object> vehicleInfo = null;
+            String batteryCode = null;
+            String devicePk = null;
+            JSONObject locData = null;
+            List<JSONObject> locDatas = new ArrayList<JSONObject>();
+            StringBuffer errMsgs = new StringBuffer("");
+            for (String vId : vehicleIds) {
+                if (WzStringUtil.isNotBlank(vId)) {
+                    vehicleInfo = bizVehicleService.getByPrimaryKey(vId);
+                    batteryCode = (String) vehicleInfo.get("vehicleCode");
+                    if (WzStringUtil.isBlank(batteryCode)) {
+                        errMsgs.append("未查询到车辆[ID:" + vId + "]对应的设备;");
+                        continue;
+                    }
+                    // 根据设备ID查询设备当前位置
+                    devicePk = batteryCode + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString();
+                    locData = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_LOC_MAP, devicePk);
+                    // 组织返回结果
+                    if (null == locData
+//                    || null == locData.getString(DeviceApiConstants.KEY_LOC_TIME)
+                            || null == locData.getDouble(DeviceApiConstants.REQ_LAT)
+                            || null == locData.getDouble(DeviceApiConstants.REQ_LON)) {
+                        errMsgs.append("未查询到车辆[ID:" + batteryCode + "]对应设备的定位信息;");
+                        continue;
+                    }
+                }
+                locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, vId);
+                locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryCode);
+                locData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
+                locDatas.add(locData);
+            }
+            // 返回结果
+            MessageResponse mr = null;
+            if (0 == errMsgs.length()) {
+                mr = new MessageResponse(RunningResult.SUCCESS, locDatas);
+            } else {
+                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString());
+            }
             return mr;
         }
     }

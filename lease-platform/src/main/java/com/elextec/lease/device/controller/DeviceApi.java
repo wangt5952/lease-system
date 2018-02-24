@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.device.common.DeviceRespMsg;
 import com.elextec.lease.manager.service.BizDeviceConfService;
 import com.elextec.persist.field.enums.DeviceType;
@@ -40,48 +41,6 @@ public class DeviceApi extends BaseController {
 
     @Autowired
     private BizDeviceConfService bizDeviceConfService;
-
-    /** 设备ID. */
-    private static final String REQ_RESP_DEVICE_ID = "DeviceID";
-
-    /*
-     * 设备设定参数控制相关Key.
-     */
-    /** 设置设备上传时间间隔. */
-    private static final String RESP_PERSET = "PerSet";
-    /** 硬件复位. */
-    private static final String RESP_RESET = "Reset";
-    /** 主动请求数据. */
-    private static final String RESP_REQUEST = "Request";
-
-    /*
-     * 设备上传参数相关Key.
-     */
-    /** 设备类别. */
-    private static final String REQ_DEVICE_TYPE = "DeviceType";
-    /** 设备版本号. */
-    private static final String REQ_VERSION = "Version";
-    /** 生产日期. */
-    private static final String REQ_DATE = "Date";
-    /** 电池保护板版本号. */
-    private static final String REQ_PV = "PV";
-    /** 电池总电压值值 单位10毫伏. */
-    private static final String REQ_TV = "TV";
-    /** 经度. */
-    private static final String REQ_LON = "LON";
-    /** 纬度. */
-    private static final String REQ_LAT = "LAT";
-    /** 车辆信息. */
-    private static final String REQ_DEVICE_DATA = "DeviceData";
-    /** 剩余容量百分比. */
-    private static final String REQ_RSOC = "RSOC";
-    /** 保护状态，不同数字保护状态说明不一. */
-    private static final String REQ_PS = "PS";
-    /** 设备电量. */
-    private static final String REQ_QUANITY = "Quanity";
-
-    /** 定位时间. */
-    private static final String KEY_LOC_TIME = "LocTime";
 
     /**
      * 获得控制参数.
@@ -120,10 +79,10 @@ public class DeviceApi extends BaseController {
         if (null !=  dc) {
             respData.put(RESP_ERR_CODE, DeviceRespMsg.SUCCESS.code());
             respData.put(RESP_ERR_MSG, DeviceRespMsg.SUCCESS.getInfo());
-            respData.put(REQ_RESP_DEVICE_ID, dc.getDeviceId());
-            respData.put(RESP_PERSET, dc.getPerSet());
-            respData.put(RESP_RESET, dc.getReset());
-            respData.put(RESP_REQUEST, dc.getRequest());
+            respData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, dc.getDeviceId());
+            respData.put(DeviceApiConstants.RESP_PERSET, dc.getPerSet());
+            respData.put(DeviceApiConstants.RESP_RESET, dc.getReset());
+            respData.put(DeviceApiConstants.RESP_REQUEST, dc.getRequest());
             return respData;
         }
         // Redis中没有则进行查库
@@ -141,10 +100,10 @@ public class DeviceApi extends BaseController {
         redisClient.valueOperations().set(WzConstants.GK_DEVICE_CONF + deviceid + WzConstants.KEY_SPLIT + devicetype, deviceConfVo, 30, TimeUnit.MINUTES);
         respData.put(RESP_ERR_CODE, DeviceRespMsg.SUCCESS.code());
         respData.put(RESP_ERR_MSG, DeviceRespMsg.SUCCESS.getInfo());
-        respData.put(REQ_RESP_DEVICE_ID, deviceConfVo.getDeviceId());
-        respData.put(RESP_PERSET, deviceConfVo.getPerSet());
-        respData.put(RESP_RESET, deviceConfVo.getReset());
-        respData.put(RESP_REQUEST, deviceConfVo.getRequest());
+        respData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, deviceConfVo.getDeviceId());
+        respData.put(DeviceApiConstants.RESP_PERSET, deviceConfVo.getPerSet());
+        respData.put(DeviceApiConstants.RESP_RESET, deviceConfVo.getReset());
+        respData.put(DeviceApiConstants.RESP_REQUEST, deviceConfVo.getRequest());
         return respData;
     }
 
@@ -230,24 +189,24 @@ public class DeviceApi extends BaseController {
         // 纬度
         Double lat = null;
         // 获取固定参数
-        deviceId  = sensorData.getString(REQ_RESP_DEVICE_ID);
-        deviceType = sensorData.getString(REQ_DEVICE_TYPE);
-        version = WzStringUtil.defaultIfBlank(sensorData.getString(REQ_VERSION), "");
-        madeDate = WzStringUtil.defaultIfBlank(sensorData.getString(REQ_DATE), "");
-        tv = WzStringUtil.defaultIfBlank(sensorData.getString(REQ_TV), "");
-        pv = WzStringUtil.defaultIfBlank(sensorData.getString(REQ_PV), "");
+        deviceId  = sensorData.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID);
+        deviceType = sensorData.getString(DeviceApiConstants.REQ_DEVICE_TYPE);
+        version = WzStringUtil.defaultIfBlank(sensorData.getString(DeviceApiConstants.REQ_VERSION), "");
+        madeDate = WzStringUtil.defaultIfBlank(sensorData.getString(DeviceApiConstants.REQ_DATE), "");
+        tv = WzStringUtil.defaultIfBlank(sensorData.getString(DeviceApiConstants.REQ_TV), "");
+        pv = WzStringUtil.defaultIfBlank(sensorData.getString(DeviceApiConstants.REQ_PV), "");
         try {
-            lon = sensorData.getDouble(REQ_LON);
-            lat = sensorData.getDouble(REQ_LAT);
+            lon = sensorData.getDouble(DeviceApiConstants.REQ_LON);
+            lat = sensorData.getDouble(DeviceApiConstants.REQ_LAT);
         } catch (Exception ex) {
             lon = null;
             lat = null;
         }
-        deviceData = sensorData.getJSONObject(REQ_DEVICE_DATA);
+        deviceData = sensorData.getJSONObject(DeviceApiConstants.REQ_DEVICE_DATA);
         if (null != deviceData) {
-            rsoc = WzStringUtil.defaultIfBlank(deviceData.getString(REQ_RSOC), "");
-            quanity = WzStringUtil.defaultIfBlank(deviceData.getString(REQ_QUANITY), "");
-            ps = WzStringUtil.defaultIfBlank(deviceData.getString(REQ_PS), "");
+            rsoc = WzStringUtil.defaultIfBlank(deviceData.getString(DeviceApiConstants.REQ_RSOC), "");
+            quanity = WzStringUtil.defaultIfBlank(deviceData.getString(DeviceApiConstants.REQ_QUANITY), "");
+            ps = WzStringUtil.defaultIfBlank(deviceData.getString(DeviceApiConstants.REQ_PS), "");
         }
         // 关键字不能为空
         if (WzStringUtil.isBlank(deviceId) || WzStringUtil.isBlank(deviceType)) {
@@ -264,9 +223,9 @@ public class DeviceApi extends BaseController {
             // 组装定位信息
             JSONObject locVo = new JSONObject();
             long sysTime  = System.currentTimeMillis();
-            locVo.put(KEY_LOC_TIME, sysTime);
-            locVo.put(REQ_LAT, lat);
-            locVo.put(REQ_LON, lon);
+            locVo.put(DeviceApiConstants.KEY_LOC_TIME, new Long(sysTime));
+            locVo.put(DeviceApiConstants.REQ_LAT, lat);
+            locVo.put(DeviceApiConstants.REQ_LON, lon);
             // 记录当前定位
             redisClient.hashOperations().put(WzConstants.GK_DEVICE_LOC_MAP, devicePk, locVo);
             // 记录轨迹信息
@@ -279,8 +238,8 @@ public class DeviceApi extends BaseController {
             } else {
                 List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
                 JSONObject lastLocVo = (JSONObject) lastLocLs.get(0);
-                if (lat.doubleValue() != lastLocVo.getDoubleValue(REQ_LAT)
-                        || lon.doubleValue() != lastLocVo.getDoubleValue(REQ_LON)) {
+                if (lat.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
+                        || lon.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)) {
                     redisClient.zsetOperations().add(trackKey, locVo, sysTime);
                 }
             }
@@ -288,46 +247,46 @@ public class DeviceApi extends BaseController {
         // 记录电池等变化信息
         // 整理电量变化相关信息
         JSONObject powerVo = new JSONObject();
-        powerVo.put(REQ_RSOC, rsoc);
-        powerVo.put(REQ_QUANITY, quanity);
-        powerVo.put(REQ_PS, ps);
+        powerVo.put(DeviceApiConstants.REQ_RSOC, rsoc);
+        powerVo.put(DeviceApiConstants.REQ_QUANITY, quanity);
+        powerVo.put(DeviceApiConstants.REQ_PS, ps);
         JSONObject lastPowerVo  = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVIE_POWER_MAP, devicePk);
         if (null == lastPowerVo) {
             redisClient.hashOperations().put(WzConstants.GK_DEVIE_POWER_MAP, devicePk, powerVo);
         } else {
             if (WzStringUtil.isNotBlank(rsoc)) {
-                lastPowerVo.put(REQ_RSOC, rsoc);
+                lastPowerVo.put(DeviceApiConstants.REQ_RSOC, rsoc);
             }
             if (WzStringUtil.isNotBlank(quanity)) {
-                lastPowerVo.put(REQ_QUANITY, quanity);
+                lastPowerVo.put(DeviceApiConstants.REQ_QUANITY, quanity);
             }
             if (WzStringUtil.isNotBlank(ps)) {
-                lastPowerVo.put(REQ_PS, ps);
+                lastPowerVo.put(DeviceApiConstants.REQ_PS, ps);
             }
             redisClient.hashOperations().put(WzConstants.GK_DEVIE_POWER_MAP, devicePk, lastPowerVo);
         }
         // 保存该设备的基本信息
         // 整理设备基本信息
         JSONObject deviceParamVo = new JSONObject();
-        deviceParamVo.put(REQ_VERSION, version);
-        deviceParamVo.put(REQ_DATE, madeDate);
-        deviceParamVo.put(REQ_PV, pv);
-        deviceParamVo.put(REQ_TV, tv);
+        deviceParamVo.put(DeviceApiConstants.REQ_VERSION, version);
+        deviceParamVo.put(DeviceApiConstants.REQ_DATE, madeDate);
+        deviceParamVo.put(DeviceApiConstants.REQ_PV, pv);
+        deviceParamVo.put(DeviceApiConstants.REQ_TV, tv);
         JSONObject lastDeviceParamVo  = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_PARAM_MAP, devicePk);
         if (null == lastDeviceParamVo) {
             redisClient.hashOperations().put(WzConstants.GK_DEVICE_PARAM_MAP, devicePk, deviceParamVo);
         } else {
             if (WzStringUtil.isNotBlank(version)) {
-                lastDeviceParamVo.put(REQ_VERSION, version);
+                lastDeviceParamVo.put(DeviceApiConstants.REQ_VERSION, version);
             }
             if (WzStringUtil.isNotBlank(madeDate)) {
-                lastDeviceParamVo.put(REQ_DATE, madeDate);
+                lastDeviceParamVo.put(DeviceApiConstants.REQ_DATE, madeDate);
             }
             if (WzStringUtil.isNotBlank(pv)) {
-                lastDeviceParamVo.put(REQ_PV, pv);
+                lastDeviceParamVo.put(DeviceApiConstants.REQ_PV, pv);
             }
             if (WzStringUtil.isNotBlank(tv)) {
-                lastDeviceParamVo.put(REQ_TV, tv);
+                lastDeviceParamVo.put(DeviceApiConstants.REQ_TV, tv);
             }
             redisClient.hashOperations().put(WzConstants.GK_DEVICE_PARAM_MAP, devicePk, lastDeviceParamVo);
         }
