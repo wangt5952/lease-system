@@ -41,6 +41,7 @@ public class BizBatteryController extends BaseController {
 
     /**
      * 查询电池
+     * @param request 请求
      * @param paramAndPaging 查询及分页参数JSON
      * <pre>
      *     {
@@ -78,7 +79,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/list")
-    public MessageResponse list(@RequestBody String paramAndPaging,HttpServletRequest request) {
+    public MessageResponse list(@RequestBody String paramAndPaging, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);

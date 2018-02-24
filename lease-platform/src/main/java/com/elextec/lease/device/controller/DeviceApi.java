@@ -149,7 +149,7 @@ public class DeviceApi extends BaseController {
     }
 
     /**
-     * 获得控制参数.
+     * 上传设备数据.
      * @param data 传输的设备数据
      * <pre>
      *     {

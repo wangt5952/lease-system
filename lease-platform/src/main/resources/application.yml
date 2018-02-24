@@ -10,10 +10,15 @@ spring:
 logging:
   config: classpath:logback.xml
 localsetting:
-  cors:
-    flag: true
   platform-type: mobile
   login-overtime-sec: 300
+  nofilters: /manager/auth/,/mobile/v1/auth/login,/mobile/v1/auth/logout,/mobile/v1/auth/sendsms,/mobile/v1/auth/resetpassword,
+  white-flag: false
+  white-url:
+  black-flag: true
+  black-url:
+  cors:
+    flag: true
   sms:
     url: http://112.74.76.186:8030/service/httpService/httpInterface.do
     username: JSM41961
