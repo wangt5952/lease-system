@@ -36,21 +36,21 @@ public interface BizVehicleMapperExt extends BizVehicleMapper {
      */
     int countExtByParam(BizVehicleParam bizVehicleParam);
 
-    /**
-     * 查询车辆是否已被绑定
-     * @param id 车辆ID
-     * */
-    int isBindOrUnBind(String id);
-
-    /**
-     * 用户与车辆解绑
-     * @param param 车辆ID与用户ID
-     * */
-    int vehicleUnBind(Map<String,Object> param);
-
-    /**
-     * 用户与车辆绑定
-     * @param param 车辆ID与用户ID
-     * */
-    int vehicleBind(Map<String,Object> param);
+//    /**
+//     * 查询车辆是否已被绑定
+//     * @param id 车辆ID
+//     * */
+//    int isBindOrUnBind(String id);
+//
+//    /**
+//     * 用户与车辆解绑
+//     * @param param 车辆ID与用户ID
+//     * */
+//    int vehicleUnBind(Map<String,Object> param);
+//
+//    /**
+//     * 用户与车辆绑定
+//     * @param param 车辆ID与用户ID
+//     * */
+//    int vehicleBind(Map<String,Object> param);
 }
