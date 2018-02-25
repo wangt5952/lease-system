@@ -258,7 +258,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public Map<String, Object> getByPrimaryKey(String id) {
-        return bizVehicleMapperExt.getVehicleInfoById(id);
+    public List<Map<String, Object>> getByPrimaryKey(Map<String, Object> param) {
+        return bizVehicleMapperExt.getVehicleInfoById(param);
     }
 }

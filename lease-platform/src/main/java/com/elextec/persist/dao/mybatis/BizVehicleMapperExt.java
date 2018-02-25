@@ -10,10 +10,10 @@ import java.util.Map;
 public interface BizVehicleMapperExt extends BizVehicleMapper {
     /**
      * 根据ID查询车辆信息.
-     * @param id 车辆ID
+     * @param param 车辆ID,是否查询在用电池
      * @return 车辆信息
      */
-    Map<String, Object> getVehicleInfoById(String id);
+    List<Map<String, Object>> getVehicleInfoById(Map<String, Object> param);
 
     /**
      * 根据用户ID查询车辆信息.
