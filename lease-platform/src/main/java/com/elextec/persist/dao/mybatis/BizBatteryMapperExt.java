@@ -5,6 +5,7 @@ import com.elextec.persist.model.mybatis.BizBatteryExample;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BizBatteryMapperExt extends BizBatteryMapper {
     /**
@@ -22,5 +23,5 @@ public interface BizBatteryMapperExt extends BizBatteryMapper {
     int countExtByParam(BizBatteryParam batteryParam);
 
     //根据车辆ID获取电池信息
-    public List<BizBatteryExt> getBatteryInfoByVehicleId(String id);
+    public List<BizBatteryExt> getBatteryInfoByVehicleId(Map<String,Object> param);
 }

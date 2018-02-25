@@ -26,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 资源管理Service实现类.
@@ -225,13 +223,14 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     public List<BizVehicleBatteryParts> getVehiclePartsById(String userId) {
-
         List<BizVehicleBatteryParts> datas = bizVehicleMapperExt.getVehicleInfoByUserId(userId);
-
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("flag",true);
         if(datas.size() > 0){
             for(int i=0;i<datas.size();i++){
                 //根据车辆ID获取电池信息
-                List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(datas.get(i).getId());
+                param.put("id",datas.get(i).getId());
+                List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(param);
                 datas.get(i).setBizBatteries(batteryDatas);
                 //根据车辆ID获取配件信息
                 List<BizPartsExt> partsDatas = bizPartsMapperExt.getById(datas.get(i).getId());
@@ -240,4 +239,26 @@ public class SysUserServcieImpl implements SysUserService {
         }
         return datas;
     }
+
+    @Override
+    public void unBind(String userId, String vehicleId) {
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("userId",userId);
+        param.put("vehicleId",vehicleId);
+        bizVehicleMapperExt.vehicleUnBind(param);
+    }
+
+    @Override
+    public void bind(String userId, String vehicleId) {
+        //校验车辆是否已经被绑定
+        int count = bizVehicleMapperExt.isBindOrUnBind(vehicleId);
+        if(count >= 1){
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "车辆已被绑定");
+        }
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("userId",userId);
+        param.put("vehicleId",vehicleId);
+        bizVehicleMapperExt.vehicleBind(param);
+    }
+
 }

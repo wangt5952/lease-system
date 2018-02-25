@@ -8,6 +8,7 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
+import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
@@ -260,5 +261,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         param.put("id", id);
         param.put("flag", isUsed);
         return bizVehicleMapperExt.getVehicleInfoById(param);
+    }
+
+    @Override
+    public List<BizVehicleBatteryParts> getByUserId(String id) {
+        return bizVehicleMapperExt.getVehicleInfoByUserId(id);
     }
 }
