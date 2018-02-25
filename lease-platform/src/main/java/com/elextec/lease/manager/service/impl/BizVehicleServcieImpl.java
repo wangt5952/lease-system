@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 车辆管理Service实现类.
@@ -258,7 +255,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<Map<String, Object>> getByPrimaryKey(Map<String, Object> param) {
+    public List<Map<String, Object>> getByPrimaryKey(String id,Boolean flag) {
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("id",id);
+        param.put("flag",flag);
         return bizVehicleMapperExt.getVehicleInfoById(param);
     }
 }

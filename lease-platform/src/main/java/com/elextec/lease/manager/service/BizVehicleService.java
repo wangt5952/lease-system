@@ -69,7 +69,8 @@ public interface BizVehicleService {
 
     /**
      * 根据ID查询车辆信息
-     * @param param 车辆ID,是否查询在用电池
+     * @param id 车辆ID
+     * @param flag 是否查询在用电池
      * */
-    public List<Map<String,Object>> getByPrimaryKey(Map<String,Object> param);
+    public List<Map<String,Object>> getByPrimaryKey(String id,Boolean flag);
 }
