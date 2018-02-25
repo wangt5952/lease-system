@@ -23,7 +23,7 @@
         where r.user_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
     </select>
 
-    <select id="getVehicleInfoById" parameterType="java.lang.String" resultType="java.util.Map">
+    <select id="getVehicleInfoById" parameterType="java.util.Map" resultType="java.util.Map">
         select
         v.id vehicleId,
         v.vehicle_code,
@@ -49,9 +49,13 @@
         from biz_vehicle v
         LEFT JOIN biz_manufacturer m1 ON v.mfrs_id = m1.id
         LEFT JOIN biz_ref_vehicle_battery r ON v.id = r.vehicle_id
+        <if test="flag" >
+            and r.unbind_time is NULL
+        </if>
         LEFT JOIN biz_battery b ON r.battery_id = b.id
         LEFT JOIN biz_manufacturer m2 ON b.mfrs_id = m2.id
         where v.id = #{id,jdbcType=VARCHAR}
+
     </select>
 
     <select id="selectExtByParam" resultMap="BizVehicleExtResultMap" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >

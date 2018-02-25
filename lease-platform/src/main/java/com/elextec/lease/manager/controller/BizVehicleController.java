@@ -429,16 +429,19 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 根据ID获取车辆信息.
-     * @param id 车辆ID
+     * @param param 车辆ID以及是否查询在用电池
      * <pre>
-     *     [id]
+     *     {
+     *         id:车辆ID,
+     *         flag:是否查询在用电池（true是查询在用电池，false是查询全部电池）
+     *     }
      * </pre>
      * @return 根据ID获取车辆信息返回
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:{
+     *         respData:[{
      *                 vehicleId:ID,
      *                 vehicleCode:车辆编号,
      *                 vehiclePn:车辆型号,
@@ -460,30 +463,33 @@ public class BizVehicleController extends BaseController {
      *                 createTime:创建时间,
      *                 updateUser:更新人,
      *                 updateTime:更新时间
-     *             }
-     *     }
+     *             },
+     *             .....
+     *             ]
+     *       }
+     *
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String id) {
+    public MessageResponse getByPK(@RequestBody String param) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(id)) {
+        if (WzStringUtil.isBlank(param)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            List<String> vehicleId = null;
+            Map<String,Object> paramMap = null;
             try {
-                String paramStr = URLDecoder.decode(id, "utf-8");
-                vehicleId = JSON.parseArray(paramStr, String.class);
-                if (null == vehicleId || 0 == vehicleId.size() || WzStringUtil.isBlank(vehicleId.get(0))) {
+                String paramStr = URLDecoder.decode(param, "utf-8");
+                paramMap = JSON.parseObject(paramStr, Map.class);
+                if (null == paramMap || 0 == paramMap.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 
-            Map<String,Object> vehicleInfo = bizVehicleService.getByPrimaryKey(vehicleId.get(0));
+            List<Map<String,Object>> vehicleInfo = bizVehicleService.getByPrimaryKey(paramMap);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, vehicleInfo);
             return mr;
@@ -544,7 +550,7 @@ public class BizVehicleController extends BaseController {
             StringBuffer errMsgs = new StringBuffer("");
             for (String vId : vehicleIds) {
                 if (WzStringUtil.isNotBlank(vId)) {
-                    vehicleInfo = bizVehicleService.getByPrimaryKey(vId);
+//                    vehicleInfo = bizVehicleService.getByPrimaryKey(vId);
                     batteryId = (String) vehicleInfo.get("batteryId");
                     batteryCode = (String) vehicleInfo.get("batteryCode");
                     if (WzStringUtil.isBlank(batteryCode)) {
