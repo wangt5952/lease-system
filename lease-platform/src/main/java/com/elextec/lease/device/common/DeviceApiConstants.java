@@ -51,4 +51,6 @@ public class DeviceApiConstants {
 
     /** 定位时间. */
     public static final String KEY_LOC_TIME = "LocTime";
+    /** 停留时间（单位:毫秒）. */
+    public static final String KEY_STAY_TIME = "StayTime";
 }
