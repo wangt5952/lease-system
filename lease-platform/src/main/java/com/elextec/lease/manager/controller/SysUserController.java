@@ -573,7 +573,7 @@ public class SysUserController extends BaseController {
      * <pre>
      *     {
      *         userId:用户ID,
-     *         VehicleId:车辆ID
+     *         vehicleId:车辆ID
      *     }
      * </pre>
      * @return 查询结果
@@ -581,7 +581,7 @@ public class SysUserController extends BaseController {
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:{}
+     *         respData:""
      *     }
      * </pre>
      */
@@ -606,13 +606,12 @@ public class SysUserController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.bind(param.get("userId"),param.get("vehicleId"));
+            sysUserService.bind(param.get("userId"), param.get("vehicleId"));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
         }
     }
-
 
     /**
      * 用户与车辆解绑接口.
@@ -620,7 +619,7 @@ public class SysUserController extends BaseController {
      * <pre>
      *     {
      *         userId:用户ID,
-     *         VehicleId:车辆ID
+     *         vehicleId:车辆ID
      *     }
      * </pre>
      * @return 查询结果
@@ -628,12 +627,12 @@ public class SysUserController extends BaseController {
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:{}
+     *         respData:""
      *     }
      * </pre>
      */
     @RequestMapping(path = "/vehicleunbind")
-    public MessageResponse vehicleUnBind(@RequestBody String userIdAndVehicleId) {
+    public MessageResponse vehicleUnbind(@RequestBody String userIdAndVehicleId) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(userIdAndVehicleId)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -648,18 +647,15 @@ public class SysUserController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 if (WzStringUtil.isBlank((String) param.get("userId")) || WzStringUtil.isBlank((String) param.get("vehicleId"))) {
-                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
                 }
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.unBind(param.get("userId"),param.get("vehicleId"));
+            sysUserService.unBind(param.get("userId"), param.get("vehicleId"));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
         }
     }
-
-
-
 }
