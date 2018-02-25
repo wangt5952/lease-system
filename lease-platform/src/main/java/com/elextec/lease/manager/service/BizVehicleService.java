@@ -70,7 +70,7 @@ public interface BizVehicleService {
     /**
      * 根据ID查询车辆信息
      * @param id 车辆ID
-     * @param flag 是否查询在用电池
+     * @param isUsed 是否查询在用电池，true：查在用电池；false：查在用及解绑的电池
      * */
-    public List<Map<String,Object>> getByPrimaryKey(String id,Boolean flag);
+    public List<Map<String,Object>> getByPrimaryKey(String id, Boolean isUsed);
 }

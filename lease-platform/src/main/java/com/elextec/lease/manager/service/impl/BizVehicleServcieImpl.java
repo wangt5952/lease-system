@@ -255,10 +255,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<Map<String, Object>> getByPrimaryKey(String id,Boolean flag) {
+    public List<Map<String, Object>> getByPrimaryKey(String id, Boolean isUsed) {
         Map<String,Object> param = new HashMap<String,Object>();
-        param.put("id",id);
-        param.put("flag",flag);
+        param.put("id", id);
+        param.put("flag", isUsed);
         return bizVehicleMapperExt.getVehicleInfoById(param);
     }
 }

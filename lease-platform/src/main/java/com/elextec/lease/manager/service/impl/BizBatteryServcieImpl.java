@@ -151,7 +151,7 @@ public class BizBatteryServcieImpl implements BizBatteryService {
 
 
     @Override
-    public BizBattery getBatteryByPrimaryKey(String id) {
+    public BizBattery getByPrimaryKey(String id) {
         return bizBatteryMapperExt.selectByPrimaryKey(id);
     }
 }

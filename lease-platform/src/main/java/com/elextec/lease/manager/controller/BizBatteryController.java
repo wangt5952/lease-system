@@ -402,7 +402,7 @@ public class BizBatteryController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            BizBattery battery = bizBatteryService.getBatteryByPrimaryKey(batteryId.get(0));
+            BizBattery battery = bizBatteryService.getByPrimaryKey(batteryId.get(0));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,battery);
             return mr;
@@ -461,7 +461,7 @@ public class BizBatteryController extends BaseController {
             StringBuffer errMsgs = new StringBuffer("");
             for (String bId : batteryIds) {
                 if (WzStringUtil.isNotBlank(bId)) {
-                    batteryInfo = bizBatteryService.getBatteryByPrimaryKey(bId);
+                    batteryInfo = bizBatteryService.getByPrimaryKey(bId);
                     if (WzStringUtil.isBlank(batteryInfo.getBatteryCode())) {
                         errMsgs.append("未查询到电池[ID:" + bId + "]对应的设备;");
                         continue;
@@ -477,19 +477,104 @@ public class BizBatteryController extends BaseController {
                         errMsgs.append("未查询到电池[ID:" + bId + "]对应设备的定位信息;");
                         continue;
                     }
+                    locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, "");
+                    locData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, bId);
+                    locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryInfo.getBatteryCode());
+                    locData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
+                    locDatas.add(locData);
                 }
-                locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, "");
-                locData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, bId);
-                locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryInfo.getBatteryCode());
-                locData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
-                locDatas.add(locData);
             }
             // 返回结果
             MessageResponse mr = null;
             if (0 == errMsgs.length()) {
                 mr = new MessageResponse(RunningResult.SUCCESS, locDatas);
             } else {
-                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString());
+                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), locDatas);
+            }
+            return mr;
+        }
+    }
+
+    /**
+     * 根据电池ID列表获取设备电量信息列表.
+     * @param ids 电池ID列表
+     * <pre>
+     *     [id1,id2,...]
+     * </pre>
+     * @return 根据ID获取设备电量信息
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 VehicleID:车辆ID,
+     *                 BatteryID:电池ID,
+     *                 DeviceID:设备ID,
+     *                 DeviceType:设备类型,
+     *                 RSOC:电池剩余容量百分比,
+     *                 Quanity:设备电量,
+     *                 PS:保护状态
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/getpowerbybatterypk")
+    public MessageResponse getPowerByBatteryPK(@RequestBody String ids) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(ids)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> batteryIds = null;
+            try {
+                String paramStr = URLDecoder.decode(ids, "utf-8");
+                batteryIds = JSON.parseArray(paramStr, String.class);
+                if (null == batteryIds || 0 == batteryIds.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 循环获得车辆电池信息并获得定位信息
+            BizBattery batteryInfo = null;
+            String devicePk = null;
+            JSONObject powerData = null;
+            List<JSONObject> powerDatas = new ArrayList<JSONObject>();
+            StringBuffer errMsgs = new StringBuffer("");
+            for (String bId : batteryIds) {
+                if (WzStringUtil.isNotBlank(bId)) {
+                    batteryInfo = bizBatteryService.getByPrimaryKey(bId);
+                    if (WzStringUtil.isBlank(batteryInfo.getBatteryCode())) {
+                        errMsgs.append("未查询到电池[ID:" + bId + "]对应的设备;");
+                        continue;
+                    }
+                    // 根据设备ID查询设备当前位置
+                    devicePk = batteryInfo.getBatteryCode() + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString();
+                    powerData = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVIE_POWER_MAP, devicePk);
+                    // 组织返回结果
+                    if (null == powerData) {
+                        powerData = new JSONObject();
+                        powerData.put(DeviceApiConstants.REQ_RSOC, 0);
+                        powerData.put(DeviceApiConstants.REQ_QUANITY, 0);
+                        powerData.put(DeviceApiConstants.REQ_PS, 0);
+                    }
+                    powerData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, "");
+                    powerData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, bId);
+                    powerData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryInfo.getBatteryCode());
+                    powerData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
+                    powerDatas.add(powerData);
+                }
+            }
+            // 返回结果
+            MessageResponse mr = null;
+            if (0 == errMsgs.length()) {
+                mr = new MessageResponse(RunningResult.SUCCESS, powerDatas);
+            } else {
+                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), powerDatas);
             }
             return mr;
         }

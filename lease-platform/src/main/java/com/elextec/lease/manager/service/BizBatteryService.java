@@ -58,6 +58,6 @@ public interface BizBatteryService {
     /**
      * 根据ID查询电池信息
      * @param id 电池ID
-     * */
-    public BizBattery getBatteryByPrimaryKey(String id);
+     */
+    public BizBattery getByPrimaryKey(String id);
 }
