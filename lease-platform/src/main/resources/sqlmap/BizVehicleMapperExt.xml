@@ -58,28 +58,28 @@
 
     </select>
 
-    <select id="isBindOrUnBind" parameterType="java.lang.String" resultType="java.lang.Integer">
-        select
-        count(*)
-        from biz_vehicle v
-        LEFT JOIN biz_ref_user_vehicle r ON v.id = r.vehicle_id
-        where v.id = #{id,jdbcType=VARCHAR}
-        and r.bind_time is NOT NULL and r.unbind_time is NULL
-    </select>
+    <!--<select id="isBindOrUnBind" parameterType="java.lang.String" resultType="java.lang.Integer">-->
+        <!--select-->
+        <!--count(*)-->
+        <!--from  biz_ref_user_vehicle r-->
+        <!--LEFT JOIN biz_vehicle v ON v.id = r.vehicle_id-->
+        <!--where r.vehicle_id = #{id,jdbcType=VARCHAR}-->
+        <!--and r.bind_time is NOT NULL and r.unbind_time is NULL-->
+    <!--</select>-->
 
-    <update id="vehicleUnBind" parameterType="java.util.Map" >
-        update biz_ref_user_vehicle set
-        unbind_time = now()
-        where user_id = #{userId,jdbcType=VARCHAR}
-        and vehicle_id = #{vehicleId,jdbcType=VARCHAR}
-        and bind_time is NOT NULL
-        and unbind_time is NULL
-    </update>
+    <!--<update id="vehicleUnBind" parameterType="java.util.Map" >-->
+        <!--update biz_ref_user_vehicle set-->
+        <!--unbind_time = now()-->
+        <!--where user_id = #{userId,jdbcType=VARCHAR}-->
+        <!--and vehicle_id = #{vehicleId,jdbcType=VARCHAR}-->
+        <!--and bind_time is NOT NULL-->
+        <!--and unbind_time is NULL-->
+    <!--</update>-->
 
-    <insert id="vehicleBind" parameterType="java.util.Map" >
-        insert into biz_ref_user_vehicle (user_id,vehicle_id,bind_time)
-        values (#{userId,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR},now())
-    </insert>
+    <!--<insert id="vehicleBind" parameterType="java.util.Map" >-->
+        <!--insert into biz_ref_user_vehicle (user_id,vehicle_id,bind_time)-->
+        <!--values (#{userId,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR},now())-->
+    <!--</insert>-->
 
 
 

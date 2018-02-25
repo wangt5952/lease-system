@@ -46,11 +46,11 @@ public interface BizVehicleMapperExt extends BizVehicleMapper {
      * 用户与车辆解绑
      * @param param 车辆ID与用户ID
      * */
-    void vehicleUnBind(Map<String,Object> param);
+    int vehicleUnBind(Map<String,Object> param);
 
     /**
      * 用户与车辆绑定
      * @param param 车辆ID与用户ID
      * */
-    void vehicleBind(Map<String,Object> param);
+    int vehicleBind(Map<String,Object> param);
 }

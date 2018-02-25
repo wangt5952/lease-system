@@ -10,13 +10,8 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
-import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
-import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
-import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
-import com.elextec.persist.dao.mybatis.SysUserMapperExt;
-import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
-import com.elextec.persist.model.mybatis.SysUser;
-import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.dao.mybatis.*;
+import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
@@ -49,6 +44,9 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Autowired
     private BizPartsMapperExt bizPartsMapperExt;
+
+    @Autowired
+    private BizRefUserVehicleMapperExt bizRefUserVehicleMapperExt;
 
     @Override
     public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr) {
@@ -242,23 +240,49 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     public void unBind(String userId, String vehicleId) {
-        Map<String,Object> param = new HashMap<String,Object>();
-        param.put("userId",userId);
-        param.put("vehicleId",vehicleId);
-        bizVehicleMapperExt.vehicleUnBind(param);
+//        Map<String,Object> param = new HashMap<String,Object>();
+//        param.put("userId",userId);
+//        param.put("vehicleId",vehicleId);
+        BizRefUserVehicle param = new BizRefUserVehicle();
+        param.setUnbindTime(new Date());
+        BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+        BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+        selectRefCriteria.andUserIdEqualTo(userId);
+        selectRefCriteria.andVehicleIdEqualTo(vehicleId);
+        selectRefCriteria.andBindTimeIsNotNull();
+        selectRefCriteria.andUnbindTimeIsNull();
+        int temp = bizRefUserVehicleMapperExt.updateByExampleSelective(param,refExample);
+        if(temp < 1){
+            throw new BizException(RunningResult.BAD_REQUEST.code(), "车辆未被绑定或未与该用户绑定");
+        }
     }
 
     @Override
     public void bind(String userId, String vehicleId) {
         //校验车辆是否已经被绑定
-        int count = bizVehicleMapperExt.isBindOrUnBind(vehicleId);
+//        int count = bizVehicleMapperExt.isBindOrUnBind(vehicleId);
+
+        BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+        BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+        selectRefCriteria.andVehicleIdEqualTo(vehicleId);
+        selectRefCriteria.andBindTimeIsNotNull();
+        selectRefCriteria.andUnbindTimeIsNull();
+        int count = bizRefUserVehicleMapperExt.countByExample(refExample);
+
         if(count >= 1){
-            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "车辆已被绑定");
+            throw new BizException(RunningResult.BAD_REQUEST.code(), "车辆已被绑定");
         }
-        Map<String,Object> param = new HashMap<String,Object>();
-        param.put("userId",userId);
-        param.put("vehicleId",vehicleId);
-        bizVehicleMapperExt.vehicleBind(param);
+
+        BizRefUserVehicle param = new BizRefUserVehicle();
+        param.setUserId(userId);
+        param.setVehicleId(vehicleId);
+        param.setBindTime(new Date());
+        bizRefUserVehicleMapperExt.insert(param);
+//        Map<String,Object> param = new HashMap<String,Object>();
+//        param.put("userId",userId);
+//        param.put("vehicleId",vehicleId);
+//        bizVehicleMapperExt.vehicleBind(param);
+
     }
 
 }
