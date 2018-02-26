@@ -33,7 +33,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 车辆管理Controller.
@@ -696,6 +695,98 @@ public class BizVehicleController extends BaseController {
             } else {
                 mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), powerDatas);
             }
+            return mr;
+        }
+    }
+
+    /**
+     * 车辆与电池绑定接口.
+     * @param vehicleIdAndBatteryId 车辆ID与电池
+     * <pre>
+     *     {
+     *         vehicleId:车辆ID,
+     *         batteryId:电池ID
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/batterybind")
+    public MessageResponse batteryBind(@RequestBody String vehicleIdAndBatteryId) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(vehicleIdAndBatteryId)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(vehicleIdAndBatteryId, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizVehicleService.bind(param.get("vehicleId"), param.get("batteryId"));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 车辆与电池解绑接口.
+     * @param vehicleIdAndBatteryId 用户ID与车辆ID
+     * <pre>
+     *     {
+     *         vehicleId:车辆ID,
+     *         batteryId:电池ID
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/batteryunbind")
+    public MessageResponse batteryUnbind(@RequestBody String vehicleIdAndBatteryId) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(vehicleIdAndBatteryId)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(vehicleIdAndBatteryId, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizVehicleService.unBind(param.get("vehicleId"), param.get("batteryId"));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
         }
     }
