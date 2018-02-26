@@ -51,7 +51,7 @@ public interface BizVehicleService {
     public void insertVehicles(List<VehicleBatteryParam> vehicleInfos);
 
     /**
-     * 插入电池.
+     * 插入车辆.
      * @param vehicleInfo 用户信息
      */
     public void insertVehicle(VehicleBatteryParam vehicleInfo);

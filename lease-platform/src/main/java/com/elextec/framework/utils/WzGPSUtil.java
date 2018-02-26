@@ -35,6 +35,120 @@ public class WzGPSUtil {
     }
 
     /**
+     * BD-09坐标转换为WGS-84坐标.
+     * @param lat BD-09纬度
+     * @param lng BD-09经度
+     * @return WGS经纬度[WGS纬度, WGS经度]
+     */
+    public static double[] bd2wgs(double lat, double lng) {
+        double[] bd2gcj = bd2gcj(lat, lng);
+//        double[] gcj2wgs = gcj2wgs(bd2gcj[0], bd2gcj[1]);
+        double[] gcj2wgs = gcj2wgsExact(bd2gcj[0], bd2gcj[1]);
+        return gcj2wgs;
+    }
+
+    /**
+     * Krasovsky_1940椭球体计算.
+     * @param lat 纬度
+     * @param lng 经度
+     * @return 计算结果经纬度[纬度, 经度]
+     */
+    private static double[] delta(double lat, double lng) {
+        double dLat = transformLat(lng - 105.0, lat - 35.0);
+        double dLng = transformLng(lng - 105.0, lat - 35.0);
+        double radLat = lat / 180.0 * PI;
+        double magic = Math.sin(radLat);
+        magic = 1 - EE * magic * magic;
+        double sqrtMagic = Math.sqrt(magic);
+        dLat = (dLat * 180.0) / ((A * (1 - EE)) / (magic * sqrtMagic) * PI);
+        dLng = (dLng * 180.0) / (A / sqrtMagic * Math.cos(radLat) * PI);
+        return new double[] {dLat, dLng};
+    }
+
+    /**
+     * WGS-84坐标转换为GCJ-02坐标.
+     * @param lat WGS纬度
+     * @param lng WGS经度
+     * @return GCJ经纬度[GCJ纬度, GCJ经度]
+     */
+    public static double[] wgs2gcj(double lat, double lng) {
+//        double dLat = transformLat(lng - 105.0, lat - 35.0);
+//        double dLon = transformLng(lng - 105.0, lat - 35.0);
+//        double radLat = lat / 180.0 * PI;
+//        double magic = Math.sin(radLat);
+//        magic = 1 - EE * magic * magic;
+//        double sqrtMagic = Math.sqrt(magic);
+//        dLat = (dLat * 180.0) / ((A * (1 - EE)) / (magic * sqrtMagic) * PI);
+//        dLon = (dLon * 180.0) / (A / sqrtMagic * Math.cos(radLat) * PI);
+        if (outOfChina(lat, lng)) {
+            return new double[] {lat, lng};
+        }
+        double[] dLatLng = delta(lat, lng);
+        double mgLat = lat + dLatLng[0];
+        double mgLon = lng + dLatLng[1];
+        double[] loc = { mgLat, mgLon };
+        return loc;
+    }
+
+    /**
+     * GCJ-02坐标转换为WGS-84坐标.
+     * @param lat GCJ纬度
+     * @param lng GCJ经度
+     * @return WGS经纬度[WGS纬度, WGS经度]
+     */
+    public static double[] gcj2wgs(double lat, double lng) {
+        if (outOfChina(lat, lng)) {
+            return new double[] {lat, lng};
+        }
+        double[] dLatLng = delta(lat, lng);
+        double mgLat = lat - dLatLng[0];
+        double mgLon = lng - dLatLng[1];
+        double[] loc = { mgLat, mgLon };
+        return loc;
+    }
+
+    /**
+     * GCJ-02坐标转换为WGS-84坐标（精确）.
+     * @param lat GCJ纬度
+     * @param lng GCJ经度
+     * @return WGS经纬度[WGS纬度, WGS经度]
+     */
+    public static double[] gcj2wgsExact(double lat, double lng) {
+        double initDelta = 0.01;
+        // 精度小数点后6位
+        double threshold = 0.000001;
+        double dLat = initDelta, dLng = initDelta;
+        double mLat = lat - dLat, mLng = lng - dLng;
+        double pLat = lat + dLat, pLng = lng + dLng;
+        double wgsLat, wgsLng;
+        int i = 0;
+        while (true) {
+            wgsLat = (mLat + pLat) / 2;
+            wgsLng = (mLng + pLng) / 2;
+            double[] tmp = wgs2gcj(wgsLat, wgsLng);
+            dLat = tmp[0] - lat;
+            dLng = tmp[1] - lng;
+            if ((Math.abs(dLat) < threshold) && (Math.abs(dLng) < threshold)) {
+                break;
+            }
+            if (dLat > 0){
+                pLat = wgsLat;
+            } else{
+                mLat = wgsLat;
+            }
+            if (dLng > 0) {
+                pLng = wgsLng;
+            } else {
+                mLng = wgsLng;
+            }
+            if (++i > 10000) {
+                break;
+            }
+        }
+        return new double[] {wgsLat, wgsLng};
+    }
+
+    /**
      * GCJ-02坐标转换为BD-09坐标.
      * @param lat GCJ纬度
      * @param lng GCJ经度
@@ -62,27 +176,6 @@ public class WzGPSUtil {
         double gg_lon = z * Math.cos(theta);
         double gg_lat = z * Math.sin(theta);
         return new double[] { gg_lat, gg_lon };
-    }
-
-    /**
-     * WGS-84坐标转换为GCJ-02坐标.
-     * @param lat WGS纬度
-     * @param lng WGS经度
-     * @return GCJ经纬度[GCJ纬度, GCJ经度]
-     */
-    public static double[] wgs2gcj(double lat, double lng) {
-        double dLat = transformLat(lng - 105.0, lat - 35.0);
-        double dLon = transformLng(lng - 105.0, lat - 35.0);
-        double radLat = lat / 180.0 * PI;
-        double magic = Math.sin(radLat);
-        magic = 1 - EE * magic * magic;
-        double sqrtMagic = Math.sqrt(magic);
-        dLat = (dLat * 180.0) / ((A * (1 - EE)) / (magic * sqrtMagic) * PI);
-        dLon = (dLon * 180.0) / (A / sqrtMagic * Math.cos(radLat) * PI);
-        double mgLat = lat + dLat;
-        double mgLon = lng + dLon;
-        double[] loc = { mgLat, mgLon };
-        return loc;
     }
 
     /**
@@ -114,6 +207,22 @@ public class WzGPSUtil {
     }
 
     /**
+     * 坐标是否在中国以外.
+     * @param lat 纬度
+     * @param lng 经度
+     * @return true:中国以外;false:中国以内
+     */
+    private static boolean outOfChina(double lat, double lng) {
+        if (lng < 72.004 || lng > 137.8347) {
+            return true;
+        }
+        if (lat < 0.8293 || lat > 55.8271) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 计算弧度.
      * @param d 角度
      * @return 弧度
@@ -130,7 +239,7 @@ public class WzGPSUtil {
      * @param lng2 第二点经度
      * @return 距离（千米）
      */
-    public static double calcDistance(double lat1, double lng1, double lat2, double lng2) {
+    public static double calcDistanceByKm(double lat1, double lng1, double lat2, double lng2) {
         double radLat1 = rad(lat1);
         double radLat2 = rad(lat2);
         double a = radLat1 - radLat2;
@@ -140,5 +249,17 @@ public class WzGPSUtil {
         s = s * EARTH_RADIUS;
         s = Math.round(s * 10000) / 10000;
         return s;
+    }
+
+    /**
+     * 计算两点距离（米）.
+     * @param lat1 第一点纬度
+     * @param lng1 第一点经度
+     * @param lat2 第二点纬度
+     * @param lng2 第二点经度
+     * @return 距离（米）
+     */
+    public static double calcDistanceByM(double lat1, double lng1, double lat2, double lng2) {
+        return calcDistanceByKm(lat1, lng1, lat2, lng2) * 1000;
     }
 }

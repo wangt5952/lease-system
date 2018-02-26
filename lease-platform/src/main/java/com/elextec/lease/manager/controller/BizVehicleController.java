@@ -8,9 +8,11 @@ import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzGPSUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.manager.request.BizVehicleParam;
+import com.elextec.lease.manager.request.LocAndRadiusParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.persist.field.enums.DeviceType;
@@ -31,6 +33,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 车辆管理Controller.
@@ -693,6 +696,88 @@ public class BizVehicleController extends BaseController {
             } else {
                 mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), powerDatas);
             }
+            return mr;
+        }
+    }
+
+    /**
+     * 根据定位点及半径获得范围内的所有车辆及定位数据.
+     * @param locAndRadius 定位点及半径参数
+     * <pre>
+     *     {
+     *         lat:纬度,
+     *         lng:经度,
+     *         radius:半径(米)
+     *     }
+     * </pre>
+     * @return 根据ID获取设备电量信息
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 VehicleID:车辆ID,
+     *                 BatteryID:电池ID,
+     *                 DeviceID:设备ID,
+     *                 DeviceType:设备类型,
+     *                 RSOC:电池剩余容量百分比,
+     *                 Quanity:设备电量,
+     *                 PS:保护状态
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/listvehiclesbylocandradius")
+    public MessageResponse listVehiclesByLocAndRadius(@RequestBody String locAndRadius) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(locAndRadius)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            LocAndRadiusParam locAndRadiusParam = null;
+            try {
+                String paramStr = URLDecoder.decode(locAndRadius, "utf-8");
+                locAndRadiusParam = JSON.parseObject(paramStr, LocAndRadiusParam.class);
+                if (null == locAndRadiusParam) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (null ==  locAndRadiusParam.getLat()
+                        || null == locAndRadiusParam.getLng()) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "定位点信息异常");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            if (null == locAndRadiusParam.getRadius()) {
+                locAndRadiusParam.setRadius(new Double(1000));
+            }
+            // 将中心点转换为GPS坐标
+            double[] wgsLatLng = WzGPSUtil.bd2wgs(locAndRadiusParam.getLat(), locAndRadiusParam.getLng());
+            // 获得所有在线设备定位信息
+            List<Object> deviceLocs = redisClient.hashOperations().values(WzConstants.GK_DEVICE_LOC_MAP);
+            // 循环所有在线设备判断并获得所有在范围内的设备
+            List<JSONObject> deviceIds = new ArrayList<JSONObject>();
+            JSONObject dLoc = null;
+            for (Object deviceLoc : deviceLocs) {
+                dLoc = (JSONObject) deviceLoc;
+                double dist = WzGPSUtil.calcDistanceByM(locAndRadiusParam.getLat(), locAndRadiusParam.getLng(), dLoc.getDouble(DeviceApiConstants.REQ_LAT), dLoc.getDouble(DeviceApiConstants.REQ_LON));
+                if (dist < locAndRadiusParam.getRadius()) {
+                    deviceIds.add(dLoc);
+                }
+            }
+            // 将所有范围内的
+
+            // 返回结果
+            MessageResponse mr = null;
+//            if (0 == errMsgs.length()) {
+//                mr = new MessageResponse(RunningResult.SUCCESS, powerDatas);
+//            } else {
+//                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), powerDatas);
+//            }
             return mr;
         }
     }

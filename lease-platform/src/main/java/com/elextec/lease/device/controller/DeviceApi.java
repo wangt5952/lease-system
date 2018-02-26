@@ -220,27 +220,39 @@ public class DeviceApi extends BaseController {
         redisClient.setOperations().add(WzConstants.GK_DEVICE_PK_SET, devicePk);
         // 记录当前位置信息及轨迹信息到缓存
         if (null != lat && null != lon) {
+            long sysTime  = System.currentTimeMillis();
             // 组装定位信息
             JSONObject locVo = new JSONObject();
-            long sysTime  = System.currentTimeMillis();
+            locVo.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, deviceId);
+            locVo.put(DeviceApiConstants.REQ_DEVICE_TYPE, deviceType);
             locVo.put(DeviceApiConstants.KEY_LOC_TIME, new Long(sysTime));
             locVo.put(DeviceApiConstants.REQ_LAT, lat);
             locVo.put(DeviceApiConstants.REQ_LON, lon);
             // 记录当前定位
-            redisClient.hashOperations().put(WzConstants.GK_DEVICE_LOC_MAP, devicePk, locVo);
+            JSONObject nowLocVo = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_LOC_MAP, devicePk);
+            if (null == nowLocVo
+                    || lat.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
+                    || lon.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)) {
+                redisClient.hashOperations().put(WzConstants.GK_DEVICE_LOC_MAP, devicePk, locVo);
+            }
             // 记录轨迹信息
             // 轨迹信息
             String trackKey = WzConstants.GK_DEVICE_TRACK + devicePk;
+            // 组装轨迹定位信息
+            JSONObject trackLocVo = new JSONObject();
+            trackLocVo.put(DeviceApiConstants.KEY_LOC_TIME, new Long(sysTime));
+            trackLocVo.put(DeviceApiConstants.REQ_LAT, lat);
+            trackLocVo.put(DeviceApiConstants.REQ_LON, lon);
             // 获得上次记录的最终位置
             Set<Object> lastLocSet = redisClient.zsetOperations().reverseRange(trackKey, 0, 0);
             if (null == lastLocSet || 0 == lastLocSet.size()) {
-                redisClient.zsetOperations().add(trackKey, locVo, sysTime);
+                redisClient.zsetOperations().add(trackKey, trackLocVo, sysTime);
             } else {
                 List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
                 JSONObject lastLocVo = (JSONObject) lastLocLs.get(0);
                 if (lat.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
                         || lon.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)) {
-                    redisClient.zsetOperations().add(trackKey, locVo, sysTime);
+                    redisClient.zsetOperations().add(trackKey, trackLocVo, sysTime);
                 }
             }
         }
