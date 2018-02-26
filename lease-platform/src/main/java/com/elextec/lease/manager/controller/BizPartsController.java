@@ -1,6 +1,7 @@
 package com.elextec.lease.manager.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
@@ -18,14 +19,12 @@ import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 配件管理Controller.
@@ -426,6 +425,94 @@ public class BizPartsController extends BaseController {
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, bizParts);
             return mr;
         }
+    }
+
+    /**
+     * 车辆和配件绑定接口
+     * @param vehicleIdAndPartsId 车辆id和配件id
+     * <pre>
+     *     {
+     *         vehicleId:车辆ID,
+     *         partsId:配件ID
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/partBind",method = RequestMethod.POST)
+    public MessageResponse partBind(@RequestBody String vehicleIdAndPartsId){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(vehicleIdAndPartsId)){
+            return new MessageResponse(RunningResult.NO_PARAM);
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> map = null;
+            try {
+                String paramStr = URLDecoder.decode(vehicleIdAndPartsId,"utf-8");
+                map = JSONObject.parseObject(paramStr,Map.class);
+                if (map == null || map.size() == 0) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(),"查询参数不能为空");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizPartsService.bind(map.get("vehicleId"),map.get("partsId"));
+            return new MessageResponse(RunningResult.SUCCESS);
+        }
+    }
+
+    /**
+     * 车辆和配件解绑接口
+     * @param vehicleIdAndPartsId 车辆ID和配件ID
+     * <pre>
+     *      {
+     *          vehicleId:车辆ID，
+     *          partsId:配件ID
+     *      }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/partsUnBind",method = RequestMethod.POST)
+    public MessageResponse partsUnBind(@RequestBody String vehicleIdAndPartsId){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(vehicleIdAndPartsId)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> map = null;
+            try {
+                String paramStr = URLDecoder.decode(vehicleIdAndPartsId, "utf-8");
+                map = JSON.parseObject(paramStr, Map.class);
+                if (map == null || map.size() == 0) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            bizPartsService.unBind(map.get("vehicleId"), map.get("partsId"));
+            // 组织返回结果并返回
+            return new MessageResponse(RunningResult.SUCCESS);
+        }
+        
     }
 
 }

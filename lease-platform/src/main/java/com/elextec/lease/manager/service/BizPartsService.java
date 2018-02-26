@@ -60,4 +60,18 @@ public interface BizPartsService {
      * */
     public BizParts getBizPartsByPrimaryKey(String id);
 
+    /**
+     * 车辆和配件绑定接口
+     * @param vehicleId 车辆ID
+     * @param partsId 配件ID
+     */
+    public void bind(String vehicleId,String partsId);
+
+    /**
+     * 车辆和配件解绑接口
+     * @param vehicleId 车辆ID
+     * @param partsId 配件ID
+     */
+    public void unBind(String vehicleId,String partsId);
+
 }
