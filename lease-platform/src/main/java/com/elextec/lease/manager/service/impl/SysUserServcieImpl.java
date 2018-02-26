@@ -240,9 +240,6 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     public void unBind(String userId, String vehicleId) {
-//        Map<String,Object> param = new HashMap<String,Object>();
-//        param.put("userId",userId);
-//        param.put("vehicleId",vehicleId);
         BizRefUserVehicle param = new BizRefUserVehicle();
         param.setUnbindTime(new Date());
         BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
@@ -259,17 +256,33 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     public void bind(String userId, String vehicleId) {
-        //校验车辆是否已经被绑定
-//        int count = bizVehicleMapperExt.isBindOrUnBind(vehicleId);
 
+        //判定用户是否存在
+        SysUserExample userExample = new SysUserExample();
+        SysUserExample.Criteria selectUserCriteria = userExample.createCriteria();
+        selectUserCriteria.andIdEqualTo(userId);
+        int userCount = sysUserMapperExt.countByExample(userExample);
+        if(userCount<1){
+            throw new BizException(RunningResult.NO_USER.code(), "用户不存在");
+        }
+
+        //判定车辆是否存在
+        BizVehicleExample vehicleExample = new BizVehicleExample();
+        BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
+        selectVehicleCriteria.andIdEqualTo(vehicleId);
+        int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
+        if(vehicleCount < 1){
+            throw new BizException(RunningResult.NO_VEHICLE.code(), "车辆不存在");
+        }
+
+        //校验车辆是否已经被绑定
         BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
         BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
         selectRefCriteria.andVehicleIdEqualTo(vehicleId);
         selectRefCriteria.andBindTimeIsNotNull();
         selectRefCriteria.andUnbindTimeIsNull();
-        int count = bizRefUserVehicleMapperExt.countByExample(refExample);
-
-        if(count >= 1){
+        int refCount = bizRefUserVehicleMapperExt.countByExample(refExample);
+        if(refCount >= 1){
             throw new BizException(RunningResult.BAD_REQUEST.code(), "车辆已被绑定");
         }
 
@@ -278,10 +291,6 @@ public class SysUserServcieImpl implements SysUserService {
         param.setVehicleId(vehicleId);
         param.setBindTime(new Date());
         bizRefUserVehicleMapperExt.insert(param);
-//        Map<String,Object> param = new HashMap<String,Object>();
-//        param.put("userId",userId);
-//        param.put("vehicleId",vehicleId);
-//        bizVehicleMapperExt.vehicleBind(param);
 
     }
 

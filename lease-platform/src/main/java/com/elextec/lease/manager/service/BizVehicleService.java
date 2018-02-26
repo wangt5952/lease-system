@@ -82,4 +82,19 @@ public interface BizVehicleService {
     public List<BizVehicleBatteryParts> getByUserId(String id);
 
 
+    /**
+     * 车辆与电池解绑.
+     * @param vehicleId 车辆ID
+     * @param batteryId 电池ID
+     */
+    public void unBind(String vehicleId,String batteryId);
+
+    /**
+     * 车辆与电池绑定.
+     * @param vehicleId 车辆ID
+     * @param batteryId 电池ID
+     */
+    public void bind(String vehicleId,String batteryId);
+
+
 }
