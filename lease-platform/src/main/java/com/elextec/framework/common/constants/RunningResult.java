@@ -20,6 +20,8 @@ public enum RunningResult {
     NO_RESOURCE("40110", "未查询到资源"),
     NO_DIRECTORY("40111", "资源目录不存在"),
     NO_VEHICLE("40112", "车辆不存在"),
+    NO_BATTERY("40113", "电池不存在"),
+    NO_PARTS("40114", "配件不存在"),
     FORBIDDEN("403", "禁止访问"),
     NOT_FOUND("404", "服务器无法找到被请求的页面或资源"),
     SERVER_ERROR("500", "服务器错误"),
