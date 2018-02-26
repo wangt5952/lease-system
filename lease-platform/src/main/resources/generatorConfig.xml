@@ -40,7 +40,7 @@
         </javaClientGenerator>
         
         <!-- 规则信息表 -->
-        <!--<table schema="" tableName="sys_user" domainObjectName="SysUser">
+        <table schema="" tableName="sys_user" domainObjectName="SysUser">
             <columnOverride column="user_type" property="userType" javaType="com.elextec.persist.field.enums.OrgAndUserType" jdbcType="VARCHAR"></columnOverride>
             <columnOverride column="user_real_name_auth_flag" property="userRealNameAuthFlag" javaType="com.elextec.persist.field.enums.RealNameAuthFlag" jdbcType="VARCHAR"></columnOverride>
             <columnOverride column="user_status" property="userStatus" javaType="com.elextec.persist.field.enums.RecordStatus" jdbcType="VARCHAR"></columnOverride>
@@ -78,7 +78,7 @@
         </table>
         <table schema="" tableName="biz_device_conf" domainObjectName="BizDeviceConf">
             <columnOverride column="device_type" property="deviceType" javaType="com.elextec.persist.field.enums.DeviceType" jdbcType="VARCHAR"></columnOverride>
-        </table>-->
+        </table>
         <table schema="" tableName="biz_vehicle_track" domainObjectName="BizVehicleTrack">
         </table>
         <!--
