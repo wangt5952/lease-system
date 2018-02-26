@@ -8,8 +8,9 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizPartsParam;
 import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
-import com.elextec.persist.model.mybatis.BizParts;
-import com.elextec.persist.model.mybatis.BizPartsExample;
+import com.elextec.persist.dao.mybatis.BizRefVehiclePartsMapperExt;
+import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
+import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,12 @@ public class BizPartsServiceImpl implements BizPartsService {
 
     @Autowired
     private BizPartsMapperExt bizPartsMapperExt;
+
+    @Autowired
+    private BizVehicleMapperExt bizVehicleMapperExt;
+
+    @Autowired
+    private BizRefVehiclePartsMapperExt bizRefVehiclePartsMapperExt;
 
     @Override
     public PageResponse<BizParts> list(boolean needPaging, PageRequest pr) {
@@ -148,6 +155,64 @@ public class BizPartsServiceImpl implements BizPartsService {
     @Override
     public BizParts getBizPartsByPrimaryKey(String id) {
         return bizPartsMapperExt.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public void bind(String vehicleId, String partsId) {
+        //判定车辆是否存在
+        BizVehicleExample vehicleExample = new BizVehicleExample();
+        BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
+        selectVehicleCriteria.andIdEqualTo(vehicleId);
+        int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
+        if(vehicleCount < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+        }
+
+        //判定配件是否存在
+        BizPartsExample bizPartsExample = new BizPartsExample();
+        BizPartsExample.Criteria selectPartsCriteria = bizPartsExample.createCriteria();
+        selectPartsCriteria.andIdEqualTo(partsId);
+        int partsCount = bizPartsMapperExt.countByExample(bizPartsExample);
+        if (partsCount <1) {
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"配件不存在");
+        }
+
+        //判定车辆和配件是否已经绑定
+        BizRefVehiclePartsExample bizRefVehiclePartsExample = new BizRefVehiclePartsExample();
+        BizRefVehiclePartsExample.Criteria selectRefCriteria = bizRefVehiclePartsExample.createCriteria();
+        selectRefCriteria.andVehicleIdEqualTo(vehicleId);
+        selectRefCriteria.andPartsIdEqualTo(partsId);
+        selectRefCriteria.andBindTimeIsNotNull();
+        selectRefCriteria.andUnbindTimeIsNull();
+        int refCount = bizRefVehiclePartsMapperExt.countByExample(bizRefVehiclePartsExample);
+        if (refCount >= 1) {
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"配件已绑定");
+        }
+
+        //如果车辆存在，配件存在，且未绑定就存入数据库
+        BizRefVehicleParts bizRefVehicleParts = new BizRefVehicleParts();
+        bizRefVehicleParts.setVehicleId(vehicleId);
+        bizRefVehicleParts.setPartsId(partsId);
+        bizRefVehicleParts.setBindTime(new Date());
+        bizRefVehiclePartsMapperExt.insert(bizRefVehicleParts);
+    }
+
+    @Override
+    public void unBind(String vehicleId, String partsId) {
+        BizRefVehicleParts bizRefVehicleParts = new BizRefVehicleParts();
+        bizRefVehicleParts.setUnbindTime(new Date());//给定解绑时间
+
+        //判断车辆和配件是否绑定
+        BizRefVehiclePartsExample bizRefVehiclePartsExample = new BizRefVehiclePartsExample();
+        BizRefVehiclePartsExample.Criteria selectRef = bizRefVehiclePartsExample.createCriteria();
+        selectRef.andVehicleIdEqualTo(vehicleId);
+        selectRef.andPartsIdEqualTo(partsId);
+        selectRef.andBindTimeIsNotNull();
+        selectRef.andUnbindTimeIsNull();
+        int refCount = bizRefVehiclePartsMapperExt.updateByExampleSelective(bizRefVehicleParts,bizRefVehiclePartsExample);
+        if (refCount < 1) {
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"配件未绑定或者未与该车辆绑定");
+        }
     }
 
 }
