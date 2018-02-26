@@ -332,6 +332,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         param.setBatteryId(batteryId);
         param.setBindTime(new Date());
         bizRefVehicleBatteryMapperExt.insert(param);
+    }
 
+    @Override
+    public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes) {
+        return bizVehicleMapperExt.selectExtByBatteryCodes(batteryCodes);
     }
 }

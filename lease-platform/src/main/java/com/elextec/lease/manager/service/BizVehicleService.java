@@ -95,5 +95,10 @@ public interface BizVehicleService {
      */
     public void bind(String vehicleId,String batteryId);
 
-
+    /**
+     * 根据电池编码查询车辆信息.
+     * @param batteryCodes 电池编码列表
+     * @return 车辆信息列表
+     */
+    public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes);
 }

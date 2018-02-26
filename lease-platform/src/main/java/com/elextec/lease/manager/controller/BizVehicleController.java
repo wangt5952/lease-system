@@ -30,9 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 车辆管理Controller.
@@ -792,7 +790,7 @@ public class BizVehicleController extends BaseController {
     }
 
     /**
-     * 根据定位点及半径获得范围内的所有车辆及定位数据.
+     * 根据定位点及半径获得范围内的所有车辆信息及定位、电池电量数据.
      * @param locAndRadius 定位点及半径参数
      * <pre>
      *     {
@@ -801,20 +799,31 @@ public class BizVehicleController extends BaseController {
      *         radius:半径(米)
      *     }
      * </pre>
-     * @return 根据ID获取设备电量信息
+     * @return 车辆信息及定位、电池电量信息列表
      * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
      *         respData:[
      *             {
-     *                 VehicleID:车辆ID,
-     *                 BatteryID:电池ID,
-     *                 DeviceID:设备ID,
-     *                 DeviceType:设备类型,
+     *                 batteryId:电池ID,
+     *                 batteryCode:电池编码,
+     *                 vehicleId:车辆ID,
+     *                 vehicleCode:车辆编码,
+     *                 vehiclePn:车辆型号,
+     *                 vehicleBrand:车辆品牌,
+     *                 vehicleMadeIn:车辆产地,
+     *                 mfrsId:生产商ID,
+     *                 vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间,
+     *                 mfrsName:生产商名,
      *                 RSOC:电池剩余容量百分比,
-     *                 Quanity:设备电量,
-     *                 PS:保护状态
+     *                 LAT:纬度,
+     *                 LON:经度,
+     *                 KEY_LOC_TIME:定位记录时间
      *             },
      *             ... ...
      *         ]
@@ -849,27 +858,35 @@ public class BizVehicleController extends BaseController {
             // 将中心点转换为GPS坐标
             double[] wgsLatLng = WzGPSUtil.bd2wgs(locAndRadiusParam.getLat(), locAndRadiusParam.getLng());
             // 获得所有在线设备定位信息
-            List<Object> deviceLocs = redisClient.hashOperations().values(WzConstants.GK_DEVICE_LOC_MAP);
+            Set<String> deviceKeys = redisClient.hashOperations().keys(WzConstants.GK_DEVICE_LOC_MAP);
             // 循环所有在线设备判断并获得所有在范围内的设备
-            List<JSONObject> deviceIds = new ArrayList<JSONObject>();
+            List<String> deviceCds = new ArrayList<String>();
+            Map<String, JSONObject> deviceLocsCache = new HashMap<String, JSONObject>();
             JSONObject dLoc = null;
-            for (Object deviceLoc : deviceLocs) {
-                dLoc = (JSONObject) deviceLoc;
+            for (String deviceKey : deviceKeys) {
+                dLoc = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_LOC_MAP, deviceKey);
                 double dist = WzGPSUtil.calcDistanceByM(locAndRadiusParam.getLat(), locAndRadiusParam.getLng(), dLoc.getDouble(DeviceApiConstants.REQ_LAT), dLoc.getDouble(DeviceApiConstants.REQ_LON));
                 if (dist < locAndRadiusParam.getRadius()) {
-                    deviceIds.add(dLoc);
+                    deviceLocsCache.put(dLoc.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID), dLoc);
+                    deviceCds.add(dLoc.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID));
                 }
             }
-            // 将所有范围内的
-
+            // 查询所有范围内的车辆信息
+            List<Map<String, Object>> vehicles = bizVehicleService.listByBatteryCode(deviceCds);
+            // 循环每个车辆信息并装配位置信息及电量信息
+            JSONObject powerInfo = null;
+            for (Map<String, Object> vh : vehicles) {
+                vh.put(DeviceApiConstants.REQ_LAT, deviceLocsCache.get(vh.get("batteryCode")).getDouble(DeviceApiConstants.REQ_LAT));
+                vh.put(DeviceApiConstants.REQ_LON, deviceLocsCache.get(vh.get("batteryCode")).getDouble(DeviceApiConstants.REQ_LON));
+                powerInfo = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVIE_POWER_MAP, vh.get("batteryCode") + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString());
+                if (null == powerInfo) {
+                    vh.put(DeviceApiConstants.REQ_RSOC, "");
+                } else {
+                    vh.put(DeviceApiConstants.REQ_RSOC, powerInfo.getString(DeviceApiConstants.REQ_RSOC));
+                }
+            }
             // 返回结果
-            MessageResponse mr = null;
-//            if (0 == errMsgs.length()) {
-//                mr = new MessageResponse(RunningResult.SUCCESS, powerDatas);
-//            } else {
-//                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), powerDatas);
-//            }
-            return mr;
+            return new MessageResponse(RunningResult.SUCCESS, vehicles);
         }
     }
 }
