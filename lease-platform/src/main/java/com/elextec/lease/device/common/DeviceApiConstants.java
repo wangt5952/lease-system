@@ -6,6 +6,9 @@ package com.elextec.lease.device.common;
  */
 public class DeviceApiConstants {
 
+    /** 轨迹分段间隔时间，单位：毫秒，默认15分钟. */
+    public static final Long TRACK_STAY_TIME = new Long(900000);
+
     /** 车辆ID. */
     public static final String REQ_RESP_VEHICLE_ID = "VehicleID";
     /** 电池ID. */
