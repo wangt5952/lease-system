@@ -15,10 +15,12 @@ import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.LocAndRadiusParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
+import com.elextec.lease.manager.service.BizVehicleTrackService;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizVehicle;
+import com.elextec.persist.model.mybatis.BizVehicleTrack;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -44,6 +47,9 @@ public class BizVehicleController extends BaseController {
 
     @Autowired
     private BizVehicleService bizVehicleService;
+
+    @Autowired
+    private BizVehicleTrackService bizVehicleTrackService;
 
     /**
      * 查询车辆.
@@ -889,4 +895,158 @@ public class BizVehicleController extends BaseController {
             return new MessageResponse(RunningResult.SUCCESS, vehicles);
         }
     }
+
+    /**
+     * 根据车辆ID以及时间区间获取车辆轨迹信息
+     * @param idAndTimeInterval 车辆ID与时间区间
+     * <pre>
+     *     {
+     *         id:车辆ID,
+     *         startTime:开始时间,
+     *         endTime:结束时间
+     *     }
+     * </pre>
+     * @return 根据车辆ID和时间区间获取车辆的轨迹信息
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 LocTime:记录时间,
+     *                 LAT:纬度,
+     *                 LON:经度,
+     *                 StayTime:停留时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/getlocbyTime")
+    public MessageResponse getLocByTime(@RequestBody String idAndTimeInterval) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(idAndTimeInterval)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> idAndTimeIntervalInfo = null;
+            long startTime = 0;
+            long endTime = 0;
+            try {
+                String paramStr = URLDecoder.decode(idAndTimeInterval, "utf-8");
+                idAndTimeIntervalInfo = JSON.parseObject(paramStr, Map.class);
+                if (null == idAndTimeIntervalInfo) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (null == idAndTimeIntervalInfo.get("id")){
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆ID参数不能为空");
+                }
+                if (null ==  idAndTimeIntervalInfo.get("startTime")
+                        || null == idAndTimeIntervalInfo.get("endTime")) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "时间区间参数不能为空");
+                }
+                SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+                startTime = sdf.parse(idAndTimeIntervalInfo.get("startTime")).getTime();
+                endTime = sdf.parse(idAndTimeIntervalInfo.get("endTime")).getTime();
+                //判定时间参数的正确性
+                if(startTime == 0 || endTime == 0 || startTime > endTime){
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "时间区间参数异常");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 循环获得车辆电池信息并获得定位信息
+            List<Map<String,Object>> vehicleInfos = null;
+            String batteryId = null;
+            String batteryCode = null;
+            String devicePk = null;
+            List<JSONObject> locDatas = new ArrayList<JSONObject>();
+            StringBuffer errMsgs = new StringBuffer("");
+            if (WzStringUtil.isNotBlank(idAndTimeIntervalInfo.get("id"))) {
+                vehicleInfos = bizVehicleService.getByPrimaryKey(idAndTimeIntervalInfo.get("id"), true);
+                if (null == vehicleInfos || 0 == vehicleInfos.size()) {
+                    errMsgs.append("未查询到车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]信息;");
+                } else {
+                        for (Map<String,Object> vehicleInfo : vehicleInfos) {
+                            batteryId = (String) vehicleInfo.get("batteryId");
+                            batteryCode = (String) vehicleInfo.get("batteryCode");
+                            if (WzStringUtil.isBlank(batteryCode)) {
+                                errMsgs.append("未查询到车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]对应的设备;");
+                            }
+                            // 根据设备ID查询设备当前位置
+                            devicePk = batteryCode + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString();
+                            // 轨迹信息
+                            String trackKey = WzConstants.GK_DEVICE_TRACK + devicePk;
+
+                            List<JSONObject> locListTemp = new ArrayList<JSONObject>();
+
+                            //获取数据库中时间区间内的数据
+                            List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByTime(batteryId,DeviceType.BATTERY.toString(),startTime,endTime);
+                            //转换封装数据库的数据
+                            if(null != locList && locList.size() > 0){
+                                for(int i=0;i<locList.size();i++){
+                                    //将数据分割
+                                    String[] locByte = locList.get(i).getLocations().split(";");
+                                    if(null != locByte && locByte.length > 0){
+                                        for(int j=0;j<locByte.length;j++){
+                                            String[] locInfo = locByte[j].split(",");
+                                            //判断参数格式是否正确
+                                            if(locInfo.length == 3){
+                                                //判断数据是否在时间区间内
+                                                if(Long.valueOf(locInfo[0]) >= startTime && Long.valueOf(locInfo[0]) <= endTime){
+                                                    JSONObject temp = new JSONObject();
+                                                    temp.put(DeviceApiConstants.KEY_LOC_TIME, Long.valueOf(locInfo[0]));
+                                                    temp.put(DeviceApiConstants.REQ_LAT, Double.valueOf(locInfo[1]));
+                                                    temp.put(DeviceApiConstants.REQ_LON, Double.valueOf(locInfo[2]));
+                                                    locListTemp.add(temp);
+                                                }
+                                            }else{
+                                                errMsgs.append("车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]对应的轨迹参数格式有误;");
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // 获得缓存中在时间区间内的数据
+                            Set<Object> lastLocSet = redisClient.zsetOperations().range(trackKey, startTime, endTime);
+                            //转换封装缓存中的数据
+                            if (null != lastLocSet && lastLocSet.size()>0) {
+                                List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
+                                for(int i=0;i<lastLocLs.size();i++){
+                                    JSONObject locVo = (JSONObject)lastLocLs.get(i);
+                                    locListTemp.add(locVo);
+                                }
+                            }
+
+                            //计算点与点之间的停留时间重新封装LIST
+                            if(locListTemp.size() > 1){
+                                for(int i=0; i<locListTemp.size();i++){
+                                    if(i+1 < locListTemp.size()){
+                                        JSONObject temp = new JSONObject();
+                                        temp.put(DeviceApiConstants.KEY_LOC_TIME, locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME));
+                                        temp.put(DeviceApiConstants.REQ_LAT, locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT));
+                                        temp.put(DeviceApiConstants.REQ_LON, locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
+                                        long residenceTime = locListTemp.get(i+1).getLongValue(DeviceApiConstants.KEY_LOC_TIME) - locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME);
+                                        temp.put(DeviceApiConstants.KEY_STAY_TIME, residenceTime);
+                                        locDatas.add(temp);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            // 返回结果
+            MessageResponse mr = null;
+            if (0 == errMsgs.length()) {
+                mr = new MessageResponse(RunningResult.SUCCESS, locDatas);
+            } else {
+                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString());
+            }
+            return mr;
+        }
+    }
+
 }
