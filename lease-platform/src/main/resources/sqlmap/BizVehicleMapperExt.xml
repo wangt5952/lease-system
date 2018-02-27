@@ -27,26 +27,26 @@
     <select id="getVehicleInfoById" parameterType="java.util.Map" resultType="java.util.Map">
         select
         v.id vehicleId,
-        v.vehicle_code,
-        v.vehicle_pn,
-        v.vehicle_brand,
-        v.vehicle_made_in,
+        v.vehicle_code vehicleCode,
+        v.vehicle_pn vehiclePn,
+        v.vehicle_brand vehicleBrand,
+        v.vehicle_made_in vehicleMadeIn,
         v.mfrs_id vehicleMfrsId,
-        v.vehicle_status,
-        v.create_user,
-        v.create_time,
-        v.update_user,
-        v.update_time,
+        v.vehicle_status vehicleStatus,
+        v.create_user createUser,
+        v.create_time createTime,
+        v.update_user updateUser,
+        v.update_time updateTime,
         m1.mfrs_name vehicleMfrsName,
         b.id batteryId,
         b.battery_code batteryCode,
-        b.battery_name,
-        b.battery_brand,
-        b.battery_pn,
-        b.battery_parameters,
+        b.battery_name batteryName,
+        b.battery_brand batteryBrand,
+        b.battery_pn batteryPn,
+        b.battery_parameters batteryParameters,
         b.mfrs_id batteryMfrsId,
         m2.mfrs_name batteryMfrsName,
-        b.battery_status
+        b.battery_status batteryStatus
         from biz_vehicle v
         LEFT JOIN biz_manufacturer m1 ON v.mfrs_id = m1.id
         LEFT JOIN biz_ref_vehicle_battery r ON v.id = r.vehicle_id
