@@ -477,9 +477,15 @@ public class WzEncryptUtil {
 //        return new String(str);
 //    }
 public static void main(String args[]) {
-        String b64 = "";
-        byte[] bts = base64ToByteArr(b64);
-        System.out.println(bts.length);
+        String s = "123,123,123;456,456,456;789,789,789;";
+        String[] sarr = s.split(";");
+        System.out.println(sarr.length);
+        for (String ts : sarr) {
+            System.out.println(ts);
+        }
+//        String b64 = "";
+//        byte[] bts = base64ToByteArr(b64);
+//        System.out.println(bts.length);
 //        String ps = getMD5("123", true);
 //        long l = System.currentTimeMillis();
 //        System.out.println(l);

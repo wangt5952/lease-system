@@ -5,6 +5,10 @@ package com.elextec.framework.common.constants;
  */
 public class WzConstants {
 
+    /** 逗号. */
+    public static final String KEY_COMMA = ",";
+    /** 分号. */
+    public static final String KEY_SEMICOLON = ";";
     /** Redis关键字分隔符. */
     public static final String KEY_SPLIT = ":";
 
