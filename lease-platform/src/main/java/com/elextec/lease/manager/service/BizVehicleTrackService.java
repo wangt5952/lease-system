@@ -29,7 +29,7 @@ public interface BizVehicleTrackService {
 
     /**
      * 根据时间区间查询车辆轨迹信息
-     * @param deviceId 设备ID
+     * @param deviceId 设备id
      * @param startTime 开始时间
      * @param endTime 结束时间
      * */
