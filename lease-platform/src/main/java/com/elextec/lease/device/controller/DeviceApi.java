@@ -4,15 +4,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.device.common.DeviceRespMsg;
 import com.elextec.lease.manager.service.BizDeviceConfService;
+import com.elextec.lease.manager.service.BizVehicleTrackService;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.model.mybatis.BizDeviceConf;
 import com.elextec.persist.model.mybatis.BizDeviceConfKey;
+import com.elextec.persist.model.mybatis.BizVehicleTrack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,8 +43,14 @@ public class DeviceApi extends BaseController {
     /** 错误消息. */
     private static final String RESP_ERR_MSG = "errormsg";
 
+    @Value("${localsetting.track-stay-time}")
+    private Long trackStayTime;
+
     @Autowired
     private BizDeviceConfService bizDeviceConfService;
+
+    @Autowired
+    private BizVehicleTrackService bizVehicleTrackService;
 
     /**
      * 获得控制参数.
@@ -221,7 +231,7 @@ public class DeviceApi extends BaseController {
         // 记录当前位置信息及轨迹信息到缓存
         if (null != lat && null != lon) {
             long sysTime  = System.currentTimeMillis();
-            // 组装定位信息
+            // 组装当前位置信息
             JSONObject locVo = new JSONObject();
             locVo.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, deviceId);
             locVo.put(DeviceApiConstants.REQ_DEVICE_TYPE, deviceType);
@@ -236,6 +246,9 @@ public class DeviceApi extends BaseController {
                 redisClient.hashOperations().put(WzConstants.GK_DEVICE_LOC_MAP, devicePk, locVo);
             }
             // 记录轨迹信息
+            if (null == trackStayTime) {
+                trackStayTime = DeviceApiConstants.TRACK_STAY_TIME;
+            }
             // 轨迹信息
             String trackKey = WzConstants.GK_DEVICE_TRACK + devicePk;
             // 组装轨迹定位信息
@@ -252,6 +265,45 @@ public class DeviceApi extends BaseController {
                 JSONObject lastLocVo = (JSONObject) lastLocLs.get(0);
                 if (lat.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
                         || lon.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)) {
+                    // 停留时间超过设定的时间则认为之前的轨迹为一个完成轨迹链，需要从缓存中取出并存到数据库中
+                    if (trackStayTime < (sysTime - lastLocVo.getLongValue(DeviceApiConstants.KEY_LOC_TIME))) {
+                        Set<Object> lastLocSetForSave = redisClient.zsetOperations().range(trackKey, 0, -1);
+                        // 整理并保存轨迹链
+                        int trackSize = lastLocSetForSave.size();
+                        int i = 0;
+                        long sTime = System.currentTimeMillis();
+                        long eTime = System.currentTimeMillis();
+                        JSONObject locVoForSave = null;
+                        StringBuffer trackStr = new StringBuffer("");
+                        for (Object locForSave : lastLocSetForSave) {
+                            locVoForSave = (JSONObject) locForSave;
+                            trackStr.append(locVoForSave.getLongValue(DeviceApiConstants.KEY_LOC_TIME))
+                                    .append(WzConstants.KEY_COMMA)
+                                    .append(locVoForSave.getDoubleValue(DeviceApiConstants.REQ_LAT))
+                                    .append(WzConstants.KEY_COMMA)
+                                    .append(locVoForSave.getDoubleValue(DeviceApiConstants.REQ_LON))
+                                    .append(WzConstants.KEY_SEMICOLON);
+                            if (0 == i) {
+                                sTime = locVoForSave.getLongValue(DeviceApiConstants.KEY_LOC_TIME);
+                            }
+                            if ((trackSize -1) == i) {
+                                eTime = locVoForSave.getLongValue(DeviceApiConstants.KEY_LOC_TIME);
+                            }
+                            i++;
+                        }
+                        BizVehicleTrack bvt = new BizVehicleTrack();
+                        bvt.setDeviceId(deviceId);
+                        bvt.setDeviceId(WzStringUtil.isBlank(deviceType) ? DeviceType.BATTERY.toString() : deviceType);
+                        bvt.setStartTime(sTime);
+                        bvt.setEndTime(eTime);
+                        bvt.setTaskInfo(WzUniqueValUtil.makeUUID());
+                        bvt.setLocations(trackStr.toString());
+                        // 保存轨迹链
+                        bizVehicleTrackService.insertVehicleTrack(bvt);
+                        // 清空已保存的轨迹链
+                        redisClient.zsetOperations().removeRange(trackKey, 0, -1);
+                    }
+                    // 插入该次定为数据
                     redisClient.zsetOperations().add(trackKey, trackLocVo, sysTime);
                 }
             }
