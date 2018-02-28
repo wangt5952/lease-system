@@ -1,8 +1,25 @@
 <template>
   <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
 
-    <div>
-      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加人员</el-button>
+    <div style="display:flex;">
+      <div style="margin-right:10px;">
+        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加人员</el-button>
+      </div>
+      <el-form :inline="true">
+        <el-form-item>
+          <el-input style="width:500px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search.userStatus" placeholder="请选择状态" style="width:100%;">
+            <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search.userType" placeholder="请选择类型" style="width:100%;">
+            <el-option v-for="o in searchTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
     </div>
 
     <el-table :data="list" height="100%"  style="width: 100%;margin-top:10px;">
@@ -35,7 +52,7 @@
     </el-pagination>
 
     <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form">
+      <el-form class="edit-form" :model="form" ref="form">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
@@ -149,6 +166,11 @@ export default {
       loading: false,
       list: [],
 
+      search: {
+        userType: '',
+        userStatus: '',
+      },
+
       pageSizes: [10, 50, 100, 200],
       currentPage: 1,
       pageSize: 10,
@@ -172,6 +194,19 @@ export default {
         { id: 'INVALID', name: '作废' },
       ],
 
+      searchTypeList: [
+        { id: '', name: '全部类型'},
+        { id: 'PLATFORM', name: '平台' },
+        { id: 'ENTERPRISE', name: '企业' },
+        { id: 'INDIVIDUAL', name: '个人' },
+      ],
+      searchStatusList: [
+        { id: '', name: '全部状态'},
+        { id: 'NORMAL', name: '正常' },
+        { id: 'FREEZE', name: '冻结' },
+        { id: 'INVALID', name: '作废' },
+      ],
+
       assignRoleFormVisible: false,
       assignRoleForm: { list: [] },
 
@@ -184,11 +219,11 @@ export default {
     }),
   },
   watch: {
-    formVisible(v) {
-      if (!v) {
-        const $form = this.$refs.form;
-        $form.resetFields();
-      }
+    search: {
+      async handler() {
+        await this.reload();
+      },
+      deep: true,
     },
   },
   methods: {
@@ -201,7 +236,7 @@ export default {
       this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
-          currPage: this.currentPage, pageSize: this.pageSize,
+          currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
@@ -325,7 +360,7 @@ export default {
 </script>
 
 <style scoped>
->>> .el-form-item {
+.edit-form >>> .el-form-item {
   height: 73px;
 }
 </style>

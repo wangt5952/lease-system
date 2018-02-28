@@ -1,8 +1,25 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
 
-    <div>
-      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加组织</el-button>
+    <div style="display:flex;">
+      <div style="margin-right:10px;">
+        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加组织</el-button>
+      </div>
+      <el-form :inline="true">
+        <el-form-item>
+          <el-input style="width:500px;" v-model="search.keyStr" placeholder="组织Code/组织名称/组织介绍/组织地址/联系人/联系电话/营业执照号码"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search.orgStatus" placeholder="请选择状态" style="width:100%;">
+            <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search.orgType" placeholder="请选择配件" style="width:100%;">
+            <el-option v-for="o in searchTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
     </div>
 
     <el-table :data="list" style="width: 100%;margin-top:10px;">
@@ -36,7 +53,7 @@
     </el-pagination>
 
     <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form">
+      <el-form class="edit-form" :model="form" ref="form">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="orgCode" :rules="[{required:true, message:'请填写编码'}]" label="编码">
@@ -110,6 +127,11 @@ export default {
       loading: false,
       list: [],
 
+      search: {
+        orgType: '',
+        orgStatus: '',
+      },
+
       pageSizes: [10, 50, 100, 200],
       currentPage: 1,
       pageSize: 10,
@@ -127,6 +149,18 @@ export default {
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
+
+      searchTypeList: [
+        { id: '', name: '全部类型'},
+        { id: 'PLATFORM', name: '平台' },
+        { id: 'ENTERPRISE', name: '企业' },
+      ],
+      searchStatusList: [
+        { id: '', name: '全部状态'},
+        { id: 'NORMAL', name: '正常' },
+        { id: 'FREEZE', name: '冻结/维保' },
+        { id: 'INVALID', name: '作废' },
+      ],
     };
   },
   computed: {
@@ -135,11 +169,11 @@ export default {
     }),
   },
   watch: {
-    formVisible(v) {
-      if (!v) {
-        const $form = this.$refs.form;
-        $form.resetFields();
-      }
+    search: {
+      async handler() {
+        await this.reload();
+      },
+      deep: true,
     },
   },
   methods: {
@@ -151,7 +185,7 @@ export default {
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/org/list', {
-          currPage: this.currentPage, pageSize: this.pageSize,
+          currPage: this.currentPage, pageSize: this.pageSize, ...this.search
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
@@ -236,7 +270,7 @@ export default {
 </script>
 
 <style scoped>
->>> .el-form-item {
+.edit-form >>> .el-form-item {
   height: 73px;
 }
 </style>

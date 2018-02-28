@@ -7,7 +7,7 @@
       </div>
       <el-form :inline="true">
         <el-form-item>
-          <el-input v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+          <el-input style="width:500px;" v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.vehicleStatus" placeholder="请选择状态" style="width:100%;">
@@ -104,7 +104,9 @@ export default {
       loading: false,
       list: [],
 
-      search: {},
+      search: {
+        vehicleStatus: '',
+      },
 
       pageSizes: [10, 50, 100, 200],
       currentPage: 1,
@@ -125,7 +127,7 @@ export default {
         { id: 'INVALID', name: '作废' },
       ],
       searchStatusList: [
-        { id: '', name: '全部' },
+        { id: '', name: '全部状态' },
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
@@ -155,7 +157,7 @@ export default {
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
-          currPage: this.currentPage, pageSize: this.pageSize, needPaging: 'true', ...this.search,
+          currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;

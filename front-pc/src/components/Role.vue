@@ -1,8 +1,15 @@
 <template>
   <div v-loading="loading && !formVisible && !assignResFormVisible" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
 
-    <div>
-      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加角色</el-button>
+    <div style="display:flex;">
+      <div style="margin-right:10px;">
+        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加角色</el-button>
+      </div>
+      <el-form :inline="true">
+        <el-form-item>
+          <el-input style="width:500px;" v-model="search.keyStr" placeholder="角色名"></el-input>
+        </el-form-item>
+      </el-form>
     </div>
 
     <el-table :data="list" height="100%" style="width: 100%;margin-top:10px;">
@@ -30,7 +37,7 @@
     </el-pagination>
 
     <el-dialog title="角色信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" v-loading="loading && formVisible">
+      <el-form class="edit-form" :model="form" ref="form" v-loading="loading && formVisible">
         <el-row :gutter="10">
           <el-col :span="12">
             <el-form-item prop="roleName" :rules="[{required:true, message:'请填写角色名'}]" label="角色名">
@@ -80,6 +87,8 @@ export default {
       loading: false,
       list: [],
 
+      search: {},
+
       pageSizes: [10, 50, 100, 200],
       currentPage: 1,
       pageSize: 10,
@@ -123,12 +132,11 @@ export default {
     },
   },
   watch: {
-    formVisible(v) {
-      if (!v) {
-        const $form = this.$refs.form;
-        this.loading = false;
-        $form.resetFields();
-      }
+    search: {
+      async handler() {
+        await this.reload();
+      },
+      deep: true,
     },
   },
   methods: {
@@ -141,7 +149,7 @@ export default {
       this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/role/list', {
-          currPage: this.currentPage, pageSize: this.pageSize,
+          currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
@@ -263,7 +271,7 @@ export default {
 </script>
 
 <style scoped>
->>> .el-form-item {
+.edit-form >>> .el-form-item {
   min-height: 73px;
 }
 </style>
