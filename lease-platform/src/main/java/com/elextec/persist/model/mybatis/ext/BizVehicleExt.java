@@ -1,11 +1,6 @@
 package com.elextec.persist.model.mybatis.ext;
 
-import com.elextec.persist.model.mybatis.BizBattery;
-import com.elextec.persist.model.mybatis.BizParts;
 import com.elextec.persist.model.mybatis.BizVehicle;
-import com.elextec.persist.model.mybatis.SysUser;
-
-import java.util.List;
 
 /**
  * 车辆扩展类.

@@ -10,6 +10,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysUserParam;
+import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.manager.service.SysRoleService;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.persist.field.enums.OrgAndUserType;
@@ -45,6 +46,9 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private SysUserService sysUserService;
+
+    @Autowired
+    private BizVehicleService bizVehicleService;
 
     @Autowired
     private SysRoleService sysRoleService;
@@ -124,7 +128,7 @@ public class SysUserController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
 //            PageResponse<SysUserExt> sysUserPageResp = sysUserService.list(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             PageResponse<SysUserExt> sysUserPageResp = sysUserService.listExtByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
@@ -559,6 +563,98 @@ public class SysUserController extends BaseController {
             respMap.put(WzConstants.KEY_USER_INFO, user);
             respMap.put(WzConstants.KEY_ROLE_INFO, userRoles);
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, respMap);
+            return mr;
+        }
+    }
+
+    /**
+     * 用户与车辆绑定接口.
+     * @param userIdAndVehicleId 用户ID与车辆ID
+     * <pre>
+     *     {
+     *         userId:用户ID,
+     *         vehicleId:车辆ID
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/vehiclebind")
+    public MessageResponse vehicleBind(@RequestBody String userIdAndVehicleId) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(userIdAndVehicleId)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(userIdAndVehicleId, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank((String) param.get("userId")) || WzStringUtil.isBlank((String) param.get("vehicleId"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            sysUserService.bind(param.get("userId"), param.get("vehicleId"));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 用户与车辆解绑接口.
+     * @param userIdAndVehicleId 用户ID与车辆ID
+     * <pre>
+     *     {
+     *         userId:用户ID,
+     *         vehicleId:车辆ID
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/vehicleunbind")
+    public MessageResponse vehicleUnbind(@RequestBody String userIdAndVehicleId) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(userIdAndVehicleId)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(userIdAndVehicleId, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isBlank((String) param.get("userId")) || WzStringUtil.isBlank((String) param.get("vehicleId"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
+                }
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            sysUserService.unBind(param.get("userId"), param.get("vehicleId"));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
         }
     }

@@ -10,6 +10,7 @@ import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 接口 用户控制Service.
@@ -79,4 +80,19 @@ public interface SysUserService {
      * 根据用户ID查询车辆、电池以及配件信息
      * */
     public List<BizVehicleBatteryParts> getVehiclePartsById(String userId);
+
+
+    /**
+     * 用户与车辆解绑.
+     * @param userId 用户ID
+     * @param vehicleId 车辆ID
+     */
+    public void unBind(String userId,String vehicleId);
+
+    /**
+     * 用户与车辆绑定.
+     * @param userId 用户ID
+     * @param vehicleId 车辆ID
+     */
+    public void bind(String userId,String vehicleId);
 }

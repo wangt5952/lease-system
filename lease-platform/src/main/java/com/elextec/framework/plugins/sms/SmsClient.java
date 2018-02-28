@@ -25,19 +25,19 @@ public class SmsClient {
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SmsClient.class);
 
-    @Value("localsetting.sms.url")
+    @Value("${localsetting.sms.url}")
     private String url;
 
-    @Value("localsetting.sms.username")
+    @Value("${localsetting.sms.username}")
     private String userName;
 
-    @Value("localsetting.sms.password")
+    @Value("${localsetting.sms.password}")
     private String password;
 
-    @Value("localsetting.sms.verycode")
+    @Value("${localsetting.sms.verycode}")
     private String veryCode;
 
-    @Value("localsetting.sms.tempid1")
+    @Value("${localsetting.sms.tempid1}")
     private String tempId1;
 
     /**

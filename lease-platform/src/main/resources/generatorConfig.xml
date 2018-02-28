@@ -79,6 +79,8 @@
         <table schema="" tableName="biz_device_conf" domainObjectName="BizDeviceConf">
             <columnOverride column="device_type" property="deviceType" javaType="com.elextec.persist.field.enums.DeviceType" jdbcType="VARCHAR"></columnOverride>
         </table>
+        <table schema="" tableName="biz_vehicle_track" domainObjectName="BizVehicleTrack">
+        </table>
         <!--
         <table schema="" tableName="jme_item_warning" domainObjectName="ItemWarning">
             <generatedKey column="id" sqlStatement="JDBC" identity="true"/>

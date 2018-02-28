@@ -98,7 +98,7 @@ public class BizDeviceConfController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
 //            PageResponse<BizDeviceConf> devPageResp = bizDeviceConfService.list(true, pagingParam);
             PageResponse<BizDeviceConf> devPageResp = bizDeviceConfService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);

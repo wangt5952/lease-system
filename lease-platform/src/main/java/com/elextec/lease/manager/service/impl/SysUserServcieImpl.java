@@ -10,13 +10,8 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
-import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
-import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
-import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
-import com.elextec.persist.dao.mybatis.SysUserMapperExt;
-import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
-import com.elextec.persist.model.mybatis.SysUser;
-import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.dao.mybatis.*;
+import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
@@ -26,9 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 资源管理Service实现类.
@@ -51,6 +44,9 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Autowired
     private BizPartsMapperExt bizPartsMapperExt;
+
+    @Autowired
+    private BizRefUserVehicleMapperExt bizRefUserVehicleMapperExt;
 
     @Override
     public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr) {
@@ -225,13 +221,14 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Override
     public List<BizVehicleBatteryParts> getVehiclePartsById(String userId) {
-
         List<BizVehicleBatteryParts> datas = bizVehicleMapperExt.getVehicleInfoByUserId(userId);
-
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("flag",true);
         if(datas.size() > 0){
             for(int i=0;i<datas.size();i++){
                 //根据车辆ID获取电池信息
-                List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(datas.get(i).getId());
+                param.put("id",datas.get(i).getId());
+                List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(param);
                 datas.get(i).setBizBatteries(batteryDatas);
                 //根据车辆ID获取配件信息
                 List<BizPartsExt> partsDatas = bizPartsMapperExt.getById(datas.get(i).getId());
@@ -240,4 +237,61 @@ public class SysUserServcieImpl implements SysUserService {
         }
         return datas;
     }
+
+    @Override
+    public void unBind(String userId, String vehicleId) {
+        BizRefUserVehicle param = new BizRefUserVehicle();
+        param.setUnbindTime(new Date());
+        BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+        BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+        selectRefCriteria.andUserIdEqualTo(userId);
+        selectRefCriteria.andVehicleIdEqualTo(vehicleId);
+        selectRefCriteria.andBindTimeIsNotNull();
+        selectRefCriteria.andUnbindTimeIsNull();
+        int temp = bizRefUserVehicleMapperExt.updateByExampleSelective(param,refExample);
+        if(temp < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆未被绑定或未与该用户绑定");
+        }
+    }
+
+    @Override
+    public void bind(String userId, String vehicleId) {
+
+        //判定用户是否存在
+        SysUserExample userExample = new SysUserExample();
+        SysUserExample.Criteria selectUserCriteria = userExample.createCriteria();
+        selectUserCriteria.andIdEqualTo(userId);
+        int userCount = sysUserMapperExt.countByExample(userExample);
+        if(userCount<1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在");
+        }
+
+        //判定车辆是否存在
+        BizVehicleExample vehicleExample = new BizVehicleExample();
+        BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
+        selectVehicleCriteria.andIdEqualTo(vehicleId);
+        int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
+        if(vehicleCount < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+        }
+
+        //校验车辆是否已经被绑定
+        BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+        BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+        selectRefCriteria.andVehicleIdEqualTo(vehicleId);
+        selectRefCriteria.andBindTimeIsNotNull();
+        selectRefCriteria.andUnbindTimeIsNull();
+        int refCount = bizRefUserVehicleMapperExt.countByExample(refExample);
+        if(refCount >= 1){
+            throw new BizException(RunningResult.BAD_REQUEST.code(), "车辆已被绑定");
+        }
+
+        BizRefUserVehicle param = new BizRefUserVehicle();
+        param.setUserId(userId);
+        param.setVehicleId(vehicleId);
+        param.setBindTime(new Date());
+        bizRefUserVehicleMapperExt.insert(param);
+
+    }
+
 }

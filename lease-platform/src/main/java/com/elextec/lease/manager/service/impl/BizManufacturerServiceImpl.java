@@ -119,8 +119,6 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
         }
         try {
             mfrsInfo.setId(WzUniqueValUtil.makeUUID());
-            mfrsInfo.setMfrsType(MfrsType.VEHICLE);
-            mfrsInfo.setMfrsStatus(RecordStatus.NORMAL.getInfo());
             mfrsInfo.setCreateTime(new Date());
             bizManufacturerMapperExt.insertSelective(mfrsInfo);
         } catch (Exception ex) {

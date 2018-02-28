@@ -5,6 +5,7 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
+import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 
@@ -50,7 +51,7 @@ public interface BizVehicleService {
     public void insertVehicles(List<VehicleBatteryParam> vehicleInfos);
 
     /**
-     * 插入电池.
+     * 插入车辆.
      * @param vehicleInfo 用户信息
      */
     public void insertVehicle(VehicleBatteryParam vehicleInfo);
@@ -70,6 +71,34 @@ public interface BizVehicleService {
     /**
      * 根据ID查询车辆信息
      * @param id 车辆ID
+     * @param isUsed 是否查询在用电池，true：查在用电池；false：查在用及解绑的电池
      * */
-    public Map<String,Object> getByPrimaryKey(String id);
+    public List<Map<String,Object>> getByPrimaryKey(String id, Boolean isUsed);
+
+    /**
+     * 根据用户ID查询车辆信息
+     * @param id 用户ID
+     * */
+    public List<BizVehicleBatteryParts> getByUserId(String id);
+
+    /**
+     * 车辆与电池解绑.
+     * @param vehicleId 车辆ID
+     * @param batteryId 电池ID
+     */
+    public void unBind(String vehicleId,String batteryId);
+
+    /**
+     * 车辆与电池绑定.
+     * @param vehicleId 车辆ID
+     * @param batteryId 电池ID
+     */
+    public void bind(String vehicleId,String batteryId);
+
+    /**
+     * 根据电池编码查询车辆信息.
+     * @param batteryCodes 电池编码列表
+     * @return 车辆信息列表
+     */
+    public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes);
 }

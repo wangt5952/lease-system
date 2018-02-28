@@ -4,6 +4,7 @@
     <resultMap extends="BaseResultMap" id="BizVehicleExtResultMap" type="com.elextec.lease.model.BizVehicleBatteryParts">
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
     </resultMap>
+
     <select id="getVehicleInfoByUserId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
         select
         v.id vehicleId,
@@ -23,36 +24,62 @@
         where r.user_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
     </select>
 
-    <select id="getVehicleInfoById" parameterType="java.lang.String" resultType="java.util.Map">
+    <select id="getVehicleInfoById" parameterType="java.util.Map" resultType="java.util.Map">
         select
         v.id vehicleId,
-        v.vehicle_code,
-        v.vehicle_pn,
-        v.vehicle_brand,
-        v.vehicle_made_in,
+        v.vehicle_code vehicleCode,
+        v.vehicle_pn vehiclePn,
+        v.vehicle_brand vehicleBrand,
+        v.vehicle_made_in vehicleMadeIn,
         v.mfrs_id vehicleMfrsId,
-        v.vehicle_status,
-        v.create_user,
-        v.create_time,
-        v.update_user,
-        v.update_time,
+        v.vehicle_status vehicleStatus,
+        v.create_user createUser,
+        v.create_time createTime,
+        v.update_user updateUser,
+        v.update_time updateTime,
         m1.mfrs_name vehicleMfrsName,
         b.id batteryId,
-        b.battery_code,
-        b.battery_name,
-        b.battery_brand,
-        b.battery_pn,
-        b.battery_parameters,
+        b.battery_code batteryCode,
+        b.battery_name batteryName,
+        b.battery_brand batteryBrand,
+        b.battery_pn batteryPn,
+        b.battery_parameters batteryParameters,
         b.mfrs_id batteryMfrsId,
         m2.mfrs_name batteryMfrsName,
-        b.battery_status
+        b.battery_status batteryStatus
         from biz_vehicle v
         LEFT JOIN biz_manufacturer m1 ON v.mfrs_id = m1.id
         LEFT JOIN biz_ref_vehicle_battery r ON v.id = r.vehicle_id
+        <if test="flag" >
+            and r.unbind_time is NULL
+        </if>
         LEFT JOIN biz_battery b ON r.battery_id = b.id
         LEFT JOIN biz_manufacturer m2 ON b.mfrs_id = m2.id
         where v.id = #{id,jdbcType=VARCHAR}
     </select>
+
+    <!--<select id="isBindOrUnBind" parameterType="java.lang.String" resultType="java.lang.Integer">-->
+        <!--select-->
+        <!--count(*)-->
+        <!--from  biz_ref_user_vehicle r-->
+        <!--LEFT JOIN biz_vehicle v ON v.id = r.vehicle_id-->
+        <!--where r.vehicle_id = #{id,jdbcType=VARCHAR}-->
+        <!--and r.bind_time is NOT NULL and r.unbind_time is NULL-->
+    <!--</select>-->
+
+    <!--<update id="vehicleUnBind" parameterType="java.util.Map" >-->
+        <!--update biz_ref_user_vehicle set-->
+        <!--unbind_time = now()-->
+        <!--where user_id = #{userId,jdbcType=VARCHAR}-->
+        <!--and vehicle_id = #{vehicleId,jdbcType=VARCHAR}-->
+        <!--and bind_time is NOT NULL-->
+        <!--and unbind_time is NULL-->
+    <!--</update>-->
+
+    <!--<insert id="vehicleBind" parameterType="java.util.Map" >-->
+        <!--insert into biz_ref_user_vehicle (user_id,vehicle_id,bind_time)-->
+        <!--values (#{userId,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR},now())-->
+    <!--</insert>-->
 
     <select id="selectExtByParam" resultMap="BizVehicleExtResultMap" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >
         SELECT distinct
@@ -100,8 +127,8 @@
     <select id="countExtByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >
         SELECT count(distinct a.id)
         FROM
-        sys_user a
-        LEFT JOIN biz_organization b ON a.org_id=b.id
+        biz_vehicle a
+        LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
         LEFT JOIN biz_ref_user_vehicle r ON a.id = r.vehicle_id
         LEFT JOIN sys_user s ON r.user_id = s.id
         <where>
@@ -124,5 +151,32 @@
                 and s.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
         </where>
+    </select>
+
+    <select id="selectExtByBatteryCodes" parameterType="java.util.List" resultType="java.util.Map">
+        select
+        b.id batteryId,
+        b.battery_code batteryCode,
+        v.id vehicleId,
+        v.vehicle_code vehicleCode,
+        v.vehicle_pn vehiclePn,
+        v.vehicle_brand vehicleBrand,
+        v.vehicle_made_in vehicleMadeIn,
+        v.mfrs_id mfrsId,
+        v.vehicle_status vehicleStatus,
+        v.create_user createUser,
+        v.create_time createTime,
+        v.update_user updateUser,
+        v.update_time updateTime,
+        m.mfrs_name mfrsName
+        from
+        biz_battery b
+        inner join biz_ref_vehicle_battery vb on b.id = vb.battery_id and vb.unbind_time IS NULL
+        inner join biz_vehicle v on vb.vehicle_id = v.id
+        LEFT join biz_manufacturer m on v.mfrs_id = m.id
+        where
+        <foreach collection="batteryCodes" item="batteryCode" index="index"  open="(" separator="or" close=")">
+            b.battery_code = #{batteryCode}
+        </foreach>
     </select>
 </mapper>

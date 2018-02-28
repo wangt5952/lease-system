@@ -5,11 +5,11 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.LoginParam;
-import com.elextec.framework.common.request.ModifyPasswordParam;
 import com.elextec.framework.common.request.ResetPasswordParam;
 import com.elextec.framework.common.request.SmsParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
+import com.elextec.framework.plugins.sms.SmsClient;
 import com.elextec.framework.utils.WzCaptchaUtil;
 import com.elextec.framework.utils.WzCheckCodeUtil;
 import com.elextec.framework.utils.WzStringUtil;
@@ -53,8 +53,8 @@ public class SysAuthController extends BaseController {
     @Autowired
     private SysUserService sysUserService;
 
-//    @Autowired
-//    private RedisClient redisClient;
+    @Autowired
+    private SmsClient smsClient;
 
     /**
      * 登录.
@@ -211,63 +211,63 @@ public class SysAuthController extends BaseController {
         return null;
     }
 
-    /**
-     * 修改密码.
-     * @param request 请求
-     * @param oldAndNewPassword 旧密码及新密码
-     * <pre>
-     *     {
-     *          oldAuthStr:旧密码验证字符串 MD5(loginName(登录用户名)+MD5(登录密码).upper()+authTime).upper(),
-     *          authTime:验证时间,
-     *          newPassword:新密码
-     *     }
-     * </pre>
-     * @return 密码修改结果
-     * <pre>
-     *     {
-     *          code:处理Code,
-     *          message:处理消息,
-     *          respData:""
-     *     }
-     * </pre>
-     */
-    @RequestMapping(path = {"/modifypassword"})
-    public MessageResponse modifyPassword(@RequestBody String oldAndNewPassword, HttpServletRequest request) {
-        // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(oldAndNewPassword)) {
-            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
-            return mr;
-        } else {
-            // 参数解析错误报“参数解析错误”
-            ModifyPasswordParam modifyPasswordParam = null;
-            try {
-                String paramStr = URLDecoder.decode(oldAndNewPassword, "utf-8");
-                modifyPasswordParam = JSON.parseObject(paramStr, ModifyPasswordParam.class);
-                if (null == modifyPasswordParam
-                        || WzStringUtil.isBlank(modifyPasswordParam.getNewPassword())
-                        || WzStringUtil.isBlank(modifyPasswordParam.getOldAuthStr())
-                        || null == modifyPasswordParam.getAuthTime()) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
-                }
-            } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
-            }
-            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
-            SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
-            // 验证用户并返回用户信息
-            if (sysAuthService.verifyUser(sue.getLoginName(), sue.getPassword(), modifyPasswordParam.getOldAuthStr(), modifyPasswordParam.getAuthTime())) {
-                SysUser updateVo = new SysUser();
-                updateVo.setId(sue.getId());
-                updateVo.setPassword(modifyPasswordParam.getNewPassword());
-                updateVo.setUpdateUser(sue.getId());
-                sysUserService.updateSysUser(updateVo);
-            }
-        }
-        // 组织返回结果并返回
-        MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
-        return mr;
-    }
+//    /**
+//     * 修改密码.
+//     * @param request 请求
+//     * @param oldAndNewPassword 旧密码及新密码
+//     * <pre>
+//     *     {
+//     *          oldAuthStr:旧密码验证字符串 MD5(loginName(登录用户名)+MD5(登录密码).upper()+authTime).upper(),
+//     *          authTime:验证时间,
+//     *          newPassword:新密码
+//     *     }
+//     * </pre>
+//     * @return 密码修改结果
+//     * <pre>
+//     *     {
+//     *          code:处理Code,
+//     *          message:处理消息,
+//     *          respData:""
+//     *     }
+//     * </pre>
+//     */
+//    @RequestMapping(path = {"/modifypassword"})
+//    public MessageResponse modifyPassword(@RequestBody String oldAndNewPassword, HttpServletRequest request) {
+//        // 无参数则报“无参数”
+//        if (WzStringUtil.isBlank(oldAndNewPassword)) {
+//            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+//            return mr;
+//        } else {
+//            // 参数解析错误报“参数解析错误”
+//            ModifyPasswordParam modifyPasswordParam = null;
+//            try {
+//                String paramStr = URLDecoder.decode(oldAndNewPassword, "utf-8");
+//                modifyPasswordParam = JSON.parseObject(paramStr, ModifyPasswordParam.class);
+//                if (null == modifyPasswordParam
+//                        || WzStringUtil.isBlank(modifyPasswordParam.getNewPassword())
+//                        || WzStringUtil.isBlank(modifyPasswordParam.getOldAuthStr())
+//                        || null == modifyPasswordParam.getAuthTime()) {
+//                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+//                }
+//            } catch (Exception ex) {
+//                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+//            }
+//            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+//            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
+//            SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+//            // 验证用户并返回用户信息
+//            if (sysAuthService.verifyUser(sue.getLoginName(), sue.getPassword(), modifyPasswordParam.getOldAuthStr(), modifyPasswordParam.getAuthTime())) {
+//                SysUser updateVo = new SysUser();
+//                updateVo.setId(sue.getId());
+//                updateVo.setPassword(modifyPasswordParam.getNewPassword());
+//                updateVo.setUpdateUser(sue.getId());
+//                sysUserService.updateSysUser(updateVo);
+//            }
+//        }
+//        // 组织返回结果并返回
+//        MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+//        return mr;
+//    }
 
     /**
      * 获得图片验证码.
@@ -368,6 +368,7 @@ public class SysAuthController extends BaseController {
             redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE + smsVCodeToken, smsVCode, 120, TimeUnit.SECONDS);
             Map<String, String> smsTokenMap = new HashMap<String, String>();
             smsTokenMap.put(WzConstants.KEY_SMS_VCODE_TOKEN, smsVCodeToken);
+            smsClient.sendSmsByTemplate1(smsParam.getMobile(), smsVCode);
             return new MessageResponse(RunningResult.SUCCESS, smsTokenMap);
         }
     }

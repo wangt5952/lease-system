@@ -102,7 +102,7 @@ public class BizMfrsController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
 //            PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.list(true, pagingParam);
             PageResponse<BizManufacturer> mfrsPageResp = bizManufacturerService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
@@ -119,10 +119,12 @@ public class BizMfrsController extends BaseController {
      *     [
      *         {
      *             mfrsName:制造商名称,
+     *             mfrsType:制造商类型（车辆VEHICLE、电池BATTERY、配件PARTS）
      *             mfrsIntroduce:制造商介绍,
      *             mfrsAddress:制造商地址,
      *             mfrsContacts:联系人（多人用 , 分割）,
      *             mfrsPhone:联系电话（多个电话用 , 分割）,
+     *             mfrsStatus:制造商状态（正常NORMAL、冻结FREEZE、作废INVALID）
      *             createUser:创建人,
      *             updateUser:更新人
      *         },
@@ -189,13 +191,15 @@ public class BizMfrsController extends BaseController {
      * @param addParam 批量新增参数JSON
      * <pre>
      *  {
-     *             mfrsName:制造商名称,
-     *             mfrsIntroduce:制造商介绍,
-     *             mfrsAddress:制造商地址,
-     *             mfrsContacts:联系人（多人用 , 分割）,
-     *             mfrsPhone:联系电话（多个电话用 , 分割）,
-     *             createUser:创建人,
-     *             updateUser:更新人
+     *              mfrsName:制造商名称,
+     *              mfrsType:制造商类型（车辆VEHICLE、电池BATTERY、配件PARTS）
+     *              mfrsIntroduce:制造商介绍,
+     *              mfrsAddress:制造商地址,
+     *              mfrsContacts:联系人（多人用 , 分割）,
+     *              mfrsPhone:联系电话（多个电话用 , 分割）,
+     *              mfrsStatus:制造商状态（正常NORMAL、冻结FREEZE、作废INVALID）
+     *              createUser:创建人,
+     *              updateUser:更新人
      *  }
      * </pre>
      * @return 新增结果

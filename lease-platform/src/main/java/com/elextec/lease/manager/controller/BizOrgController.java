@@ -106,7 +106,7 @@ public class BizOrgController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
             //PageResponse<BizOrganization> orgPageResp = bizOrganizationService.list(true, pagingParam);
             PageResponse<BizOrganization> orgPageResp = bizOrganizationService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
@@ -122,8 +122,9 @@ public class BizOrgController extends BaseController {
      * <pre>
      *     [
      *         {
-     *            org_code:组织Code,
-     *            org_name:组织名称,
+     *            orgCode:组织Code,
+     *            orgName:组织名称,
+     *            orgType:组织类别（平台PLATFORM、企业ENTERPRISE、个人INDIVIDUAL）
      *            orgIntroduce:组织介绍,
      *            orgAddress:组织地址,
      *            orgContacts:联系人（多人用 , 分割）,
@@ -131,7 +132,7 @@ public class BizOrgController extends BaseController {
      *            orgBusinessLicences:营业执照号码,
      *            orgBusinessLicenceFront:营业执照正面照片路径,
      *            orgBusinessLicenceBack:营业执照背面照片路径,
-     *            orgStatus:组织状态（正常、冻结、作废）,
+     *            orgStatus:组织状态（正常NORMAL、冻结FREEZE、作废INVALID）,
      *            createUser:创建人
      *            updateUser:更新人
      *         },
@@ -198,10 +199,10 @@ public class BizOrgController extends BaseController {
      * 增加公司组织资源.
      * @param addParam 批量新增参数JSON
      * <pre>
-     *
-     *         {
+     *     {
      *            orgCode:组织Code,
      *            orgName:组织名称,
+     *            orgType:组织类别（平台PLATFORM、企业ENTERPRISE、个人INDIVIDUAL）
      *            orgIntroduce:组织介绍,
      *            orgAddress:组织地址,
      *            orgContacts:联系人（多人用 , 分割）,
@@ -209,11 +210,10 @@ public class BizOrgController extends BaseController {
      *            orgBusinessLicences:营业执照号码,
      *            orgBusinessLicenceFront:营业执照正面照片路径,
      *            orgBusinessLicenceBack:营业执照背面照片路径,
-     *            orgStatus:组织状态（正常、冻结、作废）,
+     *            orgStatus:组织状态（正常NORMAL、冻结FREEZE、作废INVALID）,
      *            createUser:创建人
      *            updateUser:更新人
-     *         }
-     *
+     *      }
      * </pre>
      * @return 新增结果
      * <pre>
@@ -274,7 +274,7 @@ public class BizOrgController extends BaseController {
      *     {
      *         id:ID,
      *         orgName:组织名称,
-     *         orgType:组织类别（平台、企业）,
+     *         orgType:组织类别（平台PLATFORM、企业ENTERPRISE、个人INDIVIDUAL），
      *         orgIntroduce:组织介绍,
      *         orgAddress:组织地址,
      *         orgContacts:联系人（多人用 , 分割）,

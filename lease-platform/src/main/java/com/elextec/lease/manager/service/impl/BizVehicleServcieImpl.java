@@ -8,6 +8,7 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
+import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
@@ -19,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 车辆管理Service实现类.
@@ -258,7 +256,86 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public Map<String, Object> getByPrimaryKey(String id) {
-        return bizVehicleMapperExt.getVehicleInfoById(id);
+    public List<Map<String, Object>> getByPrimaryKey(String id, Boolean isUsed) {
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("id", id);
+        param.put("flag", isUsed);
+        return bizVehicleMapperExt.getVehicleInfoById(param);
+    }
+
+    @Override
+    public List<BizVehicleBatteryParts> getByUserId(String id) {
+        return bizVehicleMapperExt.getVehicleInfoByUserId(id);
+    }
+
+    @Override
+    public void unBind(String vehicleId,String batteryId) {
+        BizRefVehicleBattery param = new BizRefVehicleBattery();
+        param.setUnbindTime(new Date());
+        BizRefVehicleBatteryExample refExample = new BizRefVehicleBatteryExample();
+        BizRefVehicleBatteryExample.Criteria selectRefCriteria = refExample.createCriteria();
+        selectRefCriteria.andVehicleIdEqualTo(vehicleId);
+        selectRefCriteria.andBatteryIdEqualTo(batteryId);
+        selectRefCriteria.andBindTimeIsNotNull();
+        selectRefCriteria.andUnbindTimeIsNull();
+        int temp = bizRefVehicleBatteryMapperExt.updateByExampleSelective(param,refExample);
+        if(temp < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池未被绑定或未与该车辆绑定");
+        }
+    }
+
+    @Override
+    public void bind(String vehicleId,String batteryId) {
+
+        //判定车辆是否存在
+        BizVehicleExample vehicleExample = new BizVehicleExample();
+        BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
+        selectVehicleCriteria.andIdEqualTo(vehicleId);
+        int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
+        if(vehicleCount < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+        }
+
+        //判定电池是否存在
+        BizBatteryExample batteryExample = new BizBatteryExample();
+        BizBatteryExample.Criteria selectUserCriteria = batteryExample.createCriteria();
+        selectUserCriteria.andIdEqualTo(batteryId);
+        int userCount = bizBatteryMapperExt.countByExample(batteryExample);
+        if(userCount<1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池不存在");
+        }
+
+        //校验车辆是否已经绑定电池
+        BizRefVehicleBatteryExample refVehicleExample = new BizRefVehicleBatteryExample();
+        BizRefVehicleBatteryExample.Criteria selectVehicleRefCriteria = refVehicleExample.createCriteria();
+        selectVehicleRefCriteria.andVehicleIdEqualTo(vehicleId);
+        selectVehicleRefCriteria.andBindTimeIsNotNull();
+        selectVehicleRefCriteria.andUnbindTimeIsNull();
+        int refVehicleCount = bizRefVehicleBatteryMapperExt.countByExample(refVehicleExample);
+        if(refVehicleCount >= 1){
+            throw new BizException(RunningResult.BAD_REQUEST.code(), "车辆已经绑定了电池");
+        }
+
+        //校验电池是否已经被绑定
+        BizRefVehicleBatteryExample refBatteryExample = new BizRefVehicleBatteryExample();
+        BizRefVehicleBatteryExample.Criteria selectBatteryRefCriteria = refBatteryExample.createCriteria();
+        selectBatteryRefCriteria.andBatteryIdEqualTo(batteryId);
+        selectBatteryRefCriteria.andBindTimeIsNotNull();
+        selectBatteryRefCriteria.andUnbindTimeIsNull();
+        int refBatteryCount = bizRefVehicleBatteryMapperExt.countByExample(refBatteryExample);
+        if(refBatteryCount >= 1){
+            throw new BizException(RunningResult.BAD_REQUEST.code(), "电池已被绑定");
+        }
+
+        BizRefVehicleBattery param = new BizRefVehicleBattery();
+        param.setVehicleId(vehicleId);
+        param.setBatteryId(batteryId);
+        param.setBindTime(new Date());
+        bizRefVehicleBatteryMapperExt.insert(param);
+    }
+
+    @Override
+    public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes) {
+        return bizVehicleMapperExt.selectExtByBatteryCodes(batteryCodes);
     }
 }

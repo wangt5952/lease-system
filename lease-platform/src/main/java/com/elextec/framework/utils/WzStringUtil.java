@@ -190,4 +190,19 @@ public class WzStringUtil extends StringUtils {
         }
         return (byte) result;
     }
+
+    /**
+     * 将字符串转成Long.
+     * @param str Long字符串
+     */
+    public static Long str2Long(String str) {
+        if (isBlank(str)) {
+            return null;
+        }
+        try {
+            return Long.parseLong(str);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
