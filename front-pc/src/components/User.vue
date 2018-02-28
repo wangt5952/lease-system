@@ -35,7 +35,7 @@
     </el-pagination>
 
     <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" size="medium">
+      <el-form :model="form" ref="form">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
@@ -111,13 +111,13 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="closeForm">取消</el-button>
-        <el-button size="medium" type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button @click="closeForm">取消</el-button>
+        <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
 
     <el-dialog :title="`分配角色 ( ${assignRoleForm.name} ) `" :visible.sync="assignRoleFormVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" size="medium" v-loading="loading && assignRoleFormVisible">
+      <el-form :model="form" ref="form" v-loading="loading && assignRoleFormVisible">
         <el-row :gutter="10">
           <el-col :span="24">
             <el-form-item label="角色">
@@ -129,8 +129,8 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer" >
-        <el-button size="medium" @click="closeAssignRoleForm">取消</el-button>
-        <el-button :disabled="loading" size="medium" type="primary" @click="saveAssignRoleForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button @click="closeAssignRoleForm">取消</el-button>
+        <el-button :disabled="loading" type="primary" @click="saveAssignRoleForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
 

@@ -35,7 +35,7 @@
     </el-pagination>
 
     <el-dialog title="配件信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" size="medium">
+      <el-form :model="form" ref="form">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="partsCode" :rules="[{required:true, message:'请填写编码'}]" label="编码">
@@ -88,8 +88,8 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="closeForm">取消</el-button>
-        <el-button size="medium" type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button @click="closeForm">取消</el-button>
+        <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
 

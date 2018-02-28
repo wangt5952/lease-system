@@ -14,7 +14,7 @@ import router from './router';
 
 Vue.use(Vuex);
 Vue.use(Resource);
-Vue.use(ElementUI);
+Vue.use(ElementUI, { size: 'small'});
 Vue.use(BaiduMap, {
   ak: 'NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0',
 });
@@ -23,10 +23,14 @@ Vue.config.productionTip = false;
 
 
 const store = new Vuex.Store({
-  state: {
-    key_login_token: localStorage.getItem('key_login_token'),
-    key_res_info: JSON.parse(localStorage.getItem('key_res_info') || '[]'),
-    key_user_info: JSON.parse(localStorage.getItem('key_user_info') || '{}'),
+  state() {
+    const key_login_token = localStorage.getItem('key_login_token');
+    Vue.http.headers.common.header_login_token = key_login_token;
+    return {
+      key_login_token,
+      key_res_info: JSON.parse(localStorage.getItem('key_res_info') || '[]'),
+      key_user_info: JSON.parse(localStorage.getItem('key_user_info') || '{}'),
+    };
   },
   mutations: {
     set(state, { key, value }) {
@@ -36,7 +40,7 @@ const store = new Vuex.Store({
       localStorage.setItem('key_login_token', key_login_token);
       localStorage.setItem('key_res_info', JSON.stringify(key_res_info));
       localStorage.setItem('key_user_info', JSON.stringify(key_user_info));
-      // Vue.http.headers.common.Authorization = token;
+      Vue.http.headers.common.header_login_token = key_login_token;
       state.key_login_token = key_login_token;
       state.key_res_info = key_res_info;
       state.key_user_info = key_user_info;
@@ -51,7 +55,7 @@ const store = new Vuex.Store({
       state.key_login_token = key_login_token;
       state.key_res_info = key_res_info;
       state.key_user_info = key_user_info;
-      // Vue.http.headers.common.Authorization = undefined;
+      Vue.http.headers.common.header_login_token = undefined;
     },
   },
 });

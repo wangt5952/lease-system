@@ -1,11 +1,23 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
 
-    <div>
-      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加车辆</el-button>
+    <div style="display:flex;">
+      <div style="margin-right:10px;">
+        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加车辆</el-button>
+      </div>
+      <el-form :inline="true">
+        <el-form-item>
+          <el-input v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search.vehicleStatus" placeholder="请选择状态" style="width:100%;">
+            <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
     </div>
 
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" style="width: 100%;">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
@@ -33,7 +45,7 @@
     </el-pagination>
 
     <el-dialog title="车辆信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" size="medium">
+      <el-form class="edit-form" :model="form" ref="form">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="vehicleCode" :rules="[{required:true, message:'请填写编号'}]" label="编号">
@@ -72,8 +84,8 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="closeForm">取消</el-button>
-        <el-button size="medium" type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button @click="closeForm">取消</el-button>
+        <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
 
@@ -91,6 +103,8 @@ export default {
     return {
       loading: false,
       list: [],
+
+      search: {},
 
       pageSizes: [10, 50, 100, 200],
       currentPage: 1,
@@ -110,6 +124,12 @@ export default {
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
+      searchStatusList: [
+        { id: '', name: '全部' },
+        { id: 'NORMAL', name: '正常' },
+        { id: 'FREEZE', name: '冻结/维保' },
+        { id: 'INVALID', name: '作废' },
+      ],
       mfrsList: [],
     };
   },
@@ -119,11 +139,11 @@ export default {
     }),
   },
   watch: {
-    formVisible(v) {
-      if (!v) {
-        const $form = this.$refs.form;
-        $form.resetFields();
-      }
+    search: {
+      async handler() {
+        await this.reload();
+      },
+      deep: true,
     },
   },
   methods: {
@@ -135,7 +155,7 @@ export default {
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
-          currPage: this.currentPage, pageSize: this.pageSize,
+          currPage: this.currentPage, pageSize: this.pageSize, needPaging: 'true', ...this.search,
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
@@ -221,7 +241,7 @@ export default {
 </script>
 
 <style scoped>
->>> .el-form-item {
+.edit-form >>> .el-form-item {
   height: 73px;
 }
 </style>

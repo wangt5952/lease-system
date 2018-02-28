@@ -30,7 +30,7 @@
     </el-pagination>
 
     <el-dialog title="角色信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" size="medium" v-loading="loading && formVisible">
+      <el-form :model="form" ref="form" v-loading="loading && formVisible">
         <el-row :gutter="10">
           <el-col :span="12">
             <el-form-item prop="roleName" :rules="[{required:true, message:'请填写角色名'}]" label="角色名">
@@ -45,14 +45,14 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer" >
-        <el-button size="medium" @click="closeForm">取消</el-button>
-        <el-button :disabled="loading" size="medium" type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button @click="closeForm">取消</el-button>
+        <el-button :disabled="loading" type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
 
 
     <el-dialog :title="`分配资源 ( ${assignResForm.name} ) `" :visible.sync="assignResFormVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form" size="medium" v-loading="loading && assignResFormVisible">
+      <el-form :model="form" ref="form" v-loading="loading && assignResFormVisible">
         <el-row :gutter="10">
           <el-col :span="24">
             <el-tree :data="resTree" ref="resTree" node-key="id" :props="{label: 'resName'}" show-checkbox></el-tree>
@@ -60,8 +60,8 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer" >
-        <el-button size="medium" @click="closeAssignResForm">取消</el-button>
-        <el-button :disabled="loading" size="medium" type="primary" @click="saveAssignResForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button @click="closeAssignResForm">取消</el-button>
+        <el-button :disabled="loading" type="primary" @click="saveAssignResForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
 
