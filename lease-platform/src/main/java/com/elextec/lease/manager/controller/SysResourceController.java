@@ -125,16 +125,17 @@ public class SysResourceController extends BaseController {
      *             resCode:资源编码（必填）,
      *             resName:资源名（必填）,
      *             resIcon:资源Icon路径（非必填）,
-     *             resType:资源类型（目录、菜单、功能或按钮）（必填）,
+     *             resType:资源类型（目录CATALOG、菜单MENU、功能或按钮FUNCTION）（必填）,
      *             resUrl:资源请求URL（非必填）,
      *             groupSort:分组排序（必填）,
      *             resSort:组内排序（必填）,
-     *             showFlag:显示标志（显示、不显示）（必填）,
+     *             showFlag:显示标志（显示SHOW、不显示HIDDEN）（必填）,
      *             parent:上级资源（Root为空）（非必填）,
      *             level:级别（必填）,
      *             createUser:创建人（必填）,
      *             updateUser:更新人（必填）
-     *         }
+     *         },
+     *                 ....
      *     ]
      * </pre>
      * @return 批量新增结果
@@ -203,12 +204,12 @@ public class SysResourceController extends BaseController {
      *         {
      *             resCode:资源编码（必填）,
      *             resName:资源名（必填）,
-     *             resIcon:资源Icon名称（非必填）,
-     *             resType:资源类型（目录、菜单、功能或按钮）（必填）,
+     *             resIcon:资源Icon路径（非必填）,
+     *             resType:资源类型（目录CATALOG、菜单MENU、功能或按钮FUNCTION）（必填）,
      *             resUrl:资源请求URL（非必填）,
      *             groupSort:分组排序（必填）,
      *             resSort:组内排序（必填）,
-     *             showFlag:显示标志（显示、不显示）（必填）,
+     *             showFlag:显示标志（显示SHOW、不显示HIDDEN）（必填）,
      *             parent:上级资源（Root为空）（非必填）,
      *             level:级别（必填）,
      *             createUser:创建人（必填）,
