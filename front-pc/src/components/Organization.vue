@@ -151,12 +151,12 @@ export default {
       ],
 
       searchTypeList: [
-        { id: '', name: '全部类型'},
+        { id: '', name: '全部类型' },
         { id: 'PLATFORM', name: '平台' },
         { id: 'ENTERPRISE', name: '企业' },
       ],
       searchStatusList: [
-        { id: '', name: '全部状态'},
+        { id: '', name: '全部状态' },
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
@@ -185,7 +185,7 @@ export default {
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/org/list', {
-          currPage: this.currentPage, pageSize: this.pageSize, ...this.search
+          currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;

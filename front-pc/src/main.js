@@ -14,7 +14,7 @@ import router from './router';
 
 Vue.use(Vuex);
 Vue.use(Resource);
-Vue.use(ElementUI, { size: 'small'});
+Vue.use(ElementUI, { size: 'small' });
 Vue.use(BaiduMap, {
   ak: 'NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0',
 });

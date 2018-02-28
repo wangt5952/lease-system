@@ -111,7 +111,7 @@ export default {
       list: [],
 
       search: {
-        batteryStatus: ''
+        batteryStatus: '',
       },
 
       pageSizes: [10, 50, 100, 200],

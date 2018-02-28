@@ -99,7 +99,6 @@ export default {
 
     menuTree() {
       const resList = _.map(this.key_res_info, 'resCode');
-      console.log(resList);
 
       const travTree = root => _.filter(_.map(root, ({ children, ...o }) => {
         if (children && children.length && (!o.resCode || resList.indexOf(o.resCode) !== -1)) {

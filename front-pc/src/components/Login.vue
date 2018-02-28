@@ -30,7 +30,6 @@
 <script>
 import moment from 'moment';
 import md5 from 'js-md5';
-import _ from 'lodash';
 
 export default {
   data() {
@@ -49,8 +48,6 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/auth/login', form)).body;
         if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_res_info, key_user_info } = respData;
-
-        console.log(JSON.stringify(_.filter(key_res_info, { resType: 'MENU' })));
         await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
         this.$message.success({
           message: `欢迎回来，${key_user_info.userName}`,

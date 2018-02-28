@@ -195,13 +195,13 @@ export default {
       ],
 
       searchTypeList: [
-        { id: '', name: '全部类型'},
+        { id: '', name: '全部类型' },
         { id: 'PLATFORM', name: '平台' },
         { id: 'ENTERPRISE', name: '企业' },
         { id: 'INDIVIDUAL', name: '个人' },
       ],
       searchStatusList: [
-        { id: '', name: '全部状态'},
+        { id: '', name: '全部状态' },
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结' },
         { id: 'INVALID', name: '作废' },

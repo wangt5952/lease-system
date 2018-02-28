@@ -140,13 +140,13 @@ export default {
       ],
 
       searchTypeList: [
-        { id: '', name: '全部类型'},
+        { id: '', name: '全部类型' },
         { id: 'VEHICLE', name: '车辆' },
         { id: 'BATTERY', name: '电池' },
         { id: 'PARTS', name: '配件' },
       ],
       searchStatusList: [
-        { id: '', name: '全部状态'},
+        { id: '', name: '全部状态' },
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
