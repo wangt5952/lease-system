@@ -68,6 +68,33 @@ public class SysAuthServcieImpl implements SysAuthService {
     }
 
     @Override
+    public Map<String, Object> mobileLogin(String loginName, String authStr, long loginTime) {
+        // 返回结果定义
+        Map<String, Object> loginData = new HashMap<String, Object>();
+
+        // 查询用户
+        SysUserExample sysUserExample = new SysUserExample();
+        SysUserExample.Criteria loginNameCri = sysUserExample.createCriteria();
+        loginNameCri.andLoginNameEqualTo(loginName);
+        SysUserExample.Criteria mobileCri = sysUserExample.or();
+        mobileCri.andUserMobileEqualTo(loginName);
+        List<SysUserExt> sysUserLs = sysUserMapperExt.selectExtByExample(sysUserExample);
+
+        // 处理用户信息
+        if (null == sysUserLs || 0 == sysUserLs.size()) {
+            throw new BizException(RunningResult.NO_USER);
+        }
+        SysUserExt sue = sysUserLs.get(0);
+        // 验证用户名和密码是否正确
+        if (verifyUser(loginName, sue.getPassword(), authStr, loginTime)) {
+            loginData.put(WzConstants.KEY_USER_INFO, sue);
+        } else {
+            throw new BizException(RunningResult.NAME_OR_PASSWORD_WRONG);
+        }
+        return loginData;
+    }
+
+    @Override
     public boolean verifyUser(String loginName, String password, String authStr, long authTime) {
         // 如果登录时间和当前时间相差超过2分钟，则报错“认证超时”
         if ((System.currentTimeMillis() - authTime) > 120000) {

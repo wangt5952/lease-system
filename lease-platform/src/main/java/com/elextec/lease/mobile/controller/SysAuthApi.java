@@ -11,6 +11,7 @@ import com.elextec.framework.common.request.SmsParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.image.WzImageClient;
+import com.elextec.framework.plugins.sms.SmsClient;
 import com.elextec.framework.utils.*;
 import com.elextec.lease.manager.controller.SysAuthController;
 import com.elextec.lease.manager.service.SysAuthService;
@@ -68,6 +69,9 @@ public class SysAuthApi extends BaseController {
     @Autowired
     private SysUserService sysUserService;
 
+    @Autowired
+    private SmsClient smsClient;
+
 
     /**
      * 登录.
@@ -76,7 +80,8 @@ public class SysAuthApi extends BaseController {
      *     {
      *         loginName:登录用户名,
      *         loginAuthStr:验证字符串 MD5(用户名+MD5(密码).upper()+loginTime).upper(),
-     *         loginTime:登录时间
+     *         loginTime:登录时间,
+     *         needCaptcha:是否需要验证码
      *     }
      * </pre>
      * @return 登录结果及登录账户信息
@@ -226,7 +231,7 @@ public class SysAuthApi extends BaseController {
             }
 
             // 验证用户并返回用户信息
-            Map<String, Object> loginVo = sysAuthService.login(loginParam.getLoginName(), loginParam.getLoginAuthStr(), loginParam.getLoginTime());
+            Map<String, Object> loginVo = sysAuthService.mobileLogin(loginParam.getLoginName(), loginParam.getLoginAuthStr(), loginParam.getLoginTime());
 
             //获取用户关联车辆信息
             SysUserExt user = (SysUserExt)loginVo.get(WzConstants.KEY_USER_INFO);
@@ -377,6 +382,7 @@ public class SysAuthApi extends BaseController {
             redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE + smsVCodeToken, smsVCode, 120, TimeUnit.SECONDS);
             Map<String, String> smsTokenMap = new HashMap<String, String>();
             smsTokenMap.put(WzConstants.KEY_SMS_VCODE_TOKEN, smsVCodeToken);
+            smsClient.sendSmsByTemplate1(smsParam.getMobile(), smsVCode);
             return new MessageResponse(RunningResult.SUCCESS, smsTokenMap);
         }
     }
@@ -492,7 +498,6 @@ public class SysAuthApi extends BaseController {
                 if (null == resetParam
                         || WzStringUtil.isBlank(resetParam.getSmsVCode())
                         || WzStringUtil.isBlank(resetParam.getSmsToken())
-                        || WzStringUtil.isBlank(resetParam.getLoginName())
                         || WzStringUtil.isBlank(resetParam.getUserMobile())
                         || WzStringUtil.isBlank(resetParam.getCreateUser())
                         || WzStringUtil.isBlank(resetParam.getUpdateUser())) {
@@ -515,6 +520,7 @@ public class SysAuthApi extends BaseController {
                 userTemp.setUserMobile(resetParam.getUserMobile());
                 userTemp.setCreateUser(resetParam.getCreateUser());
                 userTemp.setUpdateUser(resetParam.getUpdateUser());
+                userTemp.setPassword(resetParam.getPassword());
                 //判断用户是手机号码注册还是用户名注册
                 if(!WzStringUtil.isNotBlank(resetParam.getLoginName())){
                     //用户名为空，则是手机号码注册，注入默认用户名为手机号码
