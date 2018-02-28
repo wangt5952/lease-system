@@ -983,7 +983,7 @@ public class BizVehicleController extends BaseController {
                             List<JSONObject> locListTemp = new ArrayList<JSONObject>();
 
                             //获取数据库中时间区间内的数据
-                            List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByTime(batteryId,DeviceType.BATTERY.toString(),startTime,endTime);
+                            List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByTime(batteryCode,DeviceType.BATTERY.toString(),startTime,endTime);
                             //转换封装数据库的数据
                             if(null != locList && locList.size() > 0){
                                 for(int i=0;i<locList.size();i++){
@@ -998,8 +998,10 @@ public class BizVehicleController extends BaseController {
                                                 if(Long.valueOf(locInfo[0]) >= startTime && Long.valueOf(locInfo[0]) <= endTime){
                                                     JSONObject temp = new JSONObject();
                                                     temp.put(DeviceApiConstants.KEY_LOC_TIME, Long.valueOf(locInfo[0]));
-                                                    temp.put(DeviceApiConstants.REQ_LAT, Double.valueOf(locInfo[1]));
-                                                    temp.put(DeviceApiConstants.REQ_LON, Double.valueOf(locInfo[2]));
+                                                    //将WGS坐标系转换为BD坐标
+                                                    double[] douTemp = WzGPSUtil.wgs2bd(Double.valueOf(locInfo[1]),Double.valueOf(locInfo[2]));
+                                                    temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
+                                                    temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
                                                     locListTemp.add(temp);
                                                 }
                                             }else{
@@ -1011,7 +1013,7 @@ public class BizVehicleController extends BaseController {
                                 }
                             }
                             // 获得缓存中在时间区间内的数据
-                            Set<Object> lastLocSet = redisClient.zsetOperations().range(trackKey, startTime, endTime);
+                            Set<Object> lastLocSet = redisClient.zsetOperations().rangeByScore(trackKey, startTime, endTime);
                             //转换封装缓存中的数据
                             if (null != lastLocSet && lastLocSet.size()>0) {
                                 List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
@@ -1027,10 +1029,20 @@ public class BizVehicleController extends BaseController {
                                     if(i+1 < locListTemp.size()){
                                         JSONObject temp = new JSONObject();
                                         temp.put(DeviceApiConstants.KEY_LOC_TIME, locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME));
-                                        temp.put(DeviceApiConstants.REQ_LAT, locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT));
-                                        temp.put(DeviceApiConstants.REQ_LON, locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
+                                        //将WGS坐标系转换为BD坐标
+                                        double[] douTemp = WzGPSUtil.wgs2bd(locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT),locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
+                                        temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
+                                        temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
                                         long residenceTime = locListTemp.get(i+1).getLongValue(DeviceApiConstants.KEY_LOC_TIME) - locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME);
                                         temp.put(DeviceApiConstants.KEY_STAY_TIME, residenceTime);
+                                        locDatas.add(temp);
+                                    }else{
+                                        JSONObject temp = new JSONObject();
+                                        temp.put(DeviceApiConstants.KEY_LOC_TIME, locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME));
+                                        //将WGS坐标系转换为BD坐标
+                                        double[] douTemp = WzGPSUtil.wgs2bd(locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT),locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
+                                        temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
+                                        temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
                                         locDatas.add(temp);
                                     }
                                 }

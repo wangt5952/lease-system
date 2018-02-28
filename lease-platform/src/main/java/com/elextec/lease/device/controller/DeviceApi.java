@@ -308,7 +308,7 @@ public class DeviceApi extends BaseController {
                             }
                             BizVehicleTrack bvt = new BizVehicleTrack();
                             bvt.setDeviceId(deviceId);
-                            bvt.setDeviceId(WzStringUtil.isBlank(deviceType) ? DeviceType.BATTERY.toString() : deviceType);
+                            bvt.setDeviceType(WzStringUtil.isBlank(deviceType) ? DeviceType.BATTERY.toString() : deviceType);
                             bvt.setStartTime(sTime);
                             bvt.setEndTime(eTime);
                             bvt.setTaskInfo(WzUniqueValUtil.makeUUID());

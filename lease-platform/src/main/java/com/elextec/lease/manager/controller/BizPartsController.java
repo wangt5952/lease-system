@@ -142,8 +142,10 @@ public class BizPartsController extends BaseController {
      *            partsName:配件货名,
      *            partsBrand:配件品牌,
      *            partsPn:配件型号,
+     *            partsType:配件类型（SEATS、FRAME、HANDLEBAR、BELL、TYRE、PEDAL、DASHBOARD）
      *            partsParameters:配件参数,
      *            mfrsId:生产商ID,
+     *            partsStatus:配件状态（NORMAL、FREEZE、INVALID）
      *            createUser:创建人,
      *            updateUser:更新人
      *         },
@@ -214,16 +216,18 @@ public class BizPartsController extends BaseController {
      * @param addParam 批量新增参数JSON
      * <pre>
      *
-     *         {
-     *            partsCode:配件编码,
-     *            partsName:配件货名,
-     *            partsBrand:配件品牌,
-     *            partsPn:配件型号,
-     *            partsParameters:配件参数,
-     *            mfrsId:生产商ID,
-     *            createUser:创建人,
-     *            updateUser:更新人
-     *         }
+     *      {
+     *         partsCode:配件编码,
+     *         partsName:配件货名,
+     *         partsBrand:配件品牌,
+     *         partsPn:配件型号,
+     *         partsType:配件类型（SEATS、FRAME、HANDLEBAR、BELL、TYRE、PEDAL、DASHBOARD）
+     *         partsParameters:配件参数,
+     *         mfrsId:生产商ID,
+     *         partsStatus:配件状态（NORMAL、FREEZE、INVALID）
+     *         createUser:创建人,
+     *         updateUser:更新人
+     *      }
      *
      * </pre>
      * @return 新增结果
