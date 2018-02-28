@@ -125,7 +125,7 @@ public class BizBatteryController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
 //            PageResponse<BizBattery> batteryPageResp = bizBatteryService.list(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             PageResponse<BizBatteryExt> batteryPageResp = bizBatteryService.listExtByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);

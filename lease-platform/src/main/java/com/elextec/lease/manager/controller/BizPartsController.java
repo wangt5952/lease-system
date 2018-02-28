@@ -122,7 +122,7 @@ public class BizPartsController extends BaseController {
                     bizPartsParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
             //PageResponse<BizParts> orgPageResp = bizPartsService.list(true, bizPartsParam);
             PageResponse<BizPartsExt> orgPageResp = bizPartsService.listExtByParam(Boolean.valueOf(bizPartsParam.getNeedPaging()), bizPartsParam);

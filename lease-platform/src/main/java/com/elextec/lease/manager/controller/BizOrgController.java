@@ -106,7 +106,7 @@ public class BizOrgController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
             //PageResponse<BizOrganization> orgPageResp = bizOrganizationService.list(true, pagingParam);
             PageResponse<BizOrganization> orgPageResp = bizOrganizationService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);

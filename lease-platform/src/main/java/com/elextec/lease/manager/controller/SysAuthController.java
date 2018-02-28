@@ -5,11 +5,11 @@ import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.request.LoginParam;
-import com.elextec.framework.common.request.ModifyPasswordParam;
 import com.elextec.framework.common.request.ResetPasswordParam;
 import com.elextec.framework.common.request.SmsParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
+import com.elextec.framework.plugins.sms.SmsClient;
 import com.elextec.framework.utils.WzCaptchaUtil;
 import com.elextec.framework.utils.WzCheckCodeUtil;
 import com.elextec.framework.utils.WzStringUtil;
@@ -53,8 +53,8 @@ public class SysAuthController extends BaseController {
     @Autowired
     private SysUserService sysUserService;
 
-//    @Autowired
-//    private RedisClient redisClient;
+    @Autowired
+    private SmsClient smsClient;
 
     /**
      * 登录.
@@ -368,6 +368,7 @@ public class SysAuthController extends BaseController {
             redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE + smsVCodeToken, smsVCode, 120, TimeUnit.SECONDS);
             Map<String, String> smsTokenMap = new HashMap<String, String>();
             smsTokenMap.put(WzConstants.KEY_SMS_VCODE_TOKEN, smsVCodeToken);
+            smsClient.sendSmsByTemplate1(smsParam.getMobile(), smsVCode);
             return new MessageResponse(RunningResult.SUCCESS, smsTokenMap);
         }
     }

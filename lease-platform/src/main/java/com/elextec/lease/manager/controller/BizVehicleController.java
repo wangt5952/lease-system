@@ -131,7 +131,7 @@ public class BizVehicleController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
 //            PageResponse<BizVehicle> vehiclePageResp = bizVehicleService.list(true, pagingParam);
             PageResponse<BizVehicleExt> vehiclePageResp = bizVehicleService.listExtByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);

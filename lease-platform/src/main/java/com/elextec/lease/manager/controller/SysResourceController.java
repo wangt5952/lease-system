@@ -106,7 +106,7 @@ public class SysResourceController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
             } catch (Exception ex) {
-                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
 //            PageResponse<SysResources> resPageResp = sysResourceService.list(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
             PageResponse<SysResources> resPageResp = sysResourceService.listByParam(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);

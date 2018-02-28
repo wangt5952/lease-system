@@ -12,8 +12,6 @@ public class BizVehicleParam extends PageRequest {
     /** 车辆状态. */
     private String vehicleStatus;
 
-
-
     /*
          * Getter 和 Setter 方法.
          */
