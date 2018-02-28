@@ -477,6 +477,7 @@ public class WzEncryptUtil {
 //        return new String(str);
 //    }
 public static void main(String args[]) {
+        System.out.println(System.currentTimeMillis());
         String s = "123,123,123;456,456,456;789,789,789;";
         String[] sarr = s.split(";");
         System.out.println(sarr.length);

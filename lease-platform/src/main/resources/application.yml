@@ -26,4 +26,4 @@ localsetting:
     verycode: upxg5dedtrk2
     tempid1: JSM41961-0001
   track-stay-time: 900000
-  loc-effective-distance: 400
+  move-speed-threshold: 16

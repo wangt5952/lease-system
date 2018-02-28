@@ -1,5 +1,11 @@
 package com.elextec.framework.utils;
 
+import com.alibaba.fastjson.JSONObject;
+import com.elextec.lease.device.common.DeviceApiConstants;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * GPS相关工具类.
  * Created by wangtao on 2018/2/5.
@@ -261,5 +267,85 @@ public class WzGPSUtil {
      */
     public static double calcDistanceByM(double lat1, double lng1, double lat2, double lng2) {
         return calcDistanceByKm(lat1, lng1, lat2, lng2) * 1000;
+    }
+
+    /**
+     * 轨迹降噪.
+     * @param locs 轨迹
+     * <pre>
+     *     [
+     *         {
+     *             LocTime:定位记录时间,
+     *             LAT:纬度,
+     *             LON:经度,
+     *             StayTime:停留时间
+     *         },
+     *         ... ...
+     *     ]
+     * </pre>
+     * @param speedThreshold 去噪速度阈值
+     * @return 去噪后的轨迹
+     * <pre>
+     *     [
+     *         {
+     *             LocTime:定位记录时间,
+     *             LAT:纬度,
+     *             LON:经度,
+     *             StayTime:停留时间
+     *         },
+     *         ... ...
+     *     ]
+     * </pre>
+     */
+    public static List<JSONObject> denoise(List<JSONObject> locs, Double speedThreshold) {
+        // 记录点小于5个则直接返回
+        if (null == locs || 5 >= locs.size() || null == speedThreshold) {
+            return locs;
+        }
+        // 确定首点
+        int firstIdx = -1;
+        double tmpDistance1 = 0;
+        long tmpIntervalTime1 = 0;
+        double tmpDistance2 = 0;
+        long tmpIntervalTime2 = 0;
+        // 连续三个点的速度均正常的情况，此三点第一个点为首点
+        for (int i = 0; i < locs.size() - 2; i++) {
+            tmpDistance1 = calcDistanceByM(locs.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT),
+                    locs.get(i).getDoubleValue(DeviceApiConstants.REQ_LON),
+                    locs.get(i + 1).getDoubleValue(DeviceApiConstants.REQ_LAT),
+                    locs.get(i + 1).getDoubleValue(DeviceApiConstants.REQ_LON));
+            tmpIntervalTime1 = (locs.get(i + 1).getLongValue(DeviceApiConstants.KEY_LOC_TIME) - locs.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME)) * 1000;
+            tmpDistance2 = calcDistanceByM(locs.get(i + 1).getDoubleValue(DeviceApiConstants.REQ_LAT),
+                    locs.get(i + 1).getDoubleValue(DeviceApiConstants.REQ_LON),
+                    locs.get(i + 2).getDoubleValue(DeviceApiConstants.REQ_LAT),
+                    locs.get(i + 2).getDoubleValue(DeviceApiConstants.REQ_LON));
+            tmpIntervalTime2 = (locs.get(i + 2).getLongValue(DeviceApiConstants.KEY_LOC_TIME) - locs.get(i + 1).getLongValue(DeviceApiConstants.KEY_LOC_TIME)) * 1000;
+            if (speedThreshold >= (tmpDistance1 / tmpIntervalTime1)
+                    && speedThreshold >= (tmpDistance2 / tmpIntervalTime2)) {
+                firstIdx = i;
+                break;
+            }
+        }
+        // 如果到最后也没有找到首点，则直接返回全部点
+        if (-1 == firstIdx) {
+            return locs;
+        }
+        // 从首点开始对其后续点进行去噪
+        List<JSONObject> usableLocs = new ArrayList<JSONObject>();
+        for (int i = firstIdx; i < locs.size(); i++) {
+            if (i == firstIdx) {
+                usableLocs.add(locs.get(i));
+            } else {
+                tmpDistance1 = calcDistanceByM(locs.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT),
+                        locs.get(i).getDoubleValue(DeviceApiConstants.REQ_LON),
+                        locs.get(i - 1).getDoubleValue(DeviceApiConstants.REQ_LAT),
+                        locs.get(i - 1).getDoubleValue(DeviceApiConstants.REQ_LON));
+                tmpIntervalTime1 = (locs.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME) - locs.get(i - 1).getLongValue(DeviceApiConstants.KEY_LOC_TIME)) * 1000;
+                if (speedThreshold >= (tmpDistance1 / tmpIntervalTime1)) {
+                    usableLocs.add(locs.get(i));
+                }
+            }
+        }
+        return usableLocs;
     }
 }
