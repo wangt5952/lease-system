@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 基础Controller.
@@ -25,12 +26,12 @@ public class BaseController {
      * @param request HttpServletRequest
      * @return 登录用户信息对象
      */
-    protected SysUserExt getPcLoginUserInfo(HttpServletRequest request) {
+    protected SysUserExt getLoginUserInfo(HttpServletRequest request) {
         String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
         if (WzStringUtil.isBlank(userToken)) {
             throw new BizException(RunningResult.AUTH_OVER_TIME);
         }
-        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
+        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
         SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
         return sue;
     }
@@ -39,44 +40,16 @@ public class BaseController {
      * 修改用户后更新PC端Session中的登录用户信息.
      * @param request HttpServletRequest
      * @param newUserExt 新用户登录信息
+     * @param ot 超时时间（秒）
      */
-    protected void resetPcLoginUserInfo(HttpServletRequest request, SysUserExt newUserExt) {
+    protected void resetLoginUserInfo(HttpServletRequest request, SysUserExt newUserExt, int ot) {
         String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
         if (WzStringUtil.isBlank(userToken)) {
             throw new BizException(RunningResult.AUTH_OVER_TIME);
         }
-        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
+        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
         userInfo.remove(WzConstants.KEY_USER_INFO);
         userInfo.put(WzConstants.KEY_USER_INFO, newUserExt);
-    }
-
-    /**
-     * 获得移动端登录用户信息.
-     * @param request HttpServletRequest
-     * @return 登录用户信息对象
-     */
-    protected SysUserExt getMobileLoginUserInfo(HttpServletRequest request) {
-        String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-        if (WzStringUtil.isBlank(userToken)) {
-            throw new BizException(RunningResult.AUTH_OVER_TIME);
-        }
-        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_MOBILE_LOGIN_INFO + userToken);
-        SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
-        return sue;
-    }
-
-    /**
-     * 修改用户后更新移动端Session中的登录用户信息.
-     * @param request HttpServletRequest
-     * @param newUserExt 新用户登录信息
-     */
-    protected void resetMobileLoginUserInfo(HttpServletRequest request, SysUserExt newUserExt) {
-        String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-        if (WzStringUtil.isBlank(userToken)) {
-            throw new BizException(RunningResult.AUTH_OVER_TIME);
-        }
-        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_MOBILE_LOGIN_INFO + userToken);
-        userInfo.remove(WzConstants.KEY_USER_INFO);
-        userInfo.put(WzConstants.KEY_USER_INFO, newUserExt);
+        redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, userInfo, ot, TimeUnit.SECONDS);
     }
 }

@@ -10,7 +10,6 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysUserParam;
-import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.manager.service.SysRoleService;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.persist.field.enums.OrgAndUserType;
@@ -23,6 +22,7 @@ import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,11 +44,11 @@ public class SysUserController extends BaseController {
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SysUserController.class);
 
-    @Autowired
-    private SysUserService sysUserService;
+    @Value("${localsetting.login-overtime-sec}")
+    private String loginOvertime;
 
     @Autowired
-    private BizVehicleService bizVehicleService;
+    private SysUserService sysUserService;
 
     @Autowired
     private SysRoleService sysRoleService;
@@ -391,7 +391,11 @@ public class SysUserController extends BaseController {
             SysUserExample.Criteria reListCri = reListParam.createCriteria();
             reListCri.andIdEqualTo(userInfo.getId());
             SysUserExt uExt = sysUserService.getExtById(reListParam);
-            resetPcLoginUserInfo(request, uExt);
+            int usedLoginOvertime = 300;
+            if (WzStringUtil.isNumeric(loginOvertime)) {
+                usedLoginOvertime = Integer.parseInt(loginOvertime);
+            }
+            resetLoginUserInfo(request, uExt, usedLoginOvertime);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, uExt);
             return mr;

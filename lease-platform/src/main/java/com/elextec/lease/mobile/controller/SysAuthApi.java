@@ -10,10 +10,8 @@ import com.elextec.framework.common.request.ResetPasswordParam;
 import com.elextec.framework.common.request.SmsParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.image.WzImageClient;
 import com.elextec.framework.plugins.sms.SmsClient;
 import com.elextec.framework.utils.*;
-import com.elextec.lease.manager.controller.SysAuthController;
 import com.elextec.lease.manager.service.SysAuthService;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
@@ -248,12 +246,12 @@ public class SysAuthApi extends BaseController {
             loginInfo.put(WzConstants.KEY_RES_INFO, loginVo.get(WzConstants.KEY_RES_INFO));
             loginInfo.put(WzConstants.KEY_VEHICLE_INFO,vehicleBatteryPartss);
             // 设置超时时间
-            Integer overtime = 5;
+            Integer overtime = 300;
             if (WzStringUtil.isNumeric(loginOvertime)) {
                 overtime = Integer.parseInt(loginOvertime);
             }
             // 登录成功，保存到Redis中
-            redisClient.valueOperations().set(WzConstants.GK_MOBILE_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.MINUTES);
+            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.MINUTES);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, loginInfo);
             return mr;
@@ -277,7 +275,7 @@ public class SysAuthApi extends BaseController {
     public MessageResponse logout(HttpServletRequest request, HttpServletResponse response) {
         String token = WzStringUtil.defaultIfEmpty(request.getHeader(WzConstants.HEADER_LOGIN_TOKEN), "");
         // 清除登录信息
-        redisClient.valueOperations().getOperations().delete(WzConstants.GK_MOBILE_LOGIN_INFO + token);
+        redisClient.valueOperations().getOperations().delete(WzConstants.GK_LOGIN_INFO + token);
         // 组织返回结果并返回
         MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
         return null;
@@ -444,7 +442,7 @@ public class SysAuthApi extends BaseController {
 
             // 获得登录用户信息
             String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_MOBILE_LOGIN_INFO + userToken);
+            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
             SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
             SysUser updateVo = new SysUser();
             updateVo.setId(sue.getId());
@@ -767,7 +765,6 @@ public class SysAuthApi extends BaseController {
                     MessageResponse mr = new MessageResponse(RunningResult.PARAM_VERIFY_ERROR);
                     return mr;
                 }
-
         }
     }
 

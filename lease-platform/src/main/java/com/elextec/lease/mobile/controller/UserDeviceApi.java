@@ -7,7 +7,7 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.utils.*;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.persist.field.enums.DeviceType;
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;

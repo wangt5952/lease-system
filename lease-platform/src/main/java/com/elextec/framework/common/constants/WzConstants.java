@@ -18,10 +18,8 @@ public class WzConstants {
     /*
      * 登录相关Key.
      */
-    /** 全局Key 登录用户PC端信息前缀. */
-    public static final String GK_PC_LOGIN_INFO = "gk_pc_login_info:";
-    /** 全局Key 登录用户移动端信息前缀. */
-    public static final String GK_MOBILE_LOGIN_INFO = "gk_mobile_login_info:";
+    /** 全局Key 登录用户缓存信息前缀. */
+    public static final String GK_LOGIN_INFO = "gk_login_info:";
     /** 登录Token. */
     public static final String KEY_LOGIN_TOKEN = "key_login_token";
     /** 登录用户详细信息. */

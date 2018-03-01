@@ -181,7 +181,7 @@ public class SysAuthController extends BaseController {
                 overtime = Integer.parseInt(loginOvertime);
             }
             // 登录成功，保存到Redis中
-            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.SECONDS);
+            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.SECONDS);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, loginInfo);
             return mr;
@@ -205,7 +205,7 @@ public class SysAuthController extends BaseController {
     public MessageResponse logout(HttpServletRequest request, HttpServletResponse response) {
         String token = WzStringUtil.defaultIfEmpty(request.getHeader(WzConstants.HEADER_LOGIN_TOKEN), "");
         // 清除登录信息
-        redisClient.valueOperations().getOperations().delete(WzConstants.GK_PC_LOGIN_INFO + token);
+        redisClient.valueOperations().getOperations().delete(WzConstants.GK_LOGIN_INFO + token);
         // 组织返回结果并返回
         MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
         return null;
@@ -430,7 +430,7 @@ public class SysAuthController extends BaseController {
 
             // 获得登录用户信息
             String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_PC_LOGIN_INFO + userToken);
+            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
             SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
             SysUser updateVo = new SysUser();
             updateVo.setId(sue.getId());
