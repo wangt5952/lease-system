@@ -17,6 +17,9 @@ public class BizPartsParam extends PageRequest {
     /*配件状态（正常、冻结、作废）*/
     private String partsStatus;
 
+    /*绑定状态*/
+    private String isBind;
+
     /*
      * Getter 和 Setter 方法.
      */
@@ -38,6 +41,14 @@ public class BizPartsParam extends PageRequest {
 
     public String getPartsStatus() {
         return partsStatus;
+    }
+
+    public String getIsBind() {
+        return isBind;
+    }
+
+    public void setIsBind(String isBind) {
+        this.isBind = isBind;
     }
 
     public void setPartsStatus(String partsStatus) {

@@ -74,6 +74,12 @@
 			<if test="orgId != null and orgId != ''" >
 				and s.org_id = #{orgId,jdbcType=VARCHAR}
 			</if>
+			<if test="isBind == BIND">
+				AND v.vehicle_id IS not NULL
+			</if>
+			<if test="isBind == UNBIND">
+				AND v.vehicle_id IS NULL
+			</if>
 		</where>
 		order by a.update_time desc,a.create_time desc
 		limit #{pageBegin} , #{pageSize}
