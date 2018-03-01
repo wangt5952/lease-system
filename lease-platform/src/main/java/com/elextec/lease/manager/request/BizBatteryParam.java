@@ -1,6 +1,7 @@
 package com.elextec.lease.manager.request;
 
 import com.elextec.framework.plugins.paging.PageRequest;
+import com.elextec.persist.field.enums.BindStatus;
 
 /**
  * 电池查询参数类.
@@ -11,10 +12,21 @@ public class BizBatteryParam extends PageRequest {
     private String keyStr;
     /** 电池状态. */
     private String batteryStatus;
+    /** 已绑定、未绑定 */
+    private String isBind;
 
     /*
      * Getter 和 Setter 方法.
      */
+
+    public String getIsBind() {
+        return isBind;
+    }
+
+    public void setIsBind(String isBind) {
+        this.isBind = isBind;
+    }
+
     public String getKeyStr() {
         return keyStr;
     }

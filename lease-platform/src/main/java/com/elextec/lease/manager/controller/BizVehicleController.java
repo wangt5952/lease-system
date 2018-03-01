@@ -60,6 +60,7 @@ public class BizVehicleController extends BaseController {
      *         keyStr:查询关键字（非必填，模糊查询，可填写车辆编号、车辆型号、车辆品牌、车辆产地、生产商ID、生产商名）,
      *         vehicleStatus:车辆状态（非必填，包括NORMAL、FREEZE、INVALID）,
      *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *         isBind:绑定未绑定状态（BIND为查已绑定，UNBIND为查未绑定,空的话则查全部）,
      *         currPage:当前页（needPaging不为false时必填）,
      *         pageSize:每页记录数（needPaging不为false时必填）
      *     }
