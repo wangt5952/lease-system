@@ -75,6 +75,7 @@ public class BizPartsController extends BaseController {
      *                 createTime:创建时间,
      *                 updateUser:更新人,
      *                 updateTime:更新时间
+     *                 vehicleId:被绑定车辆ID
      *             },
      *             ... ...
      *         ]
