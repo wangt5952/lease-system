@@ -17,7 +17,7 @@ public class BizPartsParam extends PageRequest {
     /*配件状态（正常、冻结、作废）*/
     private String partsStatus;
 
-    /*绑定状态*/
+    /*绑定状态.*/
     private String isBind;
 
     /*

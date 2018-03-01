@@ -75,7 +75,7 @@
 				and s.org_id = #{orgId,jdbcType=VARCHAR}
 			</if>
 			<if test="isBind == BIND">
-				AND v.vehicle_id IS not NULL
+				AND v.vehicle_id IS NOT NULL
 			</if>
 			<if test="isBind == UNBIND">
 				AND v.vehicle_id IS NULL

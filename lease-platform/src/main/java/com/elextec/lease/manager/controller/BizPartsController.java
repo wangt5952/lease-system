@@ -52,7 +52,7 @@ public class BizPartsController extends BaseController {
      *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
      *         currPage:当前页,
      *         pageSize:每页记录数,
-     *         isBind:绑定状态（BIND-已绑定，UNBIND-未绑定）
+     *         isBind:绑定状态（BIND-已绑定，UNBIND-未绑定）.
      *     }
      * </pre>
      * @return 查询结果列表
