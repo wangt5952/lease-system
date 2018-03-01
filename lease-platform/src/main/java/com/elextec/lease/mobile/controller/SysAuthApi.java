@@ -277,7 +277,7 @@ public class SysAuthApi extends BaseController {
     public MessageResponse logout(HttpServletRequest request, HttpServletResponse response) {
         String token = WzStringUtil.defaultIfEmpty(request.getHeader(WzConstants.HEADER_LOGIN_TOKEN), "");
         // 清除登录信息
-        redisClient.valueOperations().getOperations().delete(WzConstants.GK_MOBILE_LOGIN_INFO + ":" + token);
+        redisClient.valueOperations().getOperations().delete(WzConstants.GK_MOBILE_LOGIN_INFO + token);
         // 组织返回结果并返回
         MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
         return null;
@@ -531,7 +531,7 @@ public class SysAuthApi extends BaseController {
                 //默认状态为正常
                 userTemp.setUserStatus(RecordStatus.NORMAL);
                 //默认暂时未实名认证
-                userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.AUTHORIZED);
+                userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.UNAUTHORIZED);
                 sysUserService.insertSysUser(userTemp);
                 return new MessageResponse(RunningResult.SUCCESS);
 

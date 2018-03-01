@@ -7,6 +7,8 @@ import com.elextec.framework.utils.WzEncryptUtil;
 import com.elextec.lease.manager.service.SysAuthService;
 import com.elextec.persist.dao.mybatis.SysResourcesMapperExt;
 import com.elextec.persist.dao.mybatis.SysUserMapperExt;
+import com.elextec.persist.field.enums.OrgAndUserType;
+import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
@@ -76,8 +78,12 @@ public class SysAuthServcieImpl implements SysAuthService {
         SysUserExample sysUserExample = new SysUserExample();
         SysUserExample.Criteria loginNameCri = sysUserExample.createCriteria();
         loginNameCri.andLoginNameEqualTo(loginName);
+        //手机登录必须是个人客户
+        loginNameCri.andUserTypeEqualTo(OrgAndUserType.INDIVIDUAL);
         SysUserExample.Criteria mobileCri = sysUserExample.or();
         mobileCri.andUserMobileEqualTo(loginName);
+        //手机登录必须是个人客户
+        mobileCri.andUserTypeEqualTo(OrgAndUserType.INDIVIDUAL);
         List<SysUserExt> sysUserLs = sysUserMapperExt.selectExtByExample(sysUserExample);
 
         // 处理用户信息
