@@ -724,55 +724,50 @@ public class SysAuthApi extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
                 if(WzStringUtil.isNotBlank(resetParam.getId())){
-                    if(WzStringUtil.isNotBlank(resetParam.getUserIcon())){
-                        SysUser userTemp = sysUserService.getSysUserByPrimaryKey(resetParam.getId());
-                        if(userTemp == null){
+                    SysUser userTemp = sysUserService.getSysUserByPrimaryKey(resetParam.getId());
+                    if(userTemp == null){
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在");
-                        }
-                        //如果用户是已实名认证或待验证的状态，则不可更改信息
-                        if(RealNameAuthFlag.AUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString()) ||
-                                RealNameAuthFlag.TOAUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString())){
-                            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户已实名认证或待验证中");
-                        }
-                        //用户的身份证号与照片信息不可为空
-                        if(WzStringUtil.isBlank(resetParam.getUserPid())
-                                || WzStringUtil.isBlank(resetParam.getUserIcFront())
-                                || WzStringUtil.isBlank(resetParam.getUserIcBack())
-                                || WzStringUtil.isBlank(resetParam.getUserIcGroup())){
-                            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户照片信息不可为空");
-                        }
-                        //将身份证正面照片保存到图片服务器中
-                        String frontImageName = WzUniqueValUtil.makeUniqueTimes();
-                        WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", frontImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
-                        //将身份证背面照片保存到图片服务器中
-                        String backImageName = WzUniqueValUtil.makeUniqueTimes();
-                        WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", backImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
-                        //将用户手持身份证的照片保存到图片服务器中
-                        String groupImageName = WzUniqueValUtil.makeUniqueTimes();
-                        WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", groupImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
-
-                        userTemp.setUserPid(resetParam.getUserPid());
-                        userTemp.setUpdateUser(resetParam.getUpdateUser());
-                        //数据库只保存文件名
-                        userTemp.setUserIcFront(frontImageName + WzFileUtil.EXT_JPG);
-                        userTemp.setUserIcBack(backImageName + WzFileUtil.EXT_JPG);
-                        userTemp.setUserIcGroup(groupImageName + WzFileUtil.EXT_JPG);
-                        //用户进入待实名认证状态
-                        userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.TOAUTHORIZED);
-                        sysUserService.updateSysUser(userTemp);
-                        return new MessageResponse(RunningResult.SUCCESS);
-                    }else{
-                        MessageResponse mr = new MessageResponse(RunningResult.PARAM_VERIFY_ERROR);
-                        return mr;
                     }
+                        //如果用户是已实名认证或待验证的状态，则不可更改信息
+                    if(RealNameAuthFlag.AUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString()) ||
+                            RealNameAuthFlag.TOAUTHORIZED.toString().equals(userTemp.getUserRealNameAuthFlag().toString())){
+                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户已实名认证或待验证中");
+                    }
+                    //用户的身份证号与照片信息不可为空
+                    if(WzStringUtil.isBlank(resetParam.getUserPid())
+                            || WzStringUtil.isBlank(resetParam.getUserIcFront())
+                            || WzStringUtil.isBlank(resetParam.getUserIcBack())
+                            || WzStringUtil.isBlank(resetParam.getUserIcGroup())){
+                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户照片信息不可为空");
+                    }
+                    //将身份证正面照片保存到图片服务器中
+                    String frontImageName = WzUniqueValUtil.makeUniqueTimes();
+                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", frontImageName, WzFileUtil.EXT_JPG);
+//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    //将身份证背面照片保存到图片服务器中
+                    String backImageName = WzUniqueValUtil.makeUniqueTimes();
+                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", backImageName, WzFileUtil.EXT_JPG);
+//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    //将用户手持身份证的照片保存到图片服务器中
+                    String groupImageName = WzUniqueValUtil.makeUniqueTimes();
+                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", groupImageName, WzFileUtil.EXT_JPG);
+//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    userTemp.setUserPid(resetParam.getUserPid());
+                    userTemp.setUpdateUser(resetParam.getUpdateUser());
+                    //数据库只保存文件名
+                    userTemp.setUserIcFront(frontImageName + WzFileUtil.EXT_JPG);
+                    userTemp.setUserIcBack(backImageName + WzFileUtil.EXT_JPG);
+                    userTemp.setUserIcGroup(groupImageName + WzFileUtil.EXT_JPG);
+                    //用户进入待实名认证状态
+                    userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.TOAUTHORIZED);
+                    sysUserService.updateSysUser(userTemp);
+                    return new MessageResponse(RunningResult.SUCCESS);
                 }else{
                     //ID为空的话，参数解析失败
                     MessageResponse mr = new MessageResponse(RunningResult.PARAM_VERIFY_ERROR);
                     return mr;
                 }
+
         }
     }
 

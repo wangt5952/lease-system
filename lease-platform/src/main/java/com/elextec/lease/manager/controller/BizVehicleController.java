@@ -79,6 +79,7 @@ public class BizVehicleController extends BaseController {
      *                 mfrsId:生产商ID,
      *                 mfrsName:生产商名,
      *                 vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                 batteryId:绑定该车辆的电池ID（不为NULL就是已绑定，NULL就是未绑定）
      *                 createUser:创建人,
      *                 createTime:创建时间,
      *                 updateUser:更新人,
