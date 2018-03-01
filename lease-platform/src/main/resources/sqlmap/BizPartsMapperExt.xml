@@ -74,10 +74,10 @@
 			<if test="orgId != null and orgId != ''" >
 				and s.org_id = #{orgId,jdbcType=VARCHAR}
 			</if>
-			<if test="isBind == BIND">
+			<if test="isBind == 'BIND'">
 				AND v.vehicle_id IS NOT NULL
 			</if>
-			<if test="isBind == UNBIND">
+			<if test="isBind == 'UNBIND'">
 				AND v.vehicle_id IS NULL
 			</if>
 		</where>
@@ -89,7 +89,7 @@
 	<select id="countExtByParam" parameterType="com.elextec.lease.manager.request.BizPartsParam" resultType="java.lang.Integer" >
 		SELECT count(distinct a.id) FROM biz_parts a
 		LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
-		LEFT JOIN biz_ref_vehicle_parts v ON a.id = v.parts_id
+		LEFT JOIN biz_ref_vehicle_parts v ON a.id = v.parts_id AND unbind_time IS NULL
 		LEFT JOIN biz_ref_user_vehicle r ON v.vehicle_id = r.vehicle_id
 		LEFT JOIN sys_user s ON r.user_id = s.id
 		<where>
@@ -114,6 +114,12 @@
 			</if>
 			<if test="orgId != null and orgId != ''" >
 				and s.org_id = #{orgId,jdbcType=VARCHAR}
+			</if>
+			<if test="isBind == 'BIND'">
+				AND v.vehicle_id IS NOT NULL
+			</if>
+			<if test="isBind == 'UNBIND'">
+				AND v.vehicle_id IS NULL
 			</if>
 		</where>
 	</select>
