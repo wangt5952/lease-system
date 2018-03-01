@@ -3,6 +3,7 @@
 <mapper namespace="com.elextec.persist.dao.mybatis.BizVehicleMapperExt">
     <resultMap extends="BaseResultMap" id="BizVehicleExtResultMap" type="com.elextec.lease.model.BizVehicleBatteryParts">
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
+        <result column="battery_code" jdbcType="VARCHAR" property="batteryCode" />
     </resultMap>
 
     <select id="getVehicleInfoByUserId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
@@ -94,9 +95,12 @@
         a.create_time create_time,
         a.update_user update_user,
         a.update_time update_time,
+        d.battery_code battery_code,
         b.mfrs_name mfrs_name
         FROM
         biz_vehicle a
+        LEFT JOIN biz_ref_vehicle_battery c ON a.id = c.vehicle_id AND c.unbind_time IS NULL
+        LEFT JOIN biz_battery d ON d.id = c.battery_id
         LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
         LEFT JOIN biz_ref_user_vehicle r ON a.id = r.vehicle_id
         LEFT JOIN sys_user s ON r.user_id = s.id

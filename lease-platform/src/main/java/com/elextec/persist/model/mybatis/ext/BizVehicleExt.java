@@ -11,6 +11,17 @@ public class BizVehicleExt extends BizVehicle {
     //制商名称
     private String mfrsName;
 
+    //电池CODE
+    private String batteryCode;
+
+    public String getBatteryCode() {
+        return batteryCode;
+    }
+
+    public void setBatteryCode(String batteryCode) {
+        this.batteryCode = batteryCode;
+    }
+
     public String getMfrsName() {
         return mfrsName;
     }
