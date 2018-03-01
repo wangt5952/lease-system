@@ -122,6 +122,12 @@
             <if test="orgId != null and orgId != ''" >
                 and s.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
+            <if test="isBind == 'BIND'">
+                and d.battery_id IS NOT NULL
+            </if>
+            <if test="isBind == 'UNBIND'">
+                and d.battery_id IS NULL
+            </if>
 
         </where>
         limit #{pageBegin} , #{pageSize}
@@ -131,6 +137,7 @@
         SELECT count(distinct a.id)
         FROM
         biz_vehicle a
+        LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.vehicle_id AND c.unbind_time IS NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
         LEFT JOIN biz_ref_user_vehicle r ON a.id = r.vehicle_id
         LEFT JOIN sys_user s ON r.user_id = s.id
@@ -152,6 +159,12 @@
             </if>
             <if test="orgId != null and orgId != ''" >
                 and s.org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
+            <if test="isBind == 'BIND'">
+                and d.battery_id IS NOT NULL
+            </if>
+            <if test="isBind == 'UNBIND'">
+                and d.battery_id IS NULL
             </if>
         </where>
     </select>

@@ -53,6 +53,7 @@ public class BizBatteryController extends BaseController {
      *         keyStr:查询关键字（非必填，模糊查询，可填写电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名）,
      *         batteryStatus:电池状态（非必填，包括NORMAL、FREEZE、INVALID）,
      *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *         isBind:绑定未绑定状态（BIND为查已绑定，UNBIND为查未绑定,空的话则查全部）,
      *         currPage:当前页（needPaging不为false时必填）,
      *         pageSize:每页记录数（needPaging不为false时必填）
      *     }
@@ -73,6 +74,7 @@ public class BizBatteryController extends BaseController {
      *                 mfrsId:生产商ID,
      *                 mfrsName:生产商名,
      *                 batteryStatus:电池状态（正常、冻结、作废）,
+     *                 vehicleId:绑定车辆的ID（不为NULL的话是已绑定，为NULL的话是未绑定）
      *                 createUser:创建人,
      *                 createTime:创建时间,
      *                 updateUser:更新人,
