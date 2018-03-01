@@ -25,7 +25,7 @@ spring:
       web-stat-filter:
         enabled: false
   redis:
-    host: localhost
+    host: 106.14.172.38
     port: 6379
     pool:
       max-active: 8

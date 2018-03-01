@@ -10,8 +10,8 @@ spring:
 logging:
   config: classpath:logback.xml
 localsetting:
-  platform-type: mobile
-  login-overtime-sec: 300
+  platform-type: all
+  login-overtime-sec: 3600
   nofilters: /manager/auth/,/mobile/v1/auth/login,/mobile/v1/auth/logout,/mobile/v1/auth/sendsms,/mobile/v1/auth/resetpassword,
   white-flag: false
   white-url:

@@ -13,7 +13,7 @@ public class WzConstants {
     public static final String KEY_SPLIT = ":";
 
     /** 用户请求Header参数 登录Token. */
-    public static final String HEADER_LOGIN_TOKEN = "header_login_token";
+    public static final String HEADER_LOGIN_TOKEN = "header-login-token";
 
     /*
      * 登录相关Key.

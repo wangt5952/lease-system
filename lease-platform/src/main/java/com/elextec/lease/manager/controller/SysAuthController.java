@@ -176,12 +176,12 @@ public class SysAuthController extends BaseController {
             loginInfo.put(WzConstants.KEY_USER_INFO, loginVo.get(WzConstants.KEY_USER_INFO));
             loginInfo.put(WzConstants.KEY_RES_INFO, loginVo.get(WzConstants.KEY_RES_INFO));
             // 设置超时时间
-            Integer overtime = 5;
+            Integer overtime = 300;
             if (WzStringUtil.isNumeric(loginOvertime)) {
                 overtime = Integer.parseInt(loginOvertime);
             }
             // 登录成功，保存到Redis中
-            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.MINUTES);
+            redisClient.valueOperations().set(WzConstants.GK_PC_LOGIN_INFO + loginToken, loginInfo, overtime, TimeUnit.SECONDS);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, loginInfo);
             return mr;

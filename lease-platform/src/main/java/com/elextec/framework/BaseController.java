@@ -16,6 +16,7 @@ import java.util.Map;
  * Created by wangtao on 2018/1/16.
  */
 public class BaseController {
+
     @Autowired
     protected RedisClient redisClient;
 
