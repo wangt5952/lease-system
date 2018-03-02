@@ -1021,8 +1021,8 @@ public class BizVehicleController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/getlocbyTime")
-    public MessageResponse getLocByTime(@RequestBody String idAndTimeInterval) {
+    @RequestMapping(path = "/gettrackbytime")
+    public MessageResponse getTrackByTime(@RequestBody String idAndTimeInterval) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(idAndTimeInterval)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
