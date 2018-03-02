@@ -14,6 +14,11 @@
             <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item>
+          <el-select v-model="search.isBind" placeholder="请选择状态" style="width:100%;">
+            <el-option v-for="o in searchIsBindList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -24,6 +29,12 @@
       <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
+      <el-table-column label="电池">
+        <template slot-scope="{row}">
+          <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
+          <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
@@ -89,6 +100,23 @@
       </span>
     </el-dialog>
 
+    <el-dialog title="绑定电池" :visible.sync="bindFormVisible" :close-on-click-modal="false">
+      <el-form class="edit-form" :model="bindForm" ref="bindForm">
+        <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择状态'}]" label="电池">
+          <el-select style="width:100%;" v-model="bindForm.batteryId" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :remote-method="remoteBattery" :loading="bindForm_batteryLoading">
+            <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
+              <span style="float: left">{{ o.batteryBrand }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeBindForm">取消</el-button>
+        <el-button type="primary" @click="saveBindForm">{{form.id ? '保存' : '绑定'}}</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -106,6 +134,7 @@ export default {
 
       search: {
         vehicleStatus: '',
+        isBind: '',
       },
 
       pageSizes: [10, 50, 100, 200],
@@ -115,6 +144,12 @@ export default {
 
       formVisible: false,
       form: {},
+
+      bindFormVisible: false,
+      bindForm: {},
+
+      bindForm_batteryList: [],
+      bindForm_batteryLoading: false,
 
       typeList: [
         { id: 'VEHICLE', name: '车辆' },
@@ -131,6 +166,11 @@ export default {
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
+      ],
+      searchIsBindList: [
+        { id: '', name: '全部' },
+        { id: 'UNBIND', name: '未绑定' },
+        { id: 'BIND', name: '已绑定' },
       ],
       mfrsList: [],
     };
@@ -231,12 +271,74 @@ export default {
         this.$message.error(message);
       }
     },
+    showBindForm({ id }) {
+      const $form = this.$refs.bindForm;
+      if ($form) $form.resetFields();
+      this.bindForm = { vehicleId: id };
+      this.bindFormVisible = true;
+    },
+    closeBindForm() {
+      this.bindFormVisible = false;
+    },
+    async saveBindForm() {
+      try {
+        const $form = this.$refs.bindForm;
+        await $form.validate();
+
+        const { ...form } = this.bindForm;
+        const { code, message } = (await this.$http.post('/api/manager/vehicle/batterybind', form)).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('绑定成功');
+        await this.reload();
+        this.closeBindForm();
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    async handleUnbind({ id, vehicleCode, batteryId }) {
+      try {
+        await this.$confirm(`确认解绑${vehicleCode}的电池, 是否继续?`, '提示', { type: 'warning' });
+        const { code, message } = (await this.$http.post('/api/manager/vehicle/batteryunbind', { vehicleId:id, batteryId })).body;
+        if (code !== '200') throw new Error(message);
+        await this.reload();
+        this.$message.success('解绑成功');
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+
+    async remoteBattery(keyStr) {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/battery/list', {
+          currPage: 1, pageSize: 10, keyStr, isBind: 'UNBIND'
+        })).body;
+        if (code !== '200') throw new Error(message);
+        const { rows } = respData;
+        this.bindForm_batteryList = _.map(rows, o => ({
+          ...o,
+          batteryStatusText: (_.find(this.statusList, { id: o.batteryStatus }) || { name: o.batteryStatus }).name,
+        }));
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
   },
   async mounted() {
-    const { code, respData } = (await this.$http.post('/api/manager/mfrs/list', {
-      currPage: 1, pageSize: 999,
-    })).body;
-    if (code === '200') this.mfrsList = respData.rows;
+    try {
+      const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+        currPage: 1, pageSize: 999,
+      })).body;
+      if (code !== '200') throw new Error(message);
+      this.mfrsList = respData.rows;
+    } catch (e) {
+      const message = e.statusText || e.message;
+      this.$message.error(message);
+    }
+
     await this.reload();
   },
 };

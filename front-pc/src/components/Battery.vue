@@ -14,6 +14,11 @@
             <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item>
+          <el-select v-model="search.isBind" placeholder="请选择状态" style="width:100%;">
+            <el-option v-for="o in searchIsBindList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -25,6 +30,12 @@
       <el-table-column prop="batteryParameters" label="参数"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="batteryStatusText" label="状态"></el-table-column>
+      <el-table-column label="绑定车辆">
+        <template slot-scope="{row}">
+          <template v-if="!row.vehicleId">未绑定</template>
+          <template v-else>已绑定</template>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
@@ -112,6 +123,7 @@ export default {
 
       search: {
         batteryStatus: '',
+        isBind: '',
       },
 
       pageSizes: [10, 50, 100, 200],
@@ -137,6 +149,11 @@ export default {
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
+      ],
+      searchIsBindList: [
+        { id: '', name: '全部' },
+        { id: 'UNBIND', name: '未绑定' },
+        { id: 'BIND', name: '已绑定' },
       ],
       mfrsList: [],
     };
