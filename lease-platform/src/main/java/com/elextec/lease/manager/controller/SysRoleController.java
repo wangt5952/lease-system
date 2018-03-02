@@ -101,6 +101,8 @@ public class SysRoleController extends BaseController {
                     }
                     pagingParam.setNeedPaging("true");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
@@ -158,6 +160,8 @@ public class SysRoleController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录角色参数有误");
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -210,6 +214,8 @@ public class SysRoleController extends BaseController {
                         || WzStringUtil.isBlank(roleInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "角色参数有误");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -258,6 +264,8 @@ public class SysRoleController extends BaseController {
                 if (WzStringUtil.isBlank(roleInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -298,6 +306,8 @@ public class SysRoleController extends BaseController {
                 if (null == roleIds) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -348,6 +358,8 @@ public class SysRoleController extends BaseController {
                         throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "授权资源不能为空");
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -418,6 +430,8 @@ public class SysRoleController extends BaseController {
                 if (null == roleId || 0 == roleId.size() || WzStringUtil.isBlank(roleId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }

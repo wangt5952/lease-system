@@ -132,6 +132,8 @@ public class BizVehicleController extends BaseController {
                     }
                     pagingParam.setNeedPaging("true");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
@@ -235,6 +237,8 @@ public class BizVehicleController extends BaseController {
                         }
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -333,6 +337,8 @@ public class BizVehicleController extends BaseController {
                         }
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -385,6 +391,8 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank(vehicleInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -425,6 +433,8 @@ public class BizVehicleController extends BaseController {
                 if (null == vehicleIds || 0 == vehicleIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -496,6 +506,8 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank((String) paramMap.get("id"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -553,6 +565,8 @@ public class BizVehicleController extends BaseController {
                 if (null == vehicleIds || 0 == vehicleIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -650,6 +664,8 @@ public class BizVehicleController extends BaseController {
                 if (null == vehicleIds || 0 == vehicleIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -741,6 +757,8 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -787,6 +805,8 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -857,6 +877,8 @@ public class BizVehicleController extends BaseController {
                         || null == locAndRadiusParam.getLng()) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "定位点信息异常");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -956,6 +978,8 @@ public class BizVehicleController extends BaseController {
                 if(startTime == 0 || endTime == 0 || startTime > endTime){
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "时间区间参数异常");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }

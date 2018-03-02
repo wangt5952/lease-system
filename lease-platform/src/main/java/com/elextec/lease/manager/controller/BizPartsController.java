@@ -126,6 +126,8 @@ public class BizPartsController extends BaseController {
                     }
                     bizPartsParam.setNeedPaging("true");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
@@ -206,6 +208,8 @@ public class BizPartsController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的配件状态");
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -280,6 +284,8 @@ public class BizPartsController extends BaseController {
                         && !bizParts.getPartsStatus().toString().equals(RecordStatus.NORMAL.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的配件状态");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -330,6 +336,8 @@ public class BizPartsController extends BaseController {
                 if (WzStringUtil.isBlank(bizParts.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -370,6 +378,8 @@ public class BizPartsController extends BaseController {
                 if (null == bizPartsIds || 0 == bizPartsIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -425,6 +435,8 @@ public class BizPartsController extends BaseController {
                 if (null == bizPartsId || 0 == bizPartsId.size() || WzStringUtil.isBlank(bizPartsId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -471,6 +483,8 @@ public class BizPartsController extends BaseController {
                 if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(),"查询参数不能为空");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -514,6 +528,8 @@ public class BizPartsController extends BaseController {
                 if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }

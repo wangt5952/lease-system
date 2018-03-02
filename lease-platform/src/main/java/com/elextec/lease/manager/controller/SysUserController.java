@@ -127,6 +127,8 @@ public class SysUserController extends BaseController {
                     }
                     pagingParam.setNeedPaging("true");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
@@ -217,6 +219,8 @@ public class SysUserController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户状态无效");
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -300,6 +304,8 @@ public class SysUserController extends BaseController {
                         && !userInfo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户状态");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -382,6 +388,8 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank(userInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -432,6 +440,8 @@ public class SysUserController extends BaseController {
                 if (null == userIds || 0 == userIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -482,6 +492,8 @@ public class SysUserController extends BaseController {
                         throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "授权角色不能为空");
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -557,6 +569,8 @@ public class SysUserController extends BaseController {
                 if (null == userId || 0 == userId.size() || WzStringUtil.isBlank(userId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -607,6 +621,8 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("userId")) || WzStringUtil.isBlank((String) param.get("vehicleId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -653,6 +669,8 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("userId")) || WzStringUtil.isBlank((String) param.get("vehicleId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }

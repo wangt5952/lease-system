@@ -97,6 +97,8 @@ public class BizDeviceConfController extends BaseController {
                     }
                     pagingParam.setNeedPaging("true");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
@@ -165,6 +167,8 @@ public class BizDeviceConfController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录无需更新");
                     }
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -225,6 +229,8 @@ public class BizDeviceConfController extends BaseController {
                         && null == devConfInfo.getRequest()) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无需更新");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -285,6 +291,8 @@ public class BizDeviceConfController extends BaseController {
                         && null == devConfInfo.getRequest()) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无需更新");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -333,6 +341,8 @@ public class BizDeviceConfController extends BaseController {
                 if (null == devConfIds || 0 == devConfIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -391,6 +401,8 @@ public class BizDeviceConfController extends BaseController {
                         && !devConfKey.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无效的设备类别");
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
