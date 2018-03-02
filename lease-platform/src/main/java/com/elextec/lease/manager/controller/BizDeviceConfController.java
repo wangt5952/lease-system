@@ -306,7 +306,7 @@ public class BizDeviceConfController extends BaseController {
     }
 
     /**
-     * 批量删除用户.
+     * 批量删除设备参数.
      * @param deleteParam 删除ID列表JSON
      * <pre>
      *     [

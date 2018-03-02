@@ -252,12 +252,12 @@ public class SysAuthController extends BaseController {
                         || null == modifyPasswordParam.getAuthTime()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
-            SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+            SysUserExt sue = getLoginUserInfo(request);
             // 验证用户并返回用户信息
             if (sysAuthService.verifyUser(sue.getLoginName(), sue.getPassword(), modifyPasswordParam.getOldAuthStr(), modifyPasswordParam.getAuthTime())) {
                 SysUser updateVo = new SysUser();
