@@ -77,11 +77,6 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="密码" :rules="[{required:true, message:'请填写密码'}]">
-              <el-input v-model="form.password" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
             <el-form-item label="昵称">
               <el-input v-model="form.nickName" auto-complete="off"></el-input>
             </el-form-item>
@@ -273,7 +268,6 @@ export default {
         'userMobile',
         'userType',
         'userIcon',
-        'password',
         'nickName',
         'userName',
         'userRealNameAuthFlag',

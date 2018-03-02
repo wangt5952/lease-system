@@ -35,6 +35,12 @@
           <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
         </template>
       </el-table-column>
+      <el-table-column label="配件">
+        <template slot-scope="{row}">
+          <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
+          <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
