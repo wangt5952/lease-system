@@ -306,7 +306,7 @@ export default {
     async handleUnbind({ id, vehicleCode, batteryId }) {
       try {
         await this.$confirm(`确认解绑${vehicleCode}的电池, 是否继续?`, '提示', { type: 'warning' });
-        const { code, message } = (await this.$http.post('/api/manager/vehicle/batteryunbind', { vehicleId:id, batteryId })).body;
+        const { code, message } = (await this.$http.post('/api/manager/vehicle/batteryunbind', { vehicleId: id, batteryId })).body;
         if (code !== '200') throw new Error(message);
         await this.reload();
         this.$message.success('解绑成功');
@@ -319,7 +319,7 @@ export default {
     async remoteBattery(keyStr) {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/battery/list', {
-          currPage: 1, pageSize: 10, keyStr, isBind: 'UNBIND'
+          currPage: 1, pageSize: 10, keyStr, isBind: 'UNBIND',
         })).body;
         if (code !== '200') throw new Error(message);
         const { rows } = respData;

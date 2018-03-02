@@ -151,26 +151,25 @@ export default {
         await $form.validate();
         const { password0, password, password2 } = this.passwordForm;
 
-        if(password != password2) throw new Error('新密码两次输入不一致');
+        if (password !== password2) throw new Error('新密码两次输入不一致');
         const authTime = moment().unix() * 1000;
         const { loginName } = this.key_user_info;
         const form = {
           oldAuthStr: md5(loginName + md5(password0).toUpperCase() + authTime).toUpperCase(),
           authTime,
           newPassword: md5(password).toUpperCase(),
-        }
+        };
 
         const { code, message } = (await this.$http.post('/api/manager/auth/modifypassword', form)).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('修改密码成功');
-        this.passwordFormVisible = false
+        this.passwordFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    }
-
+    },
   },
 };
 </script>
