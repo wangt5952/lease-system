@@ -5,6 +5,8 @@
     <resultMap extends="BaseResultMap" id="BizPartsExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizPartsExt">
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
 		<result column="vehicle_id" jdbcType="VARCHAR" property="vehicleId" />
+		<result column="bind_time" jdbcType="TIMESTAMP" property="bindTime" />
+		<result column="unbind_time" jdbcType="TIMESTAMP" property="unbindTime" />
     </resultMap>
 
     <select id="getById" parameterType="java.lang.String" resultMap="BizPartsExtResultMap">
@@ -21,7 +23,9 @@
 				p.create_user,
 				p.create_time,
 				p.update_user,
-				p.update_time
+				p.update_time,
+				r.bind_time,
+				r.unbind_time
         FROM biz_ref_vehicle_parts r
         LEFT JOIN biz_parts p ON p.id = r.parts_id
         LEFT JOIN biz_manufacturer m ON m.id = p.mfrs_id

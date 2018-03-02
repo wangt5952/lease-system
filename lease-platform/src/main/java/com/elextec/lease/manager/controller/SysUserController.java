@@ -393,6 +393,8 @@ public class SysUserController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
+            //密码不可以由这个接口修改，清空上传的密码参数
+            userInfo.setPassword(null);
             sysUserService.updateSysUser(userInfo);
             // 更新登录信息
             SysUserExample reListParam  = new SysUserExample();

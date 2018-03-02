@@ -4,6 +4,8 @@
     <resultMap extends="BaseResultMap" id="BizBatteryExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizBatteryExt">
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
         <result column="vehicle_id" jdbcType="VARCHAR" property="vehicleId" />
+        <result column="bind_time" jdbcType="TIMESTAMP" property="bindTime" />
+        <result column="unbind_time" jdbcType="TIMESTAMP" property="unbindTime" />
     </resultMap>
     <select id="getBatteryInfoByVehicleId" parameterType="java.util.Map" resultMap="BizBatteryExtResultMap">
         select
@@ -14,7 +16,9 @@
             b.battery_pn,
             b.battery_parameters,
             m.mfrs_name mfrs_name,
-            b.battery_status
+            b.battery_status,
+            r.bind_time,
+            r.unbind_time
         from biz_battery b
         LEFT JOIN biz_ref_vehicle_battery r  ON r.battery_id = b.id
         LEFT JOIN biz_manufacturer m ON b.mfrs_id = m.id

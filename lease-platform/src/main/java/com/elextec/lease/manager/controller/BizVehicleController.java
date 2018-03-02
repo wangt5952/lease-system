@@ -14,14 +14,17 @@ import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.LocAndRadiusParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
+import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.manager.service.BizVehicleTrackService;
+import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.BizVehicleTrack;
 import com.elextec.persist.model.mybatis.SysUser;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -446,7 +449,7 @@ public class BizVehicleController extends BaseController {
     }
 
     /**
-     * 根据ID获取车辆信息.
+     * 根据ID获取车辆电池信息.
      * @param param 车辆ID以及是否查询在用电池
      * <pre>
      *     {
@@ -459,7 +462,7 @@ public class BizVehicleController extends BaseController {
      *     {
      *         code:返回Code,
      *         message:返回消息,
-     *         respData:[{
+     *         respData:{
      *                 vehicleId:ID,
      *                 vehicleCode:车辆编号,
      *                 vehiclePn:车辆型号,
@@ -468,22 +471,27 @@ public class BizVehicleController extends BaseController {
      *                 vehicleMfrsId:车辆生产商ID,
      *                 vehicleStatus:车辆状态（正常、冻结、报废）,
      *                 vehicleMfrsName:车辆生产商名称,
-     *                 batteryId:电池ID,
-     *                 batteryCode:电池编号,
-     *                 batteryName:电池货名,
-     *                 batteryBrand:电池品牌,
-     *                 batteryPn:电池型号,
-     *                 batteryParameters:电池参数,
-     *                 batteryMfrsId:电池生产商ID,
-     *                 batteryMfrsName:电池生产商名称,
-     *                 batteryStatus:电池状态（正常、冻结、作废）,
+     *                 bizBatteries:[
+     *                     {
+     *                         batteryId:电池ID,
+     *                         batteryCode:电池编号,
+     *                         batteryName:电池货名,
+     *                         batteryBrand:电池品牌,
+     *                         batteryPn:电池型号,
+     *                         batteryParameters:电池参数,
+     *                         batteryMfrsId:电池生产商ID,
+     *                         batteryMfrsName:电池生产商名称,
+     *                         batteryStatus:电池状态（正常、冻结、作废）
+     *                         bindTime:绑定时间,
+     *                         unbindTime:解绑时间
+     *                     }
+     *                     ....
+     *                 ]
      *                 createUser:创建人,
      *                 createTime:创建时间,
      *                 updateUser:更新人,
      *                 updateTime:更新时间
-     *             },
-     *             .....
-     *             ]
+     *             }
      *       }
      *
      * </pre>
@@ -517,12 +525,78 @@ public class BizVehicleController extends BaseController {
                     && ("true".equals(isUsedBatteryStr.toLowerCase()) || "false".equals(isUsedBatteryStr.toLowerCase()))) {
                 isUsedBattery = Boolean.valueOf(isUsedBatteryStr);
             }
-            List<Map<String,Object>> vehicleInfo = bizVehicleService.getByPrimaryKey((String) paramMap.get("id"), isUsedBattery);
+//            List<Map<String,Object>> vehicleInfo = bizVehicleService.getByPrimaryKey((String) paramMap.get("id"), isUsedBattery);
+            BizVehicleBatteryParts vehicleInfo = bizVehicleService.queryBatteryInfoByVehicleId((String) paramMap.get("id"), isUsedBattery);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, vehicleInfo);
             return mr;
         }
     }
+
+
+    /**
+     * 根据ID获取车辆电池信息.
+     * @param param 车辆ID以及是否查询在用电池
+     * <pre>
+     * [id]
+     * </pre>
+     * @return 根据ID获取车辆信息返回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[{
+     *                 id:ID,
+     *                 partsCode:配件编码,
+     *                 partsName:配件货名,
+     *                 partsBrand:配件品牌,
+     *                 partsPn:配件型号,
+     *                 partsType:配件类别（车座、车架、车把、车铃、轮胎、脚蹬、仪表盘）,
+     *                 partsParameters:配件参数,
+     *                 mfrsId:生产商ID,
+     *                 mfrsName:生产商名,
+     *                 partsStatus:配件状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *                 bindTime:绑定时间,
+     *                 unbindTime:解绑时间
+     *               },
+     *               ....
+     *           ]
+     *       }
+     *
+     *
+     * </pre>
+     */
+    @RequestMapping(path = "/getbypr")
+    public MessageResponse getByPR(@RequestBody String param) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(param)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> paramMap = null;
+            try {
+                String paramStr = URLDecoder.decode(param, "utf-8");
+                paramMap = JSON.parseArray(paramStr, String.class);
+                if (null == paramMap || 0 == paramMap.size()) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
+                }
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            List<BizPartsExt> parts = bizVehicleService.getBizPartsByVehicle(paramMap.get(0));
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, parts);
+            return mr;
+        }
+    }
+
 
     /**
      * 根据车辆ID列表获取车辆信息列表.

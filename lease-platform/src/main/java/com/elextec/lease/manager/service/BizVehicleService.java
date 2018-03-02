@@ -7,6 +7,7 @@ import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.model.mybatis.BizVehicle;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 
 import java.util.List;
@@ -101,4 +102,19 @@ public interface BizVehicleService {
      * @return 车辆信息列表
      */
     public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes);
+
+    /**
+     * 根据车辆ID查询车辆基本信息和电池信息.
+     * @param id 车辆ID
+     * @param isUsed 是否查询在用电池，true：查在用电池；false：查在用及解绑的电池
+     * @return 车辆扩展信息列表
+     */
+    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(String id, Boolean isUsed);
+
+    /**
+     * 根据车辆ID查询配件信息
+     * @param id 车辆ID
+     * */
+    public List<BizPartsExt> getBizPartsByVehicle(String id);
+
 }

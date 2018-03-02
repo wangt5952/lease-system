@@ -10,9 +10,12 @@ import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
+import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
 import com.elextec.persist.model.mybatis.*;
+import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
+import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,9 @@ public class BizVehicleServcieImpl implements BizVehicleService {
 
     @Autowired
     private BizRefVehicleBatteryMapperExt bizRefVehicleBatteryMapperExt;
+
+    @Autowired
+    private BizPartsMapperExt bizPartsMapperExt;
 
 
     @Override
@@ -337,5 +343,25 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Override
     public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes) {
         return bizVehicleMapperExt.selectExtByBatteryCodes(batteryCodes);
+    }
+
+    @Override
+    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(String id, Boolean isUsed) {
+        BizVehicleBatteryParts vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(id);
+        Map<String,Object> param = new HashMap<String,Object>();
+        if(vehicle != null){
+            param.put("flag",isUsed);
+            param.put("id",vehicle.getId());
+            List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(param);
+            vehicle.setBizBatteries(batteryDatas);
+        }else{
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+        }
+        return vehicle;
+    }
+
+    @Override
+    public List<BizPartsExt> getBizPartsByVehicle(String id) {
+        return bizPartsMapperExt.getById(id);
     }
 }

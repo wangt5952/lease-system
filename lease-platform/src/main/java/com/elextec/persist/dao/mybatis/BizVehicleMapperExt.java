@@ -43,6 +43,14 @@ public interface BizVehicleMapperExt extends BizVehicleMapper {
      */
     List<Map<String, Object>> selectExtByBatteryCodes(List<String> batteryCodes);
 
+
+    /**
+     * 根据车辆ID查找车辆基本信息
+     * @param id 查询条件（车辆ID）
+     * @return 车辆基本信息列表
+     * */
+    BizVehicleBatteryParts getVehicleInfoByVehicleId(String id);
+
 //    /**
 //     * 查询车辆是否已被绑定
 //     * @param id 车辆ID

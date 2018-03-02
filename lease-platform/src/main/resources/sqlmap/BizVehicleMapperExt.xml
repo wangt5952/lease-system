@@ -8,7 +8,7 @@
 
     <select id="getVehicleInfoByUserId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
         select
-        v.id vehicleId,
+        v.id id,
         v.vehicle_code,
         v.vehicle_pn,
         v.vehicle_brand,
@@ -23,6 +23,24 @@
         LEFT JOIN biz_vehicle v ON r.vehicle_id = v.id
         LEFT JOIN biz_manufacturer m ON v.mfrs_id = m.id
         where r.user_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
+    </select>
+
+    <select id="getVehicleInfoByVehicleId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
+        select
+        v.id id,
+        v.vehicle_code,
+        v.vehicle_pn,
+        v.vehicle_brand,
+        v.vehicle_made_in,
+        v.vehicle_status,
+        v.create_user,
+        v.create_time,
+        v.update_user,
+        v.update_time,
+        m.mfrs_name mfrs_name
+        from biz_vehicle v
+        LEFT JOIN biz_manufacturer m ON v.mfrs_id = m.id
+        where v.id = #{id,jdbcType=VARCHAR}
     </select>
 
     <select id="getVehicleInfoById" parameterType="java.util.Map" resultType="java.util.Map">
