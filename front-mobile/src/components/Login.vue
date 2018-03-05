@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="form" style="margin:40px 30px;font-size:0.4rem;">
-      <x-input placeholder="请输入帐号" v-model="form.username" style="background:#fff;">
+      <x-input placeholder="请输入帐号" v-model="form.loginName" style="background:#fff;">
         <template slot="label">
           <i class="lt lt-my"/>
         </template>
@@ -31,6 +31,9 @@
 </template>
 
 <script>
+import moment from 'moment';
+import md5 from 'js-md5';
+
 export default {
   data() {
     return {
@@ -40,7 +43,29 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      this.$router.push('/');
+
+      const { password, ...form } = this.form;
+      const loginTime = moment().unix() * 1000;
+      form.loginAuthStr = md5(form.loginName + md5(password).toUpperCase() + loginTime).toUpperCase();
+      form.loginTime = loginTime;
+
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/login', form)).body;
+        if (code !== '200') throw new Error(message || code);
+        const { key_login_token, key_res_info, key_user_info } = respData;
+        await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
+
+        this.$vux.toast.show({ text: '登录成功', type: 'success', width: '10em' });
+        this.$router.push('/');
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
+      }
+
+      // this.$vux.loading.show({ text: '登录中' });
+      // await this.$http.post('/mobile/v1/auth/login')
+      // console.log(this.form);
+      //this.$router.push('/');
     },
   },
 };
