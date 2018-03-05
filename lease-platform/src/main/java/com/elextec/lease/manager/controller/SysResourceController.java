@@ -11,9 +11,11 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysResParam;
 import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.model.SysResourcesIcon;
+import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.ResourceType;
 import com.elextec.persist.field.enums.ShowFlag;
 import com.elextec.persist.model.mybatis.SysResources;
+import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.List;
 
@@ -79,7 +82,7 @@ public class SysResourceController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/list")
-    public MessageResponse list(@RequestBody String paramAndPaging) {
+    public MessageResponse list(@RequestBody String paramAndPaging,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -94,6 +97,15 @@ public class SysResourceController extends BaseController {
                 pagingParam = JSON.parseObject(paramStr, SysResParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
                 if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging())
@@ -150,7 +162,7 @@ public class SysResourceController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParam) {
+    public MessageResponse add(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -163,6 +175,15 @@ public class SysResourceController extends BaseController {
                 resInfos = JSON.parseArray(paramStr, SysResources.class);
                 if (null == resInfos || 0 == resInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以修改车辆信息
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 SysResources insResChkVo = null;
                 for (int i = 0; i < resInfos.size(); i++) {
@@ -231,7 +252,7 @@ public class SysResourceController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addone(@RequestBody String addParam) {
+    public MessageResponse addone(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -244,6 +265,15 @@ public class SysResourceController extends BaseController {
                 resInfo = JSON.parseObject(paramStr, SysResources.class);
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以修改车辆信息
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(resInfo.getResCode())
                         || WzStringUtil.isBlank(resInfo.getResName())
@@ -307,7 +337,7 @@ public class SysResourceController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modify(@RequestBody String modifyParam) {
+    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -320,6 +350,15 @@ public class SysResourceController extends BaseController {
                 resInfo = JSON.parseObject(paramStr, SysResources.class);
                 if (null == resInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以修改车辆信息
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(resInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
@@ -352,7 +391,7 @@ public class SysResourceController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/delete")
-    public MessageResponse delete(@RequestBody String deleteParam) {
+    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -365,6 +404,15 @@ public class SysResourceController extends BaseController {
                 resIds = JSON.parseArray(paramStr, String.class);
                 if (null == resIds || 0 == resIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以修改车辆信息
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
@@ -410,7 +458,7 @@ public class SysResourceController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String id) {
+    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -423,6 +471,15 @@ public class SysResourceController extends BaseController {
                 resId = JSON.parseArray(paramStr, String.class);
                 if (null == resId || 0 == resId.size() || WzStringUtil.isBlank(resId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以修改车辆信息
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;

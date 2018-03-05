@@ -19,6 +19,8 @@ public enum RunningResult {
     NO_ROLE("40109", "未查询到角色"),
     NO_RESOURCE("40110", "未查询到资源"),
     NO_DIRECTORY("40111", "资源目录不存在"),
+    NO_FUNCTION_PERMISSION("40112", "您无权执行该操作"),
+    HAVE_BIND("40113", "绑定未解除"),
     FORBIDDEN("403", "禁止访问"),
     NOT_FOUND("404", "服务器无法找到被请求的页面或资源"),
     SERVER_ERROR("500", "服务器错误"),

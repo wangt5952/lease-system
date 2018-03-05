@@ -134,6 +134,12 @@
             <if test="userStatus != null and userStatus != ''" >
                 and a.user_status = #{userStatus,jdbcType=VARCHAR}
             </if>
+            <if test="userId != null and userId != ''" >
+                and a.id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and a.org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
         </where>
         limit #{pageBegin} , #{pageSize}
     </select>
@@ -159,6 +165,12 @@
             </if>
             <if test="userStatus != null and userStatus != ''" >
                 and a.user_status = #{userStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="userId != null and userId != ''" >
+                and a.id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and a.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
         </where>
     </select>

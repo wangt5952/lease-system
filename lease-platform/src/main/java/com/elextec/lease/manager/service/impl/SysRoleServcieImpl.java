@@ -9,10 +9,10 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.SysRoleParam;
 import com.elextec.lease.manager.service.SysRoleService;
+import com.elextec.persist.dao.mybatis.SysRefRoleResourcesMapperExt;
+import com.elextec.persist.dao.mybatis.SysRefUserRoleMapperExt;
 import com.elextec.persist.dao.mybatis.SysRoleMapperExt;
-import com.elextec.persist.model.mybatis.SysRefRoleResourcesKey;
-import com.elextec.persist.model.mybatis.SysRole;
-import com.elextec.persist.model.mybatis.SysRoleExample;
+import com.elextec.persist.model.mybatis.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,12 @@ public class SysRoleServcieImpl implements SysRoleService {
 
     @Autowired
     private SysRoleMapperExt sysRoleMapperExt;
+
+    @Autowired
+    private SysRefUserRoleMapperExt sysRefUserRoleMapperExt;
+
+    @Autowired
+    private SysRefRoleResourcesMapperExt sysRefRoleResourcesMapperExt;
 
     @Override
     public PageResponse<SysRole> list(boolean needPaging, PageRequest pr) {
@@ -155,9 +161,23 @@ public class SysRoleServcieImpl implements SysRoleService {
     public void deleteSysRole(List<String> ids) {
         int i = 0;
         try {
+            SysRefUserRoleExample example = new SysRefUserRoleExample();
+            SysRefUserRoleExample.Criteria criteria = example.createCriteria();
+            SysRefRoleResourcesExample delExample = new SysRefRoleResourcesExample();
+            SysRefRoleResourcesExample.Criteria delCriteria = delExample.createCriteria();
             for (; i < ids.size(); i++) {
+                criteria.andRoleIdEqualTo(ids.get(i));
+                int lnCnt = sysRefUserRoleMapperExt.countByExample(example);
+                if(lnCnt > 0){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,有用户绑定该角色未解除");
+                }
                 sysRoleMapperExt.deleteByPrimaryKey(ids.get(i));
+                //删除角色对应资源关系表里所有相关数据
+                delCriteria.andRoleIdEqualTo(ids.get(i));
+                sysRefRoleResourcesMapperExt.deleteByExample(delExample);
             }
+        } catch (BizException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
         }

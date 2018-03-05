@@ -86,13 +86,15 @@ public interface SysUserService {
      * 用户与车辆解绑.
      * @param userId 用户ID
      * @param vehicleId 车辆ID
+     * @param orgId 操作用户的企业ID
      */
-    public void unBind(String userId,String vehicleId);
+    public void unBind(String userId,String vehicleId,String orgId);
 
     /**
      * 用户与车辆绑定.
      * @param userId 用户ID
      * @param vehicleId 车辆ID
+     * @param orgId 操作用户的企业ID
      */
-    public void bind(String userId,String vehicleId);
+    public void bind(String userId,String vehicleId,String orgId);
 }

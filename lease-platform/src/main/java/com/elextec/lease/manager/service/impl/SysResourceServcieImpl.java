@@ -10,7 +10,9 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.SysResParam;
 import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.model.SysResourcesIcon;
+import com.elextec.persist.dao.mybatis.SysRefRoleResourcesMapperExt;
 import com.elextec.persist.dao.mybatis.SysResourcesMapperExt;
+import com.elextec.persist.model.mybatis.SysRefRoleResourcesExample;
 import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysResourcesExample;
 import org.slf4j.Logger;
@@ -42,6 +44,9 @@ public class SysResourceServcieImpl implements SysResourceService {
 
     @Autowired
     private SysResourcesMapperExt sysResourcesMapperExt;
+
+    @Autowired
+    private SysRefRoleResourcesMapperExt sysRefRoleResourcesMapperExt;
 
     @Override
     public PageResponse<SysResources> list(boolean needPaging, PageRequest pr) {
@@ -150,8 +155,17 @@ public class SysResourceServcieImpl implements SysResourceService {
         int i = 0;
         try {
             for (; i < ids.size(); i++) {
+                SysRefRoleResourcesExample example = new SysRefRoleResourcesExample();
+                SysRefRoleResourcesExample.Criteria criteria = example.createCriteria();
+                criteria.andResIdEqualTo(ids.get(i));
+                int lnCnt = sysRefRoleResourcesMapperExt.countByExample(example);
+                if(lnCnt > 0){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,有角色绑定该资源未解除");
+                }
                 sysResourcesMapperExt.deleteByPrimaryKey(ids.get(i));
             }
+        } catch (BizException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
         }

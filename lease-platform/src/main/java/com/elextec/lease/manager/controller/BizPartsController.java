@@ -169,7 +169,7 @@ public class BizPartsController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/add",method = RequestMethod.POST)
-    public MessageResponse add(@RequestBody String addParam) {
+    public MessageResponse add(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -182,6 +182,15 @@ public class BizPartsController extends BaseController {
                 bizPartsInfos = JSON.parseArray(paramStr, BizParts.class);
                 if (null == bizPartsInfos || 0 == bizPartsInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 BizParts insResChkVo = null;
                 for (int i = 0; i < bizPartsInfos.size(); i++) {
@@ -249,7 +258,7 @@ public class BizPartsController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/addone",method = RequestMethod.POST)
-    public MessageResponse addone(@RequestBody String addParam) {
+    public MessageResponse addone(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -262,6 +271,15 @@ public class BizPartsController extends BaseController {
                 bizParts = JSON.parseObject(paramStr, BizParts.class);
                 if (null == bizParts) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(bizParts.getPartsCode())
                         || null == bizParts.getPartsType()
@@ -319,7 +337,7 @@ public class BizPartsController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/modify",method = RequestMethod.POST)
-    public MessageResponse modify(@RequestBody String modifyParam) {
+    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -332,6 +350,15 @@ public class BizPartsController extends BaseController {
                 bizParts = JSON.parseObject(paramStr, BizParts.class);
                 if (null == bizParts) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(bizParts.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
@@ -364,7 +391,7 @@ public class BizPartsController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/delete",method = RequestMethod.POST)
-    public MessageResponse delete(@RequestBody String deleteParam) {
+    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -377,6 +404,15 @@ public class BizPartsController extends BaseController {
                 bizPartsIds = JSON.parseArray(paramStr, String.class);
                 if (null == bizPartsIds || 0 == bizPartsIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
@@ -421,7 +457,7 @@ public class BizPartsController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
-    public MessageResponse getByPK(@RequestBody String id) {
+    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -434,6 +470,15 @@ public class BizPartsController extends BaseController {
                 bizPartsId = JSON.parseArray(paramStr, String.class);
                 if (null == bizPartsId || 0 == bizPartsId.size() || WzStringUtil.isBlank(bizPartsId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;

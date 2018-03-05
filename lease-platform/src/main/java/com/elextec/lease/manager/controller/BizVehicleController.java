@@ -189,7 +189,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParams) {
+    public MessageResponse add(@RequestBody String addParams,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParams)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -202,6 +202,15 @@ public class BizVehicleController extends BaseController {
                 vehicleInfos = JSON.parseArray(paramStr, VehicleBatteryParam.class);
                 if (null == vehicleInfos || 0 == vehicleInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以增加车辆
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 VehicleBatteryParam insVBChkVo = null;
                 for (int i = 0; i < vehicleInfos.size(); i++) {
@@ -293,7 +302,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addone(@RequestBody String addParams) {
+    public MessageResponse addone(@RequestBody String addParams,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParams)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -307,6 +316,16 @@ public class BizVehicleController extends BaseController {
                 if (null == vechcleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以增加车辆
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+
                 if(WzStringUtil.isBlank(vechcleInfo.getFlag())){
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "车辆信息参数有误");
                 }else{
@@ -377,7 +396,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modifyUser(@RequestBody String modifyParam) {
+    public MessageResponse modifyUser(@RequestBody String modifyParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -391,6 +410,17 @@ public class BizVehicleController extends BaseController {
                 if (null == vehicleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以修改车辆信息
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+
                 if (WzStringUtil.isBlank(vehicleInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }

@@ -13,8 +13,10 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysRoleParam;
 import com.elextec.lease.manager.service.SysResourceService;
 import com.elextec.lease.manager.service.SysRoleService;
+import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.model.mybatis.SysResources;
 import com.elextec.persist.model.mybatis.SysRole;
+import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +78,7 @@ public class SysRoleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/list")
-    public MessageResponse list(@RequestBody String paramAndPaging) {
+    public MessageResponse list(@RequestBody String paramAndPaging,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -90,6 +93,16 @@ public class SysRoleController extends BaseController {
                 pagingParam = JSON.parseObject(paramStr, SysRoleParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
                 if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging())
@@ -137,7 +150,7 @@ public class SysRoleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParam) {
+    public MessageResponse add(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -150,6 +163,15 @@ public class SysRoleController extends BaseController {
                 roleInfos = JSON.parseArray(paramStr, SysRole.class);
                 if (null == roleInfos || 0 == roleInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 SysRole insRoleChkVo = null;
                 for (int i = 0; i < roleInfos.size(); i++) {
@@ -195,7 +217,7 @@ public class SysRoleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addone(@RequestBody String addParam) {
+    public MessageResponse addone(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -208,6 +230,15 @@ public class SysRoleController extends BaseController {
                 roleInfo = JSON.parseObject(paramStr, SysRole.class);
                 if (null == roleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(roleInfo.getRoleName())
                         || WzStringUtil.isBlank(roleInfo.getCreateUser())
@@ -247,7 +278,7 @@ public class SysRoleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modify(@RequestBody String modifyParam) {
+    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -260,6 +291,15 @@ public class SysRoleController extends BaseController {
                 roleInfo = JSON.parseObject(paramStr, SysRole.class);
                 if (null == roleInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(roleInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
@@ -292,7 +332,7 @@ public class SysRoleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/delete")
-    public MessageResponse delete(@RequestBody String deleteParam) {
+    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -305,6 +345,15 @@ public class SysRoleController extends BaseController {
                 roleIds = JSON.parseArray(paramStr, String.class);
                 if (null == roleIds) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
@@ -338,7 +387,7 @@ public class SysRoleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/refroleandresources")
-    public MessageResponse refRoleAndResources(@RequestBody String roleAndResources) {
+    public MessageResponse refRoleAndResources(@RequestBody String roleAndResources,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(roleAndResources)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -351,6 +400,15 @@ public class SysRoleController extends BaseController {
                 rr = JSON.parseObject(paramStr, RefRoleResourceParam.class);
                 if (null == rr || WzStringUtil.isBlank(rr.getRoleId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数解析失败或未获得被授权角色");
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if ((WzStringUtil.isBlank(rr.getDeleteAllFlg()) || !"true".equals(rr.getDeleteAllFlg().toLowerCase()))) {
                     rr.setDeleteAllFlg("false");
@@ -416,7 +474,7 @@ public class SysRoleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String id) {
+    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -429,6 +487,15 @@ public class SysRoleController extends BaseController {
                 roleId = JSON.parseArray(paramStr, String.class);
                 if (null == roleId || 0 == roleId.size() || WzStringUtil.isBlank(roleId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;

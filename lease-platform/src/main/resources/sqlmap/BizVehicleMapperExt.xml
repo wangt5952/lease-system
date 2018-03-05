@@ -119,8 +119,8 @@
         biz_vehicle a
         LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.vehicle_id AND d.unbind_time IS NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
-        LEFT JOIN biz_ref_user_vehicle r ON a.id = r.vehicle_id
-        LEFT JOIN sys_user s ON r.user_id = s.id
+        LEFT JOIN biz_ref_org_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
+        LEFT JOIN biz_ref_user_vehicle r1 ON a.id = r1.vehicle_id AND r1.unbind_time IS NULL
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >
@@ -135,10 +135,10 @@
                 and a.vehicle_status = #{vehicleStatus,jdbcType=VARCHAR}
             </if>
             <if test="userId != null and userId != ''" >
-                and s.id = #{userId,jdbcType=VARCHAR}
+                and r1.user_id = #{userId,jdbcType=VARCHAR}
             </if>
             <if test="orgId != null and orgId != ''" >
-                and s.org_id = #{orgId,jdbcType=VARCHAR}
+                and r.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
             <if test="isBind == 'BIND'">
                 and d.battery_id IS NOT NULL
@@ -157,8 +157,8 @@
         biz_vehicle a
         LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.vehicle_id AND d.unbind_time IS NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
-        LEFT JOIN biz_ref_user_vehicle r ON a.id = r.vehicle_id
-        LEFT JOIN sys_user s ON r.user_id = s.id
+        LEFT JOIN biz_org_user_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
+        LEFT JOIN biz_ref_user_vehicle r1 ON a.id = r1.vehicle_id AND r1.unbind_time IS NULL
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >
@@ -173,10 +173,10 @@
                 and a.vehicle_status = #{vehicleStatus,jdbcType=VARCHAR}
             </if>
             <if test="userId != null and userId != ''" >
-                and s.id = #{userId,jdbcType=VARCHAR}
+                and r1.user_id = #{userId,jdbcType=VARCHAR}
             </if>
             <if test="orgId != null and orgId != ''" >
-                and s.org_id = #{orgId,jdbcType=VARCHAR}
+                and r.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
             <if test="isBind == 'BIND'">
                 and d.battery_id IS NOT NULL

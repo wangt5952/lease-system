@@ -48,6 +48,12 @@ public class SysUserServcieImpl implements SysUserService {
     @Autowired
     private BizRefUserVehicleMapperExt bizRefUserVehicleMapperExt;
 
+    @Autowired
+    private BizRefOrgVehicleMapperExt bizRefOrgVehicleMapperExt;
+
+    @Autowired
+    private SysRefUserRoleMapperExt sysRefUserRoleMapperExt;
+
     @Override
     public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr) {
         // 查询总记录数
@@ -164,9 +170,24 @@ public class SysUserServcieImpl implements SysUserService {
     public void deleteSysUser(List<String> ids) {
         int i = 0;
         try {
+            BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+            selectRefCriteria.andBindTimeIsNull();
+            SysRefUserRoleExample delExample = new SysRefUserRoleExample();
+            SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
             for (; i < ids.size(); i++) {
+                selectRefCriteria.andUserIdEqualTo(ids.get(i));
+                int count = bizRefUserVehicleMapperExt.countByExample(refExample);
+                if(count >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,用户名下有未归还的车辆");
+                }
                 sysUserMapperExt.deleteByPrimaryKey(ids.get(i));
+                //删除用户和角色的所有关联
+                delCriteria.andUserIdEqualTo(ids.get(i));
+                sysRefUserRoleMapperExt.deleteByExample(delExample);
             }
+        } catch (BizException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
         }
@@ -239,7 +260,19 @@ public class SysUserServcieImpl implements SysUserService {
     }
 
     @Override
-    public void unBind(String userId, String vehicleId) {
+    public void unBind(String userId, String vehicleId,String orgId) {
+        //判定用户是否在操作用的企业名下
+        SysUserExample userExample = new SysUserExample();
+        SysUserExample.Criteria selectUserCriteria = userExample.createCriteria();
+        selectUserCriteria.andIdEqualTo(userId);
+        if(null != orgId){
+            selectUserCriteria.andOrgIdEqualTo(orgId);
+        }
+        int userCount = sysUserMapperExt.countByExample(userExample);
+        if(userCount<1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或用户不在企业名下");
+        }
+
         BizRefUserVehicle param = new BizRefUserVehicle();
         param.setUnbindTime(new Date());
         BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
@@ -255,15 +288,18 @@ public class SysUserServcieImpl implements SysUserService {
     }
 
     @Override
-    public void bind(String userId, String vehicleId) {
+    public void bind(String userId, String vehicleId,String orgId) {
 
         //判定用户是否存在
         SysUserExample userExample = new SysUserExample();
         SysUserExample.Criteria selectUserCriteria = userExample.createCriteria();
         selectUserCriteria.andIdEqualTo(userId);
-        int userCount = sysUserMapperExt.countByExample(userExample);
-        if(userCount<1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在");
+        if(null != orgId){
+            selectUserCriteria.andOrgIdEqualTo(orgId);
+        }
+        List<SysUserExt> user = sysUserMapperExt.selectExtByExample(userExample);
+        if(user.size() < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或用户不在企业名下");
         }
 
         //判定车辆是否存在
@@ -273,6 +309,24 @@ public class SysUserServcieImpl implements SysUserService {
         int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
         if(vehicleCount < 1){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+        }
+
+        //判定车辆是否属于操作用户的企业名下
+        BizRefOrgVehicleExample orgVehicleExample = new BizRefOrgVehicleExample();
+        BizRefOrgVehicleExample.Criteria selectOrgVehicleExample = orgVehicleExample.createCriteria();
+        if(null != orgId){
+            selectOrgVehicleExample.andOrgIdEqualTo(orgId);
+        }
+        selectOrgVehicleExample.andUnbindTimeIsNull();
+        selectOrgVehicleExample.andVehicleIdEqualTo(vehicleId);
+        List<BizRefOrgVehicle> orgVehicle = bizRefOrgVehicleMapperExt.selectByExample(orgVehicleExample);
+        if(orgVehicle.size() < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆与操作用户不属于同一企业");
+        }
+
+        //判定车辆是否与分配用户企业相同
+        if(!orgVehicle.get(0).getOrgId().equals(user.get(0).getOrgId())){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆与分配用户不属于同一企业");
         }
 
         //校验车辆是否已经被绑定

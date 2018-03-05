@@ -4,3 +4,4 @@
 *.yml
 lease-platform/src/main/java/com/elextec/lease/manager/controller/SysResourceController.java
 lease-platform/src/main/java/com/elextec/lease/manager/controller/SysResourceController.java
+lease-platform/src/main/resources/application-dev.yml

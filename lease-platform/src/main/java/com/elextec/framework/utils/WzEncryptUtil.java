@@ -477,13 +477,16 @@ public class WzEncryptUtil {
 //        return new String(str);
 //    }
 public static void main(String args[]) {
-        System.out.println(System.currentTimeMillis());
-        String s = "123,123,123;456,456,456;789,789,789;";
-        String[] sarr = s.split(";");
-        System.out.println(sarr.length);
-        for (String ts : sarr) {
-            System.out.println(ts);
-        }
+          for(int i=0;i<10;i++){
+              System.out.println(WzUniqueValUtil.makeUUID());
+          }
+//        System.out.println(System.currentTimeMillis());
+//        String s = "123,123,123;456,456,456;789,789,789;";
+//        String[] sarr = s.split(";");
+//        System.out.println(sarr.length);
+//        for (String ts : sarr) {
+//            System.out.println(ts);
+//        }
 //        String b64 = "";
 //        byte[] bts = base64ToByteArr(b64);
 //        System.out.println(bts.length);

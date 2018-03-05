@@ -253,9 +253,12 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     public void deleteVehicles(List<String> ids) {
         int i = 0;
         try {
+
             for (; i < ids.size(); i++) {
                 bizVehicleMapperExt.deleteByPrimaryKey(ids.get(i));
             }
+        } catch (BizException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
         }

@@ -12,6 +12,7 @@ import com.elextec.lease.manager.service.BizOrganizationService;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizOrganization;
+import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.HttpCookie;
 import java.net.URLDecoder;
 import java.util.List;
 
@@ -80,7 +83,7 @@ public class BizOrgController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/list",method = RequestMethod.POST)
-    public MessageResponse list(@RequestBody String paramAndPaging) {
+    public MessageResponse list(@RequestBody String paramAndPaging, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -95,6 +98,15 @@ public class BizOrgController extends BaseController {
                 pagingParam = JSON.parseObject(paramStr,BizOrganizationParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
                 if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging()) && "false".equals(pagingParam.getNeedPaging().toLowerCase())) {
@@ -151,7 +163,7 @@ public class BizOrgController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/add",method = RequestMethod.POST)
-    public MessageResponse add(@RequestBody String addParam) {
+    public MessageResponse add(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -164,6 +176,15 @@ public class BizOrgController extends BaseController {
                 orgInfos = JSON.parseArray(paramStr, BizOrganization.class);
                 if (null == orgInfos || 0 == orgInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 BizOrganization insOrgVo = null;
                 for (int i = 0; i < orgInfos.size(); i++) {
@@ -229,7 +250,7 @@ public class BizOrgController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/addone",method = RequestMethod.POST)
-    public MessageResponse addone(@RequestBody String addParam) {
+    public MessageResponse addone(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -242,6 +263,15 @@ public class BizOrgController extends BaseController {
                 orgInfo = JSON.parseObject(paramStr, BizOrganization.class);
                 if (null == orgInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(orgInfo.getOrgCode())
                         || WzStringUtil.isBlank(orgInfo.getOrgName())
@@ -301,7 +331,7 @@ public class BizOrgController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/modify",method = RequestMethod.POST)
-    public MessageResponse modify(@RequestBody String modifyParam) {
+    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -314,6 +344,15 @@ public class BizOrgController extends BaseController {
                 org = JSON.parseObject(paramStr, BizOrganization.class);
                 if (null == org) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(org.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
@@ -346,7 +385,7 @@ public class BizOrgController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/delete",method = RequestMethod.POST)
-    public MessageResponse delete(@RequestBody String deleteParam) {
+    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -359,6 +398,15 @@ public class BizOrgController extends BaseController {
                 orgIds = JSON.parseArray(paramStr, String.class);
                 if (null == orgIds || 0 == orgIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
@@ -406,7 +454,7 @@ public class BizOrgController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
-    public MessageResponse getByPK(@RequestBody String id) {
+    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -419,6 +467,15 @@ public class BizOrgController extends BaseController {
                 orgId = JSON.parseArray(paramStr, String.class);
                 if (null == orgId || 0 == orgId.size() || WzStringUtil.isBlank(orgId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
