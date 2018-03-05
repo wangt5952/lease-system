@@ -205,6 +205,10 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
           currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
         })).body;
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录')
+        }
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
@@ -213,7 +217,7 @@ export default {
           vehicleStatusText: (_.find(this.statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
         }));
       } catch (e) {
-        const message = e.statusText || e.message;
+        let message = e.statusText || e.message;
         this.$message.error(message);
       }
     },

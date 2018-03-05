@@ -53,6 +53,22 @@
         <el-button type="primary" @click="confirmPasswordForm">提交修改</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog title="用户登录" :visible.sync="loginFormVisible" :show-close="false" :close-on-click-modal="false">
+      <el-form class="edit-form" :model="loginForm" ref="passwordForm">
+        <el-form-item prop="loginName" :rules="[{required:true, message:'请输入用户名'}]" label="用户名">
+          <el-input v-model="loginForm.loginName" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="password" :rules="[{required:true, message:'请输入用户名'}]" label="密码">
+          <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="confirmLoginForm">登录</el-button>
+      </span>
+    </el-dialog>
+
+    {{relogin}}
   </div>
 </template>
 
@@ -110,16 +126,18 @@ const menuTree = [
 export default {
   data() {
     return {
-      msg: 'Welcome to Your Vue.js App1',
-
       passwordFormVisible: false,
       passwordForm: {},
+
+      loginFormVisible: this.$store.state.relogin,
+      loginForm: {},
     };
   },
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
       key_res_info: state => state.key_res_info,
+      relogin: state => state.relogin,
     }),
 
     menuTree() {
@@ -134,6 +152,13 @@ export default {
 
       return travTree(menuTree);
     },
+  },
+  watch: {
+    relogin(newVal) {
+      if(newVal){
+        this.loginFormVisible = true;
+      }
+    }
   },
   methods: {
     async handleLogout() {
@@ -169,6 +194,28 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
+    },
+
+    async confirmLoginForm() {
+      const { password, ...form } = this.loginForm;
+      const loginTime = moment().unix() * 1000;
+      form.loginAuthStr = md5(form.loginName + md5(password).toUpperCase() + loginTime).toUpperCase();
+      form.loginTime = loginTime;
+
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/auth/login', form)).body;
+        if (code !== '200') throw new Error(message || code);
+        const { key_login_token, key_res_info, key_user_info } = respData;
+        await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
+        this.$message.success({
+          message: `欢迎回来，${key_user_info.userName}`,
+        });
+        this.$router.go(0);
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      // this.$router.push('/');
     },
   },
 };
