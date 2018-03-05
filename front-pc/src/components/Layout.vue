@@ -155,10 +155,10 @@ export default {
   },
   watch: {
     relogin(newVal) {
-      if(newVal){
+      if (newVal) {
         this.loginFormVisible = true;
       }
-    }
+    },
   },
   methods: {
     async handleLogout() {

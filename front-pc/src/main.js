@@ -21,9 +21,6 @@ Vue.use(BaiduMap, {
 
 Vue.config.productionTip = false;
 
-console.log({e:Vue.http})
-
-
 const store = new Vuex.Store({
   state() {
     const key_login_token = localStorage.getItem('key_login_token');
@@ -63,7 +60,7 @@ const store = new Vuex.Store({
     },
     relogin(state) {
       state.relogin = true;
-    }
+    },
   },
 });
 
