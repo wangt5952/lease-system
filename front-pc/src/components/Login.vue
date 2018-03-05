@@ -86,5 +86,6 @@ export default {
   padding-left: 60px;
   font-size: 20px;
   height: 44px;
+  -webkit-box-shadow: 0 0 0px 1000px #eee inset !important;
 }
 </style>
