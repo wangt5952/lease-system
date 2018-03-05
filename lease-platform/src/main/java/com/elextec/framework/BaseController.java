@@ -31,9 +31,13 @@ public class BaseController {
         if (WzStringUtil.isBlank(userToken)) {
             throw new BizException(RunningResult.AUTH_OVER_TIME);
         }
-        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
-        SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
-        return sue;
+        try {
+            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
+            SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+            return sue;
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.AUTH_OVER_TIME);
+        }
     }
 
     /**
@@ -47,9 +51,13 @@ public class BaseController {
         if (WzStringUtil.isBlank(userToken)) {
             throw new BizException(RunningResult.AUTH_OVER_TIME);
         }
-        Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
-        userInfo.remove(WzConstants.KEY_USER_INFO);
-        userInfo.put(WzConstants.KEY_USER_INFO, newUserExt);
-        redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, userInfo, ot, TimeUnit.SECONDS);
+        try {
+            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
+            userInfo.remove(WzConstants.KEY_USER_INFO);
+            userInfo.put(WzConstants.KEY_USER_INFO, newUserExt);
+            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, userInfo, ot, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.AUTH_OVER_TIME);
+        }
     }
 }
