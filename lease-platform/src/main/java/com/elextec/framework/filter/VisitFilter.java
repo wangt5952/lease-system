@@ -58,13 +58,12 @@ public class VisitFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        logger.info("过滤器初始化");
+        logger.info("===访问过滤器初始化===");
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-
 
         // 请求
         HttpServletRequest req = (HttpServletRequest) request;
@@ -77,7 +76,7 @@ public class VisitFilter implements Filter {
         // 请求IP
         String ipStr = WzHttpUtil.getClientIP(req);
 
-        logger.info("请求:" + url + "-" + method);
+        logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]开始===");
 
         if (WzStringUtil.isBlank(ipStr)) {
             blackFlag = "false";
@@ -89,6 +88,7 @@ public class VisitFilter implements Filter {
                 String[] blackIps = blackUrl.split(",");
                 for (int i = 0; i < blackIps.length; i++) {
                     if (ipStr.equalsIgnoreCase(blackIps[i])) {
+                        logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[来访IP在黑名单中，拒绝访问]===");
                         MessageResponse errInfo = new MessageResponse(RunningResult.FORBIDDEN);
                         resp.getWriter().write(JSONObject.toJSONString(errInfo));
                         return;
@@ -100,6 +100,7 @@ public class VisitFilter implements Filter {
         if (WzStringUtil.isNotBlank(whiteFlag) && "true".equals(whiteFlag.toLowerCase())) {
             boolean isOk = false;
             if (WzStringUtil.isBlank(whiteUrl)) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[需验证白名单但白名单为空，拒绝访问]===");
                 MessageResponse errInfo = new MessageResponse(RunningResult.FORBIDDEN);
                 resp.getWriter().write(JSONObject.toJSONString(errInfo));
                 return;
@@ -112,6 +113,7 @@ public class VisitFilter implements Filter {
                     }
                 }
                 if (!isOk) {
+                    logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[来访IP不在白名单中，拒绝访问]===");
                     MessageResponse errInfo = new MessageResponse(RunningResult.FORBIDDEN);
                     resp.getWriter().write(JSONObject.toJSONString(errInfo));
                     return;
@@ -124,6 +126,7 @@ public class VisitFilter implements Filter {
             for (int i = 0; i < noFilterUrls.length; i++) {
                 if (-1 < url.indexOf(noFilterUrls[i])) {
                     chain.doFilter(request, response);
+                    logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]正常结束===");
                     return;
                 }
             }
@@ -132,6 +135,7 @@ public class VisitFilter implements Filter {
         String uToken = req.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
         // 无Token则报未登录
         if (WzStringUtil.isBlank(uToken)) {
+            logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户尚未登录]===");
             MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME.code(), "尚未登录，请登录");
             resp.getWriter().write(JSONObject.toJSONString(errInfo));
             return;
@@ -139,6 +143,7 @@ public class VisitFilter implements Filter {
         // 未获得登录缓存信息则报登录超时
         Map<String, Object> uInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + uToken);
         if (null == uInfo) {
+            logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户认证已超时]===");
             MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME);
             resp.getWriter().write(JSONObject.toJSONString(errInfo));
             return;
@@ -146,6 +151,7 @@ public class VisitFilter implements Filter {
         // 未获得登录用户信息则报登录超时
         SysUserExt uVo = (SysUserExt) uInfo.get(WzConstants.KEY_USER_INFO);
         if (null == uVo) {
+            logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户认证已超时]===");
             MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME);
             resp.getWriter().write(JSONObject.toJSONString(errInfo));
             return;
@@ -159,6 +165,7 @@ public class VisitFilter implements Filter {
         } else if ("mobile".equals(platformType.toLowerCase())) {
             // 请求中必有如下路径
             if (0 > url.indexOf("/mobile/")) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户无权访问该系统]===");
                 MessageResponse errInfo = new MessageResponse(RunningResult.NO_PERMISSION);
                 resp.getWriter().write(JSONObject.toJSONString(errInfo));
                 return;
@@ -166,6 +173,7 @@ public class VisitFilter implements Filter {
         } else if ("manager".equals(platformType.toLowerCase())) {
             // 请求中必有如下路径
             if (0 > url.indexOf("/manager/")) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户无权访问该系统]===");
                 MessageResponse errInfo = new MessageResponse(RunningResult.NO_PERMISSION);
                 resp.getWriter().write(JSONObject.toJSONString(errInfo));
                 return;
@@ -173,12 +181,14 @@ public class VisitFilter implements Filter {
         } else if ("deviceapi".equals(platformType.toLowerCase())) {
             // 请求中必有如下路径
             if (0 > url.indexOf("/device/")) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户无权访问该系统]===");
                 MessageResponse errInfo = new MessageResponse(RunningResult.NO_PERMISSION);
                 resp.getWriter().write(JSONObject.toJSONString(errInfo));
                 return;
             }
         } else {
-            MessageResponse errInfo = new MessageResponse(RunningResult.FORBIDDEN);
+            logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户无权访问该系统]===");
+            MessageResponse errInfo = new MessageResponse(RunningResult.NO_PERMISSION);
             resp.getWriter().write(JSONObject.toJSONString(errInfo));
             return;
         }
@@ -202,6 +212,7 @@ public class VisitFilter implements Filter {
                 }
             }
             if (hasFunction && !isCanUsed) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户无权访问该功能]===");
                 MessageResponse errInfo = new MessageResponse(RunningResult.NO_PERMISSION.code(), "您无权使用该功能");
                 resp.getWriter().write(JSONObject.toJSONString(errInfo));
                 return;
@@ -215,11 +226,11 @@ public class VisitFilter implements Filter {
         }
         redisClient.valueOperations().getOperations().expire(WzConstants.GK_LOGIN_INFO + uToken, overtime, TimeUnit.SECONDS);
         chain.doFilter(request, response);
+        logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]正常结束===");
     }
 
     @Override
     public void destroy() {
-        logger.info("过滤器销毁");
+        logger.info("===访问过滤器销毁===");
     }
-
 }
