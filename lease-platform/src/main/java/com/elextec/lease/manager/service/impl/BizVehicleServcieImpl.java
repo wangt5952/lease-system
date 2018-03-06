@@ -50,6 +50,9 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Autowired
     private BizRefVehiclePartsMapperExt bizRefVehiclePartsMapperExt;
 
+    @Autowired
+    private BizRefOrgVehicleMapperExt bizRefOrgVehicleMapperExt;
+
 
     @Override
     public PageResponse<BizVehicle> list(boolean needPaging, PageRequest pr) {
@@ -185,14 +188,17 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         if (0 < lnCnt) {
             throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "车辆编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
         }
-        // 电池编号重复提示错误
-        BizBatteryExample brExample = new BizBatteryExample();
-        BizBatteryExample.Criteria brCriteria = brExample.createCriteria();
-        brCriteria.andBatteryCodeEqualTo(vehicleInfo.getBatteryInfo().getBatteryCode());
-        int brCnt = bizBatteryMapperExt.countByExample(brExample);
-        if (0 < brCnt) {
-            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
+        if("0".equals(vehicleInfo.getFlag())){
+            // 电池编号重复提示错误
+            BizBatteryExample brExample = new BizBatteryExample();
+            BizBatteryExample.Criteria brCriteria = brExample.createCriteria();
+            brCriteria.andBatteryCodeEqualTo(vehicleInfo.getBatteryInfo().getBatteryCode());
+            int brCnt = bizBatteryMapperExt.countByExample(brExample);
+            if (0 < brCnt) {
+                throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
+            }
         }
+
         BizVehicle insertVehicleVo = null;
         BizBattery insertBatteryVo = null;
         BizRefVehicleBattery temp = new BizRefVehicleBattery();
@@ -259,6 +265,15 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             if(count >= 1){
                 throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定用户,无法作废");
             }
+            //验证车辆是否有企业绑定
+            BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andUnbindTimeIsNull();
+            orgCriteria.andVehicleIdEqualTo(vehicle.getId());
+            int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
+            if(orgCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定企业,无法作废");
+            }
             bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
             //解除所有电池绑定关系
             BizRefVehicleBatteryExample delBatteryExample = new BizRefVehicleBatteryExample();
@@ -295,6 +310,9 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
             delPartsCriteria.andUnbindTimeIsNull();
             delBatteryCriteria.andUnbindTimeIsNull();
+            BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andUnbindTimeIsNull();
             BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
             batteryBif.setUnbindTime(new Date());
             BizRefVehicleParts partsBif = new BizRefVehicleParts();
@@ -304,6 +322,11 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                 int count = bizRefUserVehicleMapperExt.countByExample(example);
                 if(count >= 1){
                     throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定用户");
+                }
+                orgCriteria.andVehicleIdEqualTo(ids.get(i));
+                int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
+                if(orgCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定企业");
                 }
                 bizVehicleMapperExt.deleteByPrimaryKey(ids.get(i));
                 //解除所有电池绑定关系
