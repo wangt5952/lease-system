@@ -43,7 +43,6 @@ export default {
   },
   methods: {
     async handleSubmit() {
-
       const { password, ...form } = this.form;
       const loginTime = moment().unix() * 1000;
       form.loginAuthStr = md5(form.loginName + md5(password).toUpperCase() + loginTime).toUpperCase();
@@ -65,7 +64,7 @@ export default {
       // this.$vux.loading.show({ text: '登录中' });
       // await this.$http.post('/mobile/v1/auth/login')
       // console.log(this.form);
-      //this.$router.push('/');
+      // this.$router.push('/');
     },
   },
 };

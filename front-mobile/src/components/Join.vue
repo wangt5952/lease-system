@@ -47,12 +47,11 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      console.log(1)
       this.$router.push('/login');
     },
     async handleCode() {
-      console.log(111)
-    }
+      console.log(111);
+    },
   },
 };
 </script>
