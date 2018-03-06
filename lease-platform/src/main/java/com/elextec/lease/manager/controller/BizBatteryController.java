@@ -28,7 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 电池管理Controller.
@@ -167,7 +169,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParam) {
+    public MessageResponse add(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -180,6 +182,15 @@ public class BizBatteryController extends BaseController {
                 batteryInfos = JSON.parseArray(paramStr, BizBattery.class);
                 if (null == batteryInfos || 0 == batteryInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 BizBattery insResChkVo = null;
                 for (int i = 0; i < batteryInfos.size(); i++) {
@@ -234,7 +245,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addOne(@RequestBody String addParam) {
+    public MessageResponse addOne(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -247,6 +258,15 @@ public class BizBatteryController extends BaseController {
                 batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
                 if (null == batteryInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(batteryInfo.getBatteryCode())
                         || null == batteryInfo.getBatteryStatus()
@@ -297,7 +317,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modify(@RequestBody String modifyParam) {
+    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -310,6 +330,15 @@ public class BizBatteryController extends BaseController {
                 batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
                 if (null == batteryInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(batteryInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
@@ -342,7 +371,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/delete")
-    public MessageResponse delete(@RequestBody String deleteParam) {
+    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -355,6 +384,15 @@ public class BizBatteryController extends BaseController {
                 batteryIds = JSON.parseArray(paramStr, String.class);
                 if (null == batteryIds || 0 == batteryIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
@@ -397,7 +435,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String id) {
+    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -416,7 +454,19 @@ public class BizBatteryController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            BizBattery battery = bizBatteryService.getByPrimaryKey(batteryId.get(0));
+            SysUser userTemp = getLoginUserInfo(request);
+            Map<String,Object> paramTemp = new HashMap<String,Object>();
+            paramTemp.put("id",batteryId.get(0));
+            if(userTemp == null){
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                paramTemp.put("orgId",userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                paramTemp.put("userId",userTemp.getId());
+            }
+            BizBattery battery = bizBatteryService.getByPrimaryKey(paramTemp);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS,battery);
             return mr;
@@ -450,7 +500,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getlocbybatterypk")
-    public MessageResponse getLocByBatteryPK(@RequestBody String ids) {
+    public MessageResponse getLocByBatteryPK(@RequestBody String ids,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -475,9 +525,21 @@ public class BizBatteryController extends BaseController {
             JSONObject locData = null;
             List<JSONObject> locDatas = new ArrayList<JSONObject>();
             StringBuffer errMsgs = new StringBuffer("");
+            SysUser userTemp = getLoginUserInfo(request);
+            Map<String,Object> paramTemp = new HashMap<String,Object>();
+            if(userTemp == null){
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                paramTemp.put("orgId",userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                paramTemp.put("userId",userTemp.getId());
+            }
             for (String bId : batteryIds) {
                 if (WzStringUtil.isNotBlank(bId)) {
-                    batteryInfo = bizBatteryService.getByPrimaryKey(bId);
+                    paramTemp.put("id",bId);
+                    batteryInfo = bizBatteryService.getByPrimaryKey(paramTemp);
                     if (WzStringUtil.isBlank(batteryInfo.getBatteryCode())) {
                         errMsgs.append("未查询到电池[ID:" + bId + "]对应的设备;");
                         continue;
@@ -538,7 +600,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getpowerbybatterypk")
-    public MessageResponse getPowerByBatteryPK(@RequestBody String ids) {
+    public MessageResponse getPowerByBatteryPK(@RequestBody String ids,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -563,9 +625,21 @@ public class BizBatteryController extends BaseController {
             JSONObject powerData = null;
             List<JSONObject> powerDatas = new ArrayList<JSONObject>();
             StringBuffer errMsgs = new StringBuffer("");
+            SysUser userTemp = getLoginUserInfo(request);
+            Map<String,Object> paramTemp = new HashMap<String,Object>();
+            if(userTemp == null){
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                paramTemp.put("orgId",userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                paramTemp.put("userId",userTemp.getId());
+            }
             for (String bId : batteryIds) {
                 if (WzStringUtil.isNotBlank(bId)) {
-                    batteryInfo = bizBatteryService.getByPrimaryKey(bId);
+                    paramTemp.put("id",bId);
+                    batteryInfo = bizBatteryService.getByPrimaryKey(paramTemp);
                     if (WzStringUtil.isBlank(batteryInfo.getBatteryCode())) {
                         errMsgs.append("未查询到电池[ID:" + bId + "]对应的设备;");
                         continue;

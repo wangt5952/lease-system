@@ -10,6 +10,7 @@ import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizRefVehiclePartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BizPartsServiceImpl implements BizPartsService {
@@ -135,6 +137,17 @@ public class BizPartsServiceImpl implements BizPartsService {
     @Override
     @Transactional
     public void updateBizParts(BizParts partsInfo) {
+        //判定配件是否绑定了车辆
+        if(RecordStatus.INVALID.equals(partsInfo.getPartsStatus())){
+            BizRefVehiclePartsExample example = new BizRefVehiclePartsExample();
+            BizRefVehiclePartsExample.Criteria criteria = example.createCriteria();
+            criteria.andUnbindTimeIsNull();
+            criteria.andPartsIdEqualTo(partsInfo.getId());
+            int count = bizRefVehiclePartsMapperExt.countByExample(example);
+            if(count >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "配件已绑定车辆,无法作废");
+            }
+        }
         bizPartsMapperExt.updateByPrimaryKeySelective(partsInfo);
     }
 
@@ -143,8 +156,16 @@ public class BizPartsServiceImpl implements BizPartsService {
     public void deleteBizParts(List<String> ids) {
         int i = 0;
         try {
+            BizRefVehiclePartsExample example = new BizRefVehiclePartsExample();
+            BizRefVehiclePartsExample.Criteria criteria = example.createCriteria();
+            criteria.andUnbindTimeIsNull();
             for (; i < ids.size(); i++) {
-                System.out.println(ids.get(i));
+                criteria.andPartsIdEqualTo(ids.get(i));
+                //判定配件是否绑定了车辆
+                int count = bizRefVehiclePartsMapperExt.countByExample(example);
+                if(count >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,配件已绑定车辆");
+                }
                 bizPartsMapperExt.deleteByPrimaryKey(ids.get(i));
             }
         } catch (Exception ex) {
@@ -153,28 +174,31 @@ public class BizPartsServiceImpl implements BizPartsService {
     }
 
     @Override
-    public BizParts getBizPartsByPrimaryKey(String id) {
-        return bizPartsMapperExt.selectByPrimaryKey(id);
+    public BizPartsExt getBizPartsByPrimaryKey(Map<String,Object> param) {
+        return bizPartsMapperExt.getPartInfoByPartId(param);
     }
 
     @Override
     public void bind(String vehicleId, String partsId) {
-        //判定车辆是否存在
+        //判定车辆是否存在或作废
         BizVehicleExample vehicleExample = new BizVehicleExample();
         BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
         selectVehicleCriteria.andIdEqualTo(vehicleId);
+        selectVehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
         int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
         if(vehicleCount < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在或已冻结、作废");
         }
 
-        //判定配件是否存在
+
+        //判定配件是否存在或作废
         BizPartsExample bizPartsExample = new BizPartsExample();
         BizPartsExample.Criteria selectPartsCriteria = bizPartsExample.createCriteria();
         selectPartsCriteria.andIdEqualTo(partsId);
+        selectPartsCriteria.andPartsStatusEqualTo(RecordStatus.NORMAL);
         int partsCount = bizPartsMapperExt.countByExample(bizPartsExample);
         if (partsCount <1) {
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"配件不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"配件不存在或已冻结、作废");
         }
 
         //判定车辆和配件是否已经绑定

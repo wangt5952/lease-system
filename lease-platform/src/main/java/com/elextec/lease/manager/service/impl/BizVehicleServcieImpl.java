@@ -9,10 +9,7 @@ import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
-import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
-import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
-import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
-import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
+import com.elextec.persist.dao.mybatis.*;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
@@ -46,6 +43,12 @@ public class BizVehicleServcieImpl implements BizVehicleService {
 
     @Autowired
     private BizPartsMapperExt bizPartsMapperExt;
+
+    @Autowired
+    private BizRefUserVehicleMapperExt bizRefUserVehicleMapperExt;
+
+    @Autowired
+    private BizRefVehiclePartsMapperExt bizRefVehiclePartsMapperExt;
 
 
     @Override
@@ -246,10 +249,35 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Override
     @Transactional
     public void updateVehicle(BizVehicle vehicle) {
-        bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
-        //如果车辆做报废的话，需要将已绑定的电池与配件全部解绑
+        //如果车辆做报废的话，需要判定车辆是否已绑定用户并将已绑定的电池与配件全部解绑
         if(RecordStatus.INVALID.toString().equals(vehicle.getVehicleStatus())){
-
+            BizRefUserVehicleExample example = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
+            criteria.andUnbindTimeIsNull();
+            criteria.andVehicleIdEqualTo(vehicle.getId());
+            int count = bizRefUserVehicleMapperExt.countByExample(example);
+            if(count >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定用户,无法作废");
+            }
+            bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
+            //解除所有电池绑定关系
+            BizRefVehicleBatteryExample delBatteryExample = new BizRefVehicleBatteryExample();
+            BizRefVehicleBatteryExample.Criteria delBatteryCriteria = delBatteryExample.createCriteria();
+            delBatteryCriteria.andUnbindTimeIsNull();
+            delBatteryCriteria.andVehicleIdEqualTo(vehicle.getId());
+            BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
+            batteryBif.setUnbindTime(new Date());
+            bizRefVehicleBatteryMapperExt.updateByExample(batteryBif,delBatteryExample);
+            //解除所有配件绑定关系
+            BizRefVehiclePartsExample delPartsExample = new BizRefVehiclePartsExample();
+            BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
+            delPartsCriteria.andUnbindTimeIsNull();
+            delPartsCriteria.andVehicleIdEqualTo(vehicle.getId());
+            BizRefVehicleParts partsBif = new BizRefVehicleParts();
+            partsBif.setUnbindTime(new Date());
+            bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
+        }else{
+            bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
         }
     }
 
@@ -258,9 +286,32 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     public void deleteVehicles(List<String> ids) {
         int i = 0;
         try {
-
+            BizRefUserVehicleExample example = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
+            criteria.andUnbindTimeIsNull();
+            BizRefVehicleBatteryExample delBatteryExample = new BizRefVehicleBatteryExample();
+            BizRefVehicleBatteryExample.Criteria delBatteryCriteria = delBatteryExample.createCriteria();
+            BizRefVehiclePartsExample delPartsExample = new BizRefVehiclePartsExample();
+            BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
+            delPartsCriteria.andUnbindTimeIsNull();
+            delBatteryCriteria.andUnbindTimeIsNull();
+            BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
+            batteryBif.setUnbindTime(new Date());
+            BizRefVehicleParts partsBif = new BizRefVehicleParts();
+            partsBif.setUnbindTime(new Date());
             for (; i < ids.size(); i++) {
+                criteria.andVehicleIdEqualTo(ids.get(i));
+                int count = bizRefUserVehicleMapperExt.countByExample(example);
+                if(count >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定用户");
+                }
                 bizVehicleMapperExt.deleteByPrimaryKey(ids.get(i));
+                //解除所有电池绑定关系
+                delBatteryCriteria.andVehicleIdEqualTo(ids.get(i));
+                bizRefVehicleBatteryMapperExt.updateByExample(batteryBif,delBatteryExample);
+                //解除所有配件绑定关系
+                delPartsCriteria.andVehicleIdEqualTo(ids.get(i));
+                bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
             }
         } catch (BizException ex) {
             throw ex;
@@ -299,22 +350,24 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Override
     public void bind(String vehicleId,String batteryId) {
 
-        //判定车辆是否存在
+        //判定车辆是否存在或已作废
         BizVehicleExample vehicleExample = new BizVehicleExample();
         BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
         selectVehicleCriteria.andIdEqualTo(vehicleId);
+        selectVehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
         int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
         if(vehicleCount < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在或已冻结、作废");
         }
 
-        //判定电池是否存在
+        //判定电池是否存在或已作废
         BizBatteryExample batteryExample = new BizBatteryExample();
         BizBatteryExample.Criteria selectUserCriteria = batteryExample.createCriteria();
         selectUserCriteria.andIdEqualTo(batteryId);
+        selectUserCriteria.andBatteryStatusEqualTo(RecordStatus.NORMAL);
         int userCount = bizBatteryMapperExt.countByExample(batteryExample);
         if(userCount<1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池不存在或已冻结、作废");
         }
 
         //校验车辆是否已经绑定电池

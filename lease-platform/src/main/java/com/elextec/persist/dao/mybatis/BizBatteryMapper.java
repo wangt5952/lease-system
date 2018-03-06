@@ -3,6 +3,8 @@ package com.elextec.persist.dao.mybatis;
 import com.elextec.persist.model.mybatis.BizBattery;
 import com.elextec.persist.model.mybatis.BizBatteryExample;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface BizBatteryMapper {

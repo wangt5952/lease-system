@@ -1083,6 +1083,7 @@ public class BizVehicleController extends BaseController {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
             Map<String,Object> paramTemp = new HashMap<String,Object>();
+            deviceCds.add("123456");
             paramTemp.put("batteryCodes",deviceCds);
             if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
                 paramTemp.put("orgId",userTemp.getOrgId());

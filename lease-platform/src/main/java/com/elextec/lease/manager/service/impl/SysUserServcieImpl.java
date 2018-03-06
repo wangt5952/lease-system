@@ -11,6 +11,7 @@ import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.*;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
@@ -162,7 +163,26 @@ public class SysUserServcieImpl implements SysUserService {
     @Override
     @Transactional
     public void updateSysUser(SysUser userInfo) {
-        sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
+        //如果是用户作废，需要验证用户是否有在绑的车辆和删除所有角色关联
+        if(RecordStatus.INVALID.toString().equals(userInfo.getUserStatus())){
+            //验证用户名下是否有未归还的车辆
+            BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+            selectRefCriteria.andBindTimeIsNull();
+            selectRefCriteria.andUserIdEqualTo(userInfo.getId());
+            int count = bizRefUserVehicleMapperExt.countByExample(refExample);
+            if(count >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "用户名下有未归还的车辆,无法作废");
+            }
+            sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
+            SysRefUserRoleExample delExample = new SysRefUserRoleExample();
+            SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
+            //删除用户和角色的所有关联
+            delCriteria.andUserIdEqualTo(userInfo.getId());
+            sysRefUserRoleMapperExt.deleteByExample(delExample);
+        }else{
+            sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
+        }
     }
 
     @Override
@@ -176,6 +196,7 @@ public class SysUserServcieImpl implements SysUserService {
             SysRefUserRoleExample delExample = new SysRefUserRoleExample();
             SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
             for (; i < ids.size(); i++) {
+                //验证用户名下是否有未归还的车辆
                 selectRefCriteria.andUserIdEqualTo(ids.get(i));
                 int count = bizRefUserVehicleMapperExt.countByExample(refExample);
                 if(count >= 1){
@@ -252,7 +273,7 @@ public class SysUserServcieImpl implements SysUserService {
                 List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(param);
                 datas.get(i).setBizBatteries(batteryDatas);
                 //根据车辆ID获取配件信息
-                List<BizPartsExt> partsDatas = bizPartsMapperExt.getById(datas.get(i).getId());
+                List<BizPartsExt> partsDatas = bizPartsMapperExt.getById(param);
                 datas.get(i).setBizPartss(partsDatas);
             }
         }
@@ -290,25 +311,27 @@ public class SysUserServcieImpl implements SysUserService {
     @Override
     public void bind(String userId, String vehicleId,String orgId) {
 
-        //判定用户是否存在
+        //判定用户是否存在或已作废
         SysUserExample userExample = new SysUserExample();
         SysUserExample.Criteria selectUserCriteria = userExample.createCriteria();
         selectUserCriteria.andIdEqualTo(userId);
+        selectUserCriteria.andUserStatusEqualTo(RecordStatus.NORMAL);
         if(null != orgId){
             selectUserCriteria.andOrgIdEqualTo(orgId);
         }
         List<SysUserExt> user = sysUserMapperExt.selectExtByExample(userExample);
         if(user.size() < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或用户不在企业名下");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或已冻结、作废或用户不在企业名下");
         }
 
-        //判定车辆是否存在
+        //判定车辆是否存在或已作废
         BizVehicleExample vehicleExample = new BizVehicleExample();
         BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
         selectVehicleCriteria.andIdEqualTo(vehicleId);
+        selectVehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
         int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
         if(vehicleCount < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在或已冻结、作废");
         }
 
         //判定车辆是否属于操作用户的企业名下

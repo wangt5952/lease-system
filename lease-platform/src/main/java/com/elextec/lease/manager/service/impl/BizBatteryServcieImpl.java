@@ -8,8 +8,11 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizBatteryParam;
 import com.elextec.lease.manager.service.BizBatteryService;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
+import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizBattery;
 import com.elextec.persist.model.mybatis.BizBatteryExample;
+import com.elextec.persist.model.mybatis.BizRefVehicleBatteryExample;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 资源管理Service实现类.
@@ -32,6 +36,9 @@ public class BizBatteryServcieImpl implements BizBatteryService {
 
     @Autowired
     private BizBatteryMapperExt bizBatteryMapperExt;
+
+    @Autowired
+    private BizRefVehicleBatteryMapperExt bizRefVehicleBatteryMapperExt;
 
     @Override
     public PageResponse<BizBattery> list(boolean needPaging, PageRequest pr) {
@@ -133,6 +140,17 @@ public class BizBatteryServcieImpl implements BizBatteryService {
     @Override
     @Transactional
     public void updateBattery(BizBattery batteryInfo) {
+        //电池作废需要验证电池是否绑定了车辆
+        if(RecordStatus.INVALID.equals(batteryInfo.getBatteryStatus())){
+            BizRefVehicleBatteryExample example = new BizRefVehicleBatteryExample();
+            BizRefVehicleBatteryExample.Criteria criteria = example.createCriteria();
+            criteria.andBatteryIdEqualTo(batteryInfo.getId());
+            criteria.andUnbindTimeIsNull();
+            int count = bizRefVehicleBatteryMapperExt.countByExample(example);
+            if(count >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "电池已绑定车辆,无法作废");
+            }
+        }
         bizBatteryMapperExt.updateByPrimaryKeySelective(batteryInfo);
     }
 
@@ -141,7 +159,16 @@ public class BizBatteryServcieImpl implements BizBatteryService {
     public void deleteBattery(List<String> ids) {
         int i = 0;
         try {
+            BizRefVehicleBatteryExample example = new BizRefVehicleBatteryExample();
+            BizRefVehicleBatteryExample.Criteria criteria = example.createCriteria();
+            criteria.andUnbindTimeIsNull();
             for (; i < ids.size(); i++) {
+                //验证电池是否绑定车辆
+                criteria.andBatteryIdEqualTo(ids.get(i));
+                int count = bizRefVehicleBatteryMapperExt.countByExample(example);
+                if(count >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,电池已绑定车辆");
+                }
                 bizBatteryMapperExt.deleteByPrimaryKey(ids.get(i));
             }
         } catch (Exception ex) {
@@ -151,7 +178,7 @@ public class BizBatteryServcieImpl implements BizBatteryService {
 
 
     @Override
-    public BizBattery getByPrimaryKey(String id) {
-        return bizBatteryMapperExt.selectByPrimaryKey(id);
+    public BizBattery getByPrimaryKey(Map<String,Object> param) {
+        return bizBatteryMapperExt.getBatteryInfoByBatteryId(param);
     }
 }

@@ -11,6 +11,8 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.persist.field.enums.DeviceType;
+import com.elextec.persist.field.enums.OrgAndUserType;
+import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +68,7 @@ public class UserDeviceApi extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getpowerbyvehiclepk")
-    public MessageResponse getPowerByVehiclePK(@RequestBody String ids) {
+    public MessageResponse getPowerByVehiclePK(@RequestBody String ids, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -89,9 +93,21 @@ public class UserDeviceApi extends BaseController {
             JSONObject powerData = null;
             List<JSONObject> powerDatas = new ArrayList<JSONObject>();
             StringBuffer errMsgs = new StringBuffer("");
+            SysUser userTemp = getLoginUserInfo(request);
+            if(userTemp == null){
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            Map<String,Object> paramTemp = new HashMap<String,Object>();
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                paramTemp.put("orgId",userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                paramTemp.put("userId",userTemp.getId());
+            }
             for (String vId : vehicleIds) {
                 if (WzStringUtil.isNotBlank(vId)) {
-                    vehicleInfos = bizVehicleService.getByPrimaryKey(vId, true);
+                    paramTemp.put("id",vId);
+                    vehicleInfos = bizVehicleService.getByPrimaryKey(paramTemp, true);
                     if (null == vehicleInfos || 0 == vehicleInfos.size()) {
                         errMsgs.append("未查询到车辆[ID:" + vId + "]信息;");
                         continue;
@@ -160,7 +176,7 @@ public class UserDeviceApi extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getlocbyvehiclepk")
-    public MessageResponse getLocByVehiclePK(@RequestBody String ids) {
+    public MessageResponse getLocByVehiclePK(@RequestBody String ids,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -185,9 +201,21 @@ public class UserDeviceApi extends BaseController {
             JSONObject locData = null;
             List<JSONObject> locDatas = new ArrayList<JSONObject>();
             StringBuffer errMsgs = new StringBuffer("");
+            SysUser userTemp = getLoginUserInfo(request);
+            if(userTemp == null){
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            Map<String,Object> paramTemp = new HashMap<String,Object>();
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                paramTemp.put("orgId",userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                paramTemp.put("userId",userTemp.getId());
+            }
             for (String vId : vehicleIds) {
                 if (WzStringUtil.isNotBlank(vId)) {
-                    vehicleInfos = bizVehicleService.getByPrimaryKey(vId, true);
+                    paramTemp.put("id",vId);
+                    vehicleInfos = bizVehicleService.getByPrimaryKey(paramTemp, true);
                     if (null == vehicleInfos || 0 == vehicleInfos.size()) {
                         errMsgs.append("未查询到车辆[ID:" + vId + "]信息;");
                         continue;

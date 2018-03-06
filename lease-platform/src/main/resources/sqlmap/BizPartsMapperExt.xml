@@ -136,4 +136,34 @@
 		</where>
 	</select>
 
+	<select id="getPartInfoByPartId" parameterType="java.util.Map" resultMap="BizPartsExtResultMap">
+		select
+		a.id id,
+		a.parts_code parts_code,
+		a.parts_name parts_name,
+		a.parts_brand parts_brand,
+		a.parts_pn parts_pn,
+		a.parts_type parts_type,
+		a.parts_parameters parts_parameters,
+		a.mfrs_id mfrs_id,
+		a.parts_status parts_status,
+		a.create_user create_user,
+		a.create_time create_time,
+		a.update_user update_user,
+		a.update_time update_time,
+		b.mfrs_name mfrs_name
+		from biz_parts a
+		LEFT JOIN biz_ref_vehicle_parts d ON a.id = d.parts_id AND d.unbind_time IS NULL
+		LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+		LEFT JOIN biz_ref_org_vehicle r ON d.vehicle_id = r.vehicle_id AND r.unbind_time IS NULL
+		LEFT JOIN biz_ref_user_vehicle r1 ON d.vehicle_id = r1.vehicle_id AND r.unbind_time IS NULL
+		where a.id = #{id,jdbcType=VARCHAR}
+		<if test="userId != null and userId != ''" >
+			and r1.user_id = #{userId,jdbcType=VARCHAR}
+		</if>
+		<if test="orgId != null and orgId != ''" >
+			and r.org_id = #{orgId,jdbcType=VARCHAR}
+		</if>
+	</select>
+
 </mapper>

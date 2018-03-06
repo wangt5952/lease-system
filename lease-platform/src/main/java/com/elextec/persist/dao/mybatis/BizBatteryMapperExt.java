@@ -24,4 +24,7 @@ public interface BizBatteryMapperExt extends BizBatteryMapper {
 
     //根据车辆ID获取电池信息
     public List<BizBatteryExt> getBatteryInfoByVehicleId(Map<String,Object> param);
+
+    //根据电池ID查找电池信息扩展
+    BizBatteryExt getBatteryInfoByBatteryId(Map<String,Object> param);
 }

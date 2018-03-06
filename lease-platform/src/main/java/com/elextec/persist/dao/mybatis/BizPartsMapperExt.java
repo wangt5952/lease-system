@@ -29,4 +29,7 @@ public interface BizPartsMapperExt extends BizPartsMapper {
      */
     public int countExtByParam(BizPartsParam partsParam);
 
+    //根据配件ID查找配件信息扩展
+    BizPartsExt getPartInfoByPartId(Map<String,Object> param);
+
 }
