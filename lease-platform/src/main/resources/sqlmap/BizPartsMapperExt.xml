@@ -9,7 +9,7 @@
 		<result column="unbind_time" jdbcType="TIMESTAMP" property="unbindTime" />
     </resultMap>
 
-    <select id="getById" parameterType="java.lang.String" resultMap="BizPartsExtResultMap">
+    <select id="getById" parameterType="java.util.Map" resultMap="BizPartsExtResultMap">
         SELECT
 				p.id,
 				p.parts_code,
@@ -29,7 +29,15 @@
         FROM biz_ref_vehicle_parts r
         LEFT JOIN biz_parts p ON p.id = r.parts_id
         LEFT JOIN biz_manufacturer m ON m.id = p.mfrs_id
+        LEFT JOIN biz_ref_org_vehicle r1 ON v.vehicle_id = r1.vehicle_id AND r1.unbind_time IS NULL
+        LEFT JOIN biz_ref_user_vehicle r2 ON v.vehicle_id = r2.vehicle_id AND r2.unbind_time IS NULL
         WHERE r.vehicle_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
+		<if test="userId != null and userId != ''" >
+			and r2.user_id = #{userId,jdbcType=VARCHAR}
+		</if>
+		<if test="orgId != null and orgId != ''" >
+			and r1.org_id = #{orgId,jdbcType=VARCHAR}
+		</if>
     </select>
 
 	<!--查询拓展信息-->

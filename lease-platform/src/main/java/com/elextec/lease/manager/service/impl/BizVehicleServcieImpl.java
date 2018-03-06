@@ -13,6 +13,7 @@ import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
@@ -246,6 +247,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Transactional
     public void updateVehicle(BizVehicle vehicle) {
         bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
+        //如果车辆做报废的话，需要将已绑定的电池与配件全部解绑
+        if(RecordStatus.INVALID.toString().equals(vehicle.getVehicleStatus())){
+
+        }
     }
 
     @Override
@@ -265,9 +270,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<Map<String, Object>> getByPrimaryKey(String id, Boolean isUsed) {
-        Map<String,Object> param = new HashMap<String,Object>();
-        param.put("id", id);
+    public List<Map<String, Object>> getByPrimaryKey(Map<String,Object> param, Boolean isUsed) {
         param.put("flag", isUsed);
         return bizVehicleMapperExt.getVehicleInfoById(param);
     }
@@ -344,13 +347,14 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes) {
-        return bizVehicleMapperExt.selectExtByBatteryCodes(batteryCodes);
+    public List<Map<String, Object>> listByBatteryCode(Map<String,Object> param) {
+
+        return bizVehicleMapperExt.selectExtByBatteryCodes(param);
     }
 
     @Override
-    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(String id, Boolean isUsed) {
-        BizVehicleBatteryParts vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(id);
+    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed) {
+        BizVehicleBatteryParts vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(paramMap);
         Map<String,Object> param = new HashMap<String,Object>();
         if(vehicle != null){
             param.put("flag",isUsed);
@@ -364,7 +368,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<BizPartsExt> getBizPartsByVehicle(String id) {
-        return bizPartsMapperExt.getById(id);
+    public List<BizPartsExt> getBizPartsByVehicle(Map<String,Object> param) {
+        return bizPartsMapperExt.getById(param);
     }
 }

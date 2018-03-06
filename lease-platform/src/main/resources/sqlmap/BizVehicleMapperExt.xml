@@ -25,7 +25,7 @@
         where r.user_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
     </select>
 
-    <select id="getVehicleInfoByVehicleId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
+    <select id="getVehicleInfoByVehicleId" parameterType="java.util.Map" resultMap="BizVehicleExtResultMap">
         select
         v.id id,
         v.vehicle_code,
@@ -40,7 +40,15 @@
         m.mfrs_name mfrs_name
         from biz_vehicle v
         LEFT JOIN biz_manufacturer m ON v.mfrs_id = m.id
+        LEFT JOIN biz_ref_org_vehicle r ON v.id = r.vehicle_id AND r.unbind_time IS NULL
+        LEFT JOIN biz_ref_user_vehicle r1 ON v.id = r1.vehicle_id AND r.unbind_time IS NULL
         where v.id = #{id,jdbcType=VARCHAR}
+        <if test="userId != null and userId != ''" >
+            and r1.user_id = #{userId,jdbcType=VARCHAR}
+        </if>
+        <if test="orgId != null and orgId != ''" >
+            and r.org_id = #{orgId,jdbcType=VARCHAR}
+        </if>
     </select>
 
     <select id="getVehicleInfoById" parameterType="java.util.Map" resultType="java.util.Map">
@@ -74,7 +82,15 @@
         </if>
         LEFT JOIN biz_battery b ON r.battery_id = b.id
         LEFT JOIN biz_manufacturer m2 ON b.mfrs_id = m2.id
+        LEFT JOIN biz_ref_org_vehicle r1 ON v.id = r1.vehicle_id AND r1.unbind_time IS NULL
+        LEFT JOIN biz_ref_user_vehicle r2 ON v.id = r2.vehicle_id AND r2.unbind_time IS NULL
         where v.id = #{id,jdbcType=VARCHAR}
+        <if test="userId != null and userId != ''" >
+            and r2.user_id = #{userId,jdbcType=VARCHAR}
+        </if>
+        <if test="orgId != null and orgId != ''" >
+            and r1.org_id = #{orgId,jdbcType=VARCHAR}
+        </if>
     </select>
 
     <!--<select id="isBindOrUnBind" parameterType="java.lang.String" resultType="java.lang.Integer">-->
@@ -157,7 +173,7 @@
         biz_vehicle a
         LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.vehicle_id AND d.unbind_time IS NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
-        LEFT JOIN biz_org_user_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
+        LEFT JOIN biz_ref_org_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
         LEFT JOIN biz_ref_user_vehicle r1 ON a.id = r1.vehicle_id AND r1.unbind_time IS NULL
         <where>
             1=1
@@ -187,7 +203,7 @@
         </where>
     </select>
 
-    <select id="selectExtByBatteryCodes" parameterType="java.util.List" resultType="java.util.Map">
+    <select id="selectExtByBatteryCodes" parameterType="java.util.Map" resultType="java.util.Map">
         select
         b.id batteryId,
         b.battery_code batteryCode,
@@ -208,9 +224,17 @@
         inner join biz_ref_vehicle_battery vb on b.id = vb.battery_id and vb.unbind_time IS NULL
         inner join biz_vehicle v on vb.vehicle_id = v.id
         LEFT join biz_manufacturer m on v.mfrs_id = m.id
+        LEFT JOIN biz_ref_org_vehicle r ON v.id = r.vehicle_id AND r.unbind_time IS NULL
+        LEFT JOIN biz_ref_user_vehicle r1 ON v.id = r1.vehicle_id AND r1.unbind_time IS NULL
         where
         <foreach collection="batteryCodes" item="batteryCode" index="index"  open="(" separator="or" close=")">
             b.battery_code = #{batteryCode}
         </foreach>
+        <if test="userId != null and userId != ''" >
+            and r1.user_id = #{userId,jdbcType=VARCHAR}
+        </if>
+        <if test="orgId != null and orgId != ''" >
+            and r.org_id = #{orgId,jdbcType=VARCHAR}
+        </if>
     </select>
 </mapper>
