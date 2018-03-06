@@ -11,6 +11,8 @@ public class WzConstants {
     public static final String KEY_SEMICOLON = ";";
     /** Redis关键字分隔符. */
     public static final String KEY_SPLIT = ":";
+    /** 行分隔符. */
+    public static final String KEY_LINE_SEPARATOR = System.getProperty("line.separator", "\n");
 
     /** 用户请求Header参数 登录Token. */
     public static final String HEADER_LOGIN_TOKEN = "header-login-token";

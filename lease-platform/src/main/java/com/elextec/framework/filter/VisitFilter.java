@@ -66,7 +66,8 @@ public class VisitFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
 
         // 请求
-        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletRequest req = (HttpServletRequest) request;
+        WzHttpServletRequestWrapper req = new WzHttpServletRequestWrapper((HttpServletRequest) request);
         // 响应
         HttpServletResponse resp = (HttpServletResponse) response;
         // 请求URL
@@ -75,8 +76,11 @@ public class VisitFilter implements Filter {
         String method = req.getMethod();
         // 请求IP
         String ipStr = WzHttpUtil.getClientIP(req);
+        // Body参数
+        String bodyParam = req.getBodyStr();
 
-        logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]开始===");
+        logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]开始===" + WzConstants.KEY_LINE_SEPARATOR);
+        logger.info("===请求参数:" + bodyParam);
 
         if (WzStringUtil.isBlank(ipStr)) {
             blackFlag = "false";
