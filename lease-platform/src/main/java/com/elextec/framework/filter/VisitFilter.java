@@ -70,6 +70,7 @@ public class VisitFilter implements Filter {
         WzHttpServletRequestWrapper req = new WzHttpServletRequestWrapper((HttpServletRequest) request);
         // 响应
         HttpServletResponse resp = (HttpServletResponse) response;
+        resp.setCharacterEncoding("UTF-8");
         // 请求URL
         String url = req.getRequestURI();
         // 请求方法
