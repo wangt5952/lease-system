@@ -17,7 +17,7 @@ export default new Router({
         { path: '/tab2', component: () => import('@/components/MainTab2') },
         { path: '/tab3', component: () => import('@/components/MainTab3') },
         { path: '/tab4', component: () => import('@/components/MainTab4') },
-      ]
+      ],
     },
   ],
 });
