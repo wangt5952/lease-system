@@ -12,7 +12,8 @@ export default new Router({
     { path: '/join', component: () => import('@/components/Join') },
     { path: '/',
       redirect: '/tab1',
-      component: () => import('@/components/MainLayout'), children: [
+      component: () => import('@/components/MainLayout'),
+      children: [
         { path: '/tab1', component: () => import('@/components/MainTab1') },
         { path: '/tab2', component: () => import('@/components/MainTab2') },
         { path: '/tab3', component: () => import('@/components/MainTab3') },
