@@ -6,16 +6,17 @@
     <jmxConfigurator />
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%date %-5level  - %msg%n</pattern>
+            <pattern>%date %level [%thread] - %msg%n</pattern>
         </layout>
     </appender>
     <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${log.base}/sys.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>${log.base}.%d{yyyy-MM-dd}.sys.log.zip</FileNamePattern>
+            <maxHistory>30</maxHistory>
         </rollingPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%date %-5level  - %msg%n</pattern>
+            <pattern>%date %level [%thread] %C:%L - %msg%n</pattern>
         </layout>
     </appender>
     <appender name="accessfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -24,13 +25,16 @@
             <FileNamePattern>${log.base}.%d{yyyy-MM-dd}.access.log.zip</FileNamePattern>
         </rollingPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%date %-5level  - %msg%n</pattern>
+            <pattern>%date %level [%thread] - %msg%n</pattern>
         </layout>
     </appender>
+    <logger name="com.elextec.framework.filter.VisitFilter" level="INFO" additivity="false">
+        <appender-ref ref="stdout" />
+        <appender-ref ref="accessfile" />
+    </logger>
     <root>
         <level value="INFO" />
         <appender-ref ref="stdout" />
         <appender-ref ref="logfile" />
-        <appender-ref ref="accessfile" />
     </root>
 </configuration>

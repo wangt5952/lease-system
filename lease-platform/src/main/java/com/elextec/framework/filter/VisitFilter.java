@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 请求Filter.
@@ -35,6 +36,8 @@ public class VisitFilter implements Filter {
     /** 日志. */
     private static final Logger logger = LoggerFactory.getLogger(VisitFilter.class);
 
+    @Value("${localsetting.login-overtime-sec}")
+    private String loginOvertime;
     @Value("${localsetting.platform-type}")
     private String platformType;
     @Value("${localsetting.login-overtime-sec}")
@@ -204,6 +207,13 @@ public class VisitFilter implements Filter {
                 return;
             }
         }
+        // 将访问用户信息超时时间后延
+        // 设置超时时间
+        Integer overtime = 300;
+        if (WzStringUtil.isNumeric(loginOvertime)) {
+            overtime = Integer.parseInt(loginOvertime);
+        }
+        redisClient.valueOperations().getOperations().expire(WzConstants.GK_LOGIN_INFO + uToken, overtime, TimeUnit.SECONDS);
         chain.doFilter(request, response);
     }
 
