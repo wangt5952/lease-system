@@ -10,7 +10,7 @@ import {
   Tabbar, TabbarItem,
   ButtonTab, ButtonTabItem,
   PopupPicker, Actionsheet,
-  LoadingPlugin, ToastPlugin
+  LoadingPlugin, ToastPlugin,
 } from 'vux';
 
 import 'lib-flexible/flexible';
@@ -29,7 +29,7 @@ _.forEach([
 ], o => Vue.component(o.name, o));
 
 _.forEach([
-  LoadingPlugin, ToastPlugin
+  LoadingPlugin, ToastPlugin,
 ], o => Vue.use(o));
 
 Vue.config.productionTip = false;

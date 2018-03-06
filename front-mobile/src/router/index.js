@@ -10,11 +10,14 @@ export default new Router({
     // { path: '/', name: 'HelloWorld', component: HelloWorld },
     { path: '/login', component: () => import('@/components/Login') },
     { path: '/join', component: () => import('@/components/Join') },
-    { path: '/',  redirect:'/tab1', component: () => import('@/components/MainLayout'), children: [
-      { path: '/tab1', component: () => import('@/components/MainTab1') },
-      { path: '/tab2', component: () => import('@/components/MainTab2') },
-      { path: '/tab3', component: () => import('@/components/MainTab3') },
-      { path: '/tab4', component: () => import('@/components/MainTab4') },
-    ] },
+    { path: '/',
+      redirect: '/tab1',
+      component: () => import('@/components/MainLayout'), children: [
+        { path: '/tab1', component: () => import('@/components/MainTab1') },
+        { path: '/tab2', component: () => import('@/components/MainTab2') },
+        { path: '/tab3', component: () => import('@/components/MainTab3') },
+        { path: '/tab4', component: () => import('@/components/MainTab4') },
+      ]
+    },
   ],
 });
