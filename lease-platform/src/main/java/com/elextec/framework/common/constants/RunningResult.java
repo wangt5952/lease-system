@@ -14,7 +14,7 @@ public enum RunningResult {
     PARAM_ANALYZE_ERROR("40104", "请求参数解析失败"),
     PARAM_VERIFY_ERROR("40105", "请求参数验证失败"),
     AUTH_OVER_TIME("40106", "认证已超时"),
-    NO_PERMISSION("40107", "您无权使用该系统"),
+    NO_PERMISSION("40107", "您无使用权限"),
     MULTIPLE_RECORD("40108", "记录已存在"),
     NO_ROLE("40109", "未查询到角色"),
     NO_RESOURCE("40110", "未查询到资源"),
