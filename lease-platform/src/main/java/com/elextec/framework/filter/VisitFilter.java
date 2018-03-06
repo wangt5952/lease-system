@@ -130,7 +130,7 @@ public class VisitFilter implements Filter {
             String[] noFilterUrls = nofilters.split(",");
             for (int i = 0; i < noFilterUrls.length; i++) {
                 if (-1 < url.indexOf(noFilterUrls[i])) {
-                    chain.doFilter(request, response);
+                    chain.doFilter(req, resp);
                     logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]正常结束===");
                     return;
                 }
@@ -230,7 +230,7 @@ public class VisitFilter implements Filter {
             overtime = Integer.parseInt(loginOvertime);
         }
         redisClient.valueOperations().getOperations().expire(WzConstants.GK_LOGIN_INFO + uToken, overtime, TimeUnit.SECONDS);
-        chain.doFilter(request, response);
+        chain.doFilter(req, resp);
         logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]正常结束===");
     }
 
