@@ -80,7 +80,7 @@ public class VisitFilter implements Filter {
         // Body参数
         String bodyParam = req.getBodyStr();
 
-        logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]开始===" + WzConstants.KEY_LINE_SEPARATOR);
+        logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]开始===");
         logger.info("===请求参数:" + bodyParam);
 
         if (WzStringUtil.isBlank(ipStr)) {

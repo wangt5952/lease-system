@@ -66,7 +66,8 @@ public class WzCaptchaUtil {
         for (int i = 0; i < captchaCode.length(); i++) {
             String ch = captchaCode.substring(i, i + 1);
             localGraphics.setColor(new Color(20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110)));
-            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+//            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+            localGraphics.setFont(new Font("微软雅黑", Font.PLAIN, 25));
             localGraphics.drawString(ch, chWidth * i + 10, 30);
         }
         // 保存
@@ -127,7 +128,8 @@ public class WzCaptchaUtil {
         for (int i = 0; i < captchaCode.length(); i++) {
             String ch = captchaCode.substring(i, i + 1);
             localGraphics.setColor(new Color(20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110)));
-            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+//            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+            localGraphics.setFont(new Font("微软雅黑", Font.PLAIN, 25));
             localGraphics.drawString(ch, chWidth * i + 10, 30);
         }
         // 返回Base64
@@ -166,4 +168,21 @@ public class WzCaptchaUtil {
         int b = fc + random.nextInt(bc - fc);
         return new Color(r, g, b);
     }
+
+//    /**
+//     * 获得字体.
+//     * @return 字体名
+//     */
+//    private static String getFirstFont() {
+//        String[] fontStrArr = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+//        if (0 < fontStrArr.length) {
+//            for (String fs : fontStrArr) {
+//                if (Font.SANS_SERIF.equalsIgnoreCase(fs)) {
+//                    return fs;
+//                }
+//            }
+//            return fontStrArr[0];
+//        }
+//        return Font.SANS_SERIF;
+//    }
 }
