@@ -32,7 +32,7 @@
         </template>
       </x-input>
 
-      <x-button type="primary" class="btn-normal" @click.native="handleSubmit">注册</x-button>
+      <x-button type="primary" class="btn-normal" @click.native="handleSubmit">提交</x-button>
     </div>
   </div>
 </template>
@@ -52,11 +52,11 @@ export default {
     async handleSubmit() {
       const { mobile, password, smsToken, smsVCode } = this.form;
       const form = {
-        userMobile: mobile, password: md5(password).toUpperCase(), smsToken, smsVCode
+        newPassword: md5(password).toUpperCase(), smsToken, smsVCode
       };
 
       try {
-        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/register', form)).body;
+        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/resetpassword', form)).body;
         if (code !== '200') throw new Error(message || code);
 
         this.$vux.toast.show({ text: '注册成功', type: 'success', width: '10em' });
@@ -69,11 +69,8 @@ export default {
 
     },
     async handleCode() {
-
       const { mobile, captchaToken, captcha } = this.form;
 
-
-      return;
       const form = {
         mobile, captchaToken, captcha, needCaptchaToken: 'true'
       };
@@ -86,6 +83,8 @@ export default {
         const message = e.statusText || e.message;
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       }
+
+      console.log(mobile);
     },
 
     async reloadCaptcha() {

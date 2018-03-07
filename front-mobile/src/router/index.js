@@ -10,6 +10,7 @@ export default new Router({
     // { path: '/', name: 'HelloWorld', component: HelloWorld },
     { path: '/login', component: () => import('@/components/Login') },
     { path: '/join', component: () => import('@/components/Join') },
+    { path: '/reset', component: () => import('@/components/Reset') },
     { path: '/',
       redirect: '/tab1',
       component: () => import('@/components/MainLayout'),

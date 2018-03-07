@@ -25,7 +25,7 @@
 
     <div style="display:flex; color:#00c985;margin:60px 30px;text-align:center;font-size:0.4rem;">
       <router-link to="/join" style="flex:1;color:#00c985;">账号注册</router-link>
-      <div style="flex:1;border-left:1px solid #00c985">找回密码</div>
+      <router-link to="/reset" style="flex:1;border-left:1px solid #00c985;color:#00c985;">找回密码</router-link>
     </div>
   </div>
 </template>
@@ -51,8 +51,8 @@ export default {
       try {
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/login', form)).body;
         if (code !== '200') throw new Error(message || code);
-        const { key_login_token, key_res_info, key_user_info } = respData;
-        await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
+        const { key_login_token, key_user_info } = respData;
+        await this.$store.commit('login', { key_login_token, key_user_info });
 
         this.$vux.toast.show({ text: '登录成功', type: 'success', width: '10em' });
         this.$router.push('/');
