@@ -69,11 +69,7 @@ export default {
 
     },
     async handleCode() {
-
       const { mobile, captchaToken, captcha } = this.form;
-
-
-      return;
       const form = {
         mobile, captchaToken, captcha, needCaptchaToken: 'true'
       };
