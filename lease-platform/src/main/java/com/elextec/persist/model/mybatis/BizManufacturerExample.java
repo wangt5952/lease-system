@@ -1,6 +1,7 @@
 package com.elextec.persist.model.mybatis;
 
 import com.elextec.persist.field.enums.MfrsType;
+import com.elextec.persist.field.enums.RecordStatus;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -752,62 +753,62 @@ public class BizManufacturerExample {
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusEqualTo(String value) {
+        public Criteria andMfrsStatusEqualTo(RecordStatus value) {
             addCriterion("mfrs_status =", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusNotEqualTo(String value) {
+        public Criteria andMfrsStatusNotEqualTo(RecordStatus value) {
             addCriterion("mfrs_status <>", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusGreaterThan(String value) {
+        public Criteria andMfrsStatusGreaterThan(RecordStatus value) {
             addCriterion("mfrs_status >", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusGreaterThanOrEqualTo(String value) {
+        public Criteria andMfrsStatusGreaterThanOrEqualTo(RecordStatus value) {
             addCriterion("mfrs_status >=", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusLessThan(String value) {
+        public Criteria andMfrsStatusLessThan(RecordStatus value) {
             addCriterion("mfrs_status <", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusLessThanOrEqualTo(String value) {
+        public Criteria andMfrsStatusLessThanOrEqualTo(RecordStatus value) {
             addCriterion("mfrs_status <=", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusLike(String value) {
+        public Criteria andMfrsStatusLike(RecordStatus value) {
             addCriterion("mfrs_status like", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusNotLike(String value) {
+        public Criteria andMfrsStatusNotLike(RecordStatus value) {
             addCriterion("mfrs_status not like", value, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusIn(List<String> values) {
+        public Criteria andMfrsStatusIn(List<RecordStatus> values) {
             addCriterion("mfrs_status in", values, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusNotIn(List<String> values) {
+        public Criteria andMfrsStatusNotIn(List<RecordStatus> values) {
             addCriterion("mfrs_status not in", values, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusBetween(String value1, String value2) {
+        public Criteria andMfrsStatusBetween(RecordStatus value1, RecordStatus value2) {
             addCriterion("mfrs_status between", value1, value2, "mfrsStatus");
             return (Criteria) this;
         }
 
-        public Criteria andMfrsStatusNotBetween(String value1, String value2) {
+        public Criteria andMfrsStatusNotBetween(RecordStatus value1, RecordStatus value2) {
             addCriterion("mfrs_status not between", value1, value2, "mfrsStatus");
             return (Criteria) this;
         }

@@ -12,17 +12,17 @@
         FROM biz_manufacturer
         <where>
             1=1
-            <if test="keyStr != null and keyStr != ''" >
+            <if test="keyStr != null and keyStr != ''">
                 and (mfrs_name like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_introduce like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_address like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_contacts like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_phone like concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
             </if>
-            <if test="mfrsType != null and mfrsType != ''" >
+            <if test="mfrsType != null and mfrsType != ''">
                 and mfrs_type = #{mfrsType,jdbcType=VARCHAR}
             </if>
-            <if test="mfrsStatus != null and mfrsStatus != ''" >
+            <if test="mfrsStatus != null and mfrsStatus != ''">
                 and mfrs_status = #{mfrsStatus,jdbcType=VARCHAR}
             </if>
         </where>
@@ -30,21 +30,21 @@
         limit #{pageBegin}, #{pageSize}
     </select>
 
-    <select id="countByParam" parameterType="com.elextec.lease.manager.request.BizMfrsParam" resultType="java.lang.Integer" >
+    <select id="countByParam" parameterType="com.elextec.lease.manager.request.BizMfrsParam" resultType="java.lang.Integer">
         SELECT count(distinct id) FROM biz_manufacturer
         <where>
             1=1
-            <if test="keyStr != null and keyStr != ''" >
+            <if test="keyStr != null and keyStr != ''">
                 and (mfrs_name like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_introduce like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_address like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_contacts like concat('%',#{keyStr,jdbcType=VARCHAR},'%')
                 or mfrs_phone like concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
             </if>
-            <if test="mfrsType != null and mfrsType != ''" >
+            <if test="mfrsType != null and mfrsType != ''">
                 and mfrs_type = #{mfrsType,jdbcType=VARCHAR}
             </if>
-            <if test="mfrsStatus != null and mfrsStatus != ''" >
+            <if test="mfrsStatus != null and mfrsStatus != ''">
                 and mfrs_status = #{mfrsStatus,jdbcType=VARCHAR}
             </if>
         </where>
