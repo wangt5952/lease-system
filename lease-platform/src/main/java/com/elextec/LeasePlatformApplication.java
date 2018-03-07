@@ -12,7 +12,5 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ServletComponentScan
 public class LeasePlatformApplication {
 
-        public static void main(String[] args) {
-                SpringApplication.run(LeasePlatformApplication.class, args);
-        }
+        public static void main(String[] args) { SpringApplication.run(LeasePlatformApplication.class, args); }
 }

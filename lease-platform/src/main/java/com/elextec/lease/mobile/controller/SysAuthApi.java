@@ -224,7 +224,9 @@ public class SysAuthApi extends BaseController {
                     // 只要进行验证后，不管成功失败均将之前验证码作废
                     redisClient.valueOperations().getOperations().delete(WzConstants.GK_CAPTCHA + loginParam.getCaptchaToken());
                 }
-            } catch (Exception ex) {
+            } catch (BizException ex) {
+                throw ex;
+            }catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 
@@ -362,11 +364,13 @@ public class SysAuthApi extends BaseController {
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
                         }
                         // 验证码不一致报错
-                        if (!cc.equals(smsParam.getCaptcha())) {
+                        if (!cc.equalsIgnoreCase(smsParam.getCaptcha())) {
                             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
                         }
                     }
                 }
+            }catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -434,7 +438,9 @@ public class SysAuthApi extends BaseController {
                 if (!vCode.equals(resetParam.getSmsVCode())) {
                     throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
                 }
-            } catch (Exception ex) {
+            } catch (BizException ex) {
+                throw ex;
+            }catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             // 只要进行验证后，不管成功失败均将之前验证码作废
@@ -488,6 +494,8 @@ public class SysAuthApi extends BaseController {
             try{
                 String paramStr = URLDecoder.decode(smsTokenAndUserInfo, "utf-8");
                 resetParam = JSON.parseObject(paramStr, RegisterParam.class);
+            }catch (BizException ex) {
+                throw ex;
             }catch(Exception ex){
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -496,9 +504,7 @@ public class SysAuthApi extends BaseController {
                 if (null == resetParam
                         || WzStringUtil.isBlank(resetParam.getSmsVCode())
                         || WzStringUtil.isBlank(resetParam.getSmsToken())
-                        || WzStringUtil.isBlank(resetParam.getUserMobile())
-                        || WzStringUtil.isBlank(resetParam.getCreateUser())
-                        || WzStringUtil.isBlank(resetParam.getUpdateUser())) {
+                        || WzStringUtil.isBlank(resetParam.getUserMobile())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 // 短信验证码过期报错// 验证短信验证码
@@ -569,6 +575,8 @@ public class SysAuthApi extends BaseController {
             try{
                 String paramStr = URLDecoder.decode(userInfo, "utf-8");
                 resetParam = JSON.parseObject(paramStr, SysUser.class);
+            }catch (BizException ex) {
+                throw ex;
             }catch(Exception ex){
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -644,6 +652,8 @@ public class SysAuthApi extends BaseController {
             String paramStr=null;
             try{
                 paramStr = URLDecoder.decode(userIdAndIconBase64Data, "utf-8");
+            }catch (BizException ex) {
+                throw ex;
             }catch(Exception ex){
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -718,6 +728,8 @@ public class SysAuthApi extends BaseController {
             try{
                 String paramStr = URLDecoder.decode(userIdAndIconBase64Data, "utf-8");
                 resetParam = JSON.parseObject(paramStr, SysUser.class);
+            }catch (BizException ex) {
+                throw ex;
             }catch(Exception ex){
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
