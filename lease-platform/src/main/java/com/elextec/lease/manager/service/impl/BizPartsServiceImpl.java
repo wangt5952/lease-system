@@ -4,9 +4,11 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizPartsParam;
 import com.elextec.lease.manager.service.BizPartsService;
+import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
 import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizRefVehiclePartsMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
@@ -38,6 +40,9 @@ public class BizPartsServiceImpl implements BizPartsService {
 
     @Autowired
     private BizRefVehiclePartsMapperExt bizRefVehiclePartsMapperExt;
+
+    @Autowired
+    private BizManufacturerMapperExt bizManufacturerMapperExt;
 
     @Override
     public PageResponse<BizParts> list(boolean needPaging, PageRequest pr) {
@@ -105,6 +110,17 @@ public class BizPartsServiceImpl implements BizPartsService {
         BizParts insertVo = null;
         try {
             for (; i < partsInfos.size(); i++) {
+                //校验制造商是否存在（状态为正常）
+                if(WzStringUtil.isNotBlank(partsInfos.get(i).getMfrsId())){
+                    BizManufacturerExample manuExample = new BizManufacturerExample();
+                    BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+                    manuCriteria.andIdEqualTo(partsInfos.get(i).getMfrsId());
+                    manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+                    int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+                    if(manuCot < 1){
+                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "配件对应的制造商不存在或已作废");
+                    }
+                }
                 insertVo = partsInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
                 insertVo.setCreateTime(new Date());
@@ -124,6 +140,17 @@ public class BizPartsServiceImpl implements BizPartsService {
         int lnCnt = bizPartsMapperExt.countByExample(bizPartsExample);
         if (0 < lnCnt) {
             throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "资源code(" + partsInfo.getPartsCode() + ")已存在");
+        }
+        //校验制造商是否存在（状态为正常）
+        if(WzStringUtil.isNotBlank(partsInfo.getMfrsId())){
+            BizManufacturerExample manuExample = new BizManufacturerExample();
+            BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+            manuCriteria.andIdEqualTo(partsInfo.getMfrsId());
+            manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+            int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+            if(manuCot < 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "配件对应的制造商不存在或已作废");
+            }
         }
         try {
             partsInfo.setId(WzUniqueValUtil.makeUUID());
@@ -146,6 +173,17 @@ public class BizPartsServiceImpl implements BizPartsService {
             int count = bizRefVehiclePartsMapperExt.countByExample(example);
             if(count >= 1){
                 throw new BizException(RunningResult.HAVE_BIND.code(), "配件已绑定车辆,无法作废");
+            }
+        }
+        //校验制造商是否存在（状态为正常）
+        if(WzStringUtil.isNotBlank(partsInfo.getMfrsId())){
+            BizManufacturerExample manuExample = new BizManufacturerExample();
+            BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+            manuCriteria.andIdEqualTo(partsInfo.getMfrsId());
+            manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+            int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+            if(manuCot < 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "配件对应的制造商不存在或已作废");
             }
         }
         bizPartsMapperExt.updateByPrimaryKeySelective(partsInfo);

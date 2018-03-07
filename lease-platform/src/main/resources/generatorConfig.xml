@@ -81,6 +81,8 @@
         </table>
         <table schema="" tableName="biz_vehicle_track" domainObjectName="BizVehicleTrack">
         </table>
+        <table schema="" tableName="biz_ref_org_vehicle" domainObjectName="BizRefOrgVehicle">
+        </table>
         <!--
         <table schema="" tableName="jme_item_warning" domainObjectName="ItemWarning">
             <generatedKey column="id" sqlStatement="JDBC" identity="true"/>

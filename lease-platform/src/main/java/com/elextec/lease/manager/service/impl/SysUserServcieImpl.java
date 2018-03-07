@@ -4,11 +4,13 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.*;
+import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
@@ -52,6 +54,9 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Autowired
     private SysRefUserRoleMapperExt sysRefUserRoleMapperExt;
+
+    @Autowired
+    private BizOrganizationMapperExt bizOrganizationMapperExt;
 
     @Override
     public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr) {
@@ -119,6 +124,27 @@ public class SysUserServcieImpl implements SysUserService {
         SysUser insertVo = null;
         try {
             for (; i < usersInfos.size(); i++) {
+                //验证企业是否存在（状态为正常）
+                if(WzStringUtil.isNotBlank(usersInfos.get(i).getOrgId())){
+                    BizOrganizationExample orgExample = new BizOrganizationExample();
+                    BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+                    orgCriteria.andIdEqualTo(usersInfos.get(i).getOrgId());
+                    orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+                    List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+                    if(org.size() < 1){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,用户相关企业不存在或已作废");
+                    }
+                    //验证企业类型与用户类型是否一致
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus())
+                            && OrgAndUserType.ENTERPRISE.toString().equals(usersInfos.get(i).getUserType())){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,平台下不能创建企业用户");
+                    }
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgStatus())
+                            && OrgAndUserType.PLATFORM.toString().equals(usersInfos.get(i).getUserType())){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,普通企业下不能创建平台用户");
+                    }
+
+                }
                 insertVo = usersInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
                 insertVo.setCreateTime(new Date());
@@ -147,6 +173,27 @@ public class SysUserServcieImpl implements SysUserService {
         int mobileCnt = sysUserMapperExt.countByExample(mobileExample);
         if (0 < mobileCnt) {
             throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "手机号码(" + userInfo.getUserMobile() + ")已存在");
+        }
+        //验证企业是否存在（状态为正常）
+        if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
+            BizOrganizationExample orgExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andIdEqualTo(userInfo.getOrgId());
+            orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+            if(org.size() < 1){
+                throw new BizException(RunningResult.DB_ERROR.code(), "用户相关企业不存在或已作废");
+            }
+            //验证企业类型与用户类型是否一致
+            if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus())
+                    && OrgAndUserType.ENTERPRISE.toString().equals(userInfo.getUserType())){
+                throw new BizException(RunningResult.DB_ERROR.code(), "平台下不能创建企业用户");
+            }
+            if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgStatus())
+                    && OrgAndUserType.PLATFORM.toString().equals(userInfo.getUserType())){
+                throw new BizException(RunningResult.DB_ERROR.code(), "普通企业下不能创建平台用户");
+            }
+
         }
         // 保存用户信息
         try {
@@ -179,6 +226,26 @@ public class SysUserServcieImpl implements SysUserService {
             delCriteria.andUserIdEqualTo(userInfo.getId());
             sysRefUserRoleMapperExt.deleteByExample(delExample);
         }else{
+            //验证企业是否存在（状态为正常）
+            if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
+                BizOrganizationExample orgExample = new BizOrganizationExample();
+                BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+                orgCriteria.andIdEqualTo(userInfo.getOrgId());
+                orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+                List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+                if(org.size() < 1){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "用户相关企业不存在或已作废");
+                }
+                //验证企业类型与用户类型是否一致
+                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus())
+                        && OrgAndUserType.ENTERPRISE.toString().equals(userInfo.getUserType())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "平台下不能创建企业用户");
+                }
+                if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgStatus())
+                        && OrgAndUserType.PLATFORM.toString().equals(userInfo.getUserType())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "普通企业下不能创建平台用户");
+                }
+            }
             sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
         }
     }
@@ -193,6 +260,9 @@ public class SysUserServcieImpl implements SysUserService {
             selectRefCriteria.andBindTimeIsNull();
             SysRefUserRoleExample delExample = new SysRefUserRoleExample();
             SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria sysUserCriteria = sysUserExample.createCriteria();
+            sysUserCriteria.andLoginNameEqualTo("admin");
             for (; i < ids.size(); i++) {
                 //验证用户名下是否有未归还的车辆
                 selectRefCriteria.andUserIdEqualTo(ids.get(i));
@@ -200,10 +270,17 @@ public class SysUserServcieImpl implements SysUserService {
                 if(count >= 1){
                     throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,用户名下有未归还的车辆");
                 }
+                //基本用户admin不能删除
+                sysUserCriteria.andIdEqualTo(ids.get(i));
+                int sysCot = sysUserMapperExt.countByExample(sysUserExample);
+                if(sysCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,admin不能删除");
+                }
                 sysUserMapperExt.deleteByPrimaryKey(ids.get(i));
                 //删除用户和角色的所有关联
                 delCriteria.andUserIdEqualTo(ids.get(i));
                 sysRefUserRoleMapperExt.deleteByExample(delExample);
+
             }
         } catch (BizException ex) {
             throw ex;

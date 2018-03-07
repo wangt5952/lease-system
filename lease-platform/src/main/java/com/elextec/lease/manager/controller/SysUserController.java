@@ -434,7 +434,12 @@ public class SysUserController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
-
+                //admin作为基本用户无法修改他的归属企业
+                if("admin".equals(userTemp.getLoginName())){
+                    userInfo.setOrgId(null);
+                    //用户类型无法修改，清空上传数据
+                    userInfo.setUserType(null);
+                }
                 if (null == userInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
@@ -450,8 +455,9 @@ public class SysUserController extends BaseController {
             userInfo.setPassword(null);
             //手机号码不可以由这个接口个改，清空上传的手机号码
             userInfo.setUserMobile(null);
-            //用户类型无法修改，清空上传数据
-            userInfo.setUserType(null);
+            //用户名不可修改
+            userInfo.setLoginName(null);
+
             sysUserService.updateSysUser(userInfo);
             // 更新登录信息
             SysUserExample reListParam  = new SysUserExample();

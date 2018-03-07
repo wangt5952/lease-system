@@ -4,14 +4,17 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizBatteryParam;
 import com.elextec.lease.manager.service.BizBatteryService;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
+import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
 import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.BizBattery;
 import com.elextec.persist.model.mybatis.BizBatteryExample;
+import com.elextec.persist.model.mybatis.BizManufacturerExample;
 import com.elextec.persist.model.mybatis.BizRefVehicleBatteryExample;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import org.slf4j.Logger;
@@ -39,6 +42,9 @@ public class BizBatteryServcieImpl implements BizBatteryService {
 
     @Autowired
     private BizRefVehicleBatteryMapperExt bizRefVehicleBatteryMapperExt;
+
+    @Autowired
+    private BizManufacturerMapperExt bizManufacturerMapperExt;
 
     @Override
     public PageResponse<BizBattery> list(boolean needPaging, PageRequest pr) {
@@ -106,6 +112,16 @@ public class BizBatteryServcieImpl implements BizBatteryService {
         BizBattery insertVo = null;
         try {
             for (; i < batteryInfos.size(); i++) {
+                if(WzStringUtil.isNotBlank(batteryInfos.get(i).getMfrsId())){
+                    BizManufacturerExample manuExample = new BizManufacturerExample();
+                    BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+                    manuCriteria.andIdEqualTo(batteryInfos.get(i).getMfrsId());
+                    manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+                    int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+                    if(manuCot < 1){
+                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录插入时发生错误,电池对应的制造商不存在或已作废");
+                    }
+                }
                 insertVo = batteryInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
                 insertVo.setCreateTime(new Date());
@@ -126,6 +142,17 @@ public class BizBatteryServcieImpl implements BizBatteryService {
         int lnCnt = bizBatteryMapperExt.countByExample(lnExample);
         if (0 < lnCnt) {
             throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + batteryInfo.getBatteryCode() + ")已存在");
+        }
+        //校验制造商是否存在（状态为正常）
+        if(WzStringUtil.isNotBlank(batteryInfo.getMfrsId())){
+            BizManufacturerExample manuExample = new BizManufacturerExample();
+            BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+            manuCriteria.andIdEqualTo(batteryInfo.getMfrsId());
+            manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+            int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+            if(manuCot < 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池对应的制造商不存在或已作废");
+            }
         }
         // 保存用户信息
         try {
@@ -149,6 +176,17 @@ public class BizBatteryServcieImpl implements BizBatteryService {
             int count = bizRefVehicleBatteryMapperExt.countByExample(example);
             if(count >= 1){
                 throw new BizException(RunningResult.HAVE_BIND.code(), "电池已绑定车辆,无法作废");
+            }
+        }
+        //校验制造商是否存在（状态为正常）
+        if(WzStringUtil.isNotBlank(batteryInfo.getMfrsId())){
+            BizManufacturerExample manuExample = new BizManufacturerExample();
+            BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+            manuCriteria.andIdEqualTo(batteryInfo.getMfrsId());
+            manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+            int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+            if(manuCot < 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池对应的制造商不存在或已作废");
             }
         }
         bizBatteryMapperExt.updateByPrimaryKeySelective(batteryInfo);

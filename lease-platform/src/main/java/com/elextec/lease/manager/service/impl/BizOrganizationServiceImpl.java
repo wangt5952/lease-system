@@ -104,6 +104,10 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         BizOrganization insertVo = null;
         try {
             for (; i < orgInfos.size(); i++) {
+                //平台企业只能创建一个且不能通过接口创建
+                if(OrgAndUserType.PLATFORM.toString().equals(orgInfos.get(i).getOrgType())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,平台企业只能创建一个");
+                }
                 insertVo = orgInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
                 insertVo.setOrgStatus(RecordStatus.NORMAL);
@@ -160,6 +164,18 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
             if(refCot >= 1){
                 throw new BizException(RunningResult.HAVE_BIND.code(), "企业名下有绑定的车辆,无法作废");
             }
+            //平台企业无法作废
+            BizOrganizationExample orgExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andIdEqualTo(orgInfo.getId());
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+            if(org.size() >= 1){
+                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "平台不能作废");
+                }
+            }
+
+
         }
         bizOrganizationMapperExt.updateByPrimaryKeySelective(orgInfo);
     }
@@ -175,6 +191,8 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
             BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
             BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
             refCriteria.andUnbindTimeIsNull();
+            BizOrganizationExample orgExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
             for (; i < ids.size(); i++) {
                 userCriteria.andOrgIdEqualTo(ids.get(i));
                 int userCot = sysUserMapperExt.countByExample(userExample);
@@ -185,6 +203,14 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
                 int refCot = bizRefOrgVehicleMapperExt.countByExample(refExample);
                 if(refCot >= 1){
                     throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,企业名下有绑定的车辆");
+                }
+                //平台企业无法删除
+                orgCriteria.andIdEqualTo(ids.get(i));
+                List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+                if(org.size() >= 1){
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus())){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误,平台不能作废");
+                    }
                 }
                 bizOrganizationMapperExt.deleteByPrimaryKey(ids.get(i));
             }
