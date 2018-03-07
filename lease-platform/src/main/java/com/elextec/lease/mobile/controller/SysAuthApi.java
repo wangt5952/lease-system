@@ -46,7 +46,7 @@ public class SysAuthApi extends BaseController {
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SysAuthApi.class);
 
-    @Value("${localsetting.login-overtime-sec}")
+    @Value("${localsetting.login-overtime-sec-mobile}")
     private String loginOvertime;
 
     @Value("${localsetting.upload-user-icon-root}")
