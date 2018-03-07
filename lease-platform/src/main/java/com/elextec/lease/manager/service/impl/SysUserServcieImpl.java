@@ -446,4 +446,14 @@ public class SysUserServcieImpl implements SysUserService {
 
     }
 
+    @Override
+    public void batchBind(int count, String orgId) {
+        //验证企业是否存在（状态为正常）
+        BizOrganizationExample orgExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+        orgCriteria.andIdEqualTo(orgId);
+        orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+
+    }
+
 }
