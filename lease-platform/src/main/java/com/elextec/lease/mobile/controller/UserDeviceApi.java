@@ -82,6 +82,8 @@ public class UserDeviceApi extends BaseController {
                 if (null == vehicleIds || 0 == vehicleIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            }catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
@@ -190,6 +192,8 @@ public class UserDeviceApi extends BaseController {
                 if (null == vehicleIds || 0 == vehicleIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+            }catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
