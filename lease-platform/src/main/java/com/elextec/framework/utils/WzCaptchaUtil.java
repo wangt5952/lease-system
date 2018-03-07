@@ -15,6 +15,17 @@ import java.util.Random;
 
 /**
  * 图形验证码工具类.
+ * <pre>
+ *     这里需要注意，验证码绘制使用了微软雅黑字体，
+ *     Linux服务器上无此字体，需要添加此字体后才能正常绘制，否则可能会出现乱码。
+ *     1.fc-list 查看微软雅黑字体是否存在，如果不存在则执行下列步骤
+ *     2./usr/share/fonts 目录下
+ *     mkdir microsoft
+ *     chmod -R 755 ./microsoft
+ *     3.将 msyh.ttc、msyhbd.ttc、msyhl.ttc 上传到 /usr/share/fonts/microsoft 目录下
+ *     4.fc-cache 重新刷新字体缓存
+ *     5.fc-list 查看字体是否已安装完成
+ * </pre>
  * Created by wangtao on 2018/1/16.
  */
 public class WzCaptchaUtil {
