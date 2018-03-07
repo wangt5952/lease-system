@@ -102,6 +102,7 @@ public interface SysUserService {
      * 批量分发车辆.
      * @param count 数量
      * @param orgId 分发的企业ID
+     * @param userOrgId 操作用户的企业ID（平台企业ID）
      */
-    public void batchBind(int count,String orgId);
+    public void batchBind(int count,String orgId,String userOrgId);
 }

@@ -105,7 +105,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         try {
             for (; i < orgInfos.size(); i++) {
                 //平台企业只能创建一个且不能通过接口创建
-                if(OrgAndUserType.PLATFORM.toString().equals(orgInfos.get(i).getOrgType())){
+                if(OrgAndUserType.PLATFORM.toString().equals(orgInfos.get(i).getOrgType().toString())){
                     throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,平台企业只能创建一个");
                 }
                 insertVo = orgInfos.get(i);
@@ -170,7 +170,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
             orgCriteria.andIdEqualTo(orgInfo.getId());
             List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
             if(org.size() >= 1){
-                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus())){
+                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
                     throw new BizException(RunningResult.DB_ERROR.code(), "平台不能作废");
                 }
             }
@@ -208,7 +208,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
                 orgCriteria.andIdEqualTo(ids.get(i));
                 List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
                 if(org.size() >= 1){
-                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus())){
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
                         throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误,平台不能作废");
                     }
                 }

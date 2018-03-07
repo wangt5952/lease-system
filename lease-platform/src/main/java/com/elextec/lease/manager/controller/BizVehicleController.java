@@ -123,11 +123,11 @@ public class BizVehicleController extends BaseController {
                     if(userTemp != null){
                         //根据用户类型添加条件
                         //个人用户需要添加userId为条件
-                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                             pagingParam.setUserId(userTemp.getId());
                         }
                         //企业用户需要添加orgId为条件
-                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                             pagingParam.setOrgId(userTemp.getOrgId());
                         }
                     }else{
@@ -206,7 +206,7 @@ public class BizVehicleController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以增加车辆
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -319,7 +319,7 @@ public class BizVehicleController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以增加车辆
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -414,7 +414,7 @@ public class BizVehicleController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以修改车辆信息
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -469,7 +469,7 @@ public class BizVehicleController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以删除车辆
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -568,10 +568,10 @@ public class BizVehicleController extends BaseController {
             if(userTemp == null){
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 paramMap.put("orgId",userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                 paramMap.put("userId",userTemp.getId());
             }
 //            List<Map<String,Object>> vehicleInfo = bizVehicleService.getByPrimaryKey((String) paramMap.get("id"), isUsedBattery);
@@ -645,10 +645,10 @@ public class BizVehicleController extends BaseController {
             }
             Map<String,Object> paramTemp = new HashMap<String,Object>();
             paramTemp.put("id",paramMap.get(0));
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("orgId",userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("userId",userTemp.getId());
             }
             List<BizPartsExt> parts = bizVehicleService.getBizPartsByVehicle(paramTemp);
@@ -718,10 +718,10 @@ public class BizVehicleController extends BaseController {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
             Map<String,Object> paramTemp = new HashMap<String,Object>();
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("orgId",userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("userId",userTemp.getId());
             }
             for (String vId : vehicleIds) {
@@ -829,10 +829,10 @@ public class BizVehicleController extends BaseController {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
             Map<String,Object> paramTemp = new HashMap<String,Object>();
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("orgId",userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("userId",userTemp.getId());
             }
             for (String vId : vehicleIds) {
@@ -916,7 +916,7 @@ public class BizVehicleController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -973,7 +973,7 @@ public class BizVehicleController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -1085,10 +1085,10 @@ public class BizVehicleController extends BaseController {
             Map<String,Object> paramTemp = new HashMap<String,Object>();
             deviceCds.add("123456");
             paramTemp.put("batteryCodes",deviceCds);
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("orgId",userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("userId",userTemp.getId());
             }
             // 查询所有范围内的车辆信息
@@ -1186,10 +1186,10 @@ public class BizVehicleController extends BaseController {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 Map<String,Object> paramTemp = new HashMap<String,Object>();
-                if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                     paramTemp.put("orgId",userTemp.getOrgId());
                 }
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                     paramTemp.put("userId",userTemp.getId());
                 }
                 paramTemp.put("id",idAndTimeIntervalInfo.get("id"));

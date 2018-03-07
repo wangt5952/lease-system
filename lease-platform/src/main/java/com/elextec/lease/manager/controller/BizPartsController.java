@@ -115,11 +115,11 @@ public class BizPartsController extends BaseController {
                     if(userTemp != null){
                         //根据用户类型添加条件
                         //个人用户需要添加userId为条件
-                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                             bizPartsParam.setUserId(userTemp.getId());
                         }
                         //企业用户需要添加orgId为条件
-                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                             bizPartsParam.setOrgId(userTemp.getOrgId());
                         }
                     }else{
@@ -187,7 +187,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -276,7 +276,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -355,7 +355,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -409,7 +409,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -483,10 +483,10 @@ public class BizPartsController extends BaseController {
             if(userTemp == null){
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("orgId",userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                 paramTemp.put("userId",userTemp.getId());
             }
             BizParts bizParts = bizPartsService.getBizPartsByPrimaryKey(paramTemp);
@@ -531,7 +531,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -585,7 +585,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{

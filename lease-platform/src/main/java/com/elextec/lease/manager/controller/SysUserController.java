@@ -131,11 +131,11 @@ public class SysUserController extends BaseController {
                 if(userTemp != null){
                     //根据用户类型添加条件
                     //个人用户需要添加userId为条件
-                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                         pagingParam.setUserId(userTemp.getId());
                     }
                     //企业用户需要添加orgId为条件
-                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                         pagingParam.setOrgId(userTemp.getOrgId());
                     }
                 }else{
@@ -207,7 +207,7 @@ public class SysUserController extends BaseController {
                 SysUser insUserChkVo = null;
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -227,7 +227,7 @@ public class SysUserController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户信息参数有误");
                     }
                     //个人用户无法通过电脑端创建
-                    if(OrgAndUserType.INDIVIDUAL.toString().equals(insUserChkVo.getUserType())){
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(insUserChkVo.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION.code(),"第" + i + "条记录,无法创建个人用户");
                     }
                     if (!insUserChkVo.getUserType().toString().equals(OrgAndUserType.PLATFORM.toString())
@@ -309,7 +309,7 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -327,7 +327,7 @@ public class SysUserController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "用户参数有误");
                 }
                 //个人用户无法通过电脑端创建
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userInfo.getUserType())){
+                if(OrgAndUserType.INDIVIDUAL.toString().equals(userInfo.getUserType().toString())){
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION.code(),"无法创建个人用户");
                 }
 
@@ -428,7 +428,7 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -505,7 +505,7 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -560,7 +560,7 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -665,7 +665,7 @@ public class SysUserController extends BaseController {
             SysUserExample.Criteria reListCri = reListParam.createCriteria();
             reListCri.andIdEqualTo(userId.get(0));
             //平台用户可以查询全部
-            if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+            if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                 reListCri.andOrgIdEqualTo(userTemp.getOrgId());
             }
             SysUserExt user = sysUserService.getExtById(reListParam);
@@ -724,15 +724,15 @@ public class SysUserController extends BaseController {
             SysUser userTemp = getLoginUserInfo(request);
             if(userTemp != null){
                 //个人用户无权执行该操作
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                 }
                 //企业用户只可以操作自己企业名下的车辆
-                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())) {
+                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
                     sysUserService.bind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
                 }
                 //平台用户可以操作所有车辆
-                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                     sysUserService.bind(param.get("userId"), param.get("vehicleId"),null);
                 }
             }else{
@@ -789,15 +789,15 @@ public class SysUserController extends BaseController {
             SysUser userTemp = getLoginUserInfo(request);
             if(userTemp != null){
                 //个人用户无权执行该操作
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                 }
                 //企业用户只可以操作自己企业名下的车辆
-                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())) {
+                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
                     sysUserService.unBind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
                 }
                 //平台用户可以操作所有车辆
-                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                     sysUserService.unBind(param.get("userId"), param.get("vehicleId"),null);
                 }
             }else{
@@ -846,7 +846,7 @@ public class SysUserController extends BaseController {
                 }
                 if(userTemp != null){
                     //企业与个人用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
