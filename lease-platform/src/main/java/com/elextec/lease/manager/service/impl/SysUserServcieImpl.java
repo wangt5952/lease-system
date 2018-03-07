@@ -255,15 +255,15 @@ public class SysUserServcieImpl implements SysUserService {
     public void deleteSysUser(List<String> ids) {
         int i = 0;
         try {
-            BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
-            BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
-            selectRefCriteria.andBindTimeIsNull();
-            SysRefUserRoleExample delExample = new SysRefUserRoleExample();
-            SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
-            SysUserExample sysUserExample = new SysUserExample();
-            SysUserExample.Criteria sysUserCriteria = sysUserExample.createCriteria();
-            sysUserCriteria.andLoginNameEqualTo("admin");
             for (; i < ids.size(); i++) {
+                BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+                BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+                selectRefCriteria.andBindTimeIsNull();
+                SysRefUserRoleExample delExample = new SysRefUserRoleExample();
+                SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
+                SysUserExample sysUserExample = new SysUserExample();
+                SysUserExample.Criteria sysUserCriteria = sysUserExample.createCriteria();
+                sysUserCriteria.andLoginNameEqualTo("admin");
                 //验证用户名下是否有未归还的车辆
                 selectRefCriteria.andUserIdEqualTo(ids.get(i));
                 int count = bizRefUserVehicleMapperExt.countByExample(refExample);
@@ -447,12 +447,14 @@ public class SysUserServcieImpl implements SysUserService {
     }
 
     @Override
+    @Transactional
     public void batchBind(int count, String orgId,String userOrgId) {
         //验证企业是否存在（状态为正常）
         BizOrganizationExample orgExample = new BizOrganizationExample();
         BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
         orgCriteria.andIdEqualTo(orgId);
         orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+        orgCriteria.andOrgTypeEqualTo(OrgAndUserType.ENTERPRISE);
         int orgCot = bizOrganizationMapperExt.countByExample(orgExample);
         if(orgCot < 1){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
@@ -466,8 +468,75 @@ public class SysUserServcieImpl implements SysUserService {
         if(vehicles.size() < count){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
         }
+        //将指定数量的车辆分配到指定企业
+        for(int i=0;i<count;i++){
+            //解除原有绑定关系
+            BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
+            delCriteria.andOrgIdEqualTo(userOrgId);
+            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getVehicleId());
+            delCriteria.andUnbindTimeIsNull();
+            BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
+            delTemp.setUnbindTime(new Date());
+            bizRefOrgVehicleMapperExt.updateByExample(delTemp,delExample);
+            //绑定新关系
+            BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
+            addTemp.setOrgId(orgId);
+            addTemp.setVehicleId(vehicles.get(i).getVehicleId());
+            addTemp.setBindTime(new Date());
+            bizRefOrgVehicleMapperExt.insertSelective(addTemp);
+        }
+    }
 
+    @Override
+    @Transactional
+    public void batchUnbind(int count, String orgId) {
+        //验证企业是否存在（状态为正常）
+        BizOrganizationExample orgExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+        orgCriteria.andIdEqualTo(orgId);
+        orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+        orgCriteria.andOrgTypeEqualTo(OrgAndUserType.ENTERPRISE);
+        int orgCot = bizOrganizationMapperExt.countByExample(orgExample);
+        if(orgCot < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
+        }
+        //查询企业下未分配出去的车辆
+        BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+        refCriteria.andOrgIdEqualTo(orgId);
+        refCriteria.andUnbindTimeIsNull();
+        List<BizRefOrgVehicle> vehicles = bizRefOrgVehicleMapperExt.selectByExample(refExample);
+        if(vehicles.size() < count){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
+        }
 
+        //查询平台企业ID
+        BizOrganizationExample plExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria plCriteria = plExample.createCriteria();
+        plCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
+        List<BizOrganization> plOrg = bizOrganizationMapperExt.selectByExample(plExample);
+        if(plOrg.size() != 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "平台信息异常用,平台不存在或存在多个");
+        }
+        //将指定数量的车辆归还给平台
+        for(int i=0;i<count;i++){
+            //解除原有绑定关系
+            BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
+            delCriteria.andOrgIdEqualTo(orgId);
+            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getVehicleId());
+            delCriteria.andUnbindTimeIsNull();
+            BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
+            delTemp.setUnbindTime(new Date());
+            bizRefOrgVehicleMapperExt.updateByExample(delTemp,delExample);
+            //绑定新关系
+            BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
+            addTemp.setOrgId(plOrg.get(0).getId());
+            addTemp.setVehicleId(vehicles.get(i).getVehicleId());
+            addTemp.setBindTime(new Date());
+            bizRefOrgVehicleMapperExt.insertSelective(addTemp);
+        }
     }
 
 }

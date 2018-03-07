@@ -185,15 +185,15 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     public void deleteBizOrganization(List<String> ids) {
         int i = 0;
         try {
-            SysUserExample userExample = new SysUserExample();
-            SysUserExample.Criteria userCriteria = userExample.createCriteria();
-            userCriteria.andUserStatusEqualTo(RecordStatus.NORMAL);
-            BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
-            BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
-            refCriteria.andUnbindTimeIsNull();
-            BizOrganizationExample orgExample = new BizOrganizationExample();
-            BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
             for (; i < ids.size(); i++) {
+                SysUserExample userExample = new SysUserExample();
+                SysUserExample.Criteria userCriteria = userExample.createCriteria();
+                userCriteria.andUserStatusEqualTo(RecordStatus.NORMAL);
+                BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+                BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+                refCriteria.andUnbindTimeIsNull();
+                BizOrganizationExample orgExample = new BizOrganizationExample();
+                BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
                 userCriteria.andOrgIdEqualTo(ids.get(i));
                 int userCot = sysUserMapperExt.countByExample(userExample);
                 if(userCot >= 1){

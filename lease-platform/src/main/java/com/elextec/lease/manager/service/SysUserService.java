@@ -105,4 +105,11 @@ public interface SysUserService {
      * @param userOrgId 操作用户的企业ID（平台企业ID）
      */
     public void batchBind(int count,String orgId,String userOrgId);
+
+    /**
+     * 批量归还车辆.
+     * @param count 数量
+     * @param orgId 分发的企业ID
+     */
+    public void batchUnbind(int count,String orgId);
 }

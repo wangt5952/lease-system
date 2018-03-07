@@ -836,7 +836,7 @@ public class SysUserController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            Map<String,Object> param = null;
+            Map<String,String> param = null;
             try {
                 String paramStr = URLDecoder.decode(orgIdAndCount, "utf-8");
                 param = JSON.parseObject(paramStr, Map.class);
@@ -852,9 +852,10 @@ public class SysUserController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
-                if (WzStringUtil.isBlank((String) param.get("orgId")) || WzStringUtil.isBlank((String) param.get("count"))) {
-                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
+                if (WzStringUtil.isBlank(param.get("orgId")) || WzStringUtil.isBlank(param.get("count"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数不能为空");
                 }
+                sysUserService.batchBind(Integer.valueOf(param.get("count")),param.get("orgId"),userTemp.getOrgId());
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
@@ -865,4 +866,62 @@ public class SysUserController extends BaseController {
             return mr;
         }
     }
+
+    /**
+     * 批量归还车辆接口.
+     * @param orgIdAndCount 企业ID与分发数量
+     * <pre>
+     *     {
+     *         orgId:企业ID,
+     *         count:归还数量
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/batchvehicleunbind")
+    public MessageResponse batchVehicleUnbind(@RequestBody String orgIdAndCount,HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(orgIdAndCount)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(orgIdAndCount, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                SysUser userTemp = getLoginUserInfo(request);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if(userTemp != null){
+                    //平台与个人用户无权执行该操作
+                    if(!OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                if (WzStringUtil.isBlank(param.get("orgId")) || WzStringUtil.isBlank(param.get("count"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数不能为空");
+                }
+                sysUserService.batchUnbind(Integer.valueOf(param.get("count")),param.get("orgId"));
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
 }
