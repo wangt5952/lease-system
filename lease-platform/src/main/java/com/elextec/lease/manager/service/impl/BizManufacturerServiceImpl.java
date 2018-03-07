@@ -7,11 +7,13 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizMfrsParam;
 import com.elextec.lease.manager.service.BizManufacturerService;
+import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizManufacturerMapperExt;
+import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
+import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
 import com.elextec.persist.field.enums.MfrsType;
 import com.elextec.persist.field.enums.RecordStatus;
-import com.elextec.persist.model.mybatis.BizManufacturer;
-import com.elextec.persist.model.mybatis.BizManufacturerExample;
+import com.elextec.persist.model.mybatis.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,15 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
 
     @Autowired
     private BizManufacturerMapperExt bizManufacturerMapperExt;
+
+    @Autowired
+    private BizVehicleMapperExt bizVehicleMapperExt;
+
+    @Autowired
+    private BizBatteryMapperExt bizBatteryMapperExt;
+
+    @Autowired
+    private BizPartsMapperExt bizPartsMapperExt;
 
     @Override
     public PageResponse<BizManufacturer> list(boolean needPaging, PageRequest pr) {
@@ -129,6 +140,36 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     @Override
     @Transactional
     public void updateBizManufacturer(BizManufacturer mfrsInfo) {
+        //制造商作废，判定是否绑定了设备
+        if(RecordStatus.INVALID.toString().equals(mfrsInfo.getMfrsStatus())){
+            //验证是否有车辆绑定
+            BizVehicleExample vehicleExample = new BizVehicleExample();
+            BizVehicleExample.Criteria vehicleCriteria = vehicleExample.createCriteria();
+            vehicleCriteria.andMfrsIdEqualTo(mfrsInfo.getId());
+            vehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
+            int vehicleCot = bizVehicleMapperExt.countByExample(vehicleExample);
+            if(vehicleCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "制造商有车辆绑定,无法作废");
+            }
+            //验证是否有电池绑定
+            BizBatteryExample batteryExample = new BizBatteryExample();
+            BizBatteryExample.Criteria batteryCriteria = batteryExample.createCriteria();
+            batteryCriteria.andMfrsIdEqualTo(mfrsInfo.getId());
+            batteryCriteria.andBatteryStatusEqualTo(RecordStatus.NORMAL);
+            int batteryCot = bizBatteryMapperExt.countByExample(batteryExample);
+            if(batteryCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "制造商有电池绑定,无法作废");
+            }
+            //验证是否有配件绑定
+            BizPartsExample partsExample = new BizPartsExample();
+            BizPartsExample.Criteria partsCriteria = partsExample.createCriteria();
+            partsCriteria.andMfrsIdEqualTo(mfrsInfo.getId());
+            partsCriteria.andPartsStatusEqualTo(RecordStatus.NORMAL);
+            int partsCot = bizPartsMapperExt.countByExample(partsExample);
+            if(partsCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "制造商有配件绑定,无法作废");
+            }
+        }
         bizManufacturerMapperExt.updateByPrimaryKeySelective(mfrsInfo);
     }
 
@@ -138,6 +179,33 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
         int i = 0;
         try {
             for (; i < ids.size(); i++) {
+                BizVehicleExample vehicleExample = new BizVehicleExample();
+                BizVehicleExample.Criteria vehicleCriteria = vehicleExample.createCriteria();
+                vehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
+                BizBatteryExample batteryExample = new BizBatteryExample();
+                BizBatteryExample.Criteria batteryCriteria = batteryExample.createCriteria();
+                batteryCriteria.andBatteryStatusEqualTo(RecordStatus.NORMAL);
+                BizPartsExample partsExample = new BizPartsExample();
+                BizPartsExample.Criteria partsCriteria = partsExample.createCriteria();
+                partsCriteria.andPartsStatusEqualTo(RecordStatus.NORMAL);
+                //验证是否有车辆绑定
+                vehicleCriteria.andMfrsIdEqualTo(ids.get(i));
+                int vehicleCot = bizVehicleMapperExt.countByExample(vehicleExample);
+                if(vehicleCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,制造商有车辆绑定");
+                }
+                //验证是否有电池绑定
+                batteryCriteria.andMfrsIdEqualTo(ids.get(i));
+                int batteryCot = bizBatteryMapperExt.countByExample(batteryExample);
+                if(batteryCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,制造商有电池绑定");
+                }
+                //验证是否有配件绑定
+                partsCriteria.andMfrsIdEqualTo(ids.get(i));
+                int partsCot = bizPartsMapperExt.countByExample(partsExample);
+                if(partsCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,制造商有配件绑定");
+                }
                 bizManufacturerMapperExt.deleteByPrimaryKey(ids.get(i));
             }
         } catch (Exception ex) {

@@ -131,11 +131,11 @@ public class SysUserController extends BaseController {
                 if(userTemp != null){
                     //根据用户类型添加条件
                     //个人用户需要添加userId为条件
-                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                         pagingParam.setUserId(userTemp.getId());
                     }
                     //企业用户需要添加orgId为条件
-                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                         pagingParam.setOrgId(userTemp.getOrgId());
                     }
                 }else{
@@ -207,7 +207,7 @@ public class SysUserController extends BaseController {
                 SysUser insUserChkVo = null;
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -227,7 +227,7 @@ public class SysUserController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户信息参数有误");
                     }
                     //个人用户无法通过电脑端创建
-                    if(OrgAndUserType.INDIVIDUAL.toString().equals(insUserChkVo.getUserType())){
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(insUserChkVo.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION.code(),"第" + i + "条记录,无法创建个人用户");
                     }
                     if (!insUserChkVo.getUserType().toString().equals(OrgAndUserType.PLATFORM.toString())
@@ -309,7 +309,7 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -327,7 +327,7 @@ public class SysUserController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "用户参数有误");
                 }
                 //个人用户无法通过电脑端创建
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userInfo.getUserType())){
+                if(OrgAndUserType.INDIVIDUAL.toString().equals(userInfo.getUserType().toString())){
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION.code(),"无法创建个人用户");
                 }
 
@@ -428,13 +428,18 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
-
+                //admin作为基本用户无法修改他的归属企业
+                if("admin".equals(userTemp.getLoginName())){
+                    userInfo.setOrgId(null);
+                    //用户类型无法修改，清空上传数据
+                    userInfo.setUserType(null);
+                }
                 if (null == userInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
@@ -450,8 +455,9 @@ public class SysUserController extends BaseController {
             userInfo.setPassword(null);
             //手机号码不可以由这个接口个改，清空上传的手机号码
             userInfo.setUserMobile(null);
-            //用户类型无法修改，清空上传数据
-            userInfo.setUserType(null);
+            //用户名不可修改
+            userInfo.setLoginName(null);
+
             sysUserService.updateSysUser(userInfo);
             // 更新登录信息
             SysUserExample reListParam  = new SysUserExample();
@@ -499,7 +505,7 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -554,7 +560,7 @@ public class SysUserController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -659,7 +665,7 @@ public class SysUserController extends BaseController {
             SysUserExample.Criteria reListCri = reListParam.createCriteria();
             reListCri.andIdEqualTo(userId.get(0));
             //平台用户可以查询全部
-            if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+            if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                 reListCri.andOrgIdEqualTo(userTemp.getOrgId());
             }
             SysUserExt user = sysUserService.getExtById(reListParam);
@@ -718,15 +724,15 @@ public class SysUserController extends BaseController {
             SysUser userTemp = getLoginUserInfo(request);
             if(userTemp != null){
                 //个人用户无权执行该操作
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                 }
                 //企业用户只可以操作自己企业名下的车辆
-                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())) {
+                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
                     sysUserService.bind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
                 }
                 //平台用户可以操作所有车辆
-                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                     sysUserService.bind(param.get("userId"), param.get("vehicleId"),null);
                 }
             }else{
@@ -783,15 +789,15 @@ public class SysUserController extends BaseController {
             SysUser userTemp = getLoginUserInfo(request);
             if(userTemp != null){
                 //个人用户无权执行该操作
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                 }
                 //企业用户只可以操作自己企业名下的车辆
-                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())) {
+                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
                     sysUserService.unBind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
                 }
                 //平台用户可以操作所有车辆
-                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                     sysUserService.unBind(param.get("userId"), param.get("vehicleId"),null);
                 }
             }else{
@@ -803,4 +809,119 @@ public class SysUserController extends BaseController {
             return mr;
         }
     }
+
+    /**
+     * 批量分发车辆接口.
+     * @param orgIdAndCount 企业ID与分发数量
+     * <pre>
+     *     {
+     *         orgId:企业ID,
+     *         count:分发数量
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/batchvehiclebind")
+    public MessageResponse batchVehicleBind(@RequestBody String orgIdAndCount,HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(orgIdAndCount)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(orgIdAndCount, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                SysUser userTemp = getLoginUserInfo(request);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if(userTemp != null){
+                    //企业与个人用户无权执行该操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                if (WzStringUtil.isBlank(param.get("orgId")) || WzStringUtil.isBlank(param.get("count"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数不能为空");
+                }
+                sysUserService.batchBind(Integer.valueOf(param.get("count")),param.get("orgId"),userTemp.getOrgId());
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
+    /**
+     * 批量归还车辆接口.
+     * @param orgIdAndCount 企业ID与分发数量
+     * <pre>
+     *     {
+     *         orgId:企业ID,
+     *         count:归还数量
+     *     }
+     * </pre>
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/batchvehicleunbind")
+    public MessageResponse batchVehicleUnbind(@RequestBody String orgIdAndCount,HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(orgIdAndCount)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(orgIdAndCount, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                SysUser userTemp = getLoginUserInfo(request);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if(userTemp != null){
+                    //平台与个人用户无权执行该操作
+                    if(!OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                if (WzStringUtil.isBlank(param.get("orgId")) || WzStringUtil.isBlank(param.get("count"))) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数不能为空");
+                }
+                sysUserService.batchUnbind(Integer.valueOf(param.get("count")),param.get("orgId"));
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
 }

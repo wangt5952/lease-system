@@ -38,18 +38,18 @@ public interface BizVehicleMapperExt extends BizVehicleMapper {
 
     /**
      * 根据电池编码查询车辆扩展信息列表.
-     * @param batteryCodes 查询条件（电池编码列表）
+     * @param paramMap 查询条件（电池编码列表）
      * @return 车辆扩展信息列表
      */
-    List<Map<String, Object>> selectExtByBatteryCodes(List<String> batteryCodes);
+    List<Map<String, Object>> selectExtByBatteryCodes(Map<String,Object> paramMap);
 
 
     /**
      * 根据车辆ID查找车辆基本信息
-     * @param id 查询条件（车辆ID）
+     * @param paramMap 查询条件（车辆ID、用户ID或企业ID）
      * @return 车辆基本信息列表
      * */
-    BizVehicleBatteryParts getVehicleInfoByVehicleId(String id);
+    BizVehicleBatteryParts getVehicleInfoByVehicleId(Map<String,Object> paramMap);
 
 //    /**
 //     * 查询车辆是否已被绑定

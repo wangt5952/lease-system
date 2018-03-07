@@ -50,7 +50,7 @@ public class SmsParam extends BaseModel {
         return captcha;
     }
 
-    public void setCaptchaContent(String captcha) {
+    public void setCaptcha(String captcha) {
         this.captcha = captcha;
     }
 }

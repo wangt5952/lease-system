@@ -61,7 +61,7 @@
         </table>
         <table schema="" tableName="biz_manufacturer" domainObjectName="BizManufacturer">
             <columnOverride column="mfrs_type" property="mfrsType" javaType="com.elextec.persist.field.enums.MfrsType" jdbcType="VARCHAR"></columnOverride>
-            <columnOverride column="battery_status" property="batteryStatus" javaType="com.elextec.persist.field.enums.RecordStatus" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="mfrs_status" property="mfrsStatus" javaType="com.elextec.persist.field.enums.RecordStatus" jdbcType="VARCHAR"></columnOverride>
         </table>
         <table schema="" tableName="biz_parts" domainObjectName="BizParts">
             <columnOverride column="parts_type" property="partsType" javaType="com.elextec.persist.field.enums.PartsType" jdbcType="VARCHAR"></columnOverride>
@@ -80,6 +80,8 @@
             <columnOverride column="device_type" property="deviceType" javaType="com.elextec.persist.field.enums.DeviceType" jdbcType="VARCHAR"></columnOverride>
         </table>
         <table schema="" tableName="biz_vehicle_track" domainObjectName="BizVehicleTrack">
+        </table>
+        <table schema="" tableName="biz_ref_org_vehicle" domainObjectName="BizRefOrgVehicle">
         </table>
         <!--
         <table schema="" tableName="jme_item_warning" domainObjectName="ItemWarning">

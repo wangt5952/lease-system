@@ -4,15 +4,15 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
-import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
-import com.elextec.persist.dao.mybatis.BizPartsMapperExt;
-import com.elextec.persist.dao.mybatis.BizRefVehicleBatteryMapperExt;
-import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
+import com.elextec.persist.dao.mybatis.*;
+import com.elextec.persist.field.enums.OrgAndUserType;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
@@ -45,6 +45,21 @@ public class BizVehicleServcieImpl implements BizVehicleService {
 
     @Autowired
     private BizPartsMapperExt bizPartsMapperExt;
+
+    @Autowired
+    private BizRefUserVehicleMapperExt bizRefUserVehicleMapperExt;
+
+    @Autowired
+    private BizRefVehiclePartsMapperExt bizRefVehiclePartsMapperExt;
+
+    @Autowired
+    private BizRefOrgVehicleMapperExt bizRefOrgVehicleMapperExt;
+
+    @Autowired
+    private BizManufacturerMapperExt bizManufacturerMapperExt;
+
+    @Autowired
+    private BizOrganizationMapperExt bizOrganizationMapperExt;
 
 
     @Override
@@ -119,9 +134,41 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         BizBattery insertBatteryVo = null;
         BizRefVehicleBattery temp = new BizRefVehicleBattery();
         try {
+            //新建车辆默认归属到平台下
+            BizOrganizationExample bizOrganizationExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria bizOrgCriteria = bizOrganizationExample.createCriteria();
+            bizOrgCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(bizOrganizationExample);
+            if(org.size() != 1){
+                throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误,平台企业不存在或存在多个");
+            }
+            BizRefOrgVehicle ref = new BizRefOrgVehicle();
+            ref.setOrgId(org.get(0).getId());
             for (; i < vehicleInfos.size(); i++) {
+                //校验车辆制造商是否存在（状态为正常）
+                if(WzStringUtil.isNotBlank(vehicleInfos.get(i).getBizVehicleInfo().getMfrsId())){
+                    BizManufacturerExample manuExample = new BizManufacturerExample();
+                    BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+                    manuCriteria.andIdEqualTo(vehicleInfos.get(i).getBizVehicleInfo().getMfrsId());
+                    manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+                    int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+                    if(manuCot < 1){
+                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录插入时发生错误,车辆对应的制造商不存在或已作废");
+                    }
+                }
                 //新车与新电池信息配对
                 if("0".equals(vehicleInfos.get(i).getFlag())){
+                    //校验电池制造商是否存在（状态为正常）
+                    if(WzStringUtil.isNotBlank(vehicleInfos.get(i).getBatteryInfo().getMfrsId())){
+                        BizManufacturerExample manuExample = new BizManufacturerExample();
+                        BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+                        manuCriteria.andIdEqualTo(vehicleInfos.get(i).getBatteryInfo().getMfrsId());
+                        manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+                        int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+                        if(manuCot < 1){
+                            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池对应的制造商不存在或已作废");
+                        }
+                    }
                     insertVehicleVo = vehicleInfos.get(i).getBizVehicleInfo();
                     insertBatteryVo = vehicleInfos.get(i).getBatteryInfo();
                     String vehicleId = WzUniqueValUtil.makeUUID();
@@ -164,6 +211,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                     insertVehicleVo.setCreateTime(new Date());
                     bizVehicleMapperExt.insertSelective(insertVehicleVo);
                 }
+                //新建车辆默认绑定在平台下面
+                ref.setVehicleId(vehicleInfos.get(i).getBizVehicleInfo().getId());
+                ref.setBindTime(new Date());
+                bizRefOrgVehicleMapperExt.insertSelective(ref);
             }
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误", ex);
@@ -181,14 +232,39 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         if (0 < lnCnt) {
             throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "车辆编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
         }
-        // 电池编号重复提示错误
-        BizBatteryExample brExample = new BizBatteryExample();
-        BizBatteryExample.Criteria brCriteria = brExample.createCriteria();
-        brCriteria.andBatteryCodeEqualTo(vehicleInfo.getBatteryInfo().getBatteryCode());
-        int brCnt = bizBatteryMapperExt.countByExample(brExample);
-        if (0 < brCnt) {
-            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
+        //校验车辆制造商是否存在（状态为正常）
+        if(WzStringUtil.isNotBlank(vehicleInfo.getBizVehicleInfo().getMfrsId())){
+            BizManufacturerExample manuExample = new BizManufacturerExample();
+            BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+            manuCriteria.andIdEqualTo(vehicleInfo.getBizVehicleInfo().getMfrsId());
+            manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+            int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+            if(manuCot < 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆对应的制造商不存在或已作废");
+            }
         }
+        if("0".equals(vehicleInfo.getFlag())){
+            // 电池编号重复提示错误
+            BizBatteryExample brExample = new BizBatteryExample();
+            BizBatteryExample.Criteria brCriteria = brExample.createCriteria();
+            brCriteria.andBatteryCodeEqualTo(vehicleInfo.getBatteryInfo().getBatteryCode());
+            int brCnt = bizBatteryMapperExt.countByExample(brExample);
+            if (0 < brCnt) {
+                throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
+            }
+            //校验电池制造商是否存在（状态为正常）
+            if(WzStringUtil.isNotBlank(vehicleInfo.getBatteryInfo().getMfrsId())){
+                BizManufacturerExample manuExample = new BizManufacturerExample();
+                BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+                manuCriteria.andIdEqualTo(vehicleInfo.getBatteryInfo().getMfrsId());
+                manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+                int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+                if(manuCot < 1){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池对应的制造商不存在或已作废");
+                }
+            }
+        }
+
         BizVehicle insertVehicleVo = null;
         BizBattery insertBatteryVo = null;
         BizRefVehicleBattery temp = new BizRefVehicleBattery();
@@ -237,6 +313,20 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                 insertVehicleVo.setCreateTime(new Date());
                 bizVehicleMapperExt.insertSelective(insertVehicleVo);
             }
+            //新建车辆默认归属到平台下
+            BizOrganizationExample bizOrganizationExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria bizOrgCriteria = bizOrganizationExample.createCriteria();
+            bizOrgCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(bizOrganizationExample);
+            if(org.size() == 1){
+                BizRefOrgVehicle ref = new BizRefOrgVehicle();
+                ref.setOrgId(org.get(0).getId());
+                ref.setVehicleId(vehicleInfo.getBizVehicleInfo().getId());
+                ref.setBindTime(new Date());
+                bizRefOrgVehicleMapperExt.insertSelective(ref);
+            }else{
+                throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误,平台企业不存在或存在多个");
+            }
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
         }
@@ -245,7 +335,56 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Override
     @Transactional
     public void updateVehicle(BizVehicle vehicle) {
-        bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
+        //如果车辆做报废的话，需要判定车辆是否已绑定用户并将已绑定的电池与配件全部解绑
+        if(RecordStatus.INVALID.toString().equals(vehicle.getVehicleStatus())){
+            BizRefUserVehicleExample example = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
+            criteria.andUnbindTimeIsNull();
+            criteria.andVehicleIdEqualTo(vehicle.getId());
+            int count = bizRefUserVehicleMapperExt.countByExample(example);
+            if(count >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定用户,无法作废");
+            }
+            //验证车辆是否有企业绑定
+            BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andUnbindTimeIsNull();
+            orgCriteria.andVehicleIdEqualTo(vehicle.getId());
+            int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
+            if(orgCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定企业,无法作废");
+            }
+            bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
+            //解除所有电池绑定关系
+            BizRefVehicleBatteryExample delBatteryExample = new BizRefVehicleBatteryExample();
+            BizRefVehicleBatteryExample.Criteria delBatteryCriteria = delBatteryExample.createCriteria();
+            delBatteryCriteria.andUnbindTimeIsNull();
+            delBatteryCriteria.andVehicleIdEqualTo(vehicle.getId());
+            BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
+            batteryBif.setUnbindTime(new Date());
+            bizRefVehicleBatteryMapperExt.updateByExample(batteryBif,delBatteryExample);
+            //解除所有配件绑定关系
+            BizRefVehiclePartsExample delPartsExample = new BizRefVehiclePartsExample();
+            BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
+            delPartsCriteria.andUnbindTimeIsNull();
+            delPartsCriteria.andVehicleIdEqualTo(vehicle.getId());
+            BizRefVehicleParts partsBif = new BizRefVehicleParts();
+            partsBif.setUnbindTime(new Date());
+            bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
+        }else{
+            //校验车辆制造商是否存在（状态为正常）
+            if(WzStringUtil.isNotBlank(vehicle.getMfrsId())){
+                BizManufacturerExample manuExample = new BizManufacturerExample();
+                BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+                manuCriteria.andIdEqualTo(vehicle.getMfrsId());
+                manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+                int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+                if(manuCot < 1){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆对应的制造商不存在或已作废");
+                }
+            }
+            bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
+        }
     }
 
     @Override
@@ -255,7 +394,40 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         try {
 
             for (; i < ids.size(); i++) {
+                BizRefUserVehicleExample example = new BizRefUserVehicleExample();
+                BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
+                criteria.andUnbindTimeIsNull();
+                BizRefVehicleBatteryExample delBatteryExample = new BizRefVehicleBatteryExample();
+                BizRefVehicleBatteryExample.Criteria delBatteryCriteria = delBatteryExample.createCriteria();
+                BizRefVehiclePartsExample delPartsExample = new BizRefVehiclePartsExample();
+                BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
+                delPartsCriteria.andUnbindTimeIsNull();
+                delBatteryCriteria.andUnbindTimeIsNull();
+                BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
+                BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
+                orgCriteria.andUnbindTimeIsNull();
+                BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
+                batteryBif.setUnbindTime(new Date());
+                BizRefVehicleParts partsBif = new BizRefVehicleParts();
+                partsBif.setUnbindTime(new Date());
+
+                criteria.andVehicleIdEqualTo(ids.get(i));
+                int count = bizRefUserVehicleMapperExt.countByExample(example);
+                if(count >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定用户");
+                }
+                orgCriteria.andVehicleIdEqualTo(ids.get(i));
+                int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
+                if(orgCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定企业");
+                }
                 bizVehicleMapperExt.deleteByPrimaryKey(ids.get(i));
+                //解除所有电池绑定关系
+                delBatteryCriteria.andVehicleIdEqualTo(ids.get(i));
+                bizRefVehicleBatteryMapperExt.updateByExample(batteryBif,delBatteryExample);
+                //解除所有配件绑定关系
+                delPartsCriteria.andVehicleIdEqualTo(ids.get(i));
+                bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
             }
         } catch (BizException ex) {
             throw ex;
@@ -265,9 +437,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<Map<String, Object>> getByPrimaryKey(String id, Boolean isUsed) {
-        Map<String,Object> param = new HashMap<String,Object>();
-        param.put("id", id);
+    public List<Map<String, Object>> getByPrimaryKey(Map<String,Object> param, Boolean isUsed) {
         param.put("flag", isUsed);
         return bizVehicleMapperExt.getVehicleInfoById(param);
     }
@@ -296,22 +466,24 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Override
     public void bind(String vehicleId,String batteryId) {
 
-        //判定车辆是否存在
+        //判定车辆是否存在或已作废
         BizVehicleExample vehicleExample = new BizVehicleExample();
         BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
         selectVehicleCriteria.andIdEqualTo(vehicleId);
+        selectVehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
         int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
         if(vehicleCount < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在或已冻结、作废");
         }
 
-        //判定电池是否存在
+        //判定电池是否存在或已作废
         BizBatteryExample batteryExample = new BizBatteryExample();
         BizBatteryExample.Criteria selectUserCriteria = batteryExample.createCriteria();
         selectUserCriteria.andIdEqualTo(batteryId);
+        selectUserCriteria.andBatteryStatusEqualTo(RecordStatus.NORMAL);
         int userCount = bizBatteryMapperExt.countByExample(batteryExample);
         if(userCount<1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "电池不存在或已冻结、作废");
         }
 
         //校验车辆是否已经绑定电池
@@ -344,13 +516,14 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes) {
-        return bizVehicleMapperExt.selectExtByBatteryCodes(batteryCodes);
+    public List<Map<String, Object>> listByBatteryCode(Map<String,Object> param) {
+
+        return bizVehicleMapperExt.selectExtByBatteryCodes(param);
     }
 
     @Override
-    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(String id, Boolean isUsed) {
-        BizVehicleBatteryParts vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(id);
+    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed) {
+        BizVehicleBatteryParts vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(paramMap);
         Map<String,Object> param = new HashMap<String,Object>();
         if(vehicle != null){
             param.put("flag",isUsed);
@@ -364,7 +537,25 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<BizPartsExt> getBizPartsByVehicle(String id) {
-        return bizPartsMapperExt.getById(id);
+    public List<BizPartsExt> getBizPartsByVehicle(Map<String,Object> param) {
+        return bizPartsMapperExt.getById(param);
+    }
+
+    @Override
+    public int getOrgBindVehicle(String orgId) {
+        //验证企业是否存
+        BizOrganizationExample bizOrganizationExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria bizOrgCriteria = bizOrganizationExample.createCriteria();
+        bizOrgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+        bizOrgCriteria.andIdEqualTo(orgId);
+        int orgCot = bizOrganizationMapperExt.countByExample(bizOrganizationExample);
+        if(orgCot != 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
+        }
+        BizRefOrgVehicleExample example = new BizRefOrgVehicleExample();
+        BizRefOrgVehicleExample.Criteria criteria = example.createCriteria();
+        criteria.andOrgIdEqualTo(orgId);
+        criteria.andUnbindTimeIsNull();
+        return bizRefOrgVehicleMapperExt.countByExample(example);
     }
 }

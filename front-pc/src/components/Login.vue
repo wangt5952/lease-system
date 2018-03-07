@@ -16,14 +16,15 @@
             <el-form-item>
               <el-input ref="pwd" prefix-icon="lt lt-lock" v-model="form.password" type="password" placeholder="密码" @keyup.enter.native="handleSubmit"></el-input>
             </el-form-item>
-
             <div style="cursor:pointer;background:#fff;border:2px solid #000;margin:40px 20px;text-align:center;padding:10px;border-radius:3px;" @click="handleSubmit" >登录</div>
-            <div></div>
+            <!-- <div style="cursor:pointer;background:#fff;border:2px solid #000;margin:40px 20px;text-align:center;padding:10px;border-radius:3px;" @click="resetPassword" >忘记密码</div> -->
+            <div style="margin-left:300px;margin-top:-25px">
+              <router-link to="resetPassword" style="text-decoration:none; color: #454545;">忘记密码</router-link>
+            </div>
           </el-form>
         </div>
       </el-col>
     </el-row>
-
   </div>
 </template>
 
@@ -46,6 +47,7 @@ export default {
 
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/auth/login', form)).body;
+        console.log((await this.$http.post('/api/manager/auth/login', form)));
         if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_res_info, key_user_info } = respData;
         await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
@@ -59,6 +61,9 @@ export default {
       }
       // this.$router.push('/');
     },
+    // resetPassword(){
+    //   this.$router.push('/resetPassword');
+    // }
   },
 };
 </script>
@@ -86,6 +91,6 @@ export default {
   padding-left: 60px;
   font-size: 20px;
   height: 44px;
-  -webkit-box-shadow: 0 0 0px 1000px #eee inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px #eee inset !important;  
 }
 </style>

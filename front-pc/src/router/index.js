@@ -7,6 +7,7 @@ export default new Router({
   mode: 'history',
   routes: [
     { path: '/login', component: () => import('@/components/Login') },
+    { path: '/resetPassword', component: () => import('@/components/ResetPassword') },
     { path: '/',
       component: () => import('@/components/Layout'),
       children: [

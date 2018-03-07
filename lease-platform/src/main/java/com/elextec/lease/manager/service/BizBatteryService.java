@@ -8,6 +8,7 @@ import com.elextec.persist.model.mybatis.BizBattery;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 接口 电池控制Service.
@@ -57,7 +58,7 @@ public interface BizBatteryService {
 
     /**
      * 根据ID查询电池信息
-     * @param id 电池ID
+     * @param param 电池ID、用户ID或企业ID
      */
-    public BizBattery getByPrimaryKey(String id);
+    public BizBattery getByPrimaryKey(Map<String,Object> param);
 }

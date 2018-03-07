@@ -38,6 +38,8 @@ public class VisitFilter implements Filter {
 
     @Value("${localsetting.login-overtime-sec}")
     private String loginOvertime;
+    @Value("${localsetting.login-overtime-sec-mobile}")
+    private String loginOvertimeForMibile;
     @Value("${localsetting.platform-type}")
     private String platformType;
     @Value("${localsetting.login-overtime-sec}")
@@ -66,17 +68,22 @@ public class VisitFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
 
         // 请求
-        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletRequest req = (HttpServletRequest) request;
+        WzHttpServletRequestWrapper req = new WzHttpServletRequestWrapper((HttpServletRequest) request);
         // 响应
         HttpServletResponse resp = (HttpServletResponse) response;
+        resp.setCharacterEncoding("UTF-8");
         // 请求URL
         String url = req.getRequestURI();
         // 请求方法
         String method = req.getMethod();
         // 请求IP
         String ipStr = WzHttpUtil.getClientIP(req);
+        // Body参数
+        String bodyParam = req.getBodyStr();
 
         logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]开始===");
+        logger.info("===请求参数:" + bodyParam);
 
         if (WzStringUtil.isBlank(ipStr)) {
             blackFlag = "false";
@@ -125,36 +132,11 @@ public class VisitFilter implements Filter {
             String[] noFilterUrls = nofilters.split(",");
             for (int i = 0; i < noFilterUrls.length; i++) {
                 if (-1 < url.indexOf(noFilterUrls[i])) {
-                    chain.doFilter(request, response);
+                    chain.doFilter(req, resp);
                     logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]正常结束===");
                     return;
                 }
             }
-        }
-        // 获得用户登录信息
-        String uToken = req.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-        // 无Token则报未登录
-        if (WzStringUtil.isBlank(uToken)) {
-            logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户尚未登录]===");
-            MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME.code(), "尚未登录，请登录");
-            resp.getWriter().write(JSONObject.toJSONString(errInfo));
-            return;
-        }
-        // 未获得登录缓存信息则报登录超时
-        Map<String, Object> uInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + uToken);
-        if (null == uInfo) {
-            logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户认证已超时]===");
-            MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME);
-            resp.getWriter().write(JSONObject.toJSONString(errInfo));
-            return;
-        }
-        // 未获得登录用户信息则报登录超时
-        SysUserExt uVo = (SysUserExt) uInfo.get(WzConstants.KEY_USER_INFO);
-        if (null == uVo) {
-            logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户认证已超时]===");
-            MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME);
-            resp.getWriter().write(JSONObject.toJSONString(errInfo));
-            return;
         }
         // 平台可访问验证
         if (WzStringUtil.isBlank(platformType)) {
@@ -192,40 +174,72 @@ public class VisitFilter implements Filter {
             resp.getWriter().write(JSONObject.toJSONString(errInfo));
             return;
         }
-        // 验证用户权限
-        List<SysResources> urVoLs = (List<SysResources>) uInfo.get(WzConstants.KEY_RES_INFO);
-        if ("manager".equals(platformType.toLowerCase())) {
-            boolean isCanUsed = false;
-            boolean hasFunction = false;
-            if (null == urVoLs || 0 == urVoLs.size()) {
-                isCanUsed = false;
-            } else {
-                for (SysResources sr : urVoLs) {
-                    if (ResourceType.FUNCTION.equals(sr.getResType())) {
-                        if (WzStringUtil.isNotBlank(sr.getResUrl())
-                                && -1 < url.indexOf(sr.getResUrl())) {
-                            isCanUsed = true;
-                            break;
-                        }
-                        hasFunction = true;
-                    }
-                }
-            }
-            if (hasFunction && !isCanUsed) {
-                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户无权访问该功能]===");
-                MessageResponse errInfo = new MessageResponse(RunningResult.NO_PERMISSION.code(), "您无权使用该功能");
+        // 访问非DeviceApi接口则需要进行用户信息验证
+        if (0 <= url.indexOf("/manager/") || 0 <= url.indexOf("/mobile/")) {
+            // 获得用户登录信息
+            String uToken = req.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+            // 无Token则报未登录
+            if (WzStringUtil.isBlank(uToken)) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户尚未登录]===");
+                MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME.code(), "尚未登录，请登录");
                 resp.getWriter().write(JSONObject.toJSONString(errInfo));
                 return;
             }
+            // 未获得登录缓存信息则报登录超时
+            Map<String, Object> uInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + uToken);
+            if (null == uInfo) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户认证已超时]===");
+                MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                resp.getWriter().write(JSONObject.toJSONString(errInfo));
+                return;
+            }
+            // 未获得登录用户信息则报登录超时
+            SysUserExt uVo = (SysUserExt) uInfo.get(WzConstants.KEY_USER_INFO);
+            if (null == uVo) {
+                logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户认证已超时]===");
+                MessageResponse errInfo = new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                resp.getWriter().write(JSONObject.toJSONString(errInfo));
+                return;
+            }
+
+            // 验证用户权限
+            List<SysResources> urVoLs = (List<SysResources>) uInfo.get(WzConstants.KEY_RES_INFO);
+            if ("manager".equals(platformType.toLowerCase())) {
+                boolean isCanUsed = false;
+                boolean hasFunction = false;
+                if (null == urVoLs || 0 == urVoLs.size()) {
+                    isCanUsed = false;
+                } else {
+                    for (SysResources sr : urVoLs) {
+                        if (ResourceType.FUNCTION.equals(sr.getResType())) {
+                            if (WzStringUtil.isNotBlank(sr.getResUrl())
+                                    && -1 < url.indexOf(sr.getResUrl())) {
+                                isCanUsed = true;
+                                break;
+                            }
+                            hasFunction = true;
+                        }
+                    }
+                }
+                if (hasFunction && !isCanUsed) {
+                    logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]异常结束，原因[用户无权访问该功能]===");
+                    MessageResponse errInfo = new MessageResponse(RunningResult.NO_PERMISSION.code(), "您无权使用该功能");
+                    resp.getWriter().write(JSONObject.toJSONString(errInfo));
+                    return;
+                }
+            }
+            // 将访问用户信息超时时间后延
+            // 设置超时时间
+            Integer overtime = 300;
+            if (0 <= url.indexOf("/manager/") && WzStringUtil.isNumeric(loginOvertime)) {
+                    overtime = Integer.parseInt(loginOvertime);
+            } else if (0 <= url.indexOf("/mobile/") && WzStringUtil.isNumeric(loginOvertimeForMibile)) {
+                overtime = Integer.parseInt(loginOvertimeForMibile);
+            }
+            redisClient.valueOperations().getOperations().expire(WzConstants.GK_LOGIN_INFO + uToken, overtime, TimeUnit.SECONDS);
         }
-        // 将访问用户信息超时时间后延
-        // 设置超时时间
-        Integer overtime = 300;
-        if (WzStringUtil.isNumeric(loginOvertime)) {
-            overtime = Integer.parseInt(loginOvertime);
-        }
-        redisClient.valueOperations().getOperations().expire(WzConstants.GK_LOGIN_INFO + uToken, overtime, TimeUnit.SECONDS);
-        chain.doFilter(request, response);
+
+        chain.doFilter(req, resp);
         logger.info("===[" + ipStr + "]请求:" + url + "[" + method + "]正常结束===");
     }
 

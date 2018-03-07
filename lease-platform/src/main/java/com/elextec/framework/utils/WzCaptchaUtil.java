@@ -15,6 +15,17 @@ import java.util.Random;
 
 /**
  * 图形验证码工具类.
+ * <pre>
+ *     这里需要注意，验证码绘制使用了微软雅黑字体，
+ *     Linux服务器上无此字体，需要添加此字体后才能正常绘制，否则可能会出现乱码。
+ *     1.fc-list 查看微软雅黑字体是否存在，如果不存在则执行下列步骤
+ *     2./usr/share/fonts 目录下
+ *     mkdir microsoft
+ *     chmod -R 755 ./microsoft
+ *     3.将 msyh.ttc、msyhbd.ttc、msyhl.ttc 上传到 /usr/share/fonts/microsoft 目录下
+ *     4.fc-cache 重新刷新字体缓存
+ *     5.fc-list 查看字体是否已安装完成
+ * </pre>
  * Created by wangtao on 2018/1/16.
  */
 public class WzCaptchaUtil {
@@ -66,7 +77,8 @@ public class WzCaptchaUtil {
         for (int i = 0; i < captchaCode.length(); i++) {
             String ch = captchaCode.substring(i, i + 1);
             localGraphics.setColor(new Color(20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110)));
-            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+//            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+            localGraphics.setFont(new Font("微软雅黑", Font.PLAIN, 25));
             localGraphics.drawString(ch, chWidth * i + 10, 30);
         }
         // 保存
@@ -127,7 +139,8 @@ public class WzCaptchaUtil {
         for (int i = 0; i < captchaCode.length(); i++) {
             String ch = captchaCode.substring(i, i + 1);
             localGraphics.setColor(new Color(20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110), 20 + localRandom.nextInt(110)));
-            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+//            localGraphics.setFont(new Font("宋体", Font.PLAIN, 25));
+            localGraphics.setFont(new Font("微软雅黑", Font.PLAIN, 25));
             localGraphics.drawString(ch, chWidth * i + 10, 30);
         }
         // 返回Base64
@@ -166,4 +179,21 @@ public class WzCaptchaUtil {
         int b = fc + random.nextInt(bc - fc);
         return new Color(r, g, b);
     }
+
+//    /**
+//     * 获得字体.
+//     * @return 字体名
+//     */
+//    private static String getFirstFont() {
+//        String[] fontStrArr = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+//        if (0 < fontStrArr.length) {
+//            for (String fs : fontStrArr) {
+//                if (Font.SANS_SERIF.equalsIgnoreCase(fs)) {
+//                    return fs;
+//                }
+//            }
+//            return fontStrArr[0];
+//        }
+//        return Font.SANS_SERIF;
+//    }
 }

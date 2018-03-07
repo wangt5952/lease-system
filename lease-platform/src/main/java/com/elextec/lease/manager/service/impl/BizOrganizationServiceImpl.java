@@ -8,10 +8,11 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.service.BizOrganizationService;
 import com.elextec.persist.dao.mybatis.BizOrganizationMapperExt;
+import com.elextec.persist.dao.mybatis.BizRefOrgVehicleMapperExt;
+import com.elextec.persist.dao.mybatis.SysUserMapperExt;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
-import com.elextec.persist.model.mybatis.BizOrganization;
-import com.elextec.persist.model.mybatis.BizOrganizationExample;
+import com.elextec.persist.model.mybatis.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,12 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
 
     @Autowired
     private BizOrganizationMapperExt bizOrganizationMapperExt;
+
+    @Autowired
+    private SysUserMapperExt sysUserMapperExt;
+
+    @Autowired
+    private BizRefOrgVehicleMapperExt bizRefOrgVehicleMapperExt;
 
     @Override
     public PageResponse<BizOrganization> list(boolean needPaging, PageRequest pr) {
@@ -97,6 +104,10 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         BizOrganization insertVo = null;
         try {
             for (; i < orgInfos.size(); i++) {
+                //平台企业只能创建一个且不能通过接口创建
+                if(OrgAndUserType.PLATFORM.toString().equals(orgInfos.get(i).getOrgType().toString())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,平台企业只能创建一个");
+                }
                 insertVo = orgInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
                 insertVo.setOrgStatus(RecordStatus.NORMAL);
@@ -133,6 +144,39 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     @Override
     @Transactional
     public void updateBizOrganization(BizOrganization orgInfo) {
+        //作废操作时，验证企业下面是否有用户和车辆
+        if(RecordStatus.INVALID.toString().equals(orgInfo.getOrgStatus())){
+            //判定企业下是否有未作废的用户
+            SysUserExample userExample = new SysUserExample();
+            SysUserExample.Criteria userCriteria = userExample.createCriteria();
+            userCriteria.andOrgIdEqualTo(orgInfo.getId());
+            userCriteria.andUserStatusEqualTo(RecordStatus.NORMAL);
+            int userCot = sysUserMapperExt.countByExample(userExample);
+            if(userCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "企业名下有绑定的用户,无法作废");
+            }
+            //判定企业下是否有绑定的车辆
+            BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+            refCriteria.andUnbindTimeIsNull();
+            refCriteria.andOrgIdEqualTo(orgInfo.getId());
+            int refCot = bizRefOrgVehicleMapperExt.countByExample(refExample);
+            if(refCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "企业名下有绑定的车辆,无法作废");
+            }
+            //平台企业无法作废
+            BizOrganizationExample orgExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andIdEqualTo(orgInfo.getId());
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+            if(org.size() >= 1){
+                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "平台不能作废");
+                }
+            }
+
+
+        }
         bizOrganizationMapperExt.updateByPrimaryKeySelective(orgInfo);
     }
 
@@ -142,7 +186,32 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         int i = 0;
         try {
             for (; i < ids.size(); i++) {
-                System.out.println(ids.get(i));
+                SysUserExample userExample = new SysUserExample();
+                SysUserExample.Criteria userCriteria = userExample.createCriteria();
+                userCriteria.andUserStatusEqualTo(RecordStatus.NORMAL);
+                BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+                BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+                refCriteria.andUnbindTimeIsNull();
+                BizOrganizationExample orgExample = new BizOrganizationExample();
+                BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+                userCriteria.andOrgIdEqualTo(ids.get(i));
+                int userCot = sysUserMapperExt.countByExample(userExample);
+                if(userCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,企业名下有绑定的用户");
+                }
+                refCriteria.andOrgIdEqualTo(ids.get(i));
+                int refCot = bizRefOrgVehicleMapperExt.countByExample(refExample);
+                if(refCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,企业名下有绑定的车辆");
+                }
+                //平台企业无法删除
+                orgCriteria.andIdEqualTo(ids.get(i));
+                List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+                if(org.size() >= 1){
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误,平台不能作废");
+                    }
+                }
                 bizOrganizationMapperExt.deleteByPrimaryKey(ids.get(i));
             }
         } catch (Exception ex) {

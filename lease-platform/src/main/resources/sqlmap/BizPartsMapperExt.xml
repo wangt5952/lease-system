@@ -9,7 +9,7 @@
 		<result column="unbind_time" jdbcType="TIMESTAMP" property="unbindTime" />
     </resultMap>
 
-    <select id="getById" parameterType="java.lang.String" resultMap="BizPartsExtResultMap">
+    <select id="getById" parameterType="java.util.Map" resultMap="BizPartsExtResultMap">
         SELECT
 				p.id,
 				p.parts_code,
@@ -29,7 +29,15 @@
         FROM biz_ref_vehicle_parts r
         LEFT JOIN biz_parts p ON p.id = r.parts_id
         LEFT JOIN biz_manufacturer m ON m.id = p.mfrs_id
+        LEFT JOIN biz_ref_org_vehicle r1 ON v.vehicle_id = r1.vehicle_id AND r1.unbind_time IS NULL
+        LEFT JOIN biz_ref_user_vehicle r2 ON v.vehicle_id = r2.vehicle_id AND r2.unbind_time IS NULL
         WHERE r.vehicle_id = #{id,jdbcType=VARCHAR} AND r.unbind_time is NULL
+		<if test="userId != null and userId != ''" >
+			and r2.user_id = #{userId,jdbcType=VARCHAR}
+		</if>
+		<if test="orgId != null and orgId != ''" >
+			and r1.org_id = #{orgId,jdbcType=VARCHAR}
+		</if>
     </select>
 
 	<!--查询拓展信息-->
@@ -126,6 +134,36 @@
 				AND v.vehicle_id IS NULL
 			</if>
 		</where>
+	</select>
+
+	<select id="getPartInfoByPartId" parameterType="java.util.Map" resultMap="BizPartsExtResultMap">
+		select
+		a.id id,
+		a.parts_code parts_code,
+		a.parts_name parts_name,
+		a.parts_brand parts_brand,
+		a.parts_pn parts_pn,
+		a.parts_type parts_type,
+		a.parts_parameters parts_parameters,
+		a.mfrs_id mfrs_id,
+		a.parts_status parts_status,
+		a.create_user create_user,
+		a.create_time create_time,
+		a.update_user update_user,
+		a.update_time update_time,
+		b.mfrs_name mfrs_name
+		from biz_parts a
+		LEFT JOIN biz_ref_vehicle_parts d ON a.id = d.parts_id AND d.unbind_time IS NULL
+		LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
+		LEFT JOIN biz_ref_org_vehicle r ON d.vehicle_id = r.vehicle_id AND r.unbind_time IS NULL
+		LEFT JOIN biz_ref_user_vehicle r1 ON d.vehicle_id = r1.vehicle_id AND r.unbind_time IS NULL
+		where a.id = #{id,jdbcType=VARCHAR}
+		<if test="userId != null and userId != ''" >
+			and r1.user_id = #{userId,jdbcType=VARCHAR}
+		</if>
+		<if test="orgId != null and orgId != ''" >
+			and r.org_id = #{orgId,jdbcType=VARCHAR}
+		</if>
 	</select>
 
 </mapper>

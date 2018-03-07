@@ -74,7 +74,7 @@ public interface BizVehicleService {
      * @param id 车辆ID
      * @param isUsed 是否查询在用电池，true：查在用电池；false：查在用及解绑的电池
      * */
-    public List<Map<String,Object>> getByPrimaryKey(String id, Boolean isUsed);
+    public List<Map<String,Object>> getByPrimaryKey(Map<String,Object> param, Boolean isUsed);
 
     /**
      * 根据用户ID查询车辆信息
@@ -98,23 +98,29 @@ public interface BizVehicleService {
 
     /**
      * 根据电池编码查询车辆信息.
-     * @param batteryCodes 电池编码列表
+     * @param param 电池编码列表
      * @return 车辆信息列表
      */
-    public List<Map<String, Object>> listByBatteryCode(List<String> batteryCodes);
+    public List<Map<String, Object>> listByBatteryCode(Map<String,Object> param);
 
     /**
      * 根据车辆ID查询车辆基本信息和电池信息.
-     * @param id 车辆ID
+     * @param paramMap 车辆ID,用户ID或企业ID
      * @param isUsed 是否查询在用电池，true：查在用电池；false：查在用及解绑的电池
      * @return 车辆扩展信息列表
      */
-    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(String id, Boolean isUsed);
+    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed);
 
     /**
      * 根据车辆ID查询配件信息
-     * @param id 车辆ID
+     * @param param 车辆ID、用户ID或企业ID
      * */
-    public List<BizPartsExt> getBizPartsByVehicle(String id);
+    public List<BizPartsExt> getBizPartsByVehicle(Map<String,Object> param);
+
+    /**
+     * 根据车辆ID查询配件信息
+     * @param orgId 企业ID
+     * */
+    public int getOrgBindVehicle(String orgId);
 
 }

@@ -161,11 +161,11 @@ public class SysRoleServcieImpl implements SysRoleService {
     public void deleteSysRole(List<String> ids) {
         int i = 0;
         try {
-            SysRefUserRoleExample example = new SysRefUserRoleExample();
-            SysRefUserRoleExample.Criteria criteria = example.createCriteria();
-            SysRefRoleResourcesExample delExample = new SysRefRoleResourcesExample();
-            SysRefRoleResourcesExample.Criteria delCriteria = delExample.createCriteria();
             for (; i < ids.size(); i++) {
+                SysRefUserRoleExample example = new SysRefUserRoleExample();
+                SysRefUserRoleExample.Criteria criteria = example.createCriteria();
+                SysRefRoleResourcesExample delExample = new SysRefRoleResourcesExample();
+                SysRefRoleResourcesExample.Criteria delCriteria = delExample.createCriteria();
                 criteria.andRoleIdEqualTo(ids.get(i));
                 int lnCnt = sysRefUserRoleMapperExt.countByExample(example);
                 if(lnCnt > 0){

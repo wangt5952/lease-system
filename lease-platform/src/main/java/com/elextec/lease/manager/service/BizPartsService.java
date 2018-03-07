@@ -7,6 +7,7 @@ import com.elextec.persist.model.mybatis.BizParts;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 接口 配件控制Service.
@@ -56,9 +57,9 @@ public interface BizPartsService {
 
     /**
      * 根据ID查询配件信息
-     * @param id 配件ID
+     * @param param 配件ID、用户ID或企业ID
      * */
-    public BizParts getBizPartsByPrimaryKey(String id);
+    public BizPartsExt getBizPartsByPrimaryKey(Map<String,Object> param);
 
     /**
      * 车辆和配件绑定接口

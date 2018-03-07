@@ -97,4 +97,19 @@ public interface SysUserService {
      * @param orgId 操作用户的企业ID
      */
     public void bind(String userId,String vehicleId,String orgId);
+
+    /**
+     * 批量分发车辆.
+     * @param count 数量
+     * @param orgId 分发的企业ID
+     * @param userOrgId 操作用户的企业ID（平台企业ID）
+     */
+    public void batchBind(int count,String orgId,String userOrgId);
+
+    /**
+     * 批量归还车辆.
+     * @param count 数量
+     * @param orgId 分发的企业ID
+     */
+    public void batchUnbind(int count,String orgId);
 }

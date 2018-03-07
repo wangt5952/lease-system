@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -114,11 +115,11 @@ public class BizPartsController extends BaseController {
                     if(userTemp != null){
                         //根据用户类型添加条件
                         //个人用户需要添加userId为条件
-                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType())){
+                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                             bizPartsParam.setUserId(userTemp.getId());
                         }
                         //企业用户需要添加orgId为条件
-                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType())){
+                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                             bizPartsParam.setOrgId(userTemp.getOrgId());
                         }
                     }else{
@@ -186,7 +187,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -275,7 +276,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -354,7 +355,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -408,7 +409,7 @@ public class BizPartsController extends BaseController {
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 }else{
@@ -471,22 +472,24 @@ public class BizPartsController extends BaseController {
                 if (null == bizPartsId || 0 == bizPartsId.size() || WzStringUtil.isBlank(bizPartsId.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
-                    //只有平台用户可以操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType())){
-                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
-                    }
-                }else{
-                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
-                }
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-
-            BizParts bizParts = bizPartsService.getBizPartsByPrimaryKey(bizPartsId.get(0));
+            SysUser userTemp = getLoginUserInfo(request);
+            Map<String,Object> paramTemp = new HashMap<String,Object>();
+            paramTemp.put("id",bizPartsId.get(0));
+            if(userTemp == null){
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
+                paramTemp.put("orgId",userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                paramTemp.put("userId",userTemp.getId());
+            }
+            BizParts bizParts = bizPartsService.getBizPartsByPrimaryKey(paramTemp);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, bizParts);
             return mr;
@@ -512,7 +515,7 @@ public class BizPartsController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/partBind",method = RequestMethod.POST)
-    public MessageResponse partBind(@RequestBody String vehicleIdAndPartsId){
+    public MessageResponse partBind(@RequestBody String vehicleIdAndPartsId,HttpServletRequest request){
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(vehicleIdAndPartsId)){
             return new MessageResponse(RunningResult.NO_PARAM);
@@ -524,6 +527,15 @@ public class BizPartsController extends BaseController {
                 map = JSONObject.parseObject(paramStr,Map.class);
                 if (map == null || map.size() == 0) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(),"查询参数不能为空");
@@ -557,7 +569,7 @@ public class BizPartsController extends BaseController {
      * </pre>
      */
     @RequestMapping(value = "/partsUnBind",method = RequestMethod.POST)
-    public MessageResponse partsUnBind(@RequestBody String vehicleIdAndPartsId){
+    public MessageResponse partsUnBind(@RequestBody String vehicleIdAndPartsId,HttpServletRequest request){
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(vehicleIdAndPartsId)) {
             return new MessageResponse(RunningResult.NO_PARAM);
@@ -569,6 +581,15 @@ public class BizPartsController extends BaseController {
                 map = JSON.parseObject(paramStr, Map.class);
                 if (map == null || map.size() == 0) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");

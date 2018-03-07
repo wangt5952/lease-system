@@ -3,7 +3,6 @@ package com.elextec.lease.manager.service.impl;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
@@ -11,6 +10,8 @@ import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.*;
+import com.elextec.persist.field.enums.OrgAndUserType;
+import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
@@ -53,6 +54,9 @@ public class SysUserServcieImpl implements SysUserService {
 
     @Autowired
     private SysRefUserRoleMapperExt sysRefUserRoleMapperExt;
+
+    @Autowired
+    private BizOrganizationMapperExt bizOrganizationMapperExt;
 
     @Override
     public PageResponse<SysUserExt> list(boolean needPaging, SysUserParam pr) {
@@ -120,6 +124,27 @@ public class SysUserServcieImpl implements SysUserService {
         SysUser insertVo = null;
         try {
             for (; i < usersInfos.size(); i++) {
+                //验证企业是否存在（状态为正常）
+                if(WzStringUtil.isNotBlank(usersInfos.get(i).getOrgId())){
+                    BizOrganizationExample orgExample = new BizOrganizationExample();
+                    BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+                    orgCriteria.andIdEqualTo(usersInfos.get(i).getOrgId());
+                    orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+                    List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+                    if(org.size() < 1){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,用户相关企业不存在或已作废");
+                    }
+                    //验证企业类型与用户类型是否一致
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())
+                            && OrgAndUserType.ENTERPRISE.toString().equals(usersInfos.get(i).getUserType().toString())){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,平台下不能创建企业用户");
+                    }
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgStatus().toString())
+                            && OrgAndUserType.PLATFORM.toString().equals(usersInfos.get(i).getUserType().toString())){
+                        throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,普通企业下不能创建平台用户");
+                    }
+
+                }
                 insertVo = usersInfos.get(i);
                 insertVo.setId(WzUniqueValUtil.makeUUID());
                 insertVo.setCreateTime(new Date());
@@ -149,6 +174,27 @@ public class SysUserServcieImpl implements SysUserService {
         if (0 < mobileCnt) {
             throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "手机号码(" + userInfo.getUserMobile() + ")已存在");
         }
+        //验证企业是否存在（状态为正常）
+        if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
+            BizOrganizationExample orgExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andIdEqualTo(userInfo.getOrgId());
+            orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+            if(org.size() < 1){
+                throw new BizException(RunningResult.DB_ERROR.code(), "用户相关企业不存在或已作废");
+            }
+            //验证企业类型与用户类型是否一致
+            if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())
+                    && OrgAndUserType.ENTERPRISE.toString().equals(userInfo.getUserType().toString())){
+                throw new BizException(RunningResult.DB_ERROR.code(), "平台下不能创建企业用户");
+            }
+            if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgStatus().toString())
+                    && OrgAndUserType.PLATFORM.toString().equals(userInfo.getUserType().toString())){
+                throw new BizException(RunningResult.DB_ERROR.code(), "普通企业下不能创建平台用户");
+            }
+
+        }
         // 保存用户信息
         try {
             userInfo.setId(WzUniqueValUtil.makeUUID());
@@ -162,7 +208,46 @@ public class SysUserServcieImpl implements SysUserService {
     @Override
     @Transactional
     public void updateSysUser(SysUser userInfo) {
-        sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
+        //如果是用户作废，需要验证用户是否有在绑的车辆和删除所有角色关联
+        if(RecordStatus.INVALID.toString().equals(userInfo.getUserStatus())){
+            //验证用户名下是否有未归还的车辆
+            BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+            selectRefCriteria.andBindTimeIsNull();
+            selectRefCriteria.andUserIdEqualTo(userInfo.getId());
+            int count = bizRefUserVehicleMapperExt.countByExample(refExample);
+            if(count >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "用户名下有未归还的车辆,无法作废");
+            }
+            sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
+            SysRefUserRoleExample delExample = new SysRefUserRoleExample();
+            SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
+            //删除用户和角色的所有关联
+            delCriteria.andUserIdEqualTo(userInfo.getId());
+            sysRefUserRoleMapperExt.deleteByExample(delExample);
+        }else{
+            //验证企业是否存在（状态为正常）
+            if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
+                BizOrganizationExample orgExample = new BizOrganizationExample();
+                BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+                orgCriteria.andIdEqualTo(userInfo.getOrgId());
+                orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+                List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
+                if(org.size() < 1){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "用户相关企业不存在或已作废");
+                }
+                //验证企业类型与用户类型是否一致
+                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())
+                        && OrgAndUserType.ENTERPRISE.toString().equals(userInfo.getUserType().toString())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "平台下不能创建企业用户");
+                }
+                if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgStatus().toString())
+                        && OrgAndUserType.PLATFORM.toString().equals(userInfo.getUserType().toString())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "普通企业下不能创建平台用户");
+                }
+            }
+            sysUserMapperExt.updateByPrimaryKeySelective(userInfo);
+        }
     }
 
     @Override
@@ -170,21 +255,32 @@ public class SysUserServcieImpl implements SysUserService {
     public void deleteSysUser(List<String> ids) {
         int i = 0;
         try {
-            BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
-            BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
-            selectRefCriteria.andBindTimeIsNull();
-            SysRefUserRoleExample delExample = new SysRefUserRoleExample();
-            SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
             for (; i < ids.size(); i++) {
+                BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
+                BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
+                selectRefCriteria.andBindTimeIsNull();
+                SysRefUserRoleExample delExample = new SysRefUserRoleExample();
+                SysRefUserRoleExample.Criteria delCriteria = delExample.createCriteria();
+                SysUserExample sysUserExample = new SysUserExample();
+                SysUserExample.Criteria sysUserCriteria = sysUserExample.createCriteria();
+                sysUserCriteria.andLoginNameEqualTo("admin");
+                //验证用户名下是否有未归还的车辆
                 selectRefCriteria.andUserIdEqualTo(ids.get(i));
                 int count = bizRefUserVehicleMapperExt.countByExample(refExample);
                 if(count >= 1){
                     throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,用户名下有未归还的车辆");
                 }
+                //基本用户admin不能删除
+                sysUserCriteria.andIdEqualTo(ids.get(i));
+                int sysCot = sysUserMapperExt.countByExample(sysUserExample);
+                if(sysCot >= 1){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,admin不能删除");
+                }
                 sysUserMapperExt.deleteByPrimaryKey(ids.get(i));
                 //删除用户和角色的所有关联
                 delCriteria.andUserIdEqualTo(ids.get(i));
                 sysRefUserRoleMapperExt.deleteByExample(delExample);
+
             }
         } catch (BizException ex) {
             throw ex;
@@ -252,7 +348,7 @@ public class SysUserServcieImpl implements SysUserService {
                 List<BizBatteryExt> batteryDatas = bizBatteryMapperExt.getBatteryInfoByVehicleId(param);
                 datas.get(i).setBizBatteries(batteryDatas);
                 //根据车辆ID获取配件信息
-                List<BizPartsExt> partsDatas = bizPartsMapperExt.getById(datas.get(i).getId());
+                List<BizPartsExt> partsDatas = bizPartsMapperExt.getById(param);
                 datas.get(i).setBizPartss(partsDatas);
             }
         }
@@ -290,25 +386,27 @@ public class SysUserServcieImpl implements SysUserService {
     @Override
     public void bind(String userId, String vehicleId,String orgId) {
 
-        //判定用户是否存在
+        //判定用户是否存在或已作废
         SysUserExample userExample = new SysUserExample();
         SysUserExample.Criteria selectUserCriteria = userExample.createCriteria();
         selectUserCriteria.andIdEqualTo(userId);
+        selectUserCriteria.andUserStatusEqualTo(RecordStatus.NORMAL);
         if(null != orgId){
             selectUserCriteria.andOrgIdEqualTo(orgId);
         }
         List<SysUserExt> user = sysUserMapperExt.selectExtByExample(userExample);
         if(user.size() < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或用户不在企业名下");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或已冻结、作废或用户不在企业名下");
         }
 
-        //判定车辆是否存在
+        //判定车辆是否存在或已作废
         BizVehicleExample vehicleExample = new BizVehicleExample();
         BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
         selectVehicleCriteria.andIdEqualTo(vehicleId);
+        selectVehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
         int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
         if(vehicleCount < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在或已冻结、作废");
         }
 
         //判定车辆是否属于操作用户的企业名下
@@ -337,7 +435,7 @@ public class SysUserServcieImpl implements SysUserService {
         selectRefCriteria.andUnbindTimeIsNull();
         int refCount = bizRefUserVehicleMapperExt.countByExample(refExample);
         if(refCount >= 1){
-            throw new BizException(RunningResult.BAD_REQUEST.code(), "车辆已被绑定");
+            throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已被绑定");
         }
 
         BizRefUserVehicle param = new BizRefUserVehicle();
@@ -346,6 +444,99 @@ public class SysUserServcieImpl implements SysUserService {
         param.setBindTime(new Date());
         bizRefUserVehicleMapperExt.insert(param);
 
+    }
+
+    @Override
+    @Transactional
+    public void batchBind(int count, String orgId,String userOrgId) {
+        //验证企业是否存在（状态为正常）
+        BizOrganizationExample orgExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+        orgCriteria.andIdEqualTo(orgId);
+        orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+        orgCriteria.andOrgTypeEqualTo(OrgAndUserType.ENTERPRISE);
+        int orgCot = bizOrganizationMapperExt.countByExample(orgExample);
+        if(orgCot < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
+        }
+        //查询平台下未分配出去的车辆
+        BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+        refCriteria.andOrgIdEqualTo(userOrgId);
+        refCriteria.andUnbindTimeIsNull();
+        List<BizRefOrgVehicle> vehicles = bizRefOrgVehicleMapperExt.selectByExample(refExample);
+        if(vehicles.size() < count){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
+        }
+        //将指定数量的车辆分配到指定企业
+        for(int i=0;i<count;i++){
+            //解除原有绑定关系
+            BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
+            delCriteria.andOrgIdEqualTo(userOrgId);
+            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getVehicleId());
+            delCriteria.andUnbindTimeIsNull();
+            BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
+            delTemp.setUnbindTime(new Date());
+            bizRefOrgVehicleMapperExt.updateByExample(delTemp,delExample);
+            //绑定新关系
+            BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
+            addTemp.setOrgId(orgId);
+            addTemp.setVehicleId(vehicles.get(i).getVehicleId());
+            addTemp.setBindTime(new Date());
+            bizRefOrgVehicleMapperExt.insertSelective(addTemp);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void batchUnbind(int count, String orgId) {
+        //验证企业是否存在（状态为正常）
+        BizOrganizationExample orgExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+        orgCriteria.andIdEqualTo(orgId);
+        orgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+        orgCriteria.andOrgTypeEqualTo(OrgAndUserType.ENTERPRISE);
+        int orgCot = bizOrganizationMapperExt.countByExample(orgExample);
+        if(orgCot < 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
+        }
+        //查询企业下未分配出去的车辆
+        BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+        refCriteria.andOrgIdEqualTo(orgId);
+        refCriteria.andUnbindTimeIsNull();
+        List<BizRefOrgVehicle> vehicles = bizRefOrgVehicleMapperExt.selectByExample(refExample);
+        if(vehicles.size() < count){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
+        }
+
+        //查询平台企业ID
+        BizOrganizationExample plExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria plCriteria = plExample.createCriteria();
+        plCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
+        List<BizOrganization> plOrg = bizOrganizationMapperExt.selectByExample(plExample);
+        if(plOrg.size() != 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "平台信息异常用,平台不存在或存在多个");
+        }
+        //将指定数量的车辆归还给平台
+        for(int i=0;i<count;i++){
+            //解除原有绑定关系
+            BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
+            delCriteria.andOrgIdEqualTo(orgId);
+            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getVehicleId());
+            delCriteria.andUnbindTimeIsNull();
+            BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
+            delTemp.setUnbindTime(new Date());
+            bizRefOrgVehicleMapperExt.updateByExample(delTemp,delExample);
+            //绑定新关系
+            BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
+            addTemp.setOrgId(plOrg.get(0).getId());
+            addTemp.setVehicleId(vehicles.get(i).getVehicleId());
+            addTemp.setBindTime(new Date());
+            bizRefOrgVehicleMapperExt.insertSelective(addTemp);
+        }
     }
 
 }
