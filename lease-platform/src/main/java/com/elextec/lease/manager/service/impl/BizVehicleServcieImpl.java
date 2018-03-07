@@ -139,8 +139,8 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             BizOrganizationExample.Criteria bizOrgCriteria = bizOrganizationExample.createCriteria();
             bizOrgCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
             List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(bizOrganizationExample);
-            if(org.size() < 1){
-                throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误,平台企业不存在");
+            if(org.size() != 1){
+                throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误,平台企业不存在或存在多个");
             }
             BizRefOrgVehicle ref = new BizRefOrgVehicle();
             ref.setOrgId(org.get(0).getId());
@@ -211,6 +211,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                     insertVehicleVo.setCreateTime(new Date());
                     bizVehicleMapperExt.insertSelective(insertVehicleVo);
                 }
+                //新建车辆默认绑定在平台下面
                 ref.setVehicleId(vehicleInfos.get(i).getBizVehicleInfo().getId());
                 ref.setBindTime(new Date());
                 bizRefOrgVehicleMapperExt.insertSelective(ref);
@@ -317,14 +318,14 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             BizOrganizationExample.Criteria bizOrgCriteria = bizOrganizationExample.createCriteria();
             bizOrgCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
             List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(bizOrganizationExample);
-            if(org.size() >= 1){
+            if(org.size() == 1){
                 BizRefOrgVehicle ref = new BizRefOrgVehicle();
                 ref.setOrgId(org.get(0).getId());
                 ref.setVehicleId(vehicleInfo.getBizVehicleInfo().getId());
                 ref.setBindTime(new Date());
                 bizRefOrgVehicleMapperExt.insertSelective(ref);
             }else{
-                throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误,平台企业不存在");
+                throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误,平台企业不存在或存在多个");
             }
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
@@ -391,23 +392,25 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     public void deleteVehicles(List<String> ids) {
         int i = 0;
         try {
-            BizRefUserVehicleExample example = new BizRefUserVehicleExample();
-            BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
-            criteria.andUnbindTimeIsNull();
-            BizRefVehicleBatteryExample delBatteryExample = new BizRefVehicleBatteryExample();
-            BizRefVehicleBatteryExample.Criteria delBatteryCriteria = delBatteryExample.createCriteria();
-            BizRefVehiclePartsExample delPartsExample = new BizRefVehiclePartsExample();
-            BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
-            delPartsCriteria.andUnbindTimeIsNull();
-            delBatteryCriteria.andUnbindTimeIsNull();
-            BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
-            BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
-            orgCriteria.andUnbindTimeIsNull();
-            BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
-            batteryBif.setUnbindTime(new Date());
-            BizRefVehicleParts partsBif = new BizRefVehicleParts();
-            partsBif.setUnbindTime(new Date());
+
             for (; i < ids.size(); i++) {
+                BizRefUserVehicleExample example = new BizRefUserVehicleExample();
+                BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
+                criteria.andUnbindTimeIsNull();
+                BizRefVehicleBatteryExample delBatteryExample = new BizRefVehicleBatteryExample();
+                BizRefVehicleBatteryExample.Criteria delBatteryCriteria = delBatteryExample.createCriteria();
+                BizRefVehiclePartsExample delPartsExample = new BizRefVehiclePartsExample();
+                BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
+                delPartsCriteria.andUnbindTimeIsNull();
+                delBatteryCriteria.andUnbindTimeIsNull();
+                BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
+                BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
+                orgCriteria.andUnbindTimeIsNull();
+                BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
+                batteryBif.setUnbindTime(new Date());
+                BizRefVehicleParts partsBif = new BizRefVehicleParts();
+                partsBif.setUnbindTime(new Date());
+
                 criteria.andVehicleIdEqualTo(ids.get(i));
                 int count = bizRefUserVehicleMapperExt.countByExample(example);
                 if(count >= 1){
@@ -536,5 +539,23 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Override
     public List<BizPartsExt> getBizPartsByVehicle(Map<String,Object> param) {
         return bizPartsMapperExt.getById(param);
+    }
+
+    @Override
+    public int getOrgBindVehicle(String orgId) {
+        //验证企业是否存
+        BizOrganizationExample bizOrganizationExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria bizOrgCriteria = bizOrganizationExample.createCriteria();
+        bizOrgCriteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+        bizOrgCriteria.andIdEqualTo(orgId);
+        int orgCot = bizOrganizationMapperExt.countByExample(bizOrganizationExample);
+        if(orgCot != 1){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
+        }
+        BizRefOrgVehicleExample example = new BizRefOrgVehicleExample();
+        BizRefOrgVehicleExample.Criteria criteria = example.createCriteria();
+        criteria.andOrgIdEqualTo(orgId);
+        criteria.andUnbindTimeIsNull();
+        return bizRefOrgVehicleMapperExt.countByExample(example);
     }
 }

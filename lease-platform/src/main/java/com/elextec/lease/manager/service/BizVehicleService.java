@@ -117,4 +117,10 @@ public interface BizVehicleService {
      * */
     public List<BizPartsExt> getBizPartsByVehicle(Map<String,Object> param);
 
+    /**
+     * 根据车辆ID查询配件信息
+     * @param orgId 企业ID
+     * */
+    public int getOrgBindVehicle(String orgId);
+
 }

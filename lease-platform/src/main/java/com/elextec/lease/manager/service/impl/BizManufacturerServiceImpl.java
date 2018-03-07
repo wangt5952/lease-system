@@ -178,16 +178,16 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     public void deleteBizManufacturers(List<String> ids) {
         int i = 0;
         try {
-            BizVehicleExample vehicleExample = new BizVehicleExample();
-            BizVehicleExample.Criteria vehicleCriteria = vehicleExample.createCriteria();
-            vehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
-            BizBatteryExample batteryExample = new BizBatteryExample();
-            BizBatteryExample.Criteria batteryCriteria = batteryExample.createCriteria();
-            batteryCriteria.andBatteryStatusEqualTo(RecordStatus.NORMAL);
-            BizPartsExample partsExample = new BizPartsExample();
-            BizPartsExample.Criteria partsCriteria = partsExample.createCriteria();
-            partsCriteria.andPartsStatusEqualTo(RecordStatus.NORMAL);
             for (; i < ids.size(); i++) {
+                BizVehicleExample vehicleExample = new BizVehicleExample();
+                BizVehicleExample.Criteria vehicleCriteria = vehicleExample.createCriteria();
+                vehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
+                BizBatteryExample batteryExample = new BizBatteryExample();
+                BizBatteryExample.Criteria batteryCriteria = batteryExample.createCriteria();
+                batteryCriteria.andBatteryStatusEqualTo(RecordStatus.NORMAL);
+                BizPartsExample partsExample = new BizPartsExample();
+                BizPartsExample.Criteria partsCriteria = partsExample.createCriteria();
+                partsCriteria.andPartsStatusEqualTo(RecordStatus.NORMAL);
                 //验证是否有车辆绑定
                 vehicleCriteria.andMfrsIdEqualTo(ids.get(i));
                 int vehicleCot = bizVehicleMapperExt.countByExample(vehicleExample);

@@ -194,10 +194,10 @@ public class BizPartsServiceImpl implements BizPartsService {
     public void deleteBizParts(List<String> ids) {
         int i = 0;
         try {
-            BizRefVehiclePartsExample example = new BizRefVehiclePartsExample();
-            BizRefVehiclePartsExample.Criteria criteria = example.createCriteria();
-            criteria.andUnbindTimeIsNull();
             for (; i < ids.size(); i++) {
+                BizRefVehiclePartsExample example = new BizRefVehiclePartsExample();
+                BizRefVehiclePartsExample.Criteria criteria = example.createCriteria();
+                criteria.andUnbindTimeIsNull();
                 criteria.andPartsIdEqualTo(ids.get(i));
                 //判定配件是否绑定了车辆
                 int count = bizRefVehiclePartsMapperExt.countByExample(example);

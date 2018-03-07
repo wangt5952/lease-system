@@ -1289,4 +1289,41 @@ public class BizVehicleController extends BaseController {
         }
     }
 
+
+    /**
+     * 平台与企业用户查询绑定车辆数量接口
+     * @return 查询结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/orgbindvehicle")
+    public MessageResponse orgBindVehicle(HttpServletRequest request) {
+        int vehiclesCot = 0;
+        try {
+            SysUser userTemp = getLoginUserInfo(request);
+            if(userTemp != null){
+                //个人无权执行该操作
+                if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())
+                        || OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    vehiclesCot = bizVehicleService.getOrgBindVehicle(userTemp.getOrgId());
+                }else{
+                    return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                }
+            }else{
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+        } catch (BizException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+        }
+        // 返回结果
+        return new MessageResponse(RunningResult.SUCCESS, vehiclesCot);
+    }
+
 }

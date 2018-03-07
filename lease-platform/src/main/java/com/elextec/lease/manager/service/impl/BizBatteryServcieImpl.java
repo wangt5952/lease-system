@@ -197,10 +197,10 @@ public class BizBatteryServcieImpl implements BizBatteryService {
     public void deleteBattery(List<String> ids) {
         int i = 0;
         try {
-            BizRefVehicleBatteryExample example = new BizRefVehicleBatteryExample();
-            BizRefVehicleBatteryExample.Criteria criteria = example.createCriteria();
-            criteria.andUnbindTimeIsNull();
             for (; i < ids.size(); i++) {
+                BizRefVehicleBatteryExample example = new BizRefVehicleBatteryExample();
+                BizRefVehicleBatteryExample.Criteria criteria = example.createCriteria();
+                criteria.andUnbindTimeIsNull();
                 //验证电池是否绑定车辆
                 criteria.andBatteryIdEqualTo(ids.get(i));
                 int count = bizRefVehicleBatteryMapperExt.countByExample(example);
