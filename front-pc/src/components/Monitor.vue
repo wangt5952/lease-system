@@ -8,7 +8,7 @@
         </div>
         <div @click="showVehicleDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.code}}</div>
-          <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码</div>
+          <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码 {{ searchLocList}}</div>
         </div>
         <div @click="showVehiclePath" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;">南京市雨花台区大数据产业园</div>
@@ -30,10 +30,10 @@
           <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
           <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.lng, lat: selectedItem.lat}"></bm-marker>
         </template>
-        <bm-marker v-else v-for="o in list" :key="`${[o.lng,o.lat].join(',')}`" :icon="{url: selectedItem.id == o.id ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
+        <bm-marker v-else v-for="o in vehicleList" :key="o.id" :icon="{url: selectedItem.id == o.id ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
 
       </baidu-map>
-      <el-date-picker v-if="vehiclePathVisible" size="mini" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="position:absolute;top:120px;right:400px;"></el-date-picker>
+      <el-date-picker v-if="vehiclePathVisible" v-model="searchLocList.time" value-format="yyyy-MM-dd HH:mm:ss" size="mini" type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="position:absolute;top:120px;right:400px;"></el-date-picker>
 
       <div v-if="false" style="display:flex;background:#eff5f8;height:180px;padding:10px 0;">
         <div style="flex:1;background:#fff;margin-left:10px;">
@@ -65,8 +65,8 @@
         <div style="width:80px;">剩余电量</div>
       </div>
       <div style="flex:1;overflow:scroll;font-size:14px;">
-        <div @click="handleSelectItem(o)" v-for="o in list" :key="o.id" :style="selectedId == o.id ? {backgroundColor:'#39a0f6', color:'#fff'} : {backgroundColor:'#e7eef5', color:'#9096ad'}" style="display:flex;align-items:center;height:36px;margin-bottom:5px;border-radius:3px;text-align:center;cursor:pointer;">
-          <div style="flex:1;">{{o.code}}</div>
+        <div @click="handleSelectItem(o)" v-for="o in vehicleList" :key="o.id" :style="selectedId == o.id ? {backgroundColor:'#39a0f6', color:'#fff'} : {backgroundColor:'#e7eef5', color:'#9096ad'}" style="display:flex;align-items:center;height:36px;margin-bottom:5px;border-radius:3px;text-align:center;cursor:pointer;">
+          <div style="flex:1;">{{o.vehicleCode}}</div>
           <div style="width:80px;">{{o.value}}</div>
         </div>
       </div>
@@ -122,28 +122,30 @@ export default {
       search: {},
       points: [],
       selectedId: '1',
-      list: [
-        { id: '1', code: 'aima001', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.822436, lat: 32.029365, path: [{ lng: 118.822436, lat: 32.029365 }, ...path] },
-        { id: '2', code: 'aima002', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799044, lat: 32.040109, path: [{ lng: 118.799044, lat: 32.040109 }, ...path] },
-        { id: '3', code: 'aima003', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.797499, lat: 32.029977, path: [{ lng: 118.797499, lat: 32.029977 }, ...path] },
-        { id: '4', code: 'aima004', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.7906, lat: 32.037017, path: [{ lng: 118.7906, lat: 32.037017 }, ...path] },
-        { id: '5', code: 'aima005', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.788229, lat: 32.028814, path: [{ lng: 118.788229, lat: 32.028814 }, ...path] },
-        { id: '6', code: 'aima006', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.773712, lat: 32.048587, path: [{ lng: 118.773712, lat: 32.048587 }, ...path] },
-        { id: '7', code: 'aima007', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.782839, lat: 32.048219, path: [{ lng: 118.782839, lat: 32.048219 }, ...path] },
-        { id: '8', code: 'aima008', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.765448, lat: 32.043506, path: [{ lng: 118.765448, lat: 32.043506 }, ...path] },
-        { id: '9', code: 'aima009', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801164, lat: 32.019875, path: [{ lng: 118.801164, lat: 32.019875 }, ...path] },
-        { id: '10', code: 'aima010', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.754165, lat: 32.040568, path: [{ lng: 118.754165, lat: 32.040568 }, ...path] },
-        { id: '11', code: 'aima011', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.746044, lat: 32.034017, path: [{ lng: 118.746044, lat: 32.034017 }, ...path] },
-        { id: '12', code: 'aima012', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.742595, lat: 32.021038, path: [{ lng: 118.742595, lat: 32.021038 }, ...path] },
-        { id: '13', code: 'aima013', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.781366, lat: 32.01268, path: [{ lng: 118.781366, lat: 32.01268 }, ...path] },
-        { id: '14', code: 'aima014', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799332, lat: 32.009863, path: [{ lng: 118.799332, lat: 32.009863 }, ...path] },
-        { id: '15', code: 'aima015', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801919, lat: 32.001534, path: [{ lng: 118.801919, lat: 32.001534 }, ...path] },
-        { id: '16', code: 'aima016', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.768574, lat: 31.997125, path: [] },
-        { id: '17', code: 'aima017', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.789702, lat: 32.064714, path: [] },
-        { id: '18', code: 'aima018', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.790852, lat: 32.057248, path: [] },
-        { id: '19', code: 'aima019', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.803069, lat: 32.055044, path: [] },
-        { id: '20', code: 'aima020', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.812267, lat: 32.063735, path: [] },
-      ],
+      vehicleList: [],
+      searchLocList: {},
+      // vehicleList: [
+      //   { id: '1', code: 'aima001', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.822436, lat: 32.029365, path: [{ lng: 118.822436, lat: 32.029365 }, ...path] },
+      //   { id: '2', code: 'aima002', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799044, lat: 32.040109, path: [{ lng: 118.799044, lat: 32.040109 }, ...path] },
+      //   { id: '3', code: 'aima003', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.797499, lat: 32.029977, path: [{ lng: 118.797499, lat: 32.029977 }, ...path] },
+      //   { id: '4', code: 'aima004', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.7906, lat: 32.037017, path: [{ lng: 118.7906, lat: 32.037017 }, ...path] },
+      //   { id: '5', code: 'aima005', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.788229, lat: 32.028814, path: [{ lng: 118.788229, lat: 32.028814 }, ...path] },
+      //   { id: '6', code: 'aima006', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.773712, lat: 32.048587, path: [{ lng: 118.773712, lat: 32.048587 }, ...path] },
+      //   { id: '7', code: 'aima007', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.782839, lat: 32.048219, path: [{ lng: 118.782839, lat: 32.048219 }, ...path] },
+      //   { id: '8', code: 'aima008', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.765448, lat: 32.043506, path: [{ lng: 118.765448, lat: 32.043506 }, ...path] },
+      //   { id: '9', code: 'aima009', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801164, lat: 32.019875, path: [{ lng: 118.801164, lat: 32.019875 }, ...path] },
+      //   { id: '10', code: 'aima010', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.754165, lat: 32.040568, path: [{ lng: 118.754165, lat: 32.040568 }, ...path] },
+      //   { id: '11', code: 'aima011', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.746044, lat: 32.034017, path: [{ lng: 118.746044, lat: 32.034017 }, ...path] },
+      //   { id: '12', code: 'aima012', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.742595, lat: 32.021038, path: [{ lng: 118.742595, lat: 32.021038 }, ...path] },
+      //   { id: '13', code: 'aima013', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.781366, lat: 32.01268, path: [{ lng: 118.781366, lat: 32.01268 }, ...path] },
+      //   { id: '14', code: 'aima014', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799332, lat: 32.009863, path: [{ lng: 118.799332, lat: 32.009863 }, ...path] },
+      //   { id: '15', code: 'aima015', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801919, lat: 32.001534, path: [{ lng: 118.801919, lat: 32.001534 }, ...path] },
+      //   { id: '16', code: 'aima016', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.768574, lat: 31.997125, path: [] },
+      //   { id: '17', code: 'aima017', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.789702, lat: 32.064714, path: [] },
+      //   { id: '18', code: 'aima018', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.790852, lat: 32.057248, path: [] },
+      //   { id: '19', code: 'aima019', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.803069, lat: 32.055044, path: [] },
+      //   { id: '20', code: 'aima020', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.812267, lat: 32.063735, path: [] },
+      // ],
 
       vehicleDialogVisible: false,
       batteryDialogVisible: false,
@@ -154,12 +156,18 @@ export default {
   },
   computed: {
     selectedItem() {
-      return _.find(this.list, { id: this.selectedId }) || {};
+      return _.find(this.vehicleList, { id: this.selectedId }) || {};
     },
   },
   watch: {
     'search.keyword'(v) {
       this.mapCenter = v;
+    },
+    searchLocList: {
+      async handler() {
+        this.reloadLocList();
+      },
+      deep: true,
     },
   },
   methods: {
@@ -185,7 +193,93 @@ export default {
       };
       this.selectedId = item.id;
     },
+
+    async reloadVehicleList() {
+      const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
+        needPaging: false,
+      })).body;
+      this.vehicleList = respData.rows;
+
+      if(this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, {id: this.selectedId})){
+        this.selectedId = this.vehicleList[0].id
+      }
+      await this.reloadVehicleLoc();
+      await this.reloadVehiclePower();
+    },
+
+    async reloadVehicleLoc() {
+      const { vehicleList } = this;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk', _.map(vehicleList, 'id'))).body
+        const locList = respData;
+        this.vehicleList = _.map(vehicleList, o => {
+          const loc = _.find(locList, {VehicleID: o.id});
+          if(!loc) return o;
+          return {
+            ...o,
+            lat: loc.LAT,
+            lng: loc.LON,
+            LocTime: loc.LocTime,
+          }
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async reloadVehiclePower() {
+      const { vehicleList } = this;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk', _.map(vehicleList, 'id'))).body
+        const locList = respData;
+        this.vehicleList = _.map(vehicleList, o => {
+          const power = _.find(locList, {VehicleID: o.id});
+          if(!power) return o;
+          return {
+            ...o,
+            value: power.RSOC,
+          }
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async reloadLocList() {
+      const { time } = this.searchLocList;
+      const id = this.selectedId;
+
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1]})).body
+        const locList = respData;
+        console.log(locList)
+
+        this.vehicleList = _.map(this.vehicleList, o => {
+          if(o.id !== id) return o;
+          return {
+            ...o,
+            path: _.map(locList, o => ({
+              lng: o.LON,
+              lat: o.LAT,
+            }))
+          }
+        })
+        // this.vehicleList = _.map(vehicleList, o => {
+        //   const loc = _.find(locList, {VehicleID: o.id});
+        //   if(!loc) return o;
+        //   return {
+        //     ...o,
+        //     lat: loc.LAT,
+        //     lng: loc.LON,
+        //     LocTime: loc.LocTime,
+        //   }
+        // })
+      } catch (e) {
+        console.log(e)
+      }
+    }
   },
+  async mounted() {
+    await this.reloadVehicleList();
+  }
 };
 </script>
 
