@@ -43,7 +43,11 @@ module.exports = {
     // allow optionalDependencies
     'import/no-extraneous-dependencies': ['error', {
       optionalDependencies: ['test/unit/index.js']
-    }],
+    }],    
+    "linebreak-style": [
+      "error",
+      "windows"
+    ],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'max-len': 'off',
