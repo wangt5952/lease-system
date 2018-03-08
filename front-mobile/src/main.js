@@ -10,7 +10,7 @@ import {
   Tabbar, TabbarItem,
   ButtonTab, ButtonTabItem,
   PopupPicker, Actionsheet,
-  LoadingPlugin, ToastPlugin,
+  LoadingPlugin, ToastPlugin, ConfirmPlugin,
 } from 'vux';
 
 import 'lib-flexible/flexible';
@@ -29,7 +29,7 @@ _.forEach([
 ], o => Vue.component(o.name, o));
 
 _.forEach([
-  LoadingPlugin, ToastPlugin,
+  LoadingPlugin, ToastPlugin, ConfirmPlugin,
 ], o => Vue.use(o));
 
 Vue.config.productionTip = false;
@@ -68,7 +68,7 @@ const store = new Vuex.Store({
   },
 });
 
-const whiteList = ['/login', '/join'];
+const whiteList = ['/login', '/join', '/reset'];
 router.beforeEach(async (to, from, next) => {
   const { key_login_token } = store.state;
   if (!key_login_token && whiteList.indexOf(to.path) === -1) return next({ path: '/login' });
