@@ -341,7 +341,8 @@ public class BizOrgController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 org = JSON.parseObject(paramStr, BizOrganization.class);
-                if (null == org) {
+                if (null == org
+                        || WzStringUtil.isBlank(org.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);

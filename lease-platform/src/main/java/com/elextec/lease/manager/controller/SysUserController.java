@@ -440,7 +440,8 @@ public class SysUserController extends BaseController {
                     //用户类型无法修改，清空上传数据
                     userInfo.setUserType(null);
                 }
-                if (null == userInfo) {
+                if (null == userInfo
+                        || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 if (WzStringUtil.isBlank(userInfo.getId())) {

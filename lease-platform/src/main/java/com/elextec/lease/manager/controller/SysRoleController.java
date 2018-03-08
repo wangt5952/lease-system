@@ -289,7 +289,8 @@ public class SysRoleController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 roleInfo = JSON.parseObject(paramStr, SysRole.class);
-                if (null == roleInfo) {
+                if (null == roleInfo
+                        || WzStringUtil.isBlank(roleInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);

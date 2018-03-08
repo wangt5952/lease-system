@@ -407,7 +407,8 @@ public class BizVehicleController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 vehicleInfo = JSON.parseObject(paramStr, BizVehicle.class);
-                if (null == vehicleInfo) {
+                if (null == vehicleInfo
+                        || WzStringUtil.isBlank(vehicleInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
 
