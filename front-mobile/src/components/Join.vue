@@ -40,7 +40,6 @@
 </template>
 
 <script>
-import moment from 'moment';
 import md5 from 'js-md5';
 
 export default {
@@ -54,17 +53,16 @@ export default {
   },
   methods: {
     secondTick() {
-      console.log(this.codeBtnDisabled);
-      if(this.codeBtnDisabled) {
+      if (this.codeBtnDisabled) {
         this.codeBtnDisabled = this.codeBtnDisabled - 1;
       }
-      if(!this.codeBtnDisabled) this.stopSecondTick()
+      if (!this.codeBtnDisabled) this.stopSecondTick();
     },
     startSecondTick() {
-      if(!this.secondTickHandle) this.secondTickHandle = setInterval(() => this.secondTick(), 1000);
+      if (!this.secondTickHandle) this.secondTickHandle = setInterval(() => this.secondTick(), 1000);
     },
     stopSecondTick() {
-      if(this.secondTickHandle){
+      if (this.secondTickHandle) {
         clearInterval(this.secondTickHandle);
         this.secondTickHandle = null;
       }
@@ -73,42 +71,40 @@ export default {
     async handleSubmit() {
       const { mobile, password, smsToken, smsVCode } = this.form;
       const form = {
-        userMobile: mobile, password, smsToken, smsVCode
+        userMobile: mobile, password, smsToken, smsVCode,
       };
 
       try {
-        if(!form.userMobile) throw new Error('请输入手机号');
-        if(!form.smsToken) throw new Error('请先获取短信码');
-        if(!form.smsVCode) throw new Error('请输入短信码');
-        if(!form.password) throw new Error('请输入密码');
-        form.password = md5(form.password).toUpperCase()
-        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/register', form)).body;
+        if (!form.userMobile) throw new Error('请输入手机号');
+        if (!form.smsToken) throw new Error('请先获取短信码');
+        if (!form.smsVCode) throw new Error('请输入短信码');
+        if (!form.password) throw new Error('请输入密码');
+        form.password = md5(form.password).toUpperCase();
+        const { code, message } = (await this.$http.post('/api/mobile/v1/auth/register', form)).body;
         if (code !== '200') throw new Error(message || code);
 
         this.$vux.toast.show({ text: '注册成功', type: 'success', width: '10em' });
         this.$router.push('/login');
-
       } catch (e) {
         const message = e.statusText || e.message;
         this.$vux.toast.text(message);
       }
-
     },
     async handleCode() {
       const { mobile, captchaToken, captcha } = this.form;
       const form = {
-        mobile, captchaToken, captcha, needCaptchaToken: 'true'
+        mobile, captchaToken, captcha, needCaptchaToken: 'true',
       };
       try {
-        if(!form.mobile) throw new Error('请输入手机号');
-        if(!/^\d{11}$/.test(form.mobile)) throw new Error('手机格式有误');
-        if(!form.captcha) throw new Error('请输入图形验证码');
+        if (!form.mobile) throw new Error('请输入手机号');
+        if (!/^\d{11}$/.test(form.mobile)) throw new Error('手机格式有误');
+        if (!form.captcha) throw new Error('请输入图形验证码');
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/sendsms', form)).body;
         if (code !== '200') throw new Error(message || code);
         this.codeBtnDisabled = 30;
         this.startSecondTick();
-        const { key_sms_vcode_token } = respData
-        this.form.smsToken = key_sms_vcode_token
+        const { key_sms_vcode_token } = respData;
+        this.form.smsToken = key_sms_vcode_token;
         this.$vux.toast.text('短信验证码已发送');
       } catch (e) {
         const message = e.statusText || e.message;

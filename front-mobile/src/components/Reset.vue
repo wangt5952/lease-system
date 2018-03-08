@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import moment from 'moment';
 import md5 from 'js-md5';
 
 export default {
@@ -50,43 +49,35 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      const { mobile, password, smsToken, smsVCode } = this.form;
+      const { password, smsToken, smsVCode } = this.form;
       const form = {
-        newPassword: md5(password).toUpperCase(), smsToken, smsVCode
+        newPassword: md5(password).toUpperCase(), smsToken, smsVCode,
       };
-
       try {
-        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/resetpassword', form)).body;
+        const { code, message } = (await this.$http.post('/api/mobile/v1/auth/resetpassword', form)).body;
         if (code !== '200') throw new Error(message || code);
-
         this.$vux.toast.show({ text: '注册成功', type: 'success', width: '10em' });
         this.$router.push('/login');
-
       } catch (e) {
         const message = e.statusText || e.message;
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       }
-
     },
     async handleCode() {
       const { mobile, captchaToken, captcha } = this.form;
-
       const form = {
-        mobile, captchaToken, captcha, needCaptchaToken: 'true'
+        mobile, captchaToken, captcha, needCaptchaToken: 'true',
       };
       try {
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/sendsms', form)).body;
         if (code !== '200') throw new Error(message || code);
-        const { key_sms_vcode_token } = respData
-        this.form.smsToken = key_sms_vcode_token
+        const { key_sms_vcode_token } = respData;
+        this.form.smsToken = key_sms_vcode_token;
       } catch (e) {
         const message = e.statusText || e.message;
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       }
-
-      console.log(mobile);
     },
-
     async reloadCaptcha() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/getcaptcha')).body;
@@ -101,7 +92,7 @@ export default {
     },
   },
   async mounted() {
-    await this.reloadCaptcha()
+    await this.reloadCaptcha();
   },
 };
 </script>
