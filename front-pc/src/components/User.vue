@@ -281,7 +281,6 @@ export default {
         'userIcBack',
         'userIcGroup',
         'userStatus',
-        'enterprise'
       ]);
       this.formVisible = true;
     },
@@ -303,6 +302,7 @@ export default {
           this.$message.success('编辑成功');
         } else {
           const { ...form } = this.form;
+          form.orgId = '2768bb3ed07e4ee593c9a279c0fddb0d';
           form.create_user = loginName;
           form.update_user = loginName;
           const { code, message } = (await this.$http.post('/api/manager/user/add', [form])).body;
