@@ -1,5 +1,7 @@
 package com.elextec.lease.manager.service;
 
+import com.elextec.persist.model.mybatis.SysUser;
+
 import java.util.Map;
 
 /**
@@ -35,4 +37,5 @@ public interface SysAuthService {
      * @return 验证结果
      */
     public boolean verifyUser(String loginName, String password, String authStr, long authTime);
+
 }

@@ -539,4 +539,16 @@ public class SysUserServcieImpl implements SysUserService {
         }
     }
 
+    @Override
+    public SysUser getByMobile(String mobile) {
+        SysUserExample example = new SysUserExample();
+        SysUserExample.Criteria selectMobile = example.createCriteria();
+        selectMobile.andUserMobileEqualTo(mobile);
+        List<SysUser> user = sysUserMapperExt.selectByExample(example);
+        if(user.size() < 1){
+            throw new BizException(RunningResult.NO_USER.code(),"用户未注册");
+        }
+        return user.get(0);
+    }
+
 }

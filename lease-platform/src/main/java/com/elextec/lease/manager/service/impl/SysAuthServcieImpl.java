@@ -10,6 +10,7 @@ import com.elextec.persist.dao.mybatis.SysUserMapperExt;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.SysResources;
+import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
