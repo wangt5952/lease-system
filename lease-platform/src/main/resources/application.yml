@@ -13,6 +13,7 @@ localsetting:
   platform-type: all
   login-overtime-sec: 3600
   login-overtime-sec-mobile: 3600
+  default-password:  123456
   nofilters: /manager/auth/,/mobile/v1/auth/login,/mobile/v1/auth/logout,/mobile/v1/auth/sendsms,/mobile/v1/auth/getcaptcha,/mobile/v1/auth/resetpassword,/mobile/v1/auth/register
   white-flag: false
   white-url:

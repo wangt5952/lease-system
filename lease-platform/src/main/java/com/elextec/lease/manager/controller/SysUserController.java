@@ -8,6 +8,7 @@ import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzEncryptUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysRoleService;
@@ -46,6 +47,9 @@ public class SysUserController extends BaseController {
 
     @Value("${localsetting.login-overtime-sec}")
     private String loginOvertime;
+
+    @Value("${localsetting.default-password}")
+    private String defaultPassword;
 
     @Autowired
     private SysUserService sysUserService;
@@ -219,7 +223,7 @@ public class SysUserController extends BaseController {
                     if (WzStringUtil.isBlank(insUserChkVo.getLoginName())
                             || WzStringUtil.isBlank(insUserChkVo.getUserMobile())
                             || null == insUserChkVo.getUserType()
-                            || WzStringUtil.isBlank(insUserChkVo.getPassword())
+                            || null == insUserChkVo.getOrgId()
                             || null == insUserChkVo.getUserRealNameAuthFlag()
                             || null == insUserChkVo.getUserStatus()
                             || WzStringUtil.isBlank(insUserChkVo.getCreateUser())
@@ -246,6 +250,7 @@ public class SysUserController extends BaseController {
                             && !insUserChkVo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户状态无效");
                     }
+                    userInfos.get(i).setPassword(WzEncryptUtil.getMD5(defaultPassword,true));
                 }
             } catch (BizException ex) {
                 throw ex;
@@ -319,7 +324,7 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank(userInfo.getLoginName())
                         || WzStringUtil.isBlank(userInfo.getUserMobile())
                         || null == userInfo.getUserType()
-                        || WzStringUtil.isBlank(userInfo.getPassword())
+                        || null == userInfo.getOrgId()
                         || null == userInfo.getUserRealNameAuthFlag()
                         || null == userInfo.getUserStatus()
                         || WzStringUtil.isBlank(userInfo.getCreateUser())
@@ -347,6 +352,7 @@ public class SysUserController extends BaseController {
                         && !userInfo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户状态");
                 }
+                userInfo.setPassword(WzEncryptUtil.getMD5(defaultPassword,true));
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
@@ -440,7 +446,8 @@ public class SysUserController extends BaseController {
                     //用户类型无法修改，清空上传数据
                     userInfo.setUserType(null);
                 }
-                if (null == userInfo) {
+                if (null == userInfo
+                        || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 if (WzStringUtil.isBlank(userInfo.getId())) {

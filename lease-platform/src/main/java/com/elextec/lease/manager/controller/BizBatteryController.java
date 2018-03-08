@@ -328,7 +328,8 @@ public class BizBatteryController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
-                if (null == batteryInfo) {
+                if (null == batteryInfo
+                        || WzStringUtil.isBlank(batteryInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);
@@ -340,9 +341,11 @@ public class BizBatteryController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
-                if (WzStringUtil.isBlank(batteryInfo.getId())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
+                if (WzStringUtil.isBlank(batteryInfo.getId())
+                        || WzStringUtil.isBlank(batteryInfo.getUpdateUser())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "电池参数有误");
                 }
+
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {

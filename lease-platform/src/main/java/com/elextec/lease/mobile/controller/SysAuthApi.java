@@ -382,6 +382,7 @@ public class SysAuthApi extends BaseController {
             String smsVCodeToken = WzUniqueValUtil.makeUUID();
             // 短信验证码2分钟有效
             redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE + smsVCodeToken, smsVCode, 120, TimeUnit.SECONDS);
+            redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE_MOBILE + smsVCodeToken, smsParam.getMobile());
             Map<String, String> smsTokenMap = new HashMap<String, String>();
             smsTokenMap.put(WzConstants.KEY_SMS_VCODE_TOKEN, smsVCodeToken);
             smsClient.sendSmsByTemplate1(smsParam.getMobile(), smsVCode);
@@ -447,15 +448,16 @@ public class SysAuthApi extends BaseController {
             redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
 
             // 获得登录用户信息
-            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
-            SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+            String userMobile = (String) redisClient.valueOperations().get(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
+            SysUser user = sysUserService.getByMobile(userMobile);
             SysUser updateVo = new SysUser();
-            updateVo.setId(sue.getId());
+            updateVo.setId(user.getId());
             updateVo.setPassword(resetParam.getNewPassword());
-            updateVo.setUpdateUser(sue.getId());
+            updateVo.setUpdateUser(user.getId());
             // 更新密码
             sysUserService.updateSysUser(updateVo);
+            // 缓存中的手机号码删除掉
+            redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
             return new MessageResponse(RunningResult.SUCCESS);
         }
     }
@@ -519,6 +521,7 @@ public class SysAuthApi extends BaseController {
                 }
                 // 只要进行验证后，不管成功失败均将之前验证码作废
                 redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
+                redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
 
                 SysUser userTemp = new SysUser();
                 userTemp.setUserMobile(resetParam.getUserMobile());
@@ -575,6 +578,12 @@ public class SysAuthApi extends BaseController {
             try{
                 String paramStr = URLDecoder.decode(userInfo, "utf-8");
                 resetParam = JSON.parseObject(paramStr, SysUser.class);
+                if(null == resetParam){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR);
+                }
+                if(WzStringUtil.isBlank(resetParam.getUpdateUser())){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "更新人不能为空");
+                }
             }catch (BizException ex) {
                 throw ex;
             }catch(Exception ex){
@@ -586,6 +595,7 @@ public class SysAuthApi extends BaseController {
                     if(userTemp == null){
                         throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在");
                     }
+
                     //判断用户话原来手机号与用户名是否相同，不相同的话，用户名不可更改
                     if(!userTemp.getLoginName().equals(userTemp.getUserMobile()) &&
                             !userTemp.getLoginName().equals(resetParam.getLoginName())){
@@ -652,12 +662,18 @@ public class SysAuthApi extends BaseController {
             String paramStr=null;
             try{
                 paramStr = URLDecoder.decode(userIdAndIconBase64Data, "utf-8");
+                resetParam = JSON.parseObject(paramStr, SysUser.class);
+                if(null == resetParam){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR);
+                }
+                if(WzStringUtil.isBlank(resetParam.getUpdateUser())){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "更新人不能为空");
+                }
             }catch (BizException ex) {
                 throw ex;
             }catch(Exception ex){
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-                resetParam = JSON.parseObject(paramStr, SysUser.class);
                 if(WzStringUtil.isNotBlank(resetParam.getId())){
                     if(WzStringUtil.isNotBlank(resetParam.getUserIcon())){
                         SysUser userTemp = sysUserService.getSysUserByPrimaryKey(resetParam.getId());
@@ -728,6 +744,12 @@ public class SysAuthApi extends BaseController {
             try{
                 String paramStr = URLDecoder.decode(userIdAndIconBase64Data, "utf-8");
                 resetParam = JSON.parseObject(paramStr, SysUser.class);
+                if(null == resetParam){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR);
+                }
+                if(WzStringUtil.isBlank(resetParam.getUpdateUser())){
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "更新人不能为空");
+                }
             }catch (BizException ex) {
                 throw ex;
             }catch(Exception ex){

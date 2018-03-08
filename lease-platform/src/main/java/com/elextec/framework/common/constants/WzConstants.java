@@ -38,6 +38,8 @@ public class WzConstants {
      */
     /** 全局Key 短信验证码前缀. */
     public static final String GK_SMS_VCODE = "gk_sms_vcode:";
+    /** 全局Key 接受短信验证的手机号码. */
+    public static final String GK_SMS_VCODE_MOBILE = "gk_sms_vcode_mobile";
     /** 短信验证码Token. */
     public static final String KEY_SMS_VCODE_TOKEN = "key_sms_vcode_token";
 

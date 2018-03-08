@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -371,6 +372,7 @@ public class SysAuthController extends BaseController {
             String smsVCodeToken = WzUniqueValUtil.makeUUID();
             // 短信验证码2分钟有效
             redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE + smsVCodeToken, smsVCode, 120, TimeUnit.SECONDS);
+            redisClient.valueOperations().set(WzConstants.GK_SMS_VCODE_MOBILE + smsVCodeToken, smsParam.getMobile());
             Map<String, String> smsTokenMap = new HashMap<String, String>();
             smsTokenMap.put(WzConstants.KEY_SMS_VCODE_TOKEN, smsVCodeToken);
             smsClient.sendSmsByTemplate1(smsParam.getMobile(), smsVCode);
@@ -436,15 +438,16 @@ public class SysAuthController extends BaseController {
             redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
 
             // 获得登录用户信息
-            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-            Map<String, Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
-            SysUserExt sue = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+            String userMobile = (String) redisClient.valueOperations().get(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
+            SysUser user = sysUserService.getByMobile(userMobile);
             SysUser updateVo = new SysUser();
-            updateVo.setId(sue.getId());
+            updateVo.setId(user.getId());
             updateVo.setPassword(resetParam.getNewPassword());
-            updateVo.setUpdateUser(sue.getId());
+            updateVo.setUpdateUser(user.getId());
             // 更新密码
             sysUserService.updateSysUser(updateVo);
+            // 缓存中的手机号码删除掉
+            redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
             return new MessageResponse(RunningResult.SUCCESS);
         }
     }

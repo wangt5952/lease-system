@@ -348,7 +348,8 @@ public class SysResourceController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 resInfo = JSON.parseObject(paramStr, SysResources.class);
-                if (null == resInfo) {
+                if (null == resInfo
+                        || WzStringUtil.isBlank(resInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);

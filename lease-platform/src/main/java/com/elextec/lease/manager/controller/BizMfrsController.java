@@ -324,7 +324,8 @@ public class BizMfrsController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 mfrs = JSON.parseObject(paramStr, BizManufacturer.class);
-                if (null == mfrs) {
+                if (null == mfrs
+                        || WzStringUtil.isBlank(mfrs.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);

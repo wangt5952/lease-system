@@ -120,6 +120,11 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <!-- <el-col :span="8">
+            <el-form-item label="密码">
+              <el-input v-model="form.password" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col> -->
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -276,6 +281,7 @@ export default {
         'userIcBack',
         'userIcGroup',
         'userStatus',
+        'enterprise'
       ]);
       this.formVisible = true;
     },
@@ -355,6 +361,6 @@ export default {
 
 <style scoped>
 .edit-form >>> .el-form-item {
-  height: 73px;
+  height: 65px;
 }
 </style>

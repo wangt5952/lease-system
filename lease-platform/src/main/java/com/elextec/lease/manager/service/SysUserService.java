@@ -112,4 +112,11 @@ public interface SysUserService {
      * @param orgId 分发的企业ID
      */
     public void batchUnbind(int count,String orgId);
+
+    /**
+     * 根据手机号查询用户信息
+     * @param mobile 用户手机号码
+     * @return 用户信息
+     */
+    public SysUser getByMobile(String mobile);
 }
