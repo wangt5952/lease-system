@@ -176,6 +176,11 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
           currPage: 1, pageSize: 999,
         })).body;
+
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
         this.total = total;
