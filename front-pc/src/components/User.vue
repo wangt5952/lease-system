@@ -123,7 +123,7 @@
           <el-col :span="8">
             <el-form-item label="企业">
               <el-select v-model="form.orgId" placeholder="请选择企业" style="width:100%;" >
-                <el-option v-for="o in org" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
+                <el-option v-for="o in orgList" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -180,7 +180,6 @@ export default {
 
       formVisible: false,
       form: {},
-      
       typeList: [
         { id: 'PLATFORM', name: '平台' },
         { id: 'ENTERPRISE', name: '企业' },
@@ -213,7 +212,7 @@ export default {
       assignRoleForm: { list: [] },
 
       roleList: [],
-      org:[],
+      orgList: [],
     };
   },
   computed: {
@@ -241,7 +240,6 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
           currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
         })).body;
-        
         if (code === '40106') {
           this.$store.commit('relogin');
           throw new Error('认证超时，请重新登录');
@@ -254,7 +252,7 @@ export default {
           userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
-        await this.getOrg();
+        await this.getOrgList();
         this.loading = false;
       } catch (e) {
         this.loading = false;
@@ -278,7 +276,7 @@ export default {
     showForm(form = { }) {
       this.form = _.pick(form, [
         'id',
-        'loginName',        
+        'loginName',
         'userMobile',
         'userType',
         'userIcon',
@@ -290,7 +288,7 @@ export default {
         'userIcBack',
         'userIcGroup',
         'userStatus',
-        'orgId'
+        'orgId',
       ]);
       this.formVisible = true;
     },
@@ -358,20 +356,18 @@ export default {
         this.$message.error(message);
       }
     },
-    async getOrg(){
+    async getOrgList() {
       const { code, respData } = (await this.$http.post('/api/manager/org/list', {
         currPage: 1, pageSize: 999,
       })).body;
-      if (code === '200') this.org = respData.rows;
-      console.log(this.org);
-    }
+      if (code === '200') this.orgList = respData.rows;
+    },
   },
   async mounted() {
     const { code, respData } = (await this.$http.post('/api/manager/role/list', {
       currPage: 1, pageSize: 999,
     })).body;
     if (code === '200') this.roleList = respData.rows;
-    
     await this.reload();
   },
 };

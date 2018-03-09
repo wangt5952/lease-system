@@ -8,7 +8,7 @@
         <div style="margin-top:4px;font-size:23px;color:#F2F2F2;width:150px;height:50px">小哥乐途</div>
         <div class="longinButton">
           <el-button type="info" size="medium">
-            <router-link to="login">登录</router-link>            
+            <router-link to="login">登录</router-link>
           </el-button>
         </div>
         <div class="registerButton"><a href="javascript:void(0)">注册</a></div>
@@ -19,12 +19,11 @@
     <template v-if="stepNo1">
       <div class="resPw-body">
         <div class="resPw-body-left"></div>
-        <div class="resPw-body-center">  
+        <div class="resPw-body-center">
           <div style="flex:1;border-bottom:solid 1.5px #EBEBEB;">
             <div style="background-image:url(/static/half-ring-15.png);width:45px;height:67px;position: absolute;left:42%;top:90px"></div>
             <div style="font-size:33px;width:180px;margin:3% 40% 0px 45% ">忘记密码</div>
           </div>
-          
           <div style="flex:3;display:flex;flex-direction:column;">
             <div style="background-image:url(/static/half-ring-13.png);
                 width:470px;height:40px;margin:20px 350px">
@@ -42,10 +41,10 @@
                 <el-form-item>
                   <el-input v-model="form.smsVCode" placeholder="请输入短信验证码" clearable></el-input>
                 </el-form-item>
-              </div>              
+              </div>
             </el-form>
               <div class="nextButton" style="width: 100px; height: 35px;margin:10px 430px 10px 430px">
-                <el-button style="width: 100px; height: 35px;" 
+                <el-button style="width: 100px; height: 35px;"
                     type="primary" @click="nextQuery">下一步</el-button>
               </div>
           </div>
@@ -57,12 +56,11 @@
     <template v-if="stepNo2">
       <div class="resPw-body">
         <div class="resPw-body-left"></div>
-        <div class="resPw-body-center">  
+        <div class="resPw-body-center">
           <div style="flex:1;border-bottom:solid 1.5px #EBEBEB;">
             <div style="background-image:url(/static/half-ring-15.png);width:45px;height:67px;position: absolute;left:42%;top:90px"></div>
             <div style="font-size:33px;width:180px;margin:3% 40% 0px 45% ">忘记密码</div>
           </div>
-          
           <div style="flex:3;display:flex;flex-direction:column;">
             <div style="background-image:url(/static/half-ring-14.png);
                 width:470px;height:40px;margin:20px 350px">
@@ -106,80 +104,79 @@
         Copyright© &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;
       </div>
     </div>
-</div>  
+</div>
 </template>
 <script>
 import md5 from 'js-md5';
 
 export default {
-  data(){
-    return{
-      sMs:{
-        needCaptchaToken:false
+  data() {
+    return {
+      sMs: {
+        needCaptchaToken: false,
       },
-      form:{
-        smsToken:''
+      form: {
+        smsToken: '',
       },
-      confirmNewPassword:'',
-      stepNo1:true,
-      stepNo2:false,
-      //验证码按钮状态
-      state:false,
-    }
+      confirmNewPassword: '',
+      stepNo1: true,
+      stepNo2: false,
+      // 验证码按钮状态
+      state: false,
+    };
   },
-  methods:{
-    //验证手机号码
-    async validateMobileNumber(){
+  methods: {
+    // 验证手机号码
+    async validateMobileNumber() {
       this.state = true;
-      const {...sMs} = this.sMs;
-      try{
-        const { code, message, respData } = (await this.$http.post('/api/manager/auth/sendsms',sMs)).body;        
-        if( code !== '200') throw new Error(message || code);
-        this.$message.success({ message: '验证码发送中，请稍等片刻...', });
+      const { ...sMs } = this.sMs;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/auth/sendsms', sMs)).body;
+        if (code !== '200') throw new Error(message || code);
+        this.$message.success({ message: '验证码发送中,请稍等片刻...' });
         const { key_sms_vcode_token } = respData;
         this.form.smsToken = key_sms_vcode_token;
         // console.log(this.form.smsToken);
-        console.log('最后步骤');
-      } catch (e){
+      } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      setTimeout(() =>{
+      setTimeout(() => {
         this.state = false;
-      }, 120 * 1000 );
+      }, 120 * 1000);
     },
     // 下一步按钮
-    nextQuery(){
+    nextQuery() {
       this.stepNo1 = false;
       this.stepNo2 = true;
     },
     // 完成按钮
-    async confirm(){
-      const{ smsVCode, smsToken, newPassword } = this.form;
-      if(newPassword === this.confirmNewPassword){
-        const form = { newPassword:md5(newPassword).toUpperCase(),smsVCode,smsToken };
-        try{
-          const{code,message,respData} = (await this.$http.post('/api/manager/auth/resetpassword',form)).body;
-          if(code !== '200') throw new Error(message || code);
+    async confirm() {
+      const { smsVCode, smsToken, newPassword } = this.form;
+      if (newPassword === this.confirmNewPassword) {
+        const form = { newPassword: md5(newPassword).toUpperCase(), smsVCode, smsToken };
+        try {
+          const { code, message } = (await this.$http.post('/api/manager/auth/resetpassword', form)).body;
+          if (code !== '200') throw new Error(message || code);
           this.$message.success({
             message: '重置密码成功！',
           });
-        } catch (e){
+        } catch (e) {
           const message = e.statusText || e.message;
           this.$message.error(message);
         }
-      }else{
+      } else {
         this.$message.error('两次密码输入不配备,请重新输入');
         this.cancel();
       }
     },
     // 取消按钮
-    cancel(){
+    cancel() {
       this.form.newPassword = '';
       this.confirmNewPassword = '';
-    }
+    },
   },
-}
+};
 </script>
 <style scoped>
 .resPw{
@@ -193,7 +190,7 @@ export default {
   display:flex;flex-direction:row
 }
 .header-font el-button{
-  width: 60px; height: 13px; 
+  width: 60px; height: 13px;
 }
 .longinButton{
   margin:5px 0px 0px 70%
@@ -203,18 +200,18 @@ export default {
 }
 
 .resPw-header a{
-  text-decoration:none; color:white;  
+  text-decoration:none; color:white;
 }
 /* 主体 */
 .resPw-body{
-  height: 100%;  
+  height: 100%;
   display: flex; flex-direction: row;flex: 9
 }
 .resPw-body-left,.resPw-body-right{
   flex:1;background-color: #EBEBEB;
 }
 .resPw-body-center{
-  flex:11; 
+  flex:11;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -228,5 +225,3 @@ export default {
   text-decoration:none; color: #454545;
 }
 </style>
-
-

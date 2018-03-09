@@ -59,7 +59,6 @@
     </div>
     <div style="display:flex;flex-direction:column;width:250px;background:#eff5f8;padding:10px 20px;">
       <div style="color:#9096ad;font-size:16px;">车辆列表（可用）</div>
-
       <div style="display:flex;align-items:center;font-size:14px;height:36px;margin-bottom:5px;text-align:center;">
         <div style="flex:1;">车辆编号</div>
         <div style="width:80px;">剩余电量</div>
@@ -72,7 +71,6 @@
       </div>
 
     </div>
-
 
     <el-dialog title="车辆信息" :visible.sync="vehicleDialogVisible" width="30%">
       <div class="item"><div class="item-name">车辆编号</div><div class="item-value">{{selectedItem.code}}</div></div>
@@ -110,11 +108,11 @@
 <script>
 import _ from 'lodash';
 
-const path = [
-  { lng: 118.790852, lat: 32.057248 },
-  { lng: 118.803069, lat: 32.055044 },
-  { lng: 118.812267, lat: 32.063735 },
-];
+// const path = [
+//   { lng: 118.790852, lat: 32.057248 },
+//   { lng: 118.803069, lat: 32.055044 },
+//   { lng: 118.812267, lat: 32.063735 },
+// ];
 
 export default {
   data() {
@@ -184,8 +182,7 @@ export default {
     showVehiclePath() {
       this.vehiclePathVisible = !this.vehiclePathVisible;
     },
-    handleMapClick({ point }) {
-      console.log(point);
+    handleMapClick() {
     },
     handleSelectItem(item) {
       this.mapCenter = {
@@ -198,10 +195,11 @@ export default {
       const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
         needPaging: false,
       })).body;
+      if (code !== '200') throw new Error(message);
       this.vehicleList = respData.rows;
 
-      if(this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, {id: this.selectedId})){
-        this.selectedId = this.vehicleList[0].id
+      if (this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, { id: this.selectedId })) {
+        this.selectedId = this.vehicleList[0].id;
       }
       await this.reloadVehicleLoc();
       await this.reloadVehiclePower();
@@ -209,38 +207,36 @@ export default {
 
     async reloadVehicleLoc() {
       const { vehicleList } = this;
-      try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk', _.map(vehicleList, 'id'))).body
-        const locList = respData;
-        this.vehicleList = _.map(vehicleList, o => {
-          const loc = _.find(locList, {VehicleID: o.id});
-          if(!loc) return o;
-          return {
-            ...o,
-            lat: loc.LAT,
-            lng: loc.LON,
-            LocTime: loc.LocTime,
-          }
-        })
-      } catch (e) {
-        console.log(e)
-      }
+      const { respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk', _.map(vehicleList, 'id'))).body;
+      const locList = respData;
+      this.vehicleList = _.map(vehicleList, (o) => {
+        const loc = _.find(locList, { VehicleID: o.id });
+        if (!loc) return o;
+        return {
+          ...o,
+          lat: loc.LAT,
+          lng: loc.LON,
+          LocTime: loc.LocTime,
+        };
+      });
     },
     async reloadVehiclePower() {
       const { vehicleList } = this;
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk', _.map(vehicleList, 'id'))).body
+        const { respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk', _.map(vehicleList, 'id'))).body;
+        // if (code !== '200') throw new Error(message);
         const locList = respData;
-        this.vehicleList = _.map(vehicleList, o => {
-          const power = _.find(locList, {VehicleID: o.id});
-          if(!power) return o;
+        this.vehicleList = _.map(vehicleList, (o) => {
+          const power = _.find(locList, { VehicleID: o.id });
+          if (!power) return o;
           return {
             ...o,
             value: power.RSOC,
-          }
-        })
+          };
+        });
       } catch (e) {
-        console.log(e)
+        const message = e.statusText || e.message;
+        this.$message.error(message);
       }
     },
     async reloadLocList() {
@@ -248,23 +244,22 @@ export default {
       const id = this.selectedId;
 
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1]})).body
+        const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1] })).body;
+        // if (code !== '200') throw new Error(message);
         const locList = respData;
-        console.log(locList)
-
-        this.vehicleList = _.map(this.vehicleList, o => {
-          if(o.id !== id) return o;
+        this.vehicleList = _.map(this.vehicleList, (o) => {
+          if (o.id !== id) return o;
           return {
             ...o,
-            path: _.map(locList, o => ({
-              lng: o.LON,
-              lat: o.LAT,
-            }))
-          }
-        })
+            path: _.map(locList, i => ({
+              lng: i.LON,
+              lat: i.LAT,
+            })),
+          };
+        });
         // this.vehicleList = _.map(vehicleList, o => {
         //   const loc = _.find(locList, {VehicleID: o.id});
-        //   if(!loc) return o;
+        //   if (!loc) return o;
         //   return {
         //     ...o,
         //     lat: loc.LAT,
@@ -273,13 +268,14 @@ export default {
         //   }
         // })
       } catch (e) {
-        console.log(e)
+        const message = e.statusText || e.message;
+        this.$message.error(message);
       }
-    }
+    },
   },
   async mounted() {
     await this.reloadVehicleList();
-  }
+  },
 };
 </script>
 
