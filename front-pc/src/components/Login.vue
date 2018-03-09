@@ -47,7 +47,6 @@ export default {
 
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/auth/login', form)).body;
-        console.log((await this.$http.post('/api/manager/auth/login', form)));
         if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_res_info, key_user_info } = respData;
         await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
@@ -91,6 +90,6 @@ export default {
   padding-left: 60px;
   font-size: 20px;
   height: 44px;
-  -webkit-box-shadow: 0 0 0px 1000px #eee inset !important;  
+  -webkit-box-shadow: 0 0 0px 1000px #eee inset !important;
 }
 </style>
