@@ -467,17 +467,17 @@ public class SysUserController extends BaseController {
 
             sysUserService.updateSysUser(userInfo);
             // 更新登录信息
-            SysUserExample reListParam  = new SysUserExample();
-            SysUserExample.Criteria reListCri = reListParam.createCriteria();
-            reListCri.andIdEqualTo(userInfo.getId());
-            SysUserExt uExt = sysUserService.getExtById(reListParam);
-            int usedLoginOvertime = 300;
-            if (WzStringUtil.isNumeric(loginOvertime)) {
-                usedLoginOvertime = Integer.parseInt(loginOvertime);
-            }
-            resetLoginUserInfo(request, uExt, usedLoginOvertime);
+//            SysUserExample reListParam  = new SysUserExample();
+//            SysUserExample.Criteria reListCri = reListParam.createCriteria();
+//            reListCri.andIdEqualTo(userInfo.getId());
+//            SysUserExt uExt = sysUserService.getExtById(reListParam);
+//            int usedLoginOvertime = 300;
+//            if (WzStringUtil.isNumeric(loginOvertime)) {
+//                usedLoginOvertime = Integer.parseInt(loginOvertime);
+//            }
+//            resetLoginUserInfo(request, uExt, usedLoginOvertime);
             // 组织返回结果并返回
-            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, uExt);
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
         }
     }
