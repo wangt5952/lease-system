@@ -120,11 +120,13 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <!-- <el-col :span="8">
-            <el-form-item label="密码">
-              <el-input v-model="form.password" auto-complete="off"></el-input>
+          <el-col :span="8">
+            <el-form-item label="企业">
+              <el-select v-model="form.orgId" placeholder="请选择企业" style="width:100%;" >
+                <el-option v-for="o in org" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
+              </el-select>
             </el-form-item>
-          </el-col> -->
+          </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -178,7 +180,7 @@ export default {
 
       formVisible: false,
       form: {},
-
+      
       typeList: [
         { id: 'PLATFORM', name: '平台' },
         { id: 'ENTERPRISE', name: '企业' },
@@ -211,6 +213,7 @@ export default {
       assignRoleForm: { list: [] },
 
       roleList: [],
+      org:[],
     };
   },
   computed: {
@@ -238,7 +241,7 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
           currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
         })).body;
-
+        
         if (code === '40106') {
           this.$store.commit('relogin');
           throw new Error('认证超时，请重新登录');
@@ -251,6 +254,7 @@ export default {
           userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
+        await this.getOrg();
         this.loading = false;
       } catch (e) {
         this.loading = false;
@@ -274,7 +278,7 @@ export default {
     showForm(form = { }) {
       this.form = _.pick(form, [
         'id',
-        'loginName',
+        'loginName',        
         'userMobile',
         'userType',
         'userIcon',
@@ -286,6 +290,7 @@ export default {
         'userIcBack',
         'userIcGroup',
         'userStatus',
+        'orgId'
       ]);
       this.formVisible = true;
     },
@@ -307,9 +312,9 @@ export default {
           this.$message.success('编辑成功');
         } else {
           const { ...form } = this.form;
-          form.orgId = '2768bb3ed07e4ee593c9a279c0fddb0d';
           form.create_user = loginName;
           form.update_user = loginName;
+          // form.password = '123';
           const { code, message } = (await this.$http.post('/api/manager/user/add', [form])).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
@@ -353,12 +358,20 @@ export default {
         this.$message.error(message);
       }
     },
+    async getOrg(){
+      const { code, respData } = (await this.$http.post('/api/manager/org/list', {
+        currPage: 1, pageSize: 999,
+      })).body;
+      if (code === '200') this.org = respData.rows;
+      console.log(this.org);
+    }
   },
   async mounted() {
     const { code, respData } = (await this.$http.post('/api/manager/role/list', {
       currPage: 1, pageSize: 999,
     })).body;
     if (code === '200') this.roleList = respData.rows;
+    
     await this.reload();
   },
 };
