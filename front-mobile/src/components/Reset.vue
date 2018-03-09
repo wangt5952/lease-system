@@ -14,11 +14,11 @@
           <i class="lt lt-my"/>
         </template>
       </x-input>
-      <x-input placeholder="图形验证码" v-model="form.captcha" style="background:#fff;">
+      <x-input placeholder="图形验证码" class="tu" v-model="form.captcha" style="background:#fff;">
         <template slot="label">
           <i class="lt lt-safe"/>
         </template>
-        <img style="width:3rem;margin:auto 0;" @click="reloadCaptcha" slot="right" :src="`data:image/png;base64,${key_captcha_base64}`" />
+        <img style="width:3rem;margin:auto 0;position: relative; top:0.1rem;right:0.3rem;" @click="reloadCaptcha" slot="right" :src="`data:image/png;base64,${key_captcha_base64}`" />
       </x-input>
       <x-input placeholder="短信验证码" v-model="form.smsVCode" style="background:#fff;">
         <template slot="label">
@@ -49,11 +49,16 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      const { password, smsToken, smsVCode } = this.form;
+      const { password, smsToken, smsVCode, mobile } = this.form;
       const form = {
-        newPassword: md5(password).toUpperCase(), smsToken, smsVCode,
+        newPassword: md5(password).toUpperCase(), smsToken, smsVCode, mobile,
       };
       try {
+        if (!form.mobile) throw new Error('请输入手机号');
+        if (!/^\d{11}$/.test(form.mobile)) throw new Error('手机格式不正确');
+        if (!form.smsToken) throw new Error('请先获取短信码');
+        if (!form.smsVCode) throw new Error('请输入短信码');
+        if (!form.newPassword) throw new Error('请输入新密码');
         const { code, message } = (await this.$http.post('/api/mobile/v1/auth/resetpassword', form)).body;
         if (code !== '200') throw new Error(message || code);
         this.$vux.toast.show({ text: '注册成功', type: 'success', width: '10em' });
@@ -132,12 +137,14 @@ export default {
 >>> .btn-small:active {
   background: #009C75 !important;
 }
-
 >>> .btn-normal {
   background: #008E56;
   border-radius: 30px;
 }
 >>> .btn-normal:active {
   background: #009C75 !important;
+}
+>>> .tu .weui_icon_clear{
+  position: relative; bottom:0.25rem; right:0.2rem;
 }
 </style>
