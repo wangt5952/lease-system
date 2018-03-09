@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.exceptions.BizException;
+import com.elextec.framework.utils.WzGPSUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
@@ -256,8 +257,9 @@ public class DeviceApi extends BaseController {
                 // 记录当前定位
                 JSONObject nowLocVo = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_LOC_MAP, devicePk);
                 if (null == nowLocVo
-                        || lat.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
-                        || lon.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)) {
+                        || (!WzGPSUtil.outOfChina(lat.doubleValue(), lon.doubleValue())
+                            && (lat.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
+                                || lon.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)))) {
                     redisClient.hashOperations().put(WzConstants.GK_DEVICE_LOC_MAP, devicePk, locVo);
                 }
                 // 记录轨迹信息
@@ -278,8 +280,9 @@ public class DeviceApi extends BaseController {
                 } else {
                     List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
                     JSONObject lastLocVo = (JSONObject) lastLocLs.get(0);
-                    if (lat.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
-                            || lon.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)) {
+                    if (!WzGPSUtil.outOfChina(lat.doubleValue(), lon.doubleValue())
+                            && (lat.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
+                                || lon.doubleValue() != lastLocVo.getDoubleValue(DeviceApiConstants.REQ_LON))) {
                         // 停留时间超过设定的时间则认为之前的轨迹为一个完成轨迹链，需要从缓存中取出并存到数据库中
                         if (trackStayTime < (sysTime - lastLocVo.getLongValue(DeviceApiConstants.KEY_LOC_TIME))) {
                             Set<Object> lastLocSetForSave = redisClient.zsetOperations().range(trackKey, 0, -1);

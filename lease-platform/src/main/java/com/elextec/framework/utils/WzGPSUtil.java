@@ -218,7 +218,7 @@ public class WzGPSUtil {
      * @param lng 经度
      * @return true:中国以外;false:中国以内
      */
-    private static boolean outOfChina(double lat, double lng) {
+    public static boolean outOfChina(double lat, double lng) {
         if (lng < 72.004 || lng > 137.8347) {
             return true;
         }
