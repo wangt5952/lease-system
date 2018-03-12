@@ -345,11 +345,21 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             if(count >= 1){
                 throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定用户,无法作废");
             }
-            //验证车辆是否有企业绑定
+            //验证车辆是否有企业绑定(平台除外)
+            BizOrganizationExample organizationExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria organizationCriteria = organizationExample.createCriteria();
+            organizationCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(organizationExample);
+            if(org.size() != 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "平台信息有误");
+            }
+
             BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
             BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
             orgCriteria.andUnbindTimeIsNull();
             orgCriteria.andVehicleIdEqualTo(vehicle.getId());
+            //查询时需要将平台企业ID排除在外
+            orgCriteria.andOrgIdNotEqualTo(org.get(0).getId());
             int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
             if(orgCot >= 1){
                 throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定企业,无法作废");
@@ -371,6 +381,15 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             BizRefVehicleParts partsBif = new BizRefVehicleParts();
             partsBif.setUnbindTime(new Date());
             bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
+            //解除平台与车辆绑定关系
+            BizRefOrgVehicleExample delOrgExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria delOrgCriteria = delOrgExample.createCriteria();
+            delOrgCriteria.andVehicleIdEqualTo(vehicle.getId());
+            delOrgCriteria.andUnbindTimeIsNull();
+            BizRefOrgVehicle orgRef = new BizRefOrgVehicle();
+            orgRef.setUnbindTime(new Date());
+            bizRefOrgVehicleMapperExt.updateByExample(orgRef,delOrgExample);
+
         }else{
             //校验车辆制造商是否存在（状态为正常）
             if(WzStringUtil.isNotBlank(vehicle.getMfrsId())){
@@ -392,6 +411,13 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     public void deleteVehicles(List<String> ids) {
         int i = 0;
         try {
+            BizOrganizationExample organizationExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria organizationCriteria = organizationExample.createCriteria();
+            organizationCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(organizationExample);
+            if(org.size() != 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "平台信息有误");
+            }
 
             for (; i < ids.size(); i++) {
                 BizRefUserVehicleExample example = new BizRefUserVehicleExample();
@@ -410,15 +436,17 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                 batteryBif.setUnbindTime(new Date());
                 BizRefVehicleParts partsBif = new BizRefVehicleParts();
                 partsBif.setUnbindTime(new Date());
-
                 criteria.andVehicleIdEqualTo(ids.get(i));
                 int count = bizRefUserVehicleMapperExt.countByExample(example);
                 if(count >= 1){
                     throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定用户");
                 }
                 orgCriteria.andVehicleIdEqualTo(ids.get(i));
+                //查询绑定企业时需要将平台企业除外
+                orgCriteria.andOrgIdNotEqualTo(org.get(0).getId());
                 int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
-                if(orgCot >= 1){
+
+                if(orgCot != 1){
                     throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定企业");
                 }
                 bizVehicleMapperExt.deleteByPrimaryKey(ids.get(i));
@@ -428,6 +456,14 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                 //解除所有配件绑定关系
                 delPartsCriteria.andVehicleIdEqualTo(ids.get(i));
                 bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
+                //解除平台与车辆绑定关系
+                BizRefOrgVehicleExample delOrgExample = new BizRefOrgVehicleExample();
+                BizRefOrgVehicleExample.Criteria delOrgCriteria = delOrgExample.createCriteria();
+                delOrgCriteria.andVehicleIdEqualTo(ids.get(i));
+                delOrgCriteria.andUnbindTimeIsNull();
+                BizRefOrgVehicle orgRef = new BizRefOrgVehicle();
+                orgRef.setUnbindTime(new Date());
+                bizRefOrgVehicleMapperExt.updateByExample(orgRef,delOrgExample);
             }
         } catch (BizException ex) {
             throw ex;
