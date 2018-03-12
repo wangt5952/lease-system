@@ -20,7 +20,7 @@
         </template>
         <img style="width:3rem;margin:auto 0;position: relative; top:0.1rem;right:0.3rem;" @click="reloadCaptcha" slot="right" :src="`data:image/png;base64,${key_captcha_base64}`" />
       </x-input>
-      <x-input placeholder="短信验证码" v-model="form.smsVCode" style="background:#fff;">
+      <x-input placeholder="短信验证码" class="inp-small" v-model="form.smsVCode" style="background:#fff;">
         <template slot="label">
           <i class="lt lt-safe"/>
         </template>
@@ -129,7 +129,7 @@ export default {
   margin:10px;
 }
 
->>> .btn-small {
+>>> .btn-small {  
   background: #008E56;
   font-size: 0.4rem;
   border-radius: 30px;
@@ -146,5 +146,9 @@ export default {
 }
 >>> .tu .weui_icon_clear{
   position: relative; bottom:0.25rem; right:0.2rem;
+}
+
+>>> .inp-small .weui-icon{
+  position: absolute; bottom: 0.35rem;right: 3rem;
 }
 </style>
