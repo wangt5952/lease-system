@@ -478,7 +478,8 @@ public class SysUserServcieImpl implements SysUserService {
             delCriteria.andUnbindTimeIsNull();
             BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
             delTemp.setUnbindTime(new Date());
-            bizRefOrgVehicleMapperExt.updateByExample(delTemp,delExample);
+
+            bizRefOrgVehicleMapperExt.updateByExampleSelective(delTemp,delExample);
             //绑定新关系
             BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
             addTemp.setOrgId(orgId);
@@ -529,7 +530,7 @@ public class SysUserServcieImpl implements SysUserService {
             delCriteria.andUnbindTimeIsNull();
             BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
             delTemp.setUnbindTime(new Date());
-            bizRefOrgVehicleMapperExt.updateByExample(delTemp,delExample);
+            bizRefOrgVehicleMapperExt.updateByExampleSelective(delTemp,delExample);
             //绑定新关系
             BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
             addTemp.setOrgId(plOrg.get(0).getId());
