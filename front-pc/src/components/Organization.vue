@@ -32,8 +32,9 @@
       <el-table-column prop="orgPhone" label="联系电话"></el-table-column>
       <el-table-column prop="orgBusinessLicences" label="营业执照号码"></el-table-column>
       <el-table-column prop="orgStatusText" label="状态"></el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="180">
         <template slot-scope="{row}">
+          <el-button icon="el-icon-edit" size="mini" type="text" @click="allotVehicle(row)">分配车辆</el-button>
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
           <el-tooltip content="删除" placement="top">
             <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
@@ -112,6 +113,17 @@
       </span>
     </el-dialog>
 
+    <el-dialog title="绑定企业" :visible.sync="bindFormVehicle" :close-on-click-modal="false">
+      <el-form class="edit-form" :model="bindFormOrg" ref="bindFormOrg">
+        <el-form-item prop="count" style="margin-top:10px;height:30px;" :rules="[{required:true, message: '请选择数量'}]" label="分配数量">
+          <el-input-number v-model="bindFormOrg.count" :step="1"></el-input-number>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeBindFormOrg">取消</el-button>
+        <el-button type="primary" @click="saveBindFormOrg">{{form.id ? '保存' : '绑定'}}</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -126,7 +138,7 @@ export default {
     return {
       loading: false,
       list: [],
-
+      bindForm_orgList: [],
       search: {
         orgType: '',
         orgStatus: '',
@@ -138,7 +150,11 @@ export default {
       total: 0,
 
       formVisible: false,
+      bindFormVehicle: false,
       form: {},
+      bindFormOrg: {
+        count: 1,
+      },
 
       typeList: [
         { id: 'PLATFORM', name: '平台' },
@@ -236,6 +252,39 @@ export default {
     closeForm() {
       this.form = {};
       this.formVisible = false;
+    },
+    // 跳转到给企业分配车辆页面
+    async allotVehicle({ id }) {
+      const $form = this.$refs.bindFormOrg;
+      if ($form) $form.resetFields();
+      this.bindFormOrg = { orgId: id, count: this.bindFormOrg.count };
+      const { code, respData } = (await this.$http.post('/api/manager/org/list', {
+        currPage: 1, pageSize: 999,
+      })).body;
+      if (code === '200') this.bindForm_orgList = respData.rows;
+      this.bindFormVehicle = true;
+    },
+    // 关闭
+    closeBindFormOrg() {
+      this.bindFormVehicle = false;
+    },
+    // 绑定企业
+    async saveBindFormOrg() {
+      try {
+        const $form = this.$refs.bindFormOrg;
+        await $form.validate();
+        const { ...form } = this.bindFormOrg;
+        form.count = String(this.bindFormOrg.count);
+        const { code, message } = (await this.$http.post('/api/manager/user/batchvehiclebind', form)).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('绑定企业成功');
+        await this.reload();
+        this.closeBindFormOrg();
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     async saveForm() {
       const { loginName } = this.key_user_info;
