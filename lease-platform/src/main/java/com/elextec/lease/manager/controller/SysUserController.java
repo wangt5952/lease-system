@@ -440,12 +440,7 @@ public class SysUserController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
-                //admin作为基本用户无法修改他的归属企业
-                if("admin".equals(userTemp.getLoginName())){
-                    userInfo.setOrgId(null);
-                    //用户类型无法修改，清空上传数据
-                    userInfo.setUserType(null);
-                }
+
                 if (null == userInfo
                         || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
