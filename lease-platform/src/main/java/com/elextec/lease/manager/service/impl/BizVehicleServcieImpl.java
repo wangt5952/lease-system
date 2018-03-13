@@ -372,7 +372,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             delBatteryCriteria.andVehicleIdEqualTo(vehicle.getId());
             BizRefVehicleBattery batteryBif = new BizRefVehicleBattery();
             batteryBif.setUnbindTime(new Date());
-            bizRefVehicleBatteryMapperExt.updateByExample(batteryBif,delBatteryExample);
+            bizRefVehicleBatteryMapperExt.updateByExampleSelective(batteryBif,delBatteryExample);
             //解除所有配件绑定关系
             BizRefVehiclePartsExample delPartsExample = new BizRefVehiclePartsExample();
             BizRefVehiclePartsExample.Criteria delPartsCriteria = delPartsExample.createCriteria();
@@ -380,7 +380,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             delPartsCriteria.andVehicleIdEqualTo(vehicle.getId());
             BizRefVehicleParts partsBif = new BizRefVehicleParts();
             partsBif.setUnbindTime(new Date());
-            bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
+            bizRefVehiclePartsMapperExt.updateByExampleSelective(partsBif,delPartsExample);
             //解除平台与车辆绑定关系
             BizRefOrgVehicleExample delOrgExample = new BizRefOrgVehicleExample();
             BizRefOrgVehicleExample.Criteria delOrgCriteria = delOrgExample.createCriteria();
@@ -388,7 +388,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             delOrgCriteria.andUnbindTimeIsNull();
             BizRefOrgVehicle orgRef = new BizRefOrgVehicle();
             orgRef.setUnbindTime(new Date());
-            bizRefOrgVehicleMapperExt.updateByExample(orgRef,delOrgExample);
+            bizRefOrgVehicleMapperExt.updateByExampleSelective(orgRef,delOrgExample);
 
         }else{
             //校验车辆制造商是否存在（状态为正常）
@@ -452,10 +452,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                 bizVehicleMapperExt.deleteByPrimaryKey(ids.get(i));
                 //解除所有电池绑定关系
                 delBatteryCriteria.andVehicleIdEqualTo(ids.get(i));
-                bizRefVehicleBatteryMapperExt.updateByExample(batteryBif,delBatteryExample);
+                bizRefVehicleBatteryMapperExt.updateByExampleSelective(batteryBif,delBatteryExample);
                 //解除所有配件绑定关系
                 delPartsCriteria.andVehicleIdEqualTo(ids.get(i));
-                bizRefVehiclePartsMapperExt.updateByExample(partsBif,delPartsExample);
+                bizRefVehiclePartsMapperExt.updateByExampleSelective(partsBif,delPartsExample);
                 //解除平台与车辆绑定关系
                 BizRefOrgVehicleExample delOrgExample = new BizRefOrgVehicleExample();
                 BizRefOrgVehicleExample.Criteria delOrgCriteria = delOrgExample.createCriteria();
@@ -463,7 +463,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                 delOrgCriteria.andUnbindTimeIsNull();
                 BizRefOrgVehicle orgRef = new BizRefOrgVehicle();
                 orgRef.setUnbindTime(new Date());
-                bizRefOrgVehicleMapperExt.updateByExample(orgRef,delOrgExample);
+                bizRefOrgVehicleMapperExt.updateByExampleSelective(orgRef,delOrgExample);
             }
         } catch (BizException ex) {
             throw ex;
