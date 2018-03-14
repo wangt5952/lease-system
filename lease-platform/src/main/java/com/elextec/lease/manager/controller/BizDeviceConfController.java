@@ -13,8 +13,10 @@ import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.manager.request.BizDeviceConfParam;
 import com.elextec.lease.manager.service.BizDeviceConfService;
 import com.elextec.persist.field.enums.DeviceType;
+import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.model.mybatis.BizDeviceConf;
 import com.elextec.persist.model.mybatis.BizDeviceConfKey;
+import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +74,7 @@ public class BizDeviceConfController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/list")
-    public MessageResponse list(@RequestBody String paramAndPaging) {
+    public MessageResponse list(@RequestBody String paramAndPaging,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -86,6 +89,15 @@ public class BizDeviceConfController extends BaseController {
                 pagingParam = JSON.parseObject(paramStr, BizDeviceConfParam.class);
                 if (null == pagingParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser sysUser = getLoginUserInfo(request);
+                if(sysUser != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(sysUser.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
                 if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging())
@@ -135,7 +147,7 @@ public class BizDeviceConfController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParam) {
+    public MessageResponse add(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -148,6 +160,15 @@ public class BizDeviceConfController extends BaseController {
                 devConfInfos = JSON.parseArray(paramStr, BizDeviceConf.class);
                 if (null == devConfInfos || 0 == devConfInfos.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser sysUser = getLoginUserInfo(request);
+                if(sysUser != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(sysUser.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 BizDeviceConf insDevVo = null;
                 for (int i = 0; i < devConfInfos.size(); i++) {
@@ -201,7 +222,7 @@ public class BizDeviceConfController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addOne(@RequestBody String addParam) {
+    public MessageResponse addOne(@RequestBody String addParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -214,6 +235,15 @@ public class BizDeviceConfController extends BaseController {
                 devConfInfo = JSON.parseObject(paramStr, BizDeviceConf.class);
                 if (null == devConfInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser sysUser = getLoginUserInfo(request);
+                if(sysUser != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(sysUser.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(devConfInfo.getDeviceId())
                         || null == devConfInfo.getDeviceType()) {
@@ -263,7 +293,7 @@ public class BizDeviceConfController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modify(@RequestBody String modifyParam) {
+    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -276,6 +306,15 @@ public class BizDeviceConfController extends BaseController {
                 devConfInfo = JSON.parseObject(paramStr, BizDeviceConf.class);
                 if (null == devConfInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser sysUser = getLoginUserInfo(request);
+                if(sysUser != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(sysUser.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(devConfInfo.getDeviceId())
                         || null == devConfInfo.getDeviceType()) {
@@ -327,7 +366,7 @@ public class BizDeviceConfController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/delete")
-    public MessageResponse delete(@RequestBody String deleteParam) {
+    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -340,6 +379,15 @@ public class BizDeviceConfController extends BaseController {
                 devConfIds = JSON.parseArray(paramStr, BizDeviceConfKey.class);
                 if (null == devConfIds || 0 == devConfIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser sysUser = getLoginUserInfo(request);
+                if(sysUser != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(sysUser.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
@@ -378,7 +426,7 @@ public class BizDeviceConfController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String paramPK) {
+    public MessageResponse getByPK(@RequestBody String paramPK,HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramPK)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -391,6 +439,15 @@ public class BizDeviceConfController extends BaseController {
                 devConfKey = JSONObject.parseObject(paramStr, BizDeviceConfKey.class);
                 if (null == devConfKey) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser sysUser = getLoginUserInfo(request);
+                if(sysUser != null){
+                    //只有平台用户可以操作
+                    if(!OrgAndUserType.PLATFORM.toString().equals(sysUser.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank(devConfKey.getDeviceId())
                         || null == devConfKey.getDeviceType()) {
