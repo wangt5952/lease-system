@@ -121,7 +121,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="企业">
+            <el-form-item prop="orgId" :rules="[{required:true, message:'请选择企业'}]" label="企业">
               <el-select v-model="form.orgId" placeholder="请选择企业" style="width:100%;" >
                 <el-option v-for="o in orgList" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
               </el-select>
@@ -194,7 +194,6 @@ export default {
         { id: 'FREEZE', name: '冻结' },
         { id: 'INVALID', name: '作废' },
       ],
-
       searchTypeList: [
         { id: '', name: '全部类型' },
         { id: 'PLATFORM', name: '平台' },
@@ -207,7 +206,6 @@ export default {
         { id: 'FREEZE', name: '冻结' },
         { id: 'INVALID', name: '作废' },
       ],
-
       assignRoleFormVisible: false,
       assignRoleForm: { list: [] },
 
@@ -272,7 +270,6 @@ export default {
         this.$message.error(message);
       }
     },
-
     showForm(form = { }) {
       this.form = _.pick(form, [
         'id',

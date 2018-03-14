@@ -268,7 +268,7 @@ export default {
     closeBindFormOrg() {
       this.bindFormVehicle = false;
     },
-    // 绑定企业 
+    // 绑定企业
     async saveBindFormOrg() {
       try {
         const $form = this.$refs.bindFormOrg;

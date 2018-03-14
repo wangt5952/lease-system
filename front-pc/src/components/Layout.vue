@@ -67,8 +67,6 @@
         <el-button type="primary" @click="confirmLoginForm">登录</el-button>
       </span>
     </el-dialog>
-
-    {{relogin}}
   </div>
 </template>
 
@@ -91,7 +89,8 @@ const menuTree = [
   { name: '车辆',
     icon: 'lt lt-diandongche',
     children: [
-      { name: '车辆管理', path: '/vehicle', resCode: 'vehicle_manager' },
+      { name: '车辆管理', path: '/vehicle', resCode: 'manager-vehicle-list' },
+      // { name: '车辆管理', path: '/vehicle', resCode: 'vehicle_manager' },
     ],
   },
   { name: '电池及配件',
@@ -142,7 +141,6 @@ export default {
 
     menuTree() {
       const resList = _.map(this.key_res_info, 'resCode');
-
       const travTree = root => _.filter(_.map(root, ({ children, ...o }) => {
         if (children && children.length && (!o.resCode || resList.indexOf(o.resCode) !== -1)) {
           return { ...o, children: travTree(children) };

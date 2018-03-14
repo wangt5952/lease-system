@@ -1,6 +1,5 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
-
     <div style="display:flex;">
       <div style="margin-right:10px;">
         <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加车辆</el-button>
@@ -22,7 +21,9 @@
       </el-form>
     </div>
 
-    <el-table :data="list" style="width: 100%;">
+    <!-- {{ res }} -->
+    <!-- {{ key_res_info }} -->
+    <el-table :data="list" style="width: 100%">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
@@ -41,12 +42,16 @@
           <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="">
         <template slot-scope="{row}">
-          <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-          <el-tooltip content="删除" placement="top">
-            <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-          </el-tooltip>
+          <template v-if="res['FUNCTION'].indexOf('manager-vehicle-modify') >= 0">
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+          </template>
+          <template v-if="res['FUNCTION'].indexOf('manager-vehicle-delete') >= 0">
+            <el-tooltip content="删除" placement="top">
+              <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
+            </el-tooltip>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -137,7 +142,6 @@ export default {
     return {
       loading: false,
       list: [],
-
       search: {
         vehicleStatus: '',
         isBind: '',
@@ -184,6 +188,9 @@ export default {
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
+      key_res_info: state => state.key_res_info,
+      res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
+      // res: state => _.groupBy(state.key_res_info, 'resType'),
     }),
   },
   watch: {
@@ -269,7 +276,9 @@ export default {
           if (form.parent === '') form.parent = null;
           form.create_user = loginName;
           form.update_user = loginName;
-          const { code, message } = (await this.$http.post('/api/manager/vehicle/add', [form])).body;
+          const { code, message } = (await this.$http.post('/api/manager/vehicle/addone', {
+            bizVehicleInfo: form, flag: '2',
+          })).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }
@@ -338,17 +347,19 @@ export default {
     },
   },
   async mounted() {
-    try {
-      const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
-        currPage: 1, pageSize: 999,
-      })).body;
-      if (code !== '200') throw new Error(message);
-      this.mfrsList = respData.rows;
-    } catch (e) {
-      const message = e.statusText || e.message;
-      this.$message.error(message);
+    console.log(this.key_user_info);
+    if (this.key_user_info.userType === 'PLATFORM') {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+          currPage: 1, pageSize: 999,
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.mfrsList = respData.rows;
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     }
-
     await this.reload();
   },
 };

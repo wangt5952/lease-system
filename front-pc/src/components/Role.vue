@@ -117,6 +117,8 @@ export default {
 
     resTree() {
       const { resList: list } = this;
+      // const resList = this.resList;
+      // const list = this.resList;
 
       const buildChildren = (parent) => {
         const childrenList = parent ? _.filter(list, { parent }) : _.filter(list, o => !o.parent);
@@ -127,7 +129,6 @@ export default {
           return { ...o, children };
         });
       };
-
       return buildChildren(null);
     },
   },
