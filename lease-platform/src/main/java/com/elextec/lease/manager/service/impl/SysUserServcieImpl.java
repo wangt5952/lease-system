@@ -210,6 +210,12 @@ public class SysUserServcieImpl implements SysUserService {
     public void updateSysUser(SysUser userInfo) {
         //如果是用户作废，需要验证用户是否有在绑的车辆和删除所有角色关联
         if(RecordStatus.INVALID.toString().equals(userInfo.getUserStatus())){
+            //判断用户是否为admin
+            SysUser userTemp = sysUserMapperExt.selectByPrimaryKey(userInfo.getId());
+            //admin作为基本用户无法删除
+            if("admin".equals(userTemp.getLoginName())){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "系统管理员无法作废");
+            }
             //验证用户名下是否有未归还的车辆
             BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
             BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
@@ -226,6 +232,14 @@ public class SysUserServcieImpl implements SysUserService {
             delCriteria.andUserIdEqualTo(userInfo.getId());
             sysRefUserRoleMapperExt.deleteByExample(delExample);
         }else{
+            //判断用户是否为admin
+            SysUser userTemp = sysUserMapperExt.selectByPrimaryKey(userInfo.getId());
+            //admin作为基本用户无法修改他的归属企业和用户类型
+            if("admin".equals(userTemp.getLoginName())){
+                userInfo.setOrgId(null);
+                //用户类型无法修改，清空上传数据
+                userInfo.setUserType(null);
+            }
             //验证企业是否存在（状态为正常）
             if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
                 BizOrganizationExample orgExample = new BizOrganizationExample();
@@ -256,6 +270,12 @@ public class SysUserServcieImpl implements SysUserService {
         int i = 0;
         try {
             for (; i < ids.size(); i++) {
+                //判断用户是否为admin
+                SysUser userTemp = sysUserMapperExt.selectByPrimaryKey(ids.get(i));
+                //admin作为基本用户无法删除
+                if("admin".equals(userTemp.getLoginName())){
+                    throw new BizException(RunningResult.HAVE_BIND.code(), "系统管理员无法作废");
+                }
                 BizRefUserVehicleExample refExample = new BizRefUserVehicleExample();
                 BizRefUserVehicleExample.Criteria selectRefCriteria = refExample.createCriteria();
                 selectRefCriteria.andBindTimeIsNull();
