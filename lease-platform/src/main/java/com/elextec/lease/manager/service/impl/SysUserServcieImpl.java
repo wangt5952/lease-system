@@ -209,7 +209,7 @@ public class SysUserServcieImpl implements SysUserService {
     @Transactional
     public void updateSysUser(SysUser userInfo) {
         //如果是用户作废，需要验证用户是否有在绑的车辆和删除所有角色关联
-        if(RecordStatus.INVALID.toString().equals(userInfo.getUserStatus())){
+        if(RecordStatus.INVALID.toString().equals(userInfo.getUserStatus().toString())){
             //判断用户是否为admin
             SysUser userTemp = sysUserMapperExt.selectByPrimaryKey(userInfo.getId());
             //admin作为基本用户无法删除

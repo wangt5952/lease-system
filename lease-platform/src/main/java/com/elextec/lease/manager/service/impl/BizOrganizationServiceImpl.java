@@ -145,7 +145,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     @Transactional
     public void updateBizOrganization(BizOrganization orgInfo) {
         //作废操作时，验证企业下面是否有用户和车辆
-        if(RecordStatus.INVALID.toString().equals(orgInfo.getOrgStatus())){
+        if(RecordStatus.INVALID.toString().equals(orgInfo.getOrgStatus().toString())){
             //判定企业下是否有未作废的用户
             SysUserExample userExample = new SysUserExample();
             SysUserExample.Criteria userCriteria = userExample.createCriteria();
