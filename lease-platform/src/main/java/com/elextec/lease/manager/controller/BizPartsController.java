@@ -160,6 +160,7 @@ public class BizPartsController extends BaseController {
      *         ... ...
      *     ]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量新增结果
      * <pre>
      *     {
@@ -169,8 +170,8 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/add",method = RequestMethod.POST)
-    public MessageResponse add(@RequestBody String addParam,HttpServletRequest request) {
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public MessageResponse add(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -249,6 +250,7 @@ public class BizPartsController extends BaseController {
      *      }
      *
      * </pre>
+     * @param request HttpServletRequest
      * @return 新增结果
      * <pre>
      *     {
@@ -258,8 +260,8 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/addone",method = RequestMethod.POST)
-    public MessageResponse addone(@RequestBody String addParam,HttpServletRequest request) {
+    @RequestMapping(value = "/addone", method = RequestMethod.POST)
+    public MessageResponse addone(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -328,6 +330,7 @@ public class BizPartsController extends BaseController {
      *         updateUser:更新人,
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 修改结果
      * <pre>
      *     {
@@ -337,8 +340,8 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/modify",method = RequestMethod.POST)
-    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
+    @RequestMapping(value = "/modify", method = RequestMethod.POST)
+    public MessageResponse modify(@RequestBody String modifyParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -383,6 +386,7 @@ public class BizPartsController extends BaseController {
      * <pre>
      *     [ID1,ID2,......]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量删除结果
      * <pre>
      *     {
@@ -392,8 +396,8 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/delete",method = RequestMethod.POST)
-    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public MessageResponse delete(@RequestBody String deleteParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -434,6 +438,7 @@ public class BizPartsController extends BaseController {
      * <pre>
      *     [id]
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -458,8 +463,8 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
-    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
+    @RequestMapping(value = "/getbypk", method = RequestMethod.POST)
+    public MessageResponse getByPK(@RequestBody String id, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -506,6 +511,7 @@ public class BizPartsController extends BaseController {
      *         partsId:配件ID
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -515,8 +521,8 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/partBind",method = RequestMethod.POST)
-    public MessageResponse partBind(@RequestBody String vehicleIdAndPartsId,HttpServletRequest request){
+    @RequestMapping(value = "/partBind", method = RequestMethod.POST)
+    public MessageResponse partBind(@RequestBody String vehicleIdAndPartsId, HttpServletRequest request){
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(vehicleIdAndPartsId)){
             return new MessageResponse(RunningResult.NO_PARAM);
@@ -560,6 +566,7 @@ public class BizPartsController extends BaseController {
      *          partsId:配件ID
      *      }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -569,8 +576,8 @@ public class BizPartsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/partsUnBind",method = RequestMethod.POST)
-    public MessageResponse partsUnBind(@RequestBody String vehicleIdAndPartsId,HttpServletRequest request){
+    @RequestMapping(value = "/partsUnBind", method = RequestMethod.POST)
+    public MessageResponse partsUnBind(@RequestBody String vehicleIdAndPartsId, HttpServletRequest request){
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(vehicleIdAndPartsId)) {
             return new MessageResponse(RunningResult.NO_PARAM);

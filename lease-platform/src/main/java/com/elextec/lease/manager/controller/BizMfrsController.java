@@ -53,6 +53,7 @@ public class BizMfrsController extends BaseController {
      *         pageSize:每页记录数
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果列表
      * <pre>
      *     {
@@ -78,8 +79,8 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/list",method = RequestMethod.POST)
-    public MessageResponse list(@RequestBody String paramAndPaging,HttpServletRequest request) {
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    public MessageResponse list(@RequestBody String paramAndPaging, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -145,6 +146,7 @@ public class BizMfrsController extends BaseController {
      *         ... ...
      *     ]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量新增结果
      * <pre>
      *     {
@@ -154,7 +156,7 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public MessageResponse add(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
@@ -227,6 +229,7 @@ public class BizMfrsController extends BaseController {
      *              updateUser:更新人
      *  }
      * </pre>
+     * @param request HttpServletRequest
      * @return 新增结果
      * <pre>
      *     {
@@ -236,8 +239,8 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/addone",method = RequestMethod.POST)
-    public MessageResponse addone(@RequestBody String addParam,HttpServletRequest request) {
+    @RequestMapping(value = "/addone", method = RequestMethod.POST)
+    public MessageResponse addone(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -303,6 +306,7 @@ public class BizMfrsController extends BaseController {
      *         updateUser:更新人
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 修改结果
      * <pre>
      *     {
@@ -312,8 +316,8 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/modify",method = RequestMethod.POST)
-    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
+    @RequestMapping(value = "/modify", method = RequestMethod.POST)
+    public MessageResponse modify(@RequestBody String modifyParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -358,6 +362,7 @@ public class BizMfrsController extends BaseController {
      * <pre>
      *     [ID1,ID2,......]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量删除结果
      * <pre>
      *     {
@@ -367,8 +372,8 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/delete",method = RequestMethod.POST)
-    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public MessageResponse delete(@RequestBody String deleteParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -409,6 +414,7 @@ public class BizMfrsController extends BaseController {
      * <pre>
      *     [id]
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -431,8 +437,8 @@ public class BizMfrsController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/getbypk",method = RequestMethod.POST)
-    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
+    @RequestMapping(value = "/getbypk", method = RequestMethod.POST)
+    public MessageResponse getByPK(@RequestBody String id, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);

@@ -70,6 +70,7 @@ public class SysUserController extends BaseController {
      *         pageSize:每页记录数（needPaging不为false时必填）
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果列表
      * <pre>
      *     {
@@ -105,7 +106,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/list")
-    public MessageResponse list(@RequestBody String paramAndPaging,HttpServletRequest request) {
+    public MessageResponse list(@RequestBody String paramAndPaging, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -183,6 +184,7 @@ public class SysUserController extends BaseController {
      *         }
      *     ]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量新增结果
      * <pre>
      *     {
@@ -193,7 +195,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParam,HttpServletRequest request) {
+    public MessageResponse add(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -287,6 +289,7 @@ public class SysUserController extends BaseController {
      *         updateUuser:更新人（必填）
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 新增结果
      * <pre>
      *     {
@@ -297,7 +300,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addOne(@RequestBody String addParam,HttpServletRequest request) {
+    public MessageResponse addOne(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -483,6 +486,7 @@ public class SysUserController extends BaseController {
      * <pre>
      *     [ID1,ID2,......]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量删除结果
      * <pre>
      *     {
@@ -493,7 +497,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/delete")
-    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
+    public MessageResponse delete(@RequestBody String deleteParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -538,6 +542,7 @@ public class SysUserController extends BaseController {
      *         roleIds:角色ID，多个以逗号隔开，例：角色Id1,角色Id2,角色Id3
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 处理结果
      * <pre>
      *     {
@@ -548,7 +553,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/refuserandroles")
-    public MessageResponse refUserAndRoles(@RequestBody String userAndRoles,HttpServletRequest request) {
+    public MessageResponse refUserAndRoles(@RequestBody String userAndRoles, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(userAndRoles)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -596,6 +601,7 @@ public class SysUserController extends BaseController {
      * <pre>
      *     [id]
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -640,7 +646,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
+    public MessageResponse getByPK(@RequestBody String id, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -691,6 +697,7 @@ public class SysUserController extends BaseController {
      *         vehicleId:车辆ID
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -701,7 +708,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/vehiclebind")
-    public MessageResponse vehicleBind(@RequestBody String userIdAndVehicleId,HttpServletRequest request) {
+    public MessageResponse vehicleBind(@RequestBody String userIdAndVehicleId, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(userIdAndVehicleId)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -756,6 +763,7 @@ public class SysUserController extends BaseController {
      *         vehicleId:车辆ID
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -766,7 +774,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/vehicleunbind")
-    public MessageResponse vehicleUnbind(@RequestBody String userIdAndVehicleId,HttpServletRequest request) {
+    public MessageResponse vehicleUnbind(@RequestBody String userIdAndVehicleId, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(userIdAndVehicleId)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -821,6 +829,7 @@ public class SysUserController extends BaseController {
      *         count:分发数量
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -831,7 +840,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/batchvehiclebind")
-    public MessageResponse batchVehicleBind(@RequestBody String orgIdAndCount,HttpServletRequest request) {
+    public MessageResponse batchVehicleBind(@RequestBody String orgIdAndCount, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(orgIdAndCount)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -878,6 +887,7 @@ public class SysUserController extends BaseController {
      *         count:归还数量
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -888,7 +898,7 @@ public class SysUserController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/batchvehicleunbind")
-    public MessageResponse batchVehicleUnbind(@RequestBody String orgIdAndCount,HttpServletRequest request) {
+    public MessageResponse batchVehicleUnbind(@RequestBody String orgIdAndCount, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(orgIdAndCount)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -925,5 +935,4 @@ public class SysUserController extends BaseController {
             return mr;
         }
     }
-
 }

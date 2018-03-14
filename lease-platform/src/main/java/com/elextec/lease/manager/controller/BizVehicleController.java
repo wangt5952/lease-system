@@ -14,7 +14,6 @@ import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.LocAndRadiusParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
-import com.elextec.lease.manager.service.BizPartsService;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.manager.service.BizVehicleTrackService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
@@ -68,6 +67,7 @@ public class BizVehicleController extends BaseController {
      *         pageSize:每页记录数（needPaging不为false时必填）
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 车辆列表
      * <pre>
      *     {
@@ -179,6 +179,7 @@ public class BizVehicleController extends BaseController {
      *          }
      *    }]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量新增结果
      * <pre>
      *     {
@@ -189,7 +190,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParams,HttpServletRequest request) {
+    public MessageResponse add(@RequestBody String addParams, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParams)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -292,6 +293,7 @@ public class BizVehicleController extends BaseController {
      *          }
      *    }
      * </pre>
+     * @param request HttpServletRequest
      * @return 新增结果
      * <pre>
      *     {
@@ -302,7 +304,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addone(@RequestBody String addParams,HttpServletRequest request) {
+    public MessageResponse addone(@RequestBody String addParams, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParams)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -386,6 +388,7 @@ public class BizVehicleController extends BaseController {
      *         updateUser:更新人
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 修改车辆信息返回
      * <pre>
      *     {
@@ -396,7 +399,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modifyUser(@RequestBody String modifyParam,HttpServletRequest request) {
+    public MessageResponse modifyUser(@RequestBody String modifyParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -443,6 +446,7 @@ public class BizVehicleController extends BaseController {
      * <pre>
      *     [ID1,ID2,......]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量删除车辆返回
      * <pre>
      *     {
@@ -453,7 +457,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/delete")
-    public MessageResponse deleteUsers(@RequestBody String deleteParam,HttpServletRequest request) {
+    public MessageResponse deleteUsers(@RequestBody String deleteParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -497,6 +501,7 @@ public class BizVehicleController extends BaseController {
      *         flag:是否查询在用电池（true是查询在用电池，false是查询全部电池）
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取车辆信息返回
      * <pre>
      *     {
@@ -537,7 +542,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String param,HttpServletRequest request) {
+    public MessageResponse getByPK(@RequestBody String param, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(param)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -583,13 +588,13 @@ public class BizVehicleController extends BaseController {
         }
     }
 
-
     /**
      * 根据ID获取车辆配件信息.
      * @param param 车辆ID
      * <pre>
      * [id]
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取车辆信息返回
      * <pre>
      *     {
@@ -621,7 +626,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypr")
-    public MessageResponse getByPR(@RequestBody String param,HttpServletRequest request) {
+    public MessageResponse getByPR(@RequestBody String param, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(param)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -659,13 +664,13 @@ public class BizVehicleController extends BaseController {
         }
     }
 
-
     /**
      * 根据车辆ID列表获取车辆信息列表.
      * @param ids 车辆ID列表
      * <pre>
      *     [id1,id2,...]
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取设备定位信息
      * <pre>
      *     {
@@ -687,7 +692,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getlocbyvehiclepk")
-    public MessageResponse getLocByVehiclePK(@RequestBody String ids,HttpServletRequest request) {
+    public MessageResponse getLocByVehiclePK(@RequestBody String ids, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -777,6 +782,7 @@ public class BizVehicleController extends BaseController {
      * <pre>
      *     [id1,id2,...]
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取设备电量信息
      * <pre>
      *     {
@@ -798,7 +804,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getpowerbyvehiclepk")
-    public MessageResponse getPowerByVehiclePK(@RequestBody String ids,HttpServletRequest request) {
+    public MessageResponse getPowerByVehiclePK(@RequestBody String ids, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -890,6 +896,7 @@ public class BizVehicleController extends BaseController {
      *         batteryId:电池ID
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -900,7 +907,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/batterybind")
-    public MessageResponse batteryBind(@RequestBody String vehicleIdAndBatteryId,HttpServletRequest request) {
+    public MessageResponse batteryBind(@RequestBody String vehicleIdAndBatteryId, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(vehicleIdAndBatteryId)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -947,6 +954,7 @@ public class BizVehicleController extends BaseController {
      *         batteryId:电池ID
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -957,7 +965,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/batteryunbind")
-    public MessageResponse batteryUnbind(@RequestBody String vehicleIdAndBatteryId,HttpServletRequest request) {
+    public MessageResponse batteryUnbind(@RequestBody String vehicleIdAndBatteryId, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(vehicleIdAndBatteryId)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -1005,6 +1013,7 @@ public class BizVehicleController extends BaseController {
      *         radius:半径(米)
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 车辆信息及定位、电池电量信息列表
      * <pre>
      *     {
@@ -1037,7 +1046,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/listvehiclesbylocandradius")
-    public MessageResponse listVehiclesByLocAndRadius(@RequestBody String locAndRadius,HttpServletRequest request) {
+    public MessageResponse listVehiclesByLocAndRadius(@RequestBody String locAndRadius, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(locAndRadius)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -1121,6 +1130,7 @@ public class BizVehicleController extends BaseController {
      *         endTime:结束时间
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据车辆ID和时间区间获取车辆的轨迹信息
      * <pre>
      *     {
@@ -1139,7 +1149,7 @@ public class BizVehicleController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/gettrackbytime")
-    public MessageResponse getTrackByTime(@RequestBody String idAndTimeInterval,HttpServletRequest request) {
+    public MessageResponse getTrackByTime(@RequestBody String idAndTimeInterval, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(idAndTimeInterval)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -1290,9 +1300,9 @@ public class BizVehicleController extends BaseController {
         }
     }
 
-
     /**
      * 平台与企业用户查询绑定车辆数量接口
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -1326,5 +1336,4 @@ public class BizVehicleController extends BaseController {
         // 返回结果
         return new MessageResponse(RunningResult.SUCCESS, vehiclesCot);
     }
-
 }

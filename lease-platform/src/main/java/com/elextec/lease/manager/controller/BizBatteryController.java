@@ -159,6 +159,7 @@ public class BizBatteryController extends BaseController {
      *         }
      *     ]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量新增结果
      * <pre>
      *     {
@@ -169,7 +170,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/add")
-    public MessageResponse add(@RequestBody String addParam,HttpServletRequest request) {
+    public MessageResponse add(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -235,6 +236,7 @@ public class BizBatteryController extends BaseController {
      *         updateUser:更新人
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 新增结果
      * <pre>
      *     {
@@ -245,7 +247,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/addone")
-    public MessageResponse addOne(@RequestBody String addParam,HttpServletRequest request) {
+    public MessageResponse addOne(@RequestBody String addParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(addParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -307,6 +309,7 @@ public class BizBatteryController extends BaseController {
      *         updateUser:更新人
      *     }
      * </pre>
+     * @param request HttpServletRequest
      * @return 修改结果
      * <pre>
      *     {
@@ -317,7 +320,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/modify")
-    public MessageResponse modify(@RequestBody String modifyParam,HttpServletRequest request) {
+    public MessageResponse modify(@RequestBody String modifyParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(modifyParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -364,6 +367,7 @@ public class BizBatteryController extends BaseController {
      * <pre>
      *     [ID1,ID2,......]
      * </pre>
+     * @param request HttpServletRequest
      * @return 批量删除结果
      * <pre>
      *     {
@@ -374,7 +378,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/delete")
-    public MessageResponse delete(@RequestBody String deleteParam,HttpServletRequest request) {
+    public MessageResponse delete(@RequestBody String deleteParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(deleteParam)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -415,6 +419,7 @@ public class BizBatteryController extends BaseController {
      * <pre>
      *     [id]
      * </pre>
+     * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -438,7 +443,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getbypk")
-    public MessageResponse getByPK(@RequestBody String id,HttpServletRequest request) {
+    public MessageResponse getByPK(@RequestBody String id, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(id)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -482,6 +487,7 @@ public class BizBatteryController extends BaseController {
      * <pre>
      *     [id1,id2,...]
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取设备定位信息
      * <pre>
      *     {
@@ -503,7 +509,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getlocbybatterypk")
-    public MessageResponse getLocByBatteryPK(@RequestBody String ids,HttpServletRequest request) {
+    public MessageResponse getLocByBatteryPK(@RequestBody String ids, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -582,6 +588,7 @@ public class BizBatteryController extends BaseController {
      * <pre>
      *     [id1,id2,...]
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取设备电量信息
      * <pre>
      *     {
@@ -603,7 +610,7 @@ public class BizBatteryController extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getpowerbybatterypk")
-    public MessageResponse getPowerByBatteryPK(@RequestBody String ids,HttpServletRequest request) {
+    public MessageResponse getPowerByBatteryPK(@RequestBody String ids, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);

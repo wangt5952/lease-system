@@ -47,6 +47,7 @@ public class UserDeviceApi extends BaseController {
      * <pre>
      *     [id1,id2,...]
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取设备电量信息
      * <pre>
      *     {
@@ -157,6 +158,7 @@ public class UserDeviceApi extends BaseController {
      * <pre>
      *     [id1,id2,...]
      * </pre>
+     * @param request HttpServletRequest
      * @return 根据ID获取设备定位信息
      * <pre>
      *     {
@@ -178,7 +180,7 @@ public class UserDeviceApi extends BaseController {
      * </pre>
      */
     @RequestMapping(path = "/getlocbyvehiclepk")
-    public MessageResponse getLocByVehiclePK(@RequestBody String ids,HttpServletRequest request) {
+    public MessageResponse getLocByVehiclePK(@RequestBody String ids, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(ids)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
