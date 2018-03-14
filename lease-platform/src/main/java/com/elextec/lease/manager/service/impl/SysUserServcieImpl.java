@@ -135,11 +135,11 @@ public class SysUserServcieImpl implements SysUserService {
                         throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,用户相关企业不存在或已作废");
                     }
                     //验证企业类型与用户类型是否一致
-                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())
                             && OrgAndUserType.ENTERPRISE.toString().equals(usersInfos.get(i).getUserType().toString())){
                         throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,平台下不能创建企业用户");
                     }
-                    if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgStatus().toString())
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(org.get(0).getOrgType().toString())
                             && OrgAndUserType.PLATFORM.toString().equals(usersInfos.get(i).getUserType().toString())){
                         throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误,普通企业下不能创建平台用户");
                     }
