@@ -36,24 +36,27 @@
           <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="配件">
-        <template slot-scope="{row}">
-          <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
-          <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="">
-        <template slot-scope="{row}">
-          <template v-if="res['FUNCTION'].indexOf('manager-vehicle-modify') >= 0">
-            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <template v-if="key_user_info.userType === 'PLATFORM'">
+        <el-table-column label="配件">
+          <template slot-scope="{row}">
+            <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
+            <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
           </template>
-          <template v-if="res['FUNCTION'].indexOf('manager-vehicle-delete') >= 0">
-            <el-tooltip content="删除" placement="top">
-              <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-            </el-tooltip>
+        </el-table-column>
+        <el-table-column label="操作" width="">
+          <template slot-scope="{row}">
+            <template v-if="res['FUNCTION'].indexOf('manager-vehicle-modify') >= 0">
+              <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+            </template>
+            <template v-if="res['FUNCTION'].indexOf('manager-vehicle-delete') >= 0">
+              <el-tooltip content="删除" placement="top">
+                <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
+              </el-tooltip>
+            </template>
           </template>
-        </template>
-      </el-table-column>
+        </el-table-column>
+      </template>
     </el-table>
 
     <el-pagination v-if="total" style="margin-top:10px;"
@@ -347,7 +350,6 @@ export default {
     },
   },
   async mounted() {
-    console.log(this.key_user_info);
     if (this.key_user_info.userType === 'PLATFORM') {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {

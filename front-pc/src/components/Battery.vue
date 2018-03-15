@@ -39,9 +39,9 @@
       <el-table-column label="操作" width="100">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-          <el-tooltip content="删除" placement="top">
+          <!-- <el-tooltip content="删除" placement="top">
             <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-          </el-tooltip>
+          </el-tooltip> -->
         </template>
       </el-table-column>
     </el-table>
@@ -61,7 +61,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="batteryCode" :rules="[{required:true, message:'请填写编号'}]" label="编号">
-              <el-input v-model="form.batteryCode" auto-complete="off"></el-input>
+              <el-input v-model="form.batteryCode" auto-complete="off" :disabled="form.id"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">

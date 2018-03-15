@@ -93,11 +93,12 @@ const menuTree = [
       // { name: '车辆管理', path: '/vehicle', resCode: 'vehicle_manager' },
     ],
   },
-  { name: '电池及配件',
+  { name: '电池/配件/设备',
     icon: 'lt lt-iconset0250',
     children: [
       { name: '电池管理', path: '/battery', resCode: 'battery_manager' },
       { name: '配件管理', path: '/parts', resCode: 'parts_manager' },
+      { name: '设备管理', path: '/device', resCode: 'manager-device-list' },
     ],
   },
   { name: '制造商',

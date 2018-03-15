@@ -20,7 +20,7 @@ export default new Router({
         { path: '/vehicle', component: () => import('@/components/Vehicle') },
         { path: '/battery', component: () => import('@/components/Battery') },
         { path: '/parts', component: () => import('@/components/Parts') },
-
+        { path: '/device', component: () => import('@/components/Device') },
         { path: '/monitor', component: () => import('@/components/Monitor') },
       ],
     },
