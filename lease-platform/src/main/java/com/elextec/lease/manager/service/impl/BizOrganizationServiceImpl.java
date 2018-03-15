@@ -146,6 +146,11 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     @Override
     @Transactional
     public void updateBizOrganization(BizOrganization orgInfo) {
+
+        BizOrganizationExample orgExample = new BizOrganizationExample();
+        BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
+        orgCriteria.andIdEqualTo(orgInfo.getId());
+        List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
         //作废操作时，验证企业下面是否有用户和车辆
         if(RecordStatus.INVALID.toString().equals(orgInfo.getOrgStatus().toString())){
             //判定企业下是否有未作废的用户
@@ -167,17 +172,18 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
                 throw new BizException(RunningResult.HAVE_BIND.code(), "企业名下有绑定的车辆,无法作废");
             }
             //平台企业无法作废
-            BizOrganizationExample orgExample = new BizOrganizationExample();
-            BizOrganizationExample.Criteria orgCriteria = orgExample.createCriteria();
-            orgCriteria.andIdEqualTo(orgInfo.getId());
-            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
             if(org.size() >= 1){
                 if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
                     throw new BizException(RunningResult.DB_ERROR.code(), "平台不能作废");
                 }
             }
-
-
+        }
+        //平台企业无法修改类型
+        if(org.size() >= 1){
+            if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())
+                    && !OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgStatus().toString()) ){
+                throw new BizException(RunningResult.DB_ERROR.code(), "平台不能修改类型");
+            }
         }
         bizOrganizationMapperExt.updateByPrimaryKeySelective(orgInfo);
     }
