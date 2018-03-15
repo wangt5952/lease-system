@@ -39,6 +39,8 @@ public class BizVehicleTrackServiceImpl implements BizVehicleTrackService {
                     throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "已存在重复时间段轨迹，请确认");
                 }
                 bizVehicleTrackMapperExt.insertSelective(trackInfo);
+            } catch (BizException ex) {
+                throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
             }

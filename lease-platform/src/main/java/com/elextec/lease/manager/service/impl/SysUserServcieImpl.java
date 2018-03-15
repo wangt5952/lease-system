@@ -150,6 +150,8 @@ public class SysUserServcieImpl implements SysUserService {
                 insertVo.setCreateTime(new Date());
                 sysUserMapperExt.insertSelective(insertVo);
             }
+        } catch (BizException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录插入时发生错误", ex);
         }
