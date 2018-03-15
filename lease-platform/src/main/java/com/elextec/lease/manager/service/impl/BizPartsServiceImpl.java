@@ -141,7 +141,7 @@ public class BizPartsServiceImpl implements BizPartsService {
         lnCriteria.andPartsCodeEqualTo(partsInfo.getPartsCode());
         int lnCnt = bizPartsMapperExt.countByExample(bizPartsExample);
         if (0 < lnCnt) {
-            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "资源code(" + partsInfo.getPartsCode() + ")已存在");
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "配件code(" + partsInfo.getPartsCode() + ")已存在");
         }
         //校验制造商是否存在（状态为正常）
         if(WzStringUtil.isNotBlank(partsInfo.getMfrsId())){

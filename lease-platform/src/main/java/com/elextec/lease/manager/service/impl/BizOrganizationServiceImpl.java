@@ -130,7 +130,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         lnCriteria.andOrgCodeEqualTo(orgInfo.getOrgCode());
         int lnCnt = bizOrganizationMapperExt.countByExample(lnExample);
         if (0 < lnCnt) {
-            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "资源code(" + orgInfo.getOrgCode() + ")已存在");
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "企业code(" + orgInfo.getOrgCode() + ")已存在");
         }
         try {
             orgInfo.setId(WzUniqueValUtil.makeUUID());
