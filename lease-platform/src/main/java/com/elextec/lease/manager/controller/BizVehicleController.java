@@ -250,12 +250,12 @@ public class BizVehicleController extends BaseController {
                         }
                     }
                 }
+                bizVehicleService.insertVehicles(vehicleInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizVehicleService.insertVehicles(vehicleInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -361,12 +361,12 @@ public class BizVehicleController extends BaseController {
                         }
                     }
                 }
+                bizVehicleService.insertVehicle(vechcleInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizVehicleService.insertVehicle(vechcleInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -428,12 +428,12 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank(vehicleInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
+                bizVehicleService.updateVehicle(vehicleInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizVehicleService.updateVehicle(vehicleInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -480,12 +480,12 @@ public class BizVehicleController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
+                bizVehicleService.deleteVehicles(vehicleIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizVehicleService.deleteVehicles(vehicleIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -933,12 +933,12 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
                 }
+                bizVehicleService.bind(param.get("vehicleId"), param.get("batteryId"));
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizVehicleService.bind(param.get("vehicleId"), param.get("batteryId"));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -991,12 +991,12 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
                 }
+                bizVehicleService.unBind(param.get("vehicleId"), param.get("batteryId"));
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizVehicleService.unBind(param.get("vehicleId"), param.get("batteryId"));
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

@@ -209,12 +209,12 @@ public class BizOrgController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业状态无效");
                     }
                 }
+                bizOrganizationService.insertBizOrganization(orgInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.insertBizOrganization(orgInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -293,12 +293,12 @@ public class BizOrgController extends BaseController {
                         && !orgInfo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
                 }
+                bizOrganizationService.insertBizOrganization(orgInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.insertBizOrganization(orgInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -361,12 +361,12 @@ public class BizOrgController extends BaseController {
                 if (WzStringUtil.isBlank(org.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
+                bizOrganizationService.updateBizOrganization(org);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.updateBizOrganization(org);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -413,12 +413,12 @@ public class BizOrgController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
+                bizOrganizationService.deleteBizOrganization(orgIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizOrganizationService.deleteBizOrganization(orgIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

@@ -188,12 +188,12 @@ public class BizDeviceConfController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录无需更新");
                     }
                 }
+                bizDeviceConfService.insertBizDeviceConfs(devConfInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizDeviceConfService.insertBizDeviceConfs(devConfInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -259,12 +259,13 @@ public class BizDeviceConfController extends BaseController {
                         && null == devConfInfo.getRequest()) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无需更新");
                 }
+                bizDeviceConfService.insertBizDeviceConf(devConfInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizDeviceConfService.insertBizDeviceConf(devConfInfo);
+
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -330,12 +331,12 @@ public class BizDeviceConfController extends BaseController {
                         && null == devConfInfo.getRequest()) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无需更新");
                 }
+                bizDeviceConfService.updateBizDeviceConf(devConfInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizDeviceConfService.updateBizDeviceConf(devConfInfo);
             // 修改后进行缓存
             redisClient.valueOperations().set(WzConstants.GK_DEVICE_CONF + devConfInfo.getDeviceId() + WzConstants.KEY_SPLIT + devConfInfo.getDeviceType().toString(), devConfInfo, 30, TimeUnit.MINUTES);
             // 组织返回结果并返回
@@ -389,12 +390,12 @@ public class BizDeviceConfController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
+                bizDeviceConfService.deleteBizDeviceConfs(devConfIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizDeviceConfService.deleteBizDeviceConfs(devConfIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

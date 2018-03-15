@@ -211,12 +211,12 @@ public class SysResourceController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条资源显示标志无效");
                     }
                 }
+                sysResourceService.insertSysResources(resInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysResourceService.insertSysResources(resInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -298,12 +298,12 @@ public class SysResourceController extends BaseController {
                         && !resInfo.getShowFlag().toString().equals(ShowFlag.HIDDEN.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的显示标志");
                 }
+                sysResourceService.insertSysResource(resInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysResourceService.insertSysResource(resInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -367,12 +367,12 @@ public class SysResourceController extends BaseController {
                 if (WzStringUtil.isBlank(resInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
+                sysResourceService.updateSysResources(resInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysResourceService.updateSysResources(resInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -419,12 +419,12 @@ public class SysResourceController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
+                sysResourceService.deleteSysResources(resIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysResourceService.deleteSysResources(resIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

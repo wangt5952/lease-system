@@ -208,12 +208,13 @@ public class BizBatteryController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
                     }
                 }
+                bizBatteryService.insertBatterys(batteryInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.insertBatterys(batteryInfos);
+
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -281,12 +282,12 @@ public class BizBatteryController extends BaseController {
                         && !batteryInfo.getBatteryStatus().toString().equals(RecordStatus.NORMAL.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
                 }
+                bizBatteryService.insertBattery(batteryInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.insertBattery(batteryInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -348,13 +349,12 @@ public class BizBatteryController extends BaseController {
                         || WzStringUtil.isBlank(batteryInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "电池参数有误");
                 }
-
+                bizBatteryService.updateBattery(batteryInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.updateBattery(batteryInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -401,12 +401,13 @@ public class BizBatteryController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
+                bizBatteryService.deleteBattery(batteryIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizBatteryService.deleteBattery(batteryIds);
+
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

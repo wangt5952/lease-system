@@ -254,12 +254,12 @@ public class SysUserController extends BaseController {
                     }
                     userInfos.get(i).setPassword(WzEncryptUtil.getMD5(defaultPassword,true));
                 }
+                sysUserService.insertSysUsers(userInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.insertSysUsers(userInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -356,12 +356,12 @@ public class SysUserController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户状态");
                 }
                 userInfo.setPassword(WzEncryptUtil.getMD5(defaultPassword,true));
+                sysUserService.insertSysUser(userInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.insertSysUser(userInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -451,19 +451,20 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank(userInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
+                //密码不可以由这个接口修改，清空上传的密码参数
+                userInfo.setPassword(null);
+                //手机号码不可以由这个接口个改，清空上传的手机号码
+                userInfo.setUserMobile(null);
+                //用户名不可修改
+                userInfo.setLoginName(null);
+
+                sysUserService.updateSysUser(userInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            //密码不可以由这个接口修改，清空上传的密码参数
-            userInfo.setPassword(null);
-            //手机号码不可以由这个接口个改，清空上传的手机号码
-            userInfo.setUserMobile(null);
-            //用户名不可修改
-            userInfo.setLoginName(null);
 
-            sysUserService.updateSysUser(userInfo);
             // 更新登录信息
 //            SysUserExample reListParam  = new SysUserExample();
 //            SysUserExample.Criteria reListCri = reListParam.createCriteria();
@@ -520,12 +521,12 @@ public class SysUserController extends BaseController {
                 if (null == userIds || 0 == userIds.size()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                sysUserService.deleteSysUser(userIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.deleteSysUser(userIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -582,12 +583,12 @@ public class SysUserController extends BaseController {
                         throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "授权角色不能为空");
                     }
                 }
+                sysUserService.refSysUserAndRoles(ur);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            sysUserService.refSysUserAndRoles(ur);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -725,28 +726,29 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("userId")) || WzStringUtil.isBlank((String) param.get("vehicleId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "查询条件不能为空");
                 }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //个人用户无权执行该操作
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                    //企业用户只可以操作自己企业名下的车辆
+                    else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                        sysUserService.bind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
+                    }
+                    //平台用户可以操作所有车辆
+                    else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                        sysUserService.bind(param.get("userId"), param.get("vehicleId"),null);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp != null){
-                //个人用户无权执行该操作
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                    return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
-                }
-                //企业用户只可以操作自己企业名下的车辆
-                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
-                    sysUserService.bind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
-                }
-                //平台用户可以操作所有车辆
-                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
-                    sysUserService.bind(param.get("userId"), param.get("vehicleId"),null);
-                }
-            }else{
-                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
-            }
+
 
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
@@ -791,29 +793,28 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank((String) param.get("userId")) || WzStringUtil.isBlank((String) param.get("vehicleId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
                 }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //个人用户无权执行该操作
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                    //企业用户只可以操作自己企业名下的车辆
+                    else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                        sysUserService.unBind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
+                    }
+                    //平台用户可以操作所有车辆
+                    else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                        sysUserService.unBind(param.get("userId"), param.get("vehicleId"),null);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp != null){
-                //个人用户无权执行该操作
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                    return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
-                }
-                //企业用户只可以操作自己企业名下的车辆
-                else if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
-                    sysUserService.unBind(param.get("userId"), param.get("vehicleId"),userTemp.getOrgId());
-                }
-                //平台用户可以操作所有车辆
-                else if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
-                    sysUserService.unBind(param.get("userId"), param.get("vehicleId"),null);
-                }
-            }else{
-                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
-            }
-
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

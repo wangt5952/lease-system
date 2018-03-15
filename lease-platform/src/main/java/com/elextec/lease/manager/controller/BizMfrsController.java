@@ -201,12 +201,12 @@ public class BizMfrsController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录制造商状态无效");
                     }
                 }
+                bizManufacturerService.insertBizManufacturers(mfrsInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizManufacturerService.insertBizManufacturers(mfrsInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -280,12 +280,12 @@ public class BizMfrsController extends BaseController {
                         && !mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的制造商状态");
                 }
+                bizManufacturerService.insertBizManufacturers(mfrsInfo);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizManufacturerService.insertBizManufacturers(mfrsInfo);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -344,12 +344,12 @@ public class BizMfrsController extends BaseController {
                 if (WzStringUtil.isBlank(mfrs.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
+                bizManufacturerService.updateBizManufacturer(mfrs);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizManufacturerService.updateBizManufacturer(mfrs);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -396,12 +396,12 @@ public class BizMfrsController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
+                bizManufacturerService.deleteBizManufacturers(mfrsIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizManufacturerService.deleteBizManufacturers(mfrsIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;

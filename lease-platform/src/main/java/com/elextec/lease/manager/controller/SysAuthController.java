@@ -252,20 +252,21 @@ public class SysAuthController extends BaseController {
                         || null == modifyPasswordParam.getAuthTime()) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                SysUserExt sue = getLoginUserInfo(request);
+                // 验证用户并返回用户信息
+                if (sysAuthService.verifyUser(sue.getLoginName(), sue.getPassword(), modifyPasswordParam.getOldAuthStr(), modifyPasswordParam.getAuthTime())) {
+                    SysUser updateVo = new SysUser();
+                    updateVo.setId(sue.getId());
+                    updateVo.setPassword(modifyPasswordParam.getNewPassword());
+                    updateVo.setUpdateUser(sue.getId());
+                    sysUserService.updateSysUser(updateVo);
+                }
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            SysUserExt sue = getLoginUserInfo(request);
-            // 验证用户并返回用户信息
-            if (sysAuthService.verifyUser(sue.getLoginName(), sue.getPassword(), modifyPasswordParam.getOldAuthStr(), modifyPasswordParam.getAuthTime())) {
-                SysUser updateVo = new SysUser();
-                updateVo.setId(sue.getId());
-                updateVo.setPassword(modifyPasswordParam.getNewPassword());
-                updateVo.setUpdateUser(sue.getId());
-                sysUserService.updateSysUser(updateVo);
-            }
+
         }
         // 组织返回结果并返回
         MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);

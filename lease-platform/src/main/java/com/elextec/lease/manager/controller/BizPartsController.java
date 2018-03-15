@@ -219,12 +219,12 @@ public class BizPartsController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的配件状态");
                     }
                 }
+                bizPartsService.insertBizParts(bizPartsInfos);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizPartsService.insertBizParts(bizPartsInfos);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -305,12 +305,12 @@ public class BizPartsController extends BaseController {
                         && !bizParts.getPartsStatus().toString().equals(RecordStatus.NORMAL.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的配件状态");
                 }
+                bizPartsService.insertBizParts(bizParts);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizPartsService.insertBizParts(bizParts);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -368,12 +368,12 @@ public class BizPartsController extends BaseController {
                 if (WzStringUtil.isBlank(bizParts.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
                 }
+                bizPartsService.updateBizParts(bizParts);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizPartsService.updateBizParts(bizParts);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -420,12 +420,12 @@ public class BizPartsController extends BaseController {
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
+                bizPartsService.deleteBizParts(bizPartsIds);
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizPartsService.deleteBizParts(bizPartsIds);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
             return mr;
@@ -547,12 +547,12 @@ public class BizPartsController extends BaseController {
                 if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(),"查询参数不能为空");
                 }
+                bizPartsService.bind(map.get("vehicleId"),map.get("partsId"));
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizPartsService.bind(map.get("vehicleId"),map.get("partsId"));
             return new MessageResponse(RunningResult.SUCCESS);
         }
     }
@@ -602,12 +602,13 @@ public class BizPartsController extends BaseController {
                 if (WzStringUtil.isBlank(map.get("vehicleId")) || WzStringUtil.isBlank(map.get("partsId"))) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "解绑参数不能为空");
                 }
+                bizPartsService.unBind(map.get("vehicleId"), map.get("partsId"));
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
-            bizPartsService.unBind(map.get("vehicleId"), map.get("partsId"));
+
             // 组织返回结果并返回
             return new MessageResponse(RunningResult.SUCCESS);
         }
