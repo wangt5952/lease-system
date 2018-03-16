@@ -448,7 +448,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                 orgCriteria.andOrgIdNotEqualTo(org.get(0).getId());
                 int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
 
-                if(orgCot != 1){
+                if(orgCot >= 1){
                     throw new BizException(RunningResult.HAVE_BIND.code(), "第" + i + "条记录删除时发生错误,车辆已绑定企业");
                 }
                 bizVehicleMapperExt.deleteByPrimaryKey(ids.get(i));
