@@ -114,8 +114,8 @@
     </el-dialog>
 
     <el-dialog title="绑定企业" :visible.sync="bindFormVehicle" :close-on-click-modal="false">
-      <el-form class="edit-form" :model="bindFormOrg" ref="bindFormOrg">
-        <el-form-item prop="count" style="margin-top:10px;height:30px;" :rules="[{required:true, message: '请选择数量'}]" label="分配数量">
+      <el-form class="edit-form" :model="bindFormOrg" ref="bindFormOrg" :rules="rules2">
+        <el-form-item prop="count" style="margin-top:10px;height:30px;" label="分配数量">
           <el-input-number v-model="bindFormOrg.count" :step="1"></el-input-number>
         </el-form-item>
       </el-form>
@@ -135,6 +135,19 @@ import {
 
 export default {
   data() {
+    const checkVehicleNum = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('数量不能为空'));
+      }
+      setTimeout(() => {
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入非负正整数'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
     return {
       loading: false,
       list: [],
@@ -177,6 +190,11 @@ export default {
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
+      rules2: {
+        count: [
+          { validator: checkVehicleNum, trigger: 'blur' },
+        ],
+      },
     };
   },
   computed: {

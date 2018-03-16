@@ -36,7 +36,7 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-    <!-- 弹出来的表单 -->
+    <!-- 表单 -->
     <el-dialog title="设备信息" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
         <el-row :gutter="10">
@@ -89,17 +89,18 @@ import {
 
 export default {
   data() {
-    var checkTime = (rule, value, callback) =>{
+    const checkTime = (rule, value, callback) => {
       if (!value) {
-          return callback(new Error('请求间隔时间不能为空'));
+        return callback(new Error('请求间隔时间不能为空'));
+      }
+      setTimeout(() => {
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入非负正整数'));
+        } else {
+          callback();
         }
-        setTimeout(() => {
-          if (!/^\d+$/.test(value)) {
-            callback(new Error('请输入非负正整数'));
-          } else {
-            callback();
-          }
-        }, 500);
+      }, 500);
+      return false;
     };
     return {
       loading: false,
