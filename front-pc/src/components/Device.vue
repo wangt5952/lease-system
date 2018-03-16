@@ -150,7 +150,7 @@ export default {
     };
   },
   computed: {
-    // 获取当前登录用户信息
+    // 获取当前登录用户信息.
     ...mapState({
       key_user_info: state => state.key_user_info,
     }),

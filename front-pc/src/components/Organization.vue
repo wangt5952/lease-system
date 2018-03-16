@@ -135,6 +135,7 @@ import {
 
 export default {
   data() {
+    // 表单效验
     const checkVehicleNum = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('数量不能为空'));
