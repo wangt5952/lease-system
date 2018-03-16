@@ -237,10 +237,12 @@ public class SysUserServcieImpl implements SysUserService {
             //判断用户是否为admin
             SysUser userTemp = sysUserMapperExt.selectByPrimaryKey(userInfo.getId());
             //admin作为基本用户无法修改他的归属企业和用户类型
-            if("admin".equals(userTemp.getLoginName())){
-                userInfo.setOrgId(null);
-                //用户类型无法修改，清空上传数据
-                userInfo.setUserType(null);
+            if("admin".equals(userTemp.getLoginName())
+                    && !OrgAndUserType.PLATFORM.toString().equals(userInfo.getUserType().toString())){
+//                userInfo.setOrgId(null);
+//                //用户类型无法修改，清空上传数据
+//                userInfo.setUserType(null);
+                throw new BizException(RunningResult.DB_ERROR.code(), "系统管理员不能修改用户类型");
             }
             //验证企业是否存在（状态为正常）
             if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
@@ -251,6 +253,10 @@ public class SysUserServcieImpl implements SysUserService {
                 List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
                 if(org.size() < 1){
                     throw new BizException(RunningResult.DB_ERROR.code(), "用户相关企业不存在或已作废");
+                }
+                if("admin".equals(userTemp.getLoginName())
+                        && !userTemp.getOrgId().equals(userInfo.getOrgId())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "系统管理员不能修改所属企业");
                 }
                 //验证企业类型与用户类型是否一致
                 if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())
