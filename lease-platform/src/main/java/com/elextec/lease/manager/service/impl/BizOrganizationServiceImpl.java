@@ -181,7 +181,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         //平台企业无法修改类型
         if(org.size() >= 1){
             if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())
-                    && !OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgStatus().toString()) ){
+                    && !OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgType().toString()) ){
                 throw new BizException(RunningResult.DB_ERROR.code(), "平台不能修改类型");
             }
         }
