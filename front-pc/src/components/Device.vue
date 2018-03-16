@@ -10,7 +10,7 @@
         </el-form-item>
       </el-form>
     </div>
-
+    <!-- 列表 -->
     <el-table :data="list" style="width:100%;margin-top:10px">
       <el-table-column prop="deviceId" label="编号"></el-table-column>
       <el-table-column prop="deviceTypeListText" label="设备类别"></el-table-column>
@@ -26,7 +26,7 @@
         </template>
       </el-table-column>
     </el-table>
-
+    <!-- 分页 -->
     <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
@@ -36,42 +36,36 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-
+    <!-- 弹出来的表单 -->
     <el-dialog title="设备信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form class="edit-form" :model="form" ref="form">
+      <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item prop="deviceId" :rules="[{required:true, message:'请输入编号'}]" label="编号">
+            <el-form-item prop="deviceId" label="编号">
               <el-input v-model="form.deviceId" placeholder="请输入编号" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="deviceType" :rules="[{required:true, message:'请输入设备类别'}]" label="设备类别">
+            <el-form-item prop="deviceType" label="设备类别">
               <el-select v-model="form.deviceType" placeholder="请选择设备类别" style="width:100%;">
                 <el-option v-for="o in deviceTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item
-              prop="perSet"
-              :rules="[
-                {required:true, message:'请输入请求间隔时间'},
-                { type: 'number', message: '间隔时间必须为整数数值'}
-              ]"
-              label="请求间隔时间 (单位:秒)">
+            <el-form-item prop="perSet" label="请求间隔时间 (单位:秒)">
               <el-input v-model.number="form.perSet" placeholder="请输入请求间隔时间" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="request" :rules="[{required:true, message:'请选择硬件复位标志'}]" label="硬件复位标志">
+            <el-form-item prop="request" label="硬件复位标志">
               <el-select v-model="form.reset" placeholder="请选择硬件复位标志" style="width:100%;">
                 <el-option v-for="o in resetTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="reset" :rules="[{required:true, message:'请选择主动请求数据标志'}]" label="主动请求数据标志">
+            <el-form-item prop="reset" label="主动请求数据标志">
               <el-select v-model="form.request" placeholder="请选择主动请求数据标志" style="width:100%;">
                 <el-option v-for="o in requestTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
@@ -95,6 +89,18 @@ import {
 
 export default {
   data() {
+    var checkTime = (rule, value, callback) =>{
+      if (!value) {
+          return callback(new Error('请求间隔时间不能为空'));
+        }
+        setTimeout(() => {
+          if (!/^\d+$/.test(value)) {
+            callback(new Error('请输入非负正整数'));
+          } else {
+            callback();
+          }
+        }, 500);
+    };
     return {
       loading: false,
       formVisible: false,
@@ -122,9 +128,28 @@ export default {
         { id: 0, name: '无处理' },
         { id: 1, name: '主动请求' },
       ],
+      // 表单效验
+      rules2: {
+        deviceId: [
+          { required: true, message: '请输入编号' },
+        ],
+        deviceType: [
+          { required: true, message: '请输入设备类别' },
+        ],
+        perSet: [
+          { validator: checkTime, trigger: 'blur' },
+        ],
+        request: [
+          { required: true, message: '请选择硬件复位标志' },
+        ],
+        reset: [
+          { required: true, message: '请选择主动请求数据标志' },
+        ],
+      },
     };
   },
   computed: {
+    // 获取当前登录用户信息
     ...mapState({
       key_user_info: state => state.key_user_info,
     }),
@@ -138,10 +163,12 @@ export default {
     },
   },
   methods: {
+    // 分页下拉列表改变出发事件
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();
     },
+    // 加载
     async reload() {
       this.loading = true;
       try {
@@ -168,6 +195,7 @@ export default {
         this.$message.error(message);
       }
     },
+    // 添加按钮
     addButton(form = {}) {
       const $form = this.$refs.form;
       if ($form) $form.resetFields();
@@ -182,6 +210,7 @@ export default {
       this.editButtonVisible = false;
       this.addButtonVisible = true;
     },
+    // 编辑按钮
     async editButton(form) {
       const forms = _.pick(form, [
         'deviceId',
@@ -203,9 +232,11 @@ export default {
         this.$message.error(message);
       }
     },
+    // 关闭
     closeForm() {
       this.formVisible = false;
     },
+    // 保存功能
     async saveForm(form) {
       const $form = this.$refs.form;
       await $form.validate();
@@ -221,6 +252,7 @@ export default {
       this.formVisible = false;
       await this.reload();
     },
+    // 添加功能
     async addForm() {
       const $form = this.$refs.form;
       await $form.validate();
@@ -237,6 +269,7 @@ export default {
       await this.reload();
       this.closeForm();
     },
+    // 删除功能
     async handleDelete(form) {
       this.form = _.pick(form, [
         'deviceId',
