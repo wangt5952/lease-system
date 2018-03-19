@@ -129,7 +129,7 @@ export default {
   margin:10px;
 }
 
->>> .btn-small {  
+>>> .btn-small {
   background: #008E56;
   font-size: 0.4rem;
   border-radius: 30px;
