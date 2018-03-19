@@ -33,7 +33,7 @@ spring:
       max-idle: 8
       min-idle: 0
     timeout: 0
-    password:
+    password: Njjs12345678%^&
   session:
     store-type: none
 mybatis:
