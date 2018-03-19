@@ -26,14 +26,14 @@ spring:
         enabled: false
   redis:
     host: 106.14.172.38
-    port: 6379
+    port: 9736
     pool:
       max-active: 8
       max-wait: -1
       max-idle: 8
       min-idle: 0
     timeout: 0
-    password:
+    password: Njjs12345678%^&
   session:
     store-type: none
 mybatis:

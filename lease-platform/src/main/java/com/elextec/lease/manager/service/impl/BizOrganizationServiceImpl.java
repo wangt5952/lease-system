@@ -153,6 +153,12 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
         //作废操作时，验证企业下面是否有用户和车辆
         if(RecordStatus.INVALID.toString().equals(orgInfo.getOrgStatus().toString())){
+            //平台企业无法作废
+            if(org.size() >= 1){
+                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "平台不能作废");
+                }
+            }
             //判定企业下是否有未作废的用户
             SysUserExample userExample = new SysUserExample();
             SysUserExample.Criteria userCriteria = userExample.createCriteria();
@@ -171,16 +177,11 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
             if(refCot >= 1){
                 throw new BizException(RunningResult.HAVE_BIND.code(), "企业名下有绑定的车辆,无法作废");
             }
-            //平台企业无法作废
-            if(org.size() >= 1){
-                if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
-                    throw new BizException(RunningResult.DB_ERROR.code(), "平台不能作废");
-                }
-            }
+
         }
         //平台企业无法修改类型
         if(org.size() >= 1){
-            if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())
+            if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())
                     && !OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgType().toString()) ){
                 throw new BizException(RunningResult.DB_ERROR.code(), "平台不能修改类型");
             }
@@ -216,7 +217,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
                 orgCriteria.andIdEqualTo(ids.get(i));
                 List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
                 if(org.size() >= 1){
-                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())){
                         throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误,平台不能作废");
                     }
                 }
