@@ -26,7 +26,7 @@ spring:
         enabled: false
   redis:
     host: 106.14.172.38
-    port: 6379
+    port: 9736
     pool:
       max-active: 8
       max-wait: -1
