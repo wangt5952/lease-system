@@ -217,7 +217,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
                 orgCriteria.andIdEqualTo(ids.get(i));
                 List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
                 if(org.size() >= 1){
-                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgStatus().toString())){
+                    if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())){
                         throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误,平台不能作废");
                     }
                 }
