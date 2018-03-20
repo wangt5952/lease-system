@@ -112,23 +112,24 @@ public class BizBatteryController extends BaseController {
                     if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
                     }
-                    SysUser userTemp = getLoginUserInfo(request);
-                    if(userTemp != null){
-                        //根据用户类型添加条件
-                        //个人用户需要添加userId为条件
-                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                            pagingParam.setUserId(userTemp.getId());
-                            pagingParam.setIsBind("BIND");
-                        }
-                        //企业用户需要添加orgId为条件
-                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                            pagingParam.setOrgId(userTemp.getOrgId());
-                            pagingParam.setIsBind("BIND");
-                        }
-                    }else{
-                        return new MessageResponse(RunningResult.AUTH_OVER_TIME.code(),"登录信息已失效");
-                    }
+
                     pagingParam.setNeedPaging("true");
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //根据用户类型添加条件
+                    //个人用户需要添加userId为条件
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        pagingParam.setUserId(userTemp.getId());
+                        pagingParam.setIsBind("BIND");
+                    }
+                    //企业用户需要添加orgId为条件
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
+                        pagingParam.setOrgId(userTemp.getOrgId());
+                        pagingParam.setIsBind("BIND");
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME.code(),"登录信息已失效");
                 }
             } catch (BizException ex) {
                 throw ex;
