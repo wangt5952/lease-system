@@ -58,7 +58,6 @@
                 or a.battery_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
                 or a.battery_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
                 or a.battery_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
-                or a.mfrs_id like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
                 or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
             </if>
             <if test="batteryStatus != null and batteryStatus != ''" >
@@ -98,7 +97,6 @@
                 or a.battery_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
                 or a.battery_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
                 or a.battery_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
-                or a.mfrs_id like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
                 or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
             </if>
             <if test="batteryStatus != null and batteryStatus != ''" >

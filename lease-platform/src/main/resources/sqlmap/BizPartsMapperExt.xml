@@ -71,7 +71,6 @@
 				OR a.parts_brand LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
 				OR a.parts_pn LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
 				OR a.parts_parameters LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-				OR a.mfrs_id LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
 				OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
 			</if>
 			<if test="partsType != null and partsType != ''" >
@@ -112,7 +111,6 @@
 				OR a.parts_brand LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
 				OR a.parts_pn LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
 				OR a.parts_parameters LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
-				OR a.mfrs_id LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%')
 				OR b.mfrs_name LIKE concat('%',#{keyStr,jdbcType=VARCHAR},'%'))
 			</if>
 			<if test="partsType != null and partsType != ''" >
