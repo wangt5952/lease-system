@@ -97,7 +97,7 @@ public class BizVehicleController extends BaseController {
     @RequestMapping(path = "/list")
     public MessageResponse list(@RequestBody String paramAndPaging, HttpServletRequest request) {
         // 无参数则报“无参数”
-        if (WzStringUtil.isBlank(paramAndPaging)) {
+          if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
@@ -119,21 +119,21 @@ public class BizVehicleController extends BaseController {
                     if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
                     }
-                    SysUser userTemp = getLoginUserInfo(request);
-                    if(userTemp != null){
-                        //根据用户类型添加条件
-                        //个人用户需要添加userId为条件
-                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                            pagingParam.setUserId(userTemp.getId());
-                        }
-                        //企业用户需要添加orgId为条件
-                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                            pagingParam.setOrgId(userTemp.getOrgId());
-                        }
-                    }else{
-                        return new MessageResponse(RunningResult.AUTH_OVER_TIME);
-                    }
                     pagingParam.setNeedPaging("true");
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //根据用户类型添加条件
+                    //个人用户需要添加userId为条件
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        pagingParam.setUserId(userTemp.getId());
+                    }
+                    //企业用户需要添加orgId为条件
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
+                        pagingParam.setOrgId(userTemp.getOrgId());
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
                 throw ex;
