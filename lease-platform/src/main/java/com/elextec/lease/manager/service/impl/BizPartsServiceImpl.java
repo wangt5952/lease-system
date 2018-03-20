@@ -167,14 +167,15 @@ public class BizPartsServiceImpl implements BizPartsService {
     @Transactional
     public void updateBizParts(BizParts partsInfo) {
         //判定配件是否绑定了车辆
-        if(RecordStatus.INVALID.toString().equals(partsInfo.getPartsStatus())){
+        if(RecordStatus.INVALID.toString().equals(partsInfo.getPartsStatus())
+                || RecordStatus.FREEZE.toString().equals(partsInfo.getPartsStatus())){
             BizRefVehiclePartsExample example = new BizRefVehiclePartsExample();
             BizRefVehiclePartsExample.Criteria criteria = example.createCriteria();
             criteria.andUnbindTimeIsNull();
             criteria.andPartsIdEqualTo(partsInfo.getId());
             int count = bizRefVehiclePartsMapperExt.countByExample(example);
             if(count >= 1){
-                throw new BizException(RunningResult.HAVE_BIND.code(), "配件已绑定车辆,无法作废");
+                throw new BizException(RunningResult.HAVE_BIND.code(), "配件已绑定车辆,无法作废或冻结");
             }
         }
         //校验制造商是否存在（状态为正常）

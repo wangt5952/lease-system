@@ -17,6 +17,7 @@ import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
+import com.sun.prism.impl.Disposer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -338,14 +339,15 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Transactional
     public void updateVehicle(BizVehicle vehicle) {
         //如果车辆做报废的话，需要判定车辆是否已绑定用户并将已绑定的电池与配件全部解绑
-        if(RecordStatus.INVALID.toString().equals(vehicle.getVehicleStatus().toString())){
+        if(RecordStatus.INVALID.toString().equals(vehicle.getVehicleStatus().toString())
+                || RecordStatus.FREEZE.toString().equals(vehicle.getVehicleStatus().toString())){
             BizRefUserVehicleExample example = new BizRefUserVehicleExample();
             BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
             criteria.andUnbindTimeIsNull();
             criteria.andVehicleIdEqualTo(vehicle.getId());
             int count = bizRefUserVehicleMapperExt.countByExample(example);
             if(count >= 1){
-                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定用户,无法作废");
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定用户,无法作废或冻结");
             }
             //验证车辆是否有企业绑定(平台除外)
             BizOrganizationExample organizationExample = new BizOrganizationExample();
@@ -364,7 +366,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             orgCriteria.andOrgIdNotEqualTo(org.get(0).getId());
             int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
             if(orgCot >= 1){
-                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定企业,无法作废");
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定企业,无法作废或冻结");
             }
             bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
             //解除所有电池绑定关系
