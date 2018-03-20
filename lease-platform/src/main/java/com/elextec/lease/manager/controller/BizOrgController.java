@@ -304,23 +304,22 @@ public class BizOrgController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
                 }
                 //上传企业营业执照
-                if (WzStringUtil.isBlank(orgInfo.getOrgBusinessLicenceFront())) {
-                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(),"营业执照正面照片路径不能为空");
+                if (WzStringUtil.isNotBlank(orgInfo.getOrgBusinessLicenceFront())) {
+                    //把唯一时间作为照片名字
+                    String imageName = WzUniqueValUtil.makeUniqueTimes();
+                    //去掉BASE64里的空格和回车换成加号
+                    String orgBusinessLicenceFront = orgInfo.getOrgBusinessLicenceFront().replace(" ","+");
+                    /**
+                     * 保存文件.
+                     * fileBase64Data 文件内容Base64字符串
+                     * saveRoot 保存根目录
+                     * saveDir 保存相对目录
+                     * fileName 文件名（不带扩展名）
+                     * ext 扩展名
+                     */
+                    WzFileUtil.save(orgBusinessLicenceFront, uploadOrgIconRoot, "", imageName, WzFileUtil.EXT_JPG);
+                    orgInfo.setOrgBusinessLicenceFront(imageName + WzFileUtil.EXT_JPG);
                 }
-                //去掉BASE64里的空格和回车换成加号
-                String orgBusinessLicenceFront = orgInfo.getOrgBusinessLicenceFront().replace(" ","+");
-                //把唯一时间作为照片名字
-                String imageName = WzUniqueValUtil.makeUniqueTimes();
-                /**
-                 * 保存文件.
-                 * fileBase64Data 文件内容Base64字符串
-                 * saveRoot 保存根目录
-                 * saveDir 保存相对目录
-                 * fileName 文件名（不带扩展名）
-                 * ext 扩展名
-                 */
-                WzFileUtil.save(orgBusinessLicenceFront, uploadOrgIconRoot, "", imageName, WzFileUtil.EXT_JPG);
-                orgInfo.setOrgBusinessLicenceFront(imageName + WzFileUtil.EXT_JPG);
                 bizOrganizationService.insertBizOrganization(orgInfo);
             } catch (BizException ex) {
                 throw ex;
