@@ -124,6 +124,11 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
 
     @Override
     public void insertBizOrganization(BizOrganization orgInfo) {
+
+        //平台企业只能创建一个且不能通过接口创建
+        if(OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgType().toString())){
+            throw new BizException(RunningResult.DB_ERROR.code(), "平台企业只能创建一个");
+        }
         // 资源code重复提示错误
         BizOrganizationExample lnExample = new BizOrganizationExample();
         BizOrganizationExample.Criteria lnCriteria = lnExample.createCriteria();
