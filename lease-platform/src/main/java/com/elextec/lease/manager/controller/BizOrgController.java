@@ -6,7 +6,10 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzEncryptUtil;
+import com.elextec.framework.utils.WzFileUtil;
 import com.elextec.framework.utils.WzStringUtil;
+import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.service.BizOrganizationService;
 import com.elextec.persist.field.enums.OrgAndUserType;
@@ -16,6 +19,7 @@ import com.elextec.persist.model.mybatis.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +42,12 @@ public class BizOrgController extends BaseController {
 
     @Autowired
     private BizOrganizationService bizOrganizationService;
+
+    @Value("${localsetting.upload-res-icon-root}")
+    private String uploadOrgIconRoot;
+
+    @Value("${localsetting.download-res-icon-prefix}")
+    private String downloadOrgIconPrefix;
 
     /**
      * 查询公司组织.
@@ -293,6 +303,24 @@ public class BizOrgController extends BaseController {
                         && !orgInfo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
                 }
+                //上传企业营业执照
+                if (WzStringUtil.isBlank(orgInfo.getOrgBusinessLicenceFront())) {
+                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(),"营业执照正面照片路径不能为空");
+                }
+                //去掉BASE64里的空格和回车换成加号
+                String orgBusinessLicenceFront = orgInfo.getOrgBusinessLicenceFront().replace(" ","+");
+                //把唯一时间作为照片名字
+                String imageName = WzUniqueValUtil.makeUniqueTimes();
+                /**
+                 * 保存文件.
+                 * fileBase64Data 文件内容Base64字符串
+                 * saveRoot 保存根目录
+                 * saveDir 保存相对目录
+                 * fileName 文件名（不带扩展名）
+                 * ext 扩展名
+                 */
+                WzFileUtil.save(orgBusinessLicenceFront, uploadOrgIconRoot, "", imageName, WzFileUtil.EXT_JPG);
+                orgInfo.setOrgBusinessLicenceFront(imageName + WzFileUtil.EXT_JPG);
                 bizOrganizationService.insertBizOrganization(orgInfo);
             } catch (BizException ex) {
                 throw ex;
@@ -320,6 +348,7 @@ public class BizOrgController extends BaseController {
      *         orgBusinessLicences:营业执照号码,
      *         orgBusinessLicenceFront:营业执照正面照片路径,
      *         orgBusinessLicenceBack:营业执照背面照片路径,
+     *         orgStatus:组织状态（正常NORMAL、冻结FREEZE、作废INVALID）,
      *         updateUser:更新人
      *     }
      * </pre>
@@ -360,6 +389,26 @@ public class BizOrgController extends BaseController {
                 }
                 if (WzStringUtil.isBlank(org.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
+                }
+                //企业营业执照如果不为空空
+                if (WzStringUtil.isNotBlank(org.getOrgBusinessLicenceFront())){
+                    //获取原企业营业执照
+                    BizOrganization bizOrganization = bizOrganizationService.getBizOrganizationByPrimaryKey(org.getId());
+                    String orgImg = bizOrganization.getOrgBusinessLicenceFront();
+                    if (orgImg != null || !orgImg.equals("")) {
+                        //删除库里的营业执照
+                        if (WzStringUtil.isNotBlank(orgImg)) {
+                            WzFileUtil.deleteFile(uploadOrgIconRoot,orgImg);
+                        }
+                    }
+                    //把唯一时间作为照片名字
+                    String orgImgTime = WzUniqueValUtil.makeUniqueTimes();
+                    //去掉BASE64里的空格和回车换成加号
+                    String orgBusinessLicenceFront = org.getOrgBusinessLicenceFront().replace(" ","+");
+                    //保存企业营业执照
+                    WzFileUtil.save(orgBusinessLicenceFront, uploadOrgIconRoot, "", orgImgTime, WzFileUtil.EXT_JPG);
+                    //把时间和图片格式拼一起，库里只保存照片名
+                    org.setOrgBusinessLicenceFront(orgImgTime + WzFileUtil.EXT_JPG);
                 }
                 bizOrganizationService.updateBizOrganization(org);
             } catch (BizException ex) {
