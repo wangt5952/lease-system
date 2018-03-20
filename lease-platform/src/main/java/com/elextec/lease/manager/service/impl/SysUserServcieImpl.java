@@ -6,6 +6,7 @@ import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
@@ -15,6 +16,7 @@ import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
+import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -488,11 +490,14 @@ public class SysUserServcieImpl implements SysUserService {
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
         }
         //查询平台下未分配出去的车辆
-        BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
-        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
-        refCriteria.andOrgIdEqualTo(userOrgId);
-        refCriteria.andUnbindTimeIsNull();
-        List<BizRefOrgVehicle> vehicles = bizRefOrgVehicleMapperExt.selectByExample(refExample);
+//        BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+//        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+//        refCriteria.andOrgIdEqualTo(userOrgId);
+//        refCriteria.andUnbindTimeIsNull();
+        BizVehicleParam paramMap = new BizVehicleParam();
+        paramMap.setOrgId(userOrgId);
+        paramMap.setVehicleStatus(RecordStatus.NORMAL.toString());
+        List<BizVehicleExt> vehicles = bizVehicleMapperExt.selectExtByParam(paramMap);
         if(vehicles.size() < count){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
         }
@@ -502,7 +507,7 @@ public class SysUserServcieImpl implements SysUserService {
             BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
             BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
             delCriteria.andOrgIdEqualTo(userOrgId);
-            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getVehicleId());
+            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getId());
             delCriteria.andUnbindTimeIsNull();
             BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
             delTemp.setUnbindTime(new Date());
@@ -511,7 +516,7 @@ public class SysUserServcieImpl implements SysUserService {
             //绑定新关系
             BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
             addTemp.setOrgId(orgId);
-            addTemp.setVehicleId(vehicles.get(i).getVehicleId());
+            addTemp.setVehicleId(vehicles.get(i).getId());
             addTemp.setBindTime(new Date());
             bizRefOrgVehicleMapperExt.insertSelective(addTemp);
         }
@@ -531,11 +536,14 @@ public class SysUserServcieImpl implements SysUserService {
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "企业不存在或已作废");
         }
         //查询企业下未分配出去的车辆
-        BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
-        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
-        refCriteria.andOrgIdEqualTo(orgId);
-        refCriteria.andUnbindTimeIsNull();
-        List<BizRefOrgVehicle> vehicles = bizRefOrgVehicleMapperExt.selectByExample(refExample);
+//        BizRefOrgVehicleExample refExample = new BizRefOrgVehicleExample();
+//        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
+//        refCriteria.andOrgIdEqualTo(orgId);
+//        refCriteria.andUnbindTimeIsNull();
+        BizVehicleParam paramMap = new BizVehicleParam();
+        paramMap.setOrgId(orgId);
+        paramMap.setVehicleStatus(RecordStatus.NORMAL.toString());
+        List<BizVehicleExt> vehicles = bizVehicleMapperExt.selectExtByParam(paramMap);
         if(vehicles.size() < count){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
         }
@@ -554,7 +562,7 @@ public class SysUserServcieImpl implements SysUserService {
             BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
             BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
             delCriteria.andOrgIdEqualTo(orgId);
-            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getVehicleId());
+            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getId());
             delCriteria.andUnbindTimeIsNull();
             BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
             delTemp.setUnbindTime(new Date());
@@ -562,7 +570,7 @@ public class SysUserServcieImpl implements SysUserService {
             //绑定新关系
             BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
             addTemp.setOrgId(plOrg.get(0).getId());
-            addTemp.setVehicleId(vehicles.get(i).getVehicleId());
+            addTemp.setVehicleId(vehicles.get(i).getId());
             addTemp.setBindTime(new Date());
             bizRefOrgVehicleMapperExt.insertSelective(addTemp);
         }
