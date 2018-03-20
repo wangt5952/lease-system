@@ -118,10 +118,12 @@ public class BizBatteryController extends BaseController {
                         //个人用户需要添加userId为条件
                         if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
                             pagingParam.setUserId(userTemp.getId());
+                            pagingParam.setIsBind("BIND");
                         }
                         //企业用户需要添加orgId为条件
                         if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                             pagingParam.setOrgId(userTemp.getOrgId());
+                            pagingParam.setIsBind("BIND");
                         }
                     }else{
                         return new MessageResponse(RunningResult.AUTH_OVER_TIME.code(),"登录信息已失效");
