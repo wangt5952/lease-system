@@ -674,8 +674,13 @@ public class SysUserController extends BaseController {
             SysUserExample.Criteria reListCri = reListParam.createCriteria();
             reListCri.andIdEqualTo(userId.get(0));
             //平台用户可以查询全部
-            if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 reListCri.andOrgIdEqualTo(userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                if(!userId.get(0).equals(userTemp.getId())){
+                    return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                }
             }
             SysUserExt user = sysUserService.getExtById(reListParam);
 //            SysUser user = sysUserService.getSysUserByPrimaryKey(userId.get(0));
