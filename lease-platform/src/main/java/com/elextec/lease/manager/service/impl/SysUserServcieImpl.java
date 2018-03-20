@@ -424,7 +424,7 @@ public class SysUserServcieImpl implements SysUserService {
         }
         List<SysUserExt> user = sysUserMapperExt.selectExtByExample(userExample);
         if(user.size() < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或已冻结、作废或用户不在企业名下");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或已作废或用户不在企业名下");
         }
 
         //判定车辆是否存在或已作废
