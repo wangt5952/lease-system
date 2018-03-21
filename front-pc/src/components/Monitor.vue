@@ -8,7 +8,7 @@
         </div>
         <div @click="showVehicleDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.code}}</div>
-          <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码 {{ searchLocList}}</div>
+          <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码 {{ searchLocList }}</div>
         </div>
         <div @click="showVehiclePath" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;">南京市雨花台区大数据产业园</div>
@@ -153,7 +153,8 @@ export default {
   },
   computed: {
     selectedItem() {
-      return _.find(this.vehicleList, { id: this.selectedId }) || {};
+      const vehicleListInfo = (_.find(this.vehicleList, { id: this.selectedId }) || {});
+      return vehicleListInfo;
     },
   },
   watch: {
@@ -183,13 +184,17 @@ export default {
     },
     handleMapClick() {
     },
+
     handleSelectItem(item) {
       this.mapCenter = {
         lng: item.lng, lat: item.lat,
       };
+      // this.mapCenter = {
+      //   lng: 131.950098881728703, lat: 118.86545776052435,
+      // };
       this.selectedId = item.id;
     },
-
+    // 获取所有车辆信息
     async reloadVehicleList() {
       const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
         needPaging: false,
@@ -203,7 +208,7 @@ export default {
       await this.reloadVehicleLoc();
       await this.reloadVehiclePower();
     },
-
+    // 获取车辆定位(经、纬度)
     async reloadVehicleLoc() {
       const { vehicleList } = this;
       const { respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk', _.map(vehicleList, 'id'))).body;
@@ -219,6 +224,7 @@ export default {
         };
       });
     },
+    // 获取车辆电池信息
     async reloadVehiclePower() {
       const { vehicleList } = this;
       try {
@@ -238,14 +244,17 @@ export default {
         this.$message.error(message);
       }
     },
+    // 获取车辆在某一段时间内行驶的记录
     async reloadLocList() {
       const { time } = this.searchLocList;
       const id = this.selectedId;
-
       try {
         const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1] })).body;
         // if (code !== '200') throw new Error(message);
         const locList = respData;
+        this.mapCenter = {
+          lng: locList[0].LON, lat: locList[0].LAT,
+        };
         this.vehicleList = _.map(this.vehicleList, (o) => {
           if (o.id !== id) return o;
           return {

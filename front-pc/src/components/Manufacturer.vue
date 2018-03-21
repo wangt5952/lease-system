@@ -1,10 +1,11 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
-
     <div style="display:flex;">
-      <div style="margin-right:10px;">
-        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加制造商</el-button>
-      </div>
+      <template v-if="res['FUNCTION'].indexOf('manager-mfrs-addone') >= 0">
+        <div style="margin-right:10px;">
+          <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加制造商</el-button>
+        </div>
+      </template>
       <el-form :inline="true">
         <el-form-item>
           <el-input style="width:500px;" v-model="search.keyStr" placeholder="制造商名称／制造商介绍／制造商地址／联系人／联系电话"></el-input>
@@ -30,14 +31,13 @@
       <el-table-column prop="mfrsContacts" label="联系人"></el-table-column>
       <el-table-column prop="mfrsPhone" label="联系电话"></el-table-column>
       <el-table-column prop="mfrsStatusText" label="状态"></el-table-column>
-      <el-table-column label="操作" width="100">
-        <template slot-scope="{row}">
-          <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-          <el-tooltip content="删除" placement="top">
-            <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-          </el-tooltip>
-        </template>
-      </el-table-column>
+      <template v-if="res['FUNCTION'].indexOf('manager-mfrs-modify') >= 0">
+        <el-table-column label="操作" width="100">
+          <template slot-scope="{row}">
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+          </template>
+        </el-table-column>
+      </template>
     </el-table>
 
     <el-pagination v-if="total" style="margin-top:10px;"
@@ -156,6 +156,7 @@ export default {
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
+      res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
     }),
   },
   watch: {
@@ -256,7 +257,9 @@ export default {
     },
   },
   async mounted() {
+    this.loading = true;
     await this.reload();
+    this.loading = false;
   },
 };
 </script>

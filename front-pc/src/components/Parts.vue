@@ -1,10 +1,12 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
-
     <div style="display:flex;">
-      <div style="margin-right:10px;">
-        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加配件</el-button>
-      </div>
+      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <template v-if="res['FUNCTION'].indexOf('manager-parts-addone') >= 0">
+        <div style="margin-right:10px;">
+          <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加配件</el-button>
+        </div>
+      </template>
       <el-form :inline="true">
         <el-form-item>
           <el-input style="width:500px;" v-model="search.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
@@ -31,14 +33,14 @@
       <el-table-column prop="partsParameters" label="参数"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="partsStatusText" label="状态"></el-table-column>
-      <el-table-column label="操作" width="100">
-        <template slot-scope="{row}">
-          <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-          <!-- <el-tooltip content="删除" placement="top">
-            <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-          </el-tooltip> -->
-        </template>
-      </el-table-column>
+      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <template v-if="res['FUNCTION'].indexOf('manager-parts-modify') >= 0">
+        <el-table-column label="操作" width="100">
+          <template slot-scope="{row}">
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+          </template>
+        </el-table-column>
+      </template>
     </el-table>
 
     <el-pagination v-if="total" style="margin-top:10px;"
@@ -176,6 +178,7 @@ export default {
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
+      res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
     }),
   },
   watch: {
@@ -281,7 +284,9 @@ export default {
       currPage: 1, pageSize: 999,
     })).body;
     if (code === '200') this.mfrsList = respData.rows;
+    this.loading = true;
     await this.reload();
+    this.loading = false;
   },
 };
 </script>

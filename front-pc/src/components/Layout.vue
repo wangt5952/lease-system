@@ -96,8 +96,8 @@ const menuTree = [
   { name: '电池/配件/设备',
     icon: 'lt lt-iconset0250',
     children: [
-      { name: '电池管理', path: '/battery', resCode: 'battery_manager' },
-      { name: '配件管理', path: '/parts', resCode: 'parts_manager' },
+      { name: '电池管理', path: '/battery', resCode: 'manager-battery-list' },
+      { name: '配件管理', path: '/parts', resCode: 'manager-parts-list' },
       { name: '设备管理', path: '/device', resCode: 'manager-device-list' },
     ],
   },
@@ -116,9 +116,9 @@ const menuTree = [
   { name: '权限',
     icon: 'lt lt-quanxian',
     children: [
-      { name: '用户管理', path: '/user', resCode: 'user_manager' },
-      { name: '角色管理', path: '/role', resCode: 'role_manager' },
-      { name: '资源管理', path: '/resource', resCode: 'res_manager' },
+      { name: '用户管理', path: '/user', resCode: 'manager-user-list' },
+      { name: '角色管理', path: '/role', resCode: 'manager-role-list' },
+      { name: '资源管理', path: '/resource', resCode: 'manager-res-listicon' },
     ],
   },
 ];

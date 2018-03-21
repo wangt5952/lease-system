@@ -262,7 +262,9 @@ export default {
     },
   },
   async mounted() {
+    this.loading = true;
     await this.reload();
+    this.loading = false;
   },
 };
 </script>

@@ -1,9 +1,12 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
-      <div style="margin-right:10px;">
-        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加车辆</el-button>
-      </div>
+      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <template v-if="res['FUNCTION'].indexOf('manager-vehicle-addone') >= 0">
+        <div style="margin-right:10px;">
+          <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加车辆</el-button>
+        </div>
+      </template>
       <el-form :inline="true">
         <el-form-item>
           <el-input style="width:500px;" v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
@@ -22,7 +25,7 @@
     </div>
 
     <!-- {{ res }} -->
-    <!-- {{ key_res_info }} -->
+    <!-- {{ key_user_info }} -->
     <el-table :data="list" style="width: 100%">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
@@ -30,30 +33,27 @@
       <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
-      <el-table-column label="电池">
-        <template slot-scope="{row}">
-          <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
-          <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
-        </template>
-      </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <template v-if="key_user_info.userType === 'PLATFORM'">
-        <el-table-column label="配件">
-          <template slot-scope="{row}">
+      <template v-if="res['FUNCTION'].indexOf('manager-vehicle-batterybind') >= 0">
+        <el-table-column label="电池">
+          <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
             <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
           </template>
         </el-table-column>
+      </template>
+      <template v-if="key_user_info.userType !== 'ENTERPRISE'">
+        <el-table-column label="配件">
+          <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
+            <el-button v-if="!row.batteryId" type="text" @click="showBindPartForm(row)">绑定</el-button>
+            <el-button v-else type="text" @click="partHandleUnbind(row)">解绑</el-button>
+          </template>
+        </el-table-column>
+      </template>
+      <template v-if="res['FUNCTION'].indexOf('manager-vehicle-modify') >= 0">
         <el-table-column label="操作" width="">
           <template slot-scope="{row}">
-            <template v-if="res['FUNCTION'].indexOf('manager-vehicle-modify') >= 0">
-              <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-            </template>
-            <template v-if="res['FUNCTION'].indexOf('manager-vehicle-delete') >= 0">
-              <el-tooltip content="删除" placement="top">
-                <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-              </el-tooltip>
-            </template>
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
           </template>
         </el-table-column>
       </template>
@@ -117,7 +117,7 @@
     <el-dialog title="绑定电池" :visible.sync="bindFormVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="bindForm" ref="bindForm">
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择状态'}]" label="电池">
-          <el-select style="width:100%;" v-model="bindForm.batteryId" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :remote-method="remoteBattery" :loading="bindForm_batteryLoading">
+          <el-select style="width:100%;" v-model="bindForm.batteryId" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :loading="bindForm_batteryLoading">
             <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
               <span style="float: left">{{ o.batteryBrand }}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
@@ -128,6 +128,14 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeBindForm">取消</el-button>
         <el-button type="primary" @click="saveBindForm">{{form.id ? '保存' : '绑定'}}</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="绑定配件" :visible.sync="bindPartsFormVisible" :close-on-click-modal="false">
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeBindPartsForm">取消</el-button>
+        <el-button type="primary" @click="saveBindPartsForm">{{form.id ? '保存' : '绑定'}}</el-button>
       </span>
     </el-dialog>
 
@@ -159,6 +167,7 @@ export default {
       form: {},
 
       bindFormVisible: false,
+      bindPartsFormVisible: false,
       bindForm: {},
 
       bindForm_batteryList: [],
@@ -306,7 +315,6 @@ export default {
       try {
         const $form = this.$refs.bindForm;
         await $form.validate();
-
         const { ...form } = this.bindForm;
         const { code, message } = (await this.$http.post('/api/manager/vehicle/batterybind', form)).body;
         if (code !== '200') throw new Error(message);
@@ -318,6 +326,15 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
+    },
+    // 显示配件窗口
+    showBindPartForm() {
+      const $form = this.$refs.bindPartForm;
+      if ($form) $form.resetFields();
+      this.bindPartsFormVisible = true;
+    },
+    closeBindPartsForm() {
+      this.bindPartsFormVisible = false;
     },
     async handleUnbind({ id, vehicleCode, batteryId }) {
       try {
@@ -331,11 +348,10 @@ export default {
         this.$message.error(message);
       }
     },
-
     async remoteBattery(keyStr) {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/battery/list', {
-          currPage: 1, pageSize: 10, keyStr, isBind: 'UNBIND',
+          keyStr, needPaging: false, batteryStatus: 'NORMAL', isBind: 'UNBIND',
         })).body;
         if (code !== '200') throw new Error(message);
         const { rows } = respData;
@@ -347,6 +363,12 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
+    },
+    async getPartsInfo(keyStr) {
+      const { code, message } = (await this.$http.post('/api/manager/parts/list', {
+        currPage: 1, pageSize: 10, keyStr, isBind: 'UNBIND',
+      })).body;
+      if (code !== '200') throw new Error(message);
     },
   },
   async mounted() {
@@ -362,7 +384,9 @@ export default {
         this.$message.error(message);
       }
     }
+    this.loading = true;
     await this.reload();
+    this.loading = false;
   },
 };
 </script>

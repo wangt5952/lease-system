@@ -1,9 +1,11 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
-      <div style="margin-right:10px;">
-        <el-button icon="el-icon-plus" type="primary" size="small" @click="addButton">添加设备</el-button>
-      </div>
+      <template v-if="res['FUNCTION'].indexOf('manager-device-addone') >= 0">
+        <div style="margin-right:10px;">
+          <el-button icon="el-icon-plus" type="primary" size="small" @click="addButton">添加设备</el-button>
+        </div>
+      </template>
       <el-form :inline="true">
         <el-form-item>
           <el-input style="width:500px;" v-model="search.keyStr" placeholder="设备编码"></el-input>
@@ -19,10 +21,14 @@
       <el-table-column prop="requestTypeText" label="主动请求数据标志"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="{row}">
-          <el-button icon="el-icon-edit" size="mini" type="text" @click="editButton(row)">编辑</el-button>
-          <el-tooltip content="删除" placement="top">
-            <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-          </el-tooltip>
+          <template v-if="res['FUNCTION'].indexOf('manager-device-modify') >= 0">
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="editButton(row)">编辑</el-button>
+          </template>
+          <template v-if="res['FUNCTION'].indexOf('manager-device-delete') >= 0">
+            <el-tooltip content="删除" placement="top">
+              <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
+            </el-tooltip>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -42,12 +48,12 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="deviceId" label="编号">
-              <el-input v-model="form.deviceId" placeholder="请输入编号" auto-complete="off"></el-input>
+              <el-input v-model="form.deviceId" placeholder="请输入编号" auto-complete="off" :disabled="editForm"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item prop="deviceType" label="设备类别">
-              <el-select v-model="form.deviceType" placeholder="请选择设备类别" style="width:100%;">
+              <el-select v-model="form.deviceType" placeholder="请选择设备类别" style="width:100%;" :disabled="editForm">
                 <el-option v-for="o in deviceTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
@@ -107,6 +113,7 @@ export default {
       formVisible: false,
       editButtonVisible: false,
       addButtonVisible: false,
+      editForm: false,
       search: {},
       form: {},
 
@@ -153,6 +160,8 @@ export default {
     // 获取当前登录用户信息.
     ...mapState({
       key_user_info: state => state.key_user_info,
+      key_res_info: state => state.key_res_info,
+      res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
     }),
   },
   watch: {
@@ -171,33 +180,36 @@ export default {
     },
     // 加载
     async reload() {
-      this.loading = true;
-      try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/device/list', {
-          currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
-        })).body;
-        if (code === '40106') {
-          this.$store.commit('relogin');
-          throw new Error('认证超时，请重新登录');
+      this.loading = false;
+      if (this.key_user_info.userType === 'PLATFORM') {
+        try {
+          const { code, message, respData } = (await this.$http.post('/api/manager/device/list', {
+            currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
+          })).body;
+          if (code === '40106') {
+            this.$store.commit('relogin');
+            throw new Error('认证超时，请重新登录');
+          }
+          if (code !== '200') throw new Error(message);
+          const { total, rows } = respData;
+          this.total = total;
+          this.list = _.map(rows, o => ({
+            ...o,
+            resetTypeText: (_.find(this.resetTypeList, { id: o.reset }) || {}).name,
+            requestTypeText: (_.find(this.requestTypeList, { id: o.request }) || {}).name,
+            deviceTypeListText: (_.find(this.deviceTypeList, { id: o.deviceType }) || {}).name,
+          }));
+          this.loading = false;
+        } catch (e) {
+          this.loading = false;
+          const message = e.statusText || e.message;
+          this.$message.error(message);
         }
-        if (code !== '200') throw new Error(message);
-        const { total, rows } = respData;
-        this.total = total;
-        this.list = _.map(rows, o => ({
-          ...o,
-          resetTypeText: (_.find(this.resetTypeList, { id: o.reset }) || {}).name,
-          requestTypeText: (_.find(this.requestTypeList, { id: o.request }) || {}).name,
-          deviceTypeListText: (_.find(this.deviceTypeList, { id: o.deviceType }) || {}).name,
-        }));
-        this.loading = false;
-      } catch (e) {
-        this.loading = false;
-        const message = e.statusText || e.message;
-        this.$message.error(message);
       }
     },
     // 添加按钮
     addButton(form = {}) {
+      this.editForm = false;
       const $form = this.$refs.form;
       if ($form) $form.resetFields();
       this.form = _.pick(form, [
@@ -213,6 +225,7 @@ export default {
     },
     // 编辑按钮
     async editButton(form) {
+      this.editForm = true;
       const forms = _.pick(form, [
         'deviceId',
         'deviceType',
@@ -290,7 +303,9 @@ export default {
     },
   },
   async mounted() {
+    this.loading = true;
     await this.reload();
+    this.loading = false;
   },
 };
 </script>
