@@ -588,4 +588,10 @@ public class SysUserServcieImpl implements SysUserService {
         return user.get(0);
     }
 
+    @Override
+    @Transactional
+    public void modifyInformation(SysUser user) {
+        sysUserMapperExt.updateByPrimaryKeySelective(user);
+    }
+
 }
