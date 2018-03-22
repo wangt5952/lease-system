@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -1337,4 +1338,56 @@ public class BizVehicleController extends BaseController {
         // 返回结果
         return new MessageResponse(RunningResult.SUCCESS, vehiclesCot);
     }
+
+    /**
+     * <pre>
+     *     {
+     *         id:当前用户登录id
+     *     }
+     * </pre>
+     * @param sysUserId 登录用户
+     * @param request HttpServletRequest
+     * @return 根据当前登录用户查询当前用户下的所有车辆
+     */
+    @RequestMapping(value = "/getVehicleByUserId",method = RequestMethod.POST)
+    public MessageResponse getVehicleByUserId(@RequestBody String sysUserId,HttpServletRequest request){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(sysUserId)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,Object> map = null;
+            try {
+                String paramStr = URLDecoder.decode(sysUserId, "utf-8");
+                map = JSONObject.parseObject(paramStr,Map.class);
+                if (WzStringUtil.isBlank(map.get("id").toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                //获取登录对象的信息
+                SysUser userTemp = getLoginUserInfo(request);
+                if (userTemp == null) {
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                //判断登录用户的类型
+                if (userTemp.getUserType().equals(OrgAndUserType.PLATFORM)) {
+                    return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(map.get("id").toString(),null));
+                } else if (userTemp.getUserType().equals(OrgAndUserType.INDIVIDUAL)) {
+                    if (userTemp.getId().equals(map.get("id"))){
+                        return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(null,null));
+                    } else {
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                } else if (userTemp.getUserType().equals(OrgAndUserType.ENTERPRISE)) {
+                    return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(map.get("id").toString(),userTemp.getOrgId()));
+                } else {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
+            }
+        }
+    }
+
 }

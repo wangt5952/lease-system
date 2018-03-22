@@ -71,7 +71,7 @@ public interface BizVehicleService {
 
     /**
      * 根据ID查询车辆信息
-     * @param id 车辆ID
+     * @param param 车辆ID
      * @param isUsed 是否查询在用电池，true：查在用电池；false：查在用及解绑的电池
      * */
     public List<Map<String,Object>> getByPrimaryKey(Map<String,Object> param, Boolean isUsed);
@@ -122,5 +122,12 @@ public interface BizVehicleService {
      * @param orgId 企业ID
      * */
     public int getOrgBindVehicle(String orgId);
+
+    /**
+     * 查询当前登录用户下的所有车辆
+     * @param sysUserId 当前登录用户的id
+     * @return 所有车辆
+     */
+    public List<BizVehicle> getVehicleByUserId(String sysUserId,String orgId);
 
 }

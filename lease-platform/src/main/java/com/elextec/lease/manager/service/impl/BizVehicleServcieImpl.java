@@ -62,6 +62,9 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Autowired
     private BizOrganizationMapperExt bizOrganizationMapperExt;
 
+    @Autowired
+    private SysUserMapperExt sysUserMapperExt;
+
 
     @Override
     public PageResponse<BizVehicle> list(boolean needPaging, PageRequest pr) {
@@ -624,5 +627,23 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         criteria.andOrgIdEqualTo(orgId);
         criteria.andUnbindTimeIsNull();
         return bizRefOrgVehicleMapperExt.countByExample(example);
+    }
+
+    @Override
+    public List<BizVehicle> getVehicleByUserId(String sysUserId,String orgId) {
+        //orgId不为空代表是企业，为空代表是平台
+        if (WzStringUtil.isNotBlank(orgId)) {
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria criteria = sysUserExample.createCriteria();
+            criteria.andIdEqualTo(sysUserId);
+            criteria.andOrgIdEqualTo(orgId);
+            if (sysUserMapperExt.countByExample(sysUserExample) == 1) {
+                return bizRefUserVehicleMapperExt.getVehicleByUserId(sysUserId);
+            } else {
+                throw new BizException(RunningResult.NO_FUNCTION_PERMISSION);
+            }
+        } else {
+            return bizRefUserVehicleMapperExt.getVehicleByUserId(sysUserId);
+        }
     }
 }
