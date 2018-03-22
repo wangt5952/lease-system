@@ -1348,6 +1348,30 @@ public class BizVehicleController extends BaseController {
      * @param sysUserId 登录用户
      * @param request HttpServletRequest
      * @return 根据当前登录用户查询当前用户下的所有车辆
+     * * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 vehicleCode:车辆编号,
+     *                 vehiclePn:车辆型号,
+     *                 vehicleBrand:车辆品牌,
+     *                 vehicleMadeIn:车辆产地,
+     *                 mfrsId:生产商ID,
+     *                 mfrsName:生产商名,
+     *                 vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                 batteryId:绑定该车辆的电池ID（不为NULL就是已绑定，NULL就是未绑定）
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
      */
     @RequestMapping(value = "/getVehicleByUserId",method = RequestMethod.POST)
     public MessageResponse getVehicleByUserId(@RequestBody String sysUserId,HttpServletRequest request){
