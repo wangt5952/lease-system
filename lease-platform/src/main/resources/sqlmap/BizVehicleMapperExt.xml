@@ -235,4 +235,70 @@
             and r.org_id = #{orgId,jdbcType=VARCHAR}
         </if>
     </select>
+
+    <select id="selectExtUnbindExtByParams" resultMap="BizVehicleExtResultMap" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >
+        SELECT distinct
+          a.id id,
+          a.vehicle_code vehicle_code,
+          a.vehicle_pn vehicle_pn,
+          a.vehicle_brand vehicle_brand,
+          a.vehicle_made_in vehicle_made_in,
+          a.mfrs_id mfrs_id,
+          a.vehicle_status vehicle_status,
+          a.create_user create_user,
+          a.create_time create_time,
+          a.update_user update_user,
+          b.mfrs_name mfrs_name,
+          a.update_time update_time
+        FROM biz_vehicle a
+        LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
+        LEFT JOIN biz_ref_org_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.vehicle_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_made_in like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="vehicleStatus != null and vehicleStatus != ''" >
+                and a.vehicle_status = #{vehicleStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and r.org_id = #{orgId,jdbcType=VARCHAR}
+                and a.id not in (select r1.vehicle_id from biz_ref_user_vehicle r1
+                LEFT JOIN biz_ref_org_vehicle r2 ON r1.vehicle_id = r2.vehicle_id and r2.unbind_time IS NULL
+                where r1.unbind_time is NULL AND r2.org_id = #{orgId,jdbcType=VARCHAR})
+            </if>
+        </where>
+        limit #{pageBegin} , #{pageSize}
+    </select>
+
+    <select id="countExtUnbindExtByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >
+        SELECT COUNT(distinct a.id)
+        FROM biz_vehicle a
+        LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
+        LEFT JOIN biz_ref_org_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.vehicle_code like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_pn like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_brand like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.vehicle_made_in like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or b.mfrs_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="vehicleStatus != null and vehicleStatus != ''" >
+                and a.vehicle_status = #{vehicleStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and r.org_id = #{orgId,jdbcType=VARCHAR}
+                and a.id not in (select r1.vehicle_id from biz_ref_user_vehicle r1
+                LEFT JOIN biz_ref_org_vehicle r2 ON r1.vehicle_id = r2.vehicle_id and r2.unbind_time IS NULL
+                where r1.unbind_time is NULL AND r2.org_id = #{orgId,jdbcType=VARCHAR})
+            </if>
+        </where>
+    </select>
+
 </mapper>

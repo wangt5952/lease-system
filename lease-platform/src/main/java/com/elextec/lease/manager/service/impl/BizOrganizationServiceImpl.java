@@ -242,21 +242,4 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         return bizOrganizationMapperExt.selectByPrimaryKey(id);
     }
 
-    @Override
-    public List<BizVehicle> getOrgIdByVehicle(String sysUserId,String orgId) {
-        if (WzStringUtil.isNotBlank(sysUserId)) {
-            SysUserExample sysUserExample = new SysUserExample();
-            SysUserExample.Criteria criteria = sysUserExample.createCriteria();
-            criteria.andIdEqualTo(sysUserId);
-            criteria.andOrgIdEqualTo(orgId);
-            // 该企业存在
-            if (sysUserMapperExt.countByExample(sysUserExample) == 1) {
-                return bizOrganizationMapperExt.getOrgIdByVehicle(orgId);
-            } else {
-                throw new BizException(RunningResult.NO_FUNCTION_PERMISSION);
-            }
-        } else {
-            return bizOrganizationMapperExt.getOrgIdByVehicle(orgId);
-        }
-    }
 }

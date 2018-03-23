@@ -130,4 +130,13 @@ public interface BizVehicleService {
      */
     public List<BizVehicle> getVehicleByUserId(String sysUserId,String orgId);
 
+    /**
+     * 获得车辆列表（附带扩展信息）.
+     * @param needPaging 是否需要分页
+     * @param pr 带条件的分页参数
+     * @return 车辆列表
+     */
+    public PageResponse<BizVehicleExt> selectExtUnbindExtByParams(boolean needPaging, BizVehicleParam pr);
+
+
 }

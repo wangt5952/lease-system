@@ -70,24 +70,4 @@
       </where>
     </select>
 
-
-    <select id="getOrgIdByVehicle" parameterType="java.lang.String" resultMap="bizvehicle">
-        SELECT v.id,
-        v.vehicle_code,
-        v.vehicle_pn,
-        v.vehicle_brand,
-        v.vehicle_made_in,
-        v.mfrs_id,
-        v.vehicle_status,
-        v.create_user,
-        v.create_time,
-        v.update_user,
-        v.update_time
-        FROM `biz_vehicle` v
-        LEFT JOIN biz_ref_org_vehicle r on r.vehicle_id = v.id
-        LEFT JOIN biz_organization o on o.id = r.org_id
-        WHERE r.org_id = #{orgId,jdbcType=VARCHAR}
-        AND r.unbind_time IS NULL
-    </select>
-
 </mapper>

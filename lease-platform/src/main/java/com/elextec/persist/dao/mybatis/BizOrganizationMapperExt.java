@@ -29,11 +29,4 @@ public interface BizOrganizationMapperExt extends BizOrganizationMapper {
      */
     public int countByParam(BizOrganizationParam bizOrganizationParam);
 
-    /**
-     * 根据企业id查询所属车辆
-     * @param orgId 企业ID
-     * @return 车辆列表
-     */
-    public List<BizVehicle> getOrgIdByVehicle(String orgId);
-
 }

@@ -45,7 +45,9 @@ import java.util.*;
 @RestController
 @RequestMapping(path = "/manager/vehicle")
 public class BizVehicleController extends BaseController {
-    /** 日志. */
+    /**
+     * 日志.
+     */
     private final Logger logger = LoggerFactory.getLogger(BizVehicleController.class);
 
     @Autowired
@@ -56,17 +58,18 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 查询车辆.
-     * @param request 请求
+     *
+     * @param request        请求
      * @param paramAndPaging 分页参数JSON
      * <pre>
-     *     {
-     *         keyStr:查询关键字（非必填，模糊查询，可填写车辆编号、车辆型号、车辆品牌、车辆产地、生产商ID、生产商名）,
-     *         vehicleStatus:车辆状态（非必填，包括NORMAL、FREEZE、INVALID）,
-     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
-     *         isBind:绑定未绑定状态（BIND为查已绑定，UNBIND为查未绑定,空的话则查全部）,
-     *         currPage:当前页（needPaging不为false时必填）,
-     *         pageSize:每页记录数（needPaging不为false时必填）
-     *     }
+     *        {
+     *                       keyStr:查询关键字（非必填，模糊查询，可填写车辆编号、车辆型号、车辆品牌、车辆产地、生产商ID、生产商名）,
+     *                       vehicleStatus:车辆状态（非必填，包括NORMAL、FREEZE、INVALID）,
+     *                       needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *                       isBind:绑定未绑定状态（BIND为查已绑定，UNBIND为查未绑定,空的话则查全部）,
+     *                       currPage:当前页（needPaging不为false时必填）,
+     *                       pageSize:每页记录数（needPaging不为false时必填）
+     *         }
      * </pre>
      * @param request HttpServletRequest
      * @return 车辆列表
@@ -98,7 +101,7 @@ public class BizVehicleController extends BaseController {
     @RequestMapping(path = "/list")
     public MessageResponse list(@RequestBody String paramAndPaging, HttpServletRequest request) {
         // 无参数则报“无参数”
-          if (WzStringUtil.isBlank(paramAndPaging)) {
+        if (WzStringUtil.isBlank(paramAndPaging)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
             return mr;
         } else {
@@ -123,17 +126,17 @@ public class BizVehicleController extends BaseController {
                     pagingParam.setNeedPaging("true");
                 }
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
+                if (userTemp != null) {
                     //根据用户类型添加条件
                     //个人用户需要添加userId为条件
-                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                    if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
                         pagingParam.setUserId(userTemp.getId());
                     }
                     //企业用户需要添加orgId为条件
-                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
+                    if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
                         pagingParam.setOrgId(userTemp.getOrgId());
                     }
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
             } catch (BizException ex) {
@@ -151,36 +154,37 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 批量增加车辆信息.（车辆与电池信息配对）.
-     * @param addParams 车辆电池配对信息列表JSON
-     * <pre>
-     *     [{
-     *          "bizVehicleInfo": {
-     *               vehicleCode:车辆编号,
-     *               vehiclePn:车辆型号,
-     *               vehicleBrand:车辆品牌,
-     *               vehicleMadeIn:车辆产地,
-     *               mfrsId:生产商ID,
-     *               vehicleStatus:车辆状态（正常、冻结、报废）,
-     *               createUser:创建人,
-     *               updateUser:更新人
      *
-     *          },
-     *          "flag": 有无电池flag("0"是新车配新电池信息,"1"是新车配旧电池信息,旧电池信息只带ID既可,"2"是只有车辆信息，电池信息不用传),
-     *          "batteryInfo": {
-     *               id:ID（仅flag为1时有效，其余电池项仅flag为0时有效）,
-     *               batteryCode:电池编号,
-     *               batteryName:电池货名,
-     *               batteryBrand:电池品牌,
-     *               batteryPn:电池型号,
-     *               batteryParameters:电池参数,
-     *               mfrsId:生产商ID,
-     *               batteryStatus:电池状态（正常、冻结、作废）,
-     *               createUser:创建人,
-     *               updateUser:更新人
-     *          }
-     *    }]
-     * </pre>
-     * @param request HttpServletRequest
+     * @param addParams 车辆电池配对信息列表JSON
+     *                  <pre>
+     *                      [{
+     *                           "bizVehicleInfo": {
+     *                                vehicleCode:车辆编号,
+     *                                vehiclePn:车辆型号,
+     *                                vehicleBrand:车辆品牌,
+     *                                vehicleMadeIn:车辆产地,
+     *                                mfrsId:生产商ID,
+     *                                vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                                createUser:创建人,
+     *                                updateUser:更新人
+     *
+     *                           },
+     *                           "flag": 有无电池flag("0"是新车配新电池信息,"1"是新车配旧电池信息,旧电池信息只带ID既可,"2"是只有车辆信息，电池信息不用传),
+     *                           "batteryInfo": {
+     *                                id:ID（仅flag为1时有效，其余电池项仅flag为0时有效）,
+     *                                batteryCode:电池编号,
+     *                                batteryName:电池货名,
+     *                                batteryBrand:电池品牌,
+     *                                batteryPn:电池型号,
+     *                                batteryParameters:电池参数,
+     *                                mfrsId:生产商ID,
+     *                                batteryStatus:电池状态（正常、冻结、作废）,
+     *                                createUser:创建人,
+     *                                updateUser:更新人
+     *                           }
+     *                     }]
+     *                  </pre>
+     * @param request   HttpServletRequest
      * @return 批量新增结果
      * <pre>
      *     {
@@ -206,20 +210,20 @@ public class BizVehicleController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
+                if (userTemp != null) {
                     //只有平台用户可以增加车辆
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    if (!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 VehicleBatteryParam insVBChkVo = null;
                 for (int i = 0; i < vehicleInfos.size(); i++) {
                     insVBChkVo = vehicleInfos.get(i);
-                    if(WzStringUtil.isBlank(insVBChkVo.getFlag())){
+                    if (WzStringUtil.isBlank(insVBChkVo.getFlag())) {
                         return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "车辆信息参数有误");
-                    }else{
+                    } else {
                         if (WzStringUtil.isBlank(insVBChkVo.getBizVehicleInfo().getVehicleCode())
                                 || null == insVBChkVo.getBizVehicleInfo().getVehicleStatus()
                                 || WzStringUtil.isBlank(insVBChkVo.getBizVehicleInfo().getCreateUser())
@@ -231,7 +235,7 @@ public class BizVehicleController extends BaseController {
                                 && !insVBChkVo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.NORMAL.toString())) {
                             return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的车辆状态");
                         }
-                        if("0".equals(insVBChkVo.getFlag())){
+                        if ("0".equals(insVBChkVo.getFlag())) {
                             if (WzStringUtil.isBlank(insVBChkVo.getBatteryInfo().getBatteryCode())
                                     || null == insVBChkVo.getBatteryInfo().getBatteryStatus()
                                     || WzStringUtil.isBlank(insVBChkVo.getBatteryInfo().getCreateUser())
@@ -244,7 +248,7 @@ public class BizVehicleController extends BaseController {
                                 return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
                             }
                         }
-                        if("1".equals(insVBChkVo.getFlag())){
+                        if ("1".equals(insVBChkVo.getFlag())) {
                             if (WzStringUtil.isBlank(insVBChkVo.getBatteryInfo().getId())) {
                                 return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "车辆信息参数有误");
                             }
@@ -265,36 +269,37 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 增加车辆信息.（车辆与电池信息配对）.
-     * @param addParams 车辆电池配对信息列表JSON
-     * <pre>
-     *     {
-     *          "bizVehicleInfo": {
-     *               vehicleCode:车辆编号,
-     *               vehiclePn:车辆型号,
-     *               vehicleBrand:车辆品牌,
-     *               vehicleMadeIn:车辆产地,
-     *               mfrsId:生产商ID,
-     *               vehicleStatus:车辆状态（正常、冻结、报废）,
-     *               createUser:创建人,
-     *               updateUser:更新人
      *
-     *          },
-     *          "flag": 有无电池flag("0"是新车配新电池信息,"1"是新车配旧电池信息,旧电池信息只带ID既可,"2"是只有车辆信息，电池信息不用传),
-     *          "batteryInfo": {
-     *               id:ID,
-     *               batteryCode:电池编号,
-     *               batteryName:电池货名,
-     *               batteryBrand:电池品牌,
-     *               batteryPn:电池型号,
-     *               batteryParameters:电池参数,
-     *               mfrsId:生产商ID,
-     *               batteryStatus:电池状态（正常、冻结、作废）,
-     *               createUser:创建人,
-     *               updateUser:更新人
-     *          }
-     *    }
-     * </pre>
-     * @param request HttpServletRequest
+     * @param addParams 车辆电池配对信息列表JSON
+     *                  <pre>
+     *                      {
+     *                           "bizVehicleInfo": {
+     *                                vehicleCode:车辆编号,
+     *                                vehiclePn:车辆型号,
+     *                                vehicleBrand:车辆品牌,
+     *                                vehicleMadeIn:车辆产地,
+     *                                mfrsId:生产商ID,
+     *                                vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                                createUser:创建人,
+     *                                updateUser:更新人
+     *
+     *                           },
+     *                           "flag": 有无电池flag("0"是新车配新电池信息,"1"是新车配旧电池信息,旧电池信息只带ID既可,"2"是只有车辆信息，电池信息不用传),
+     *                           "batteryInfo": {
+     *                                id:ID,
+     *                                batteryCode:电池编号,
+     *                                batteryName:电池货名,
+     *                                batteryBrand:电池品牌,
+     *                                batteryPn:电池型号,
+     *                                batteryParameters:电池参数,
+     *                                mfrsId:生产商ID,
+     *                                batteryStatus:电池状态（正常、冻结、作废）,
+     *                                createUser:创建人,
+     *                                updateUser:更新人
+     *                           }
+     *                     }
+     *                  </pre>
+     * @param request   HttpServletRequest
      * @return 新增结果
      * <pre>
      *     {
@@ -320,18 +325,18 @@ public class BizVehicleController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
+                if (userTemp != null) {
                     //只有平台用户可以增加车辆
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    if (!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
 
-                if(WzStringUtil.isBlank(vechcleInfo.getFlag())){
+                if (WzStringUtil.isBlank(vechcleInfo.getFlag())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "车辆信息参数有误");
-                }else{
+                } else {
                     if (WzStringUtil.isBlank(vechcleInfo.getBizVehicleInfo().getVehicleCode())
                             || null == vechcleInfo.getBizVehicleInfo().getVehicleStatus()
                             || WzStringUtil.isBlank(vechcleInfo.getBizVehicleInfo().getCreateUser())
@@ -343,7 +348,7 @@ public class BizVehicleController extends BaseController {
                             && !vechcleInfo.getBizVehicleInfo().getVehicleStatus().toString().equals(RecordStatus.NORMAL.toString())) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的车辆状态");
                     }
-                    if("0".equals(vechcleInfo.getFlag())){
+                    if ("0".equals(vechcleInfo.getFlag())) {
                         if (WzStringUtil.isBlank(vechcleInfo.getBatteryInfo().getBatteryCode())
                                 || null == vechcleInfo.getBatteryInfo().getBatteryStatus()
                                 || WzStringUtil.isBlank(vechcleInfo.getBatteryInfo().getCreateUser())
@@ -356,7 +361,7 @@ public class BizVehicleController extends BaseController {
                             return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的电池状态");
                         }
                     }
-                    if("1".equals(vechcleInfo.getFlag())){
+                    if ("1".equals(vechcleInfo.getFlag())) {
                         if (WzStringUtil.isBlank(vechcleInfo.getBatteryInfo().getId())) {
                             return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "车辆信息参数有误");
                         }
@@ -377,20 +382,21 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 修改车辆信息.
+     *
      * @param modifyParam 车辆信息JSON
-     * <pre>
-     *     {
-     *         id:ID,
-     *         vehicleCode:车辆编号,
-     *         vehiclePn:车辆型号,
-     *         vehicleBrand:车辆品牌,
-     *         vehicleMadeIn:车辆产地,
-     *         mfrsId:生产商ID,
-     *         vehicleStatus:车辆状态（正常、冻结、报废）,
-     *         updateUser:更新人
-     *     }
-     * </pre>
-     * @param request HttpServletRequest
+     *                    <pre>
+     *                        {
+     *                            id:ID,
+     *                            vehicleCode:车辆编号,
+     *                            vehiclePn:车辆型号,
+     *                            vehicleBrand:车辆品牌,
+     *                            vehicleMadeIn:车辆产地,
+     *                            mfrsId:生产商ID,
+     *                            vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                            updateUser:更新人
+     *                        }
+     *                    </pre>
+     * @param request     HttpServletRequest
      * @return 修改车辆信息返回
      * <pre>
      *     {
@@ -418,12 +424,12 @@ public class BizVehicleController extends BaseController {
                 }
 
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
+                if (userTemp != null) {
                     //只有平台用户可以修改车辆信息
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    if (!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
 
@@ -444,11 +450,12 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 批量删除车辆.
+     *
      * @param deleteParam 待删除的车辆列表JSON
-     * <pre>
-     *     [ID1,ID2,......]
-     * </pre>
-     * @param request HttpServletRequest
+     *                    <pre>
+     *                        [ID1,ID2,......]
+     *                    </pre>
+     * @param request     HttpServletRequest
      * @return 批量删除车辆返回
      * <pre>
      *     {
@@ -474,12 +481,12 @@ public class BizVehicleController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
+                if (userTemp != null) {
                     //只有平台用户可以删除车辆
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    if (!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 bizVehicleService.deleteVehicles(vehicleIds);
@@ -496,13 +503,14 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 根据ID获取车辆电池信息.
-     * @param param 车辆ID以及是否查询在用电池
-     * <pre>
-     *     {
-     *         id:车辆ID,
-     *         flag:是否查询在用电池（true是查询在用电池，false是查询全部电池）
-     *     }
-     * </pre>
+     *
+     * @param param   车辆ID以及是否查询在用电池
+     *                <pre>
+     *                    {
+     *                        id:车辆ID,
+     *                        flag:是否查询在用电池（true是查询在用电池，false是查询全部电池）
+     *                    }
+     *                </pre>
      * @param request HttpServletRequest
      * @return 根据ID获取车辆信息返回
      * <pre>
@@ -551,7 +559,7 @@ public class BizVehicleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            Map<String,Object> paramMap = null;
+            Map<String, Object> paramMap = null;
             try {
                 String paramStr = URLDecoder.decode(param, "utf-8");
                 paramMap = JSON.parseObject(paramStr, Map.class);
@@ -573,14 +581,14 @@ public class BizVehicleController extends BaseController {
                 isUsedBattery = Boolean.valueOf(isUsedBatteryStr);
             }
             SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp == null){
+            if (userTemp == null) {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                paramMap.put("orgId",userTemp.getOrgId());
+            if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                paramMap.put("orgId", userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                paramMap.put("userId",userTemp.getId());
+            if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                paramMap.put("userId", userTemp.getId());
             }
 //            List<Map<String,Object>> vehicleInfo = bizVehicleService.getByPrimaryKey((String) paramMap.get("id"), isUsedBattery);
             BizVehicleBatteryParts vehicleInfo = bizVehicleService.queryBatteryInfoByVehicleId(paramMap, isUsedBattery);
@@ -592,10 +600,11 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 根据ID获取车辆配件信息.
-     * @param param 车辆ID
-     * <pre>
-     * [id]
-     * </pre>
+     *
+     * @param param   车辆ID
+     *                <pre>
+     *                [id]
+     *                </pre>
      * @param request HttpServletRequest
      * @return 根据ID获取车辆信息返回
      * <pre>
@@ -648,16 +657,16 @@ public class BizVehicleController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp == null){
+            if (userTemp == null) {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
-            Map<String,Object> paramTemp = new HashMap<String,Object>();
-            paramTemp.put("id",paramMap.get(0));
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("orgId",userTemp.getOrgId());
+            Map<String, Object> paramTemp = new HashMap<String, Object>();
+            paramTemp.put("id", paramMap.get(0));
+            if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("orgId", userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("userId",userTemp.getId());
+            if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("userId", userTemp.getId());
             }
             List<BizPartsExt> parts = bizVehicleService.getBizPartsByVehicle(paramTemp);
             // 组织返回结果并返回
@@ -668,10 +677,11 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 根据车辆ID列表获取车辆信息列表.
-     * @param ids 车辆ID列表
-     * <pre>
-     *     [id1,id2,...]
-     * </pre>
+     *
+     * @param ids     车辆ID列表
+     *                <pre>
+     *                    [id1,id2,...]
+     *                </pre>
      * @param request HttpServletRequest
      * @return 根据ID获取设备定位信息
      * <pre>
@@ -714,7 +724,7 @@ public class BizVehicleController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             // 循环获得车辆电池信息并获得定位信息
-            List<Map<String,Object>> vehicleInfos = null;
+            List<Map<String, Object>> vehicleInfos = null;
             String batteryId = null;
             String batteryCode = null;
             String devicePk = null;
@@ -722,25 +732,25 @@ public class BizVehicleController extends BaseController {
             List<JSONObject> locDatas = new ArrayList<JSONObject>();
             StringBuffer errMsgs = new StringBuffer("");
             SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp == null){
+            if (userTemp == null) {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
-            Map<String,Object> paramTemp = new HashMap<String,Object>();
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("orgId",userTemp.getOrgId());
+            Map<String, Object> paramTemp = new HashMap<String, Object>();
+            if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("orgId", userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("userId",userTemp.getId());
+            if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("userId", userTemp.getId());
             }
             for (String vId : vehicleIds) {
                 if (WzStringUtil.isNotBlank(vId)) {
-                    paramTemp.put("id",vId);
+                    paramTemp.put("id", vId);
                     vehicleInfos = bizVehicleService.getByPrimaryKey(paramTemp, true);
                     if (null == vehicleInfos || 0 == vehicleInfos.size()) {
                         errMsgs.append("未查询到车辆[ID:" + vId + "]信息;");
                         continue;
                     } else {
-                        for (Map<String,Object> vehicleInfo : vehicleInfos) {
+                        for (Map<String, Object> vehicleInfo : vehicleInfos) {
                             batteryId = (String) vehicleInfo.get("batteryId");
                             batteryCode = (String) vehicleInfo.get("batteryCode");
                             if (WzStringUtil.isBlank(batteryCode)) {
@@ -780,10 +790,11 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 根据车辆ID列表获取设备电量信息列表.
-     * @param ids 车辆ID列表
-     * <pre>
-     *     [id1,id2,...]
-     * </pre>
+     *
+     * @param ids     车辆ID列表
+     *                <pre>
+     *                    [id1,id2,...]
+     *                </pre>
      * @param request HttpServletRequest
      * @return 根据ID获取设备电量信息
      * <pre>
@@ -826,7 +837,7 @@ public class BizVehicleController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             // 循环获得车辆电池信息并获得定位信息
-            List<Map<String,Object>> vehicleInfos = null;
+            List<Map<String, Object>> vehicleInfos = null;
             String batteryId = null;
             String batteryCode = null;
             String devicePk = null;
@@ -834,25 +845,25 @@ public class BizVehicleController extends BaseController {
             List<JSONObject> powerDatas = new ArrayList<JSONObject>();
             StringBuffer errMsgs = new StringBuffer("");
             SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp == null){
+            if (userTemp == null) {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
-            Map<String,Object> paramTemp = new HashMap<String,Object>();
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("orgId",userTemp.getOrgId());
+            Map<String, Object> paramTemp = new HashMap<String, Object>();
+            if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("orgId", userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("userId",userTemp.getId());
+            if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("userId", userTemp.getId());
             }
             for (String vId : vehicleIds) {
                 if (WzStringUtil.isNotBlank(vId)) {
-                    paramTemp.put("id",vId);
+                    paramTemp.put("id", vId);
                     vehicleInfos = bizVehicleService.getByPrimaryKey(paramTemp, true);
                     if (null == vehicleInfos || 0 == vehicleInfos.size()) {
                         errMsgs.append("未查询到车辆[ID:" + vId + "]信息;");
                         continue;
                     } else {
-                        for (Map<String,Object> vehicleInfo : vehicleInfos) {
+                        for (Map<String, Object> vehicleInfo : vehicleInfos) {
                             batteryId = (String) vehicleInfo.get("batteryId");
                             batteryCode = (String) vehicleInfo.get("batteryCode");
                             if (WzStringUtil.isBlank(batteryCode)) {
@@ -891,14 +902,15 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 车辆与电池绑定接口.
+     *
      * @param vehicleIdAndBatteryId 车辆ID与电池
-     * <pre>
-     *     {
-     *         vehicleId:车辆ID,
-     *         batteryId:电池ID
-     *     }
-     * </pre>
-     * @param request HttpServletRequest
+     *                              <pre>
+     *                                  {
+     *                                      vehicleId:车辆ID,
+     *                                      batteryId:电池ID
+     *                                  }
+     *                              </pre>
+     * @param request               HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -916,7 +928,7 @@ public class BizVehicleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            Map<String,String> param = null;
+            Map<String, String> param = null;
             try {
                 String paramStr = URLDecoder.decode(vehicleIdAndBatteryId, "utf-8");
                 param = JSON.parseObject(paramStr, Map.class);
@@ -924,12 +936,12 @@ public class BizVehicleController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
+                if (userTemp != null) {
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    if (!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
@@ -949,14 +961,15 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 车辆与电池解绑接口.
+     *
      * @param vehicleIdAndBatteryId 用户ID与车辆ID
-     * <pre>
-     *     {
-     *         vehicleId:车辆ID,
-     *         batteryId:电池ID
-     *     }
-     * </pre>
-     * @param request HttpServletRequest
+     *                              <pre>
+     *                                  {
+     *                                      vehicleId:车辆ID,
+     *                                      batteryId:电池ID
+     *                                  }
+     *                              </pre>
+     * @param request               HttpServletRequest
      * @return 查询结果
      * <pre>
      *     {
@@ -974,7 +987,7 @@ public class BizVehicleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            Map<String,String> param = null;
+            Map<String, String> param = null;
             try {
                 String paramStr = URLDecoder.decode(vehicleIdAndBatteryId, "utf-8");
                 param = JSON.parseObject(paramStr, Map.class);
@@ -982,12 +995,12 @@ public class BizVehicleController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp != null){
+                if (userTemp != null) {
                     //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    if (!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
                 if (WzStringUtil.isBlank((String) param.get("vehicleId")) || WzStringUtil.isBlank((String) param.get("batteryId"))) {
@@ -1007,15 +1020,16 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 根据定位点及半径获得范围内的所有车辆信息及定位、电池电量数据.
+     *
      * @param locAndRadius 定位点及半径参数
-     * <pre>
-     *     {
-     *         lat:纬度,
-     *         lng:经度,
-     *         radius:半径(米)
-     *     }
-     * </pre>
-     * @param request HttpServletRequest
+     *                     <pre>
+     *                         {
+     *                             lat:纬度,
+     *                             lng:经度,
+     *                             radius:半径(米)
+     *                         }
+     *                     </pre>
+     * @param request      HttpServletRequest
      * @return 车辆信息及定位、电池电量信息列表
      * <pre>
      *     {
@@ -1062,7 +1076,7 @@ public class BizVehicleController extends BaseController {
                 if (null == locAndRadiusParam) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if (null ==  locAndRadiusParam.getLat()
+                if (null == locAndRadiusParam.getLat()
                         || null == locAndRadiusParam.getLng()) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "定位点信息异常");
                 }
@@ -1091,17 +1105,17 @@ public class BizVehicleController extends BaseController {
                 }
             }
             SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp == null){
+            if (userTemp == null) {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
-            Map<String,Object> paramTemp = new HashMap<String,Object>();
+            Map<String, Object> paramTemp = new HashMap<String, Object>();
             deviceCds.add("123456");
-            paramTemp.put("batteryCodes",deviceCds);
-            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("orgId",userTemp.getOrgId());
+            paramTemp.put("batteryCodes", deviceCds);
+            if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("orgId", userTemp.getOrgId());
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                paramTemp.put("userId",userTemp.getId());
+            if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("userId", userTemp.getId());
             }
             // 查询所有范围内的车辆信息
             List<Map<String, Object>> vehicles = bizVehicleService.listByBatteryCode(paramTemp);
@@ -1124,15 +1138,16 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 根据车辆ID以及时间区间获取车辆轨迹信息
+     *
      * @param idAndTimeInterval 车辆ID与时间区间
-     * <pre>
-     *     {
-     *         id:车辆ID,
-     *         startTime:开始时间,
-     *         endTime:结束时间
-     *     }
-     * </pre>
-     * @param request HttpServletRequest
+     *                          <pre>
+     *                              {
+     *                                  id:车辆ID,
+     *                                  startTime:开始时间,
+     *                                  endTime:结束时间
+     *                              }
+     *                          </pre>
+     * @param request           HttpServletRequest
      * @return 根据车辆ID和时间区间获取车辆的轨迹信息
      * <pre>
      *     {
@@ -1158,7 +1173,7 @@ public class BizVehicleController extends BaseController {
             return mr;
         } else {
             // 参数解析错误报“参数解析错误”
-            Map<String,String> idAndTimeIntervalInfo = null;
+            Map<String, String> idAndTimeIntervalInfo = null;
             long startTime = 0;
             long endTime = 0;
             try {
@@ -1167,18 +1182,18 @@ public class BizVehicleController extends BaseController {
                 if (null == idAndTimeIntervalInfo) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if (null == idAndTimeIntervalInfo.get("id")){
+                if (null == idAndTimeIntervalInfo.get("id")) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆ID参数不能为空");
                 }
-                if (null ==  idAndTimeIntervalInfo.get("startTime")
+                if (null == idAndTimeIntervalInfo.get("startTime")
                         || null == idAndTimeIntervalInfo.get("endTime")) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "时间区间参数不能为空");
                 }
-                SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 startTime = sdf.parse(idAndTimeIntervalInfo.get("startTime")).getTime();
                 endTime = sdf.parse(idAndTimeIntervalInfo.get("endTime")).getTime();
                 //判定时间参数的正确性
-                if(startTime == 0 || endTime == 0 || startTime > endTime){
+                if (startTime == 0 || endTime == 0 || startTime > endTime) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "时间区间参数异常");
                 }
             } catch (BizException ex) {
@@ -1187,7 +1202,7 @@ public class BizVehicleController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
             // 循环获得车辆电池信息并获得定位信息
-            List<Map<String,Object>> vehicleInfos = null;
+            List<Map<String, Object>> vehicleInfos = null;
             String batteryId = null;
             String batteryCode = null;
             String devicePk = null;
@@ -1195,102 +1210,102 @@ public class BizVehicleController extends BaseController {
             StringBuffer errMsgs = new StringBuffer("");
             if (WzStringUtil.isNotBlank(idAndTimeIntervalInfo.get("id"))) {
                 SysUser userTemp = getLoginUserInfo(request);
-                if(userTemp == null){
+                if (userTemp == null) {
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
                 }
-                Map<String,Object> paramTemp = new HashMap<String,Object>();
-                if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                    paramTemp.put("orgId",userTemp.getOrgId());
+                Map<String, Object> paramTemp = new HashMap<String, Object>();
+                if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                    paramTemp.put("orgId", userTemp.getOrgId());
                 }
-                if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                    paramTemp.put("userId",userTemp.getId());
+                if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                    paramTemp.put("userId", userTemp.getId());
                 }
-                paramTemp.put("id",idAndTimeIntervalInfo.get("id"));
+                paramTemp.put("id", idAndTimeIntervalInfo.get("id"));
                 vehicleInfos = bizVehicleService.getByPrimaryKey(paramTemp, true);
                 if (null == vehicleInfos || 0 == vehicleInfos.size()) {
                     errMsgs.append("未查询到车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]信息;");
                 } else {
-                        for (Map<String,Object> vehicleInfo : vehicleInfos) {
-                            batteryId = (String) vehicleInfo.get("batteryId");
-                            batteryCode = (String) vehicleInfo.get("batteryCode");
-                            if (WzStringUtil.isBlank(batteryCode)) {
-                                errMsgs.append("未查询到车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]对应的设备;");
-                            }
-                            // 根据设备ID查询设备当前位置
-                            devicePk = batteryCode + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString();
-                            // 轨迹信息
-                            String trackKey = WzConstants.GK_DEVICE_TRACK + devicePk;
+                    for (Map<String, Object> vehicleInfo : vehicleInfos) {
+                        batteryId = (String) vehicleInfo.get("batteryId");
+                        batteryCode = (String) vehicleInfo.get("batteryCode");
+                        if (WzStringUtil.isBlank(batteryCode)) {
+                            errMsgs.append("未查询到车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]对应的设备;");
+                        }
+                        // 根据设备ID查询设备当前位置
+                        devicePk = batteryCode + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString();
+                        // 轨迹信息
+                        String trackKey = WzConstants.GK_DEVICE_TRACK + devicePk;
 
-                            List<JSONObject> locListTemp = new ArrayList<JSONObject>();
+                        List<JSONObject> locListTemp = new ArrayList<JSONObject>();
 
-                            //获取数据库中时间区间内的数据
-                            List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByTime(batteryCode,DeviceType.BATTERY.toString(),startTime,endTime);
-                            //转换封装数据库的数据
-                            if(null != locList && locList.size() > 0){
-                                for(int i=0;i<locList.size();i++){
-                                    //将数据分割
-                                    String[] locByte = locList.get(i).getLocations().split(";");
-                                    if(null != locByte && locByte.length > 0){
-                                        for(int j=0;j<locByte.length;j++){
-                                            String[] locInfo = locByte[j].split(",");
-                                            //判断参数格式是否正确
-                                            if(locInfo.length == 3){
-                                                //判断数据是否在时间区间内
-                                                if(Long.valueOf(locInfo[0]) >= startTime && Long.valueOf(locInfo[0]) <= endTime){
-                                                    JSONObject temp = new JSONObject();
-                                                    temp.put(DeviceApiConstants.KEY_LOC_TIME, Long.valueOf(locInfo[0]));
-                                                    //将WGS坐标系转换为BD坐标
-                                                    double[] douTemp = WzGPSUtil.wgs2bd(Double.valueOf(locInfo[1]),Double.valueOf(locInfo[2]));
-                                                    temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
-                                                    temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
-                                                    locListTemp.add(temp);
-                                                }
-                                            }else{
-                                                errMsgs.append("车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]对应的轨迹参数格式有误;");
-                                                break;
+                        //获取数据库中时间区间内的数据
+                        List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByTime(batteryCode, DeviceType.BATTERY.toString(), startTime, endTime);
+                        //转换封装数据库的数据
+                        if (null != locList && locList.size() > 0) {
+                            for (int i = 0; i < locList.size(); i++) {
+                                //将数据分割
+                                String[] locByte = locList.get(i).getLocations().split(";");
+                                if (null != locByte && locByte.length > 0) {
+                                    for (int j = 0; j < locByte.length; j++) {
+                                        String[] locInfo = locByte[j].split(",");
+                                        //判断参数格式是否正确
+                                        if (locInfo.length == 3) {
+                                            //判断数据是否在时间区间内
+                                            if (Long.valueOf(locInfo[0]) >= startTime && Long.valueOf(locInfo[0]) <= endTime) {
+                                                JSONObject temp = new JSONObject();
+                                                temp.put(DeviceApiConstants.KEY_LOC_TIME, Long.valueOf(locInfo[0]));
+                                                //将WGS坐标系转换为BD坐标
+                                                double[] douTemp = WzGPSUtil.wgs2bd(Double.valueOf(locInfo[1]), Double.valueOf(locInfo[2]));
+                                                temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
+                                                temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
+                                                locListTemp.add(temp);
                                             }
+                                        } else {
+                                            errMsgs.append("车辆[ID:" + idAndTimeIntervalInfo.get("id") + "]对应的轨迹参数格式有误;");
+                                            break;
                                         }
                                     }
                                 }
                             }
-                            // 获得缓存中在时间区间内的数据
-                            Set<Object> lastLocSet = redisClient.zsetOperations().rangeByScore(trackKey, startTime, endTime);
-                            //转换封装缓存中的数据
-                            if (null != lastLocSet && lastLocSet.size()>0) {
-                                List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
-                                for(int i=0;i<lastLocLs.size();i++){
-                                    JSONObject locVo = (JSONObject)lastLocLs.get(i);
-                                    locListTemp.add(locVo);
-                                }
+                        }
+                        // 获得缓存中在时间区间内的数据
+                        Set<Object> lastLocSet = redisClient.zsetOperations().rangeByScore(trackKey, startTime, endTime);
+                        //转换封装缓存中的数据
+                        if (null != lastLocSet && lastLocSet.size() > 0) {
+                            List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
+                            for (int i = 0; i < lastLocLs.size(); i++) {
+                                JSONObject locVo = (JSONObject) lastLocLs.get(i);
+                                locListTemp.add(locVo);
                             }
+                        }
 
-                            //计算点与点之间的停留时间重新封装LIST
-                            if(locListTemp.size() > 1){
-                                for(int i=0; i<locListTemp.size();i++){
-                                    if(i+1 < locListTemp.size()){
-                                        JSONObject temp = new JSONObject();
-                                        temp.put(DeviceApiConstants.KEY_LOC_TIME, locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME));
-                                        //将WGS坐标系转换为BD坐标
-                                        double[] douTemp = WzGPSUtil.wgs2bd(locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT),locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
-                                        temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
-                                        temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
-                                        long residenceTime = locListTemp.get(i+1).getLongValue(DeviceApiConstants.KEY_LOC_TIME) - locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME);
-                                        temp.put(DeviceApiConstants.KEY_STAY_TIME, residenceTime);
-                                        locDatas.add(temp);
-                                    }else{
-                                        JSONObject temp = new JSONObject();
-                                        temp.put(DeviceApiConstants.KEY_LOC_TIME, locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME));
-                                        //将WGS坐标系转换为BD坐标
-                                        double[] douTemp = WzGPSUtil.wgs2bd(locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT),locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
-                                        temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
-                                        temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
-                                        locDatas.add(temp);
-                                    }
+                        //计算点与点之间的停留时间重新封装LIST
+                        if (locListTemp.size() > 1) {
+                            for (int i = 0; i < locListTemp.size(); i++) {
+                                if (i + 1 < locListTemp.size()) {
+                                    JSONObject temp = new JSONObject();
+                                    temp.put(DeviceApiConstants.KEY_LOC_TIME, locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME));
+                                    //将WGS坐标系转换为BD坐标
+                                    double[] douTemp = WzGPSUtil.wgs2bd(locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT), locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
+                                    temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
+                                    temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
+                                    long residenceTime = locListTemp.get(i + 1).getLongValue(DeviceApiConstants.KEY_LOC_TIME) - locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME);
+                                    temp.put(DeviceApiConstants.KEY_STAY_TIME, residenceTime);
+                                    locDatas.add(temp);
+                                } else {
+                                    JSONObject temp = new JSONObject();
+                                    temp.put(DeviceApiConstants.KEY_LOC_TIME, locListTemp.get(i).getLongValue(DeviceApiConstants.KEY_LOC_TIME));
+                                    //将WGS坐标系转换为BD坐标
+                                    double[] douTemp = WzGPSUtil.wgs2bd(locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LAT), locListTemp.get(i).getDoubleValue(DeviceApiConstants.REQ_LON));
+                                    temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
+                                    temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
+                                    locDatas.add(temp);
                                 }
                             }
                         }
                     }
                 }
+            }
             // 返回结果
             MessageResponse mr = null;
             if (0 == errMsgs.length()) {
@@ -1304,6 +1319,7 @@ public class BizVehicleController extends BaseController {
 
     /**
      * 平台与企业用户查询绑定车辆数量接口
+     *
      * @param request HttpServletRequest
      * @return 查询结果
      * <pre>
@@ -1319,15 +1335,15 @@ public class BizVehicleController extends BaseController {
         int vehiclesCot = 0;
         try {
             SysUser userTemp = getLoginUserInfo(request);
-            if(userTemp != null){
+            if (userTemp != null) {
                 //个人无权执行该操作
-                if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())
-                        || OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())
+                        || OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
                     vehiclesCot = bizVehicleService.getOrgBindVehicle(userTemp.getOrgId());
-                }else{
+                } else {
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                 }
-            }else{
+            } else {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
         } catch (BizException ex) {
@@ -1345,8 +1361,9 @@ public class BizVehicleController extends BaseController {
      *         id:当前用户登录id
      *     }
      * </pre>
+     *
      * @param sysUserId 登录用户
-     * @param request HttpServletRequest
+     * @param request   HttpServletRequest
      * @return 根据当前登录用户查询当前用户下的所有车辆
      * <pre>
      *     {
@@ -1373,17 +1390,17 @@ public class BizVehicleController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(value = "/getVehicleByUserId",method = RequestMethod.POST)
-    public MessageResponse getVehicleByUserId(@RequestBody String sysUserId,HttpServletRequest request){
+    @RequestMapping(value = "/getVehicleByUserId", method = RequestMethod.POST)
+    public MessageResponse getVehicleByUserId(@RequestBody String sysUserId, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(sysUserId)) {
             return new MessageResponse(RunningResult.NO_PARAM);
         } else {
             // 参数解析错误报“参数解析错误”
-            Map<String,Object> map = null;
+            Map<String, Object> map = null;
             try {
                 String paramStr = URLDecoder.decode(sysUserId, "utf-8");
-                map = JSONObject.parseObject(paramStr,Map.class);
+                map = JSONObject.parseObject(paramStr, Map.class);
                 if (WzStringUtil.isBlank(map.get("id").toString())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
@@ -1394,15 +1411,15 @@ public class BizVehicleController extends BaseController {
                 }
                 //判断登录用户的类型
                 if (userTemp.getUserType().equals(OrgAndUserType.PLATFORM)) {
-                    return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(map.get("id").toString(),null));
+                    return new MessageResponse(RunningResult.SUCCESS, bizVehicleService.getVehicleByUserId(map.get("id").toString(), null));
                 } else if (userTemp.getUserType().equals(OrgAndUserType.INDIVIDUAL)) {
-                    if (userTemp.getId().equals(map.get("id"))){
-                        return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(map.get("id").toString(),null));
+                    if (userTemp.getId().equals(map.get("id"))) {
+                        return new MessageResponse(RunningResult.SUCCESS, bizVehicleService.getVehicleByUserId(map.get("id").toString(), null));
                     } else {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }
                 } else if (userTemp.getUserType().equals(OrgAndUserType.ENTERPRISE)) {
-                    return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(map.get("id").toString(),userTemp.getOrgId()));
+                    return new MessageResponse(RunningResult.SUCCESS, bizVehicleService.getVehicleByUserId(map.get("id").toString(), userTemp.getOrgId()));
                 } else {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
@@ -1411,6 +1428,104 @@ public class BizVehicleController extends BaseController {
             } catch (Exception ex) {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
             }
+        }
+    }
+
+    /**
+     * 该企业下未绑定的车辆
+     * <pre>
+     *     {
+     *         orgId:企业id，
+     *         keyStr:查询关键字（非必填，模糊查询，可填写车辆编号、车辆型号、车辆品牌、车辆产地、生产商ID、生产商名）,
+     *         vehicleStatus:车辆状态（非必填，包括NORMAL、FREEZE、INVALID）,
+     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *         isBind:绑定未绑定状态（BIND为查已绑定，UNBIND为查未绑定,空的话则查全部）,
+     *         currPage:当前页（needPaging不为false时必填）,
+     *         pageSize:每页记录数（needPaging不为false时必填）
+     *     }
+     * </pre>
+     *
+     * @param paramAndPaging
+     * @param request 登录信息
+     * @return 车辆列表
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 vehicleCode:车辆编号,
+     *                 vehiclePn:车辆型号,
+     *                 vehicleBrand:车辆品牌,
+     *                 vehicleMadeIn:车辆产地,
+     *                 mfrsId:生产商ID,
+     *                 mfrsName:生产商名,
+     *                 vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                 batteryId:绑定该车辆的电池ID（不为NULL就是已绑定，NULL就是未绑定）
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/selectExtUnbindExtByParams", method = RequestMethod.POST)
+    public MessageResponse selectExtUnbindExtByParams(@RequestBody String paramAndPaging, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(paramAndPaging)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            BizVehicleParam pagingParam = null;
+            try {
+                String paramStr = URLDecoder.decode(paramAndPaging, "utf-8");
+                pagingParam = JSON.parseObject(paramStr, BizVehicleParam.class);
+                if (null == pagingParam) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 仅needPaging标志为false时，不需要分页，其他情况均需要进行分页
+                if (WzStringUtil.isNotBlank(pagingParam.getNeedPaging())
+                        && "false".equals(pagingParam.getNeedPaging().toLowerCase())) {
+                    pagingParam.setNeedPaging("false");
+                } else {
+                    if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
+                    }
+                    pagingParam.setNeedPaging("true");
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if (userTemp != null) {
+                    if (userTemp.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                            return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                    //根据用户类型添加条件
+                    //平台用户需要添加上传的orgId为条件
+                    if (OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())) {
+                        if (WzStringUtil.isBlank(pagingParam.getOrgId())) {
+                            return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "企业id参数不能为空");
+                        }
+                        pagingParam.setOrgId(pagingParam.getOrgId());
+                    }
+                    //企业用户需要添加orgId为条件
+                    if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                        pagingParam.setOrgId(userTemp.getOrgId());
+                    }
+                } else {
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+            } catch(BizException ex){
+                throw ex;
+            } catch(Exception ex){
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
+            }
+            PageResponse<BizVehicleExt> vehiclePageResp = bizVehicleService.selectExtUnbindExtByParams(Boolean.valueOf(pagingParam.getNeedPaging()), pagingParam);
+            // 组织返回结果并返回
+            return new MessageResponse(RunningResult.SUCCESS, vehiclePageResp);
         }
     }
 

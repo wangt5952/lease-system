@@ -62,12 +62,4 @@ public interface BizOrganizationService {
      */
     public BizOrganization getBizOrganizationByPrimaryKey(String id);
 
-    /**
-     * 根据企业id查看该企业下的所有车辆
-     * @param sysUserId 用户登录id
-     * @param orgId 企业id
-     * @return 车辆列表
-     */
-    public List<BizVehicle> getOrgIdByVehicle(String sysUserId, String orgId);
-
 }

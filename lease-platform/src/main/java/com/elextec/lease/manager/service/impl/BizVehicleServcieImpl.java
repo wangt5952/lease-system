@@ -646,4 +646,31 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             return bizRefUserVehicleMapperExt.getVehicleByUserId(sysUserId);
         }
     }
+
+    @Override
+    public PageResponse<BizVehicleExt> selectExtUnbindExtByParams(boolean needPaging, BizVehicleParam pr) {
+        // 查询总记录数
+        int vehicleTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            vehicleTotal = pr.getTotal();
+        } else {
+            vehicleTotal = bizVehicleMapperExt.countExtUnbindExtByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizVehicleExt> vehicleLs = bizVehicleMapperExt.selectExtUnbindExtByParams(pr);
+        // 组织并返回结果
+        PageResponse<BizVehicleExt> presp = new PageResponse<BizVehicleExt>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(vehicleTotal);
+        if (null == vehicleLs) {
+            presp.setRows(new ArrayList<BizVehicleExt>());
+        } else {
+            presp.setRows(vehicleLs);
+        }
+        return presp;
+    }
 }
