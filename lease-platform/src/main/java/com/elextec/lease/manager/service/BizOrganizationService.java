@@ -4,8 +4,10 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.persist.model.mybatis.BizOrganization;
+import com.elextec.persist.model.mybatis.BizVehicle;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 公司组织Service
@@ -59,5 +61,13 @@ public interface BizOrganizationService {
      * @return 公司组织信息
      */
     public BizOrganization getBizOrganizationByPrimaryKey(String id);
+
+    /**
+     * 根据企业id查看该企业下的所有车辆
+     * @param sysUserId 用户登录id
+     * @param orgId 企业id
+     * @return 车辆列表
+     */
+    public List<BizVehicle> getOrgIdByVehicle(String sysUserId, String orgId);
 
 }

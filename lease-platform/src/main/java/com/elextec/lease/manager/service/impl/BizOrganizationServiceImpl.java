@@ -4,6 +4,7 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.service.BizOrganizationService;
@@ -22,6 +23,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BizOrganizationServiceImpl implements BizOrganizationService {
@@ -238,5 +240,23 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     @Override
     public BizOrganization getBizOrganizationByPrimaryKey(String id) {
         return bizOrganizationMapperExt.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public List<BizVehicle> getOrgIdByVehicle(String sysUserId,String orgId) {
+        if (WzStringUtil.isNotBlank(sysUserId)) {
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria criteria = sysUserExample.createCriteria();
+            criteria.andIdEqualTo(sysUserId);
+            criteria.andOrgIdEqualTo(orgId);
+            // 该企业存在
+            if (sysUserMapperExt.countByExample(sysUserExample) == 1) {
+                return bizOrganizationMapperExt.getOrgIdByVehicle(orgId);
+            } else {
+                throw new BizException(RunningResult.NO_FUNCTION_PERMISSION);
+            }
+        } else {
+            return bizOrganizationMapperExt.getOrgIdByVehicle(orgId);
+        }
     }
 }

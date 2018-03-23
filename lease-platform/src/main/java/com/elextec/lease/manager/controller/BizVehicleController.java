@@ -1348,7 +1348,7 @@ public class BizVehicleController extends BaseController {
      * @param sysUserId 登录用户
      * @param request HttpServletRequest
      * @return 根据当前登录用户查询当前用户下的所有车辆
-     * * <pre>
+     * <pre>
      *     {
      *         code:返回Code,
      *         message:返回消息,
@@ -1397,7 +1397,7 @@ public class BizVehicleController extends BaseController {
                     return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(map.get("id").toString(),null));
                 } else if (userTemp.getUserType().equals(OrgAndUserType.INDIVIDUAL)) {
                     if (userTemp.getId().equals(map.get("id"))){
-                        return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(null,null));
+                        return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.getVehicleByUserId(map.get("id").toString(),null));
                     } else {
                         return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                     }

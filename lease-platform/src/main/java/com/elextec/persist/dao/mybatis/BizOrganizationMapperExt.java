@@ -2,6 +2,7 @@ package com.elextec.persist.dao.mybatis;
 
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.persist.model.mybatis.BizOrganization;
+import com.elextec.persist.model.mybatis.BizVehicle;
 
 import java.util.List;
 
@@ -27,5 +28,12 @@ public interface BizOrganizationMapperExt extends BizOrganizationMapper {
      * @return 组织信息记录数
      */
     public int countByParam(BizOrganizationParam bizOrganizationParam);
+
+    /**
+     * 根据企业id查询所属车辆
+     * @param orgId 企业ID
+     * @return 车辆列表
+     */
+    public List<BizVehicle> getOrgIdByVehicle(String orgId);
 
 }
