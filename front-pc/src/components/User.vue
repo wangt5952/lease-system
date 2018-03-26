@@ -31,18 +31,20 @@
       <el-table-column prop="userName" label="姓名"></el-table-column>
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <template v-if="key_user_info.userType === 'PLATFORM'">
-        <el-table-column label="操作" width="250">
-          <template slot-scope="{row}">
+      <el-table-column label="操作" width="250">
+        <template slot-scope="{row}">
+          <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
             <template v-if="row.userType === 'INDIVIDUAL'">
               <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
+              <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
             </template>
-            <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
+          </template>
+          <template v-if="key_user_info.userType === 'PLATFORM'">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
           </template>
-        </el-table-column>
-      </template>
+        </template>
+      </el-table-column>
     </el-table>
 
     <el-pagination v-if="total" style="margin-top:10px;"
@@ -86,7 +88,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="姓名">
+            <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
               <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
@@ -98,7 +100,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="userPid" :rules="[{required:true, message:'请填写身份证号码'}]" label="身份证号">
+            <el-form-item prop="userPid" label="身份证号">
               <el-input v-model="form.userPid" placeholder="请选择企业" auto-complete="off" :disabled="disabledForm"></el-input>
             </el-form-item>
           </el-col>
@@ -174,7 +176,6 @@
           </el-select>
         </el-form-item>
       </el-form>
-
       <el-table :data="vehicleList" style="width: 100%">
         <el-table-column prop="vehicleCode" label="编号"></el-table-column>
         <el-table-column prop="vehiclePn" label="型号"></el-table-column>
@@ -182,15 +183,12 @@
         <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
         <el-table-column prop="mfrsName" label="生产商"></el-table-column>
         <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
-        <template v-if="res['FUNCTION'].indexOf('manager-parts-modify') >= 0">
-          <el-table-column label="操作" width="100">
-            <template slot-scope="{row}">
-              <el-button v-if="!row.vehicleId" type="primary" @click="bindVehicle(row)">绑定</el-button>
-            </template>
-          </el-table-column>
-        </template>
+        <el-table-column label="操作" width="100">
+          <template slot-scope="{row}">
+            <el-button type="primary" @click="bindVehicle(row)">绑定</el-button>
+          </template>
+        </el-table-column>
       </el-table>
-
       <el-pagination v-if="vehicleTotal" style="margin-top:10px;"
         @size-change="vehicleHandleSizeChange"
         @current-change="vehicleReload"
@@ -200,9 +198,8 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="vehicleTotal">
       </el-pagination>
-
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeVehicleForm">取消</el-button>
+        <el-button @click="closeVehicleForm">关闭</el-button>
         <el-button type="primary" @click="saveVehicleForm">保存</el-button>
       </span>
     </el-dialog>
