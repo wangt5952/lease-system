@@ -259,7 +259,7 @@ public class SysAuthController extends BaseController {
                     updateVo.setId(sue.getId());
                     updateVo.setPassword(modifyPasswordParam.getNewPassword());
                     updateVo.setUpdateUser(sue.getId());
-                    sysUserService.updateSysUser(updateVo);
+                    sysUserService.updatePassword(updateVo);
                 }
             } catch (BizException ex) {
                 throw ex;

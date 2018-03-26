@@ -46,7 +46,7 @@
         b.mfrs_name mfrs_name
         FROM
         biz_battery a
-        LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id
+        LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id AND d.unbind_time is NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
         LEFT JOIN biz_ref_org_vehicle r ON d.vehicle_id = r.vehicle_id AND r.unbind_time IS NULL
         LEFT JOIN biz_ref_user_vehicle r1 ON d.vehicle_id = r1.vehicle_id and r1.unbind_time is NULL
@@ -84,7 +84,7 @@
         count(distinct a.id)
         FROM
         biz_battery a
-        LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id
+        LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id AND d.unbind_time is NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
         LEFT JOIN biz_ref_org_vehicle r ON d.vehicle_id = r.vehicle_id AND r.unbind_time IS NULL
         LEFT JOIN biz_ref_user_vehicle r1 ON d.vehicle_id = r1.vehicle_id and r1.unbind_time is NULL

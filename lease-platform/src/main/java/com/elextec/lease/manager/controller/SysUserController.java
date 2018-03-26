@@ -436,11 +436,17 @@ public class SysUserController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 userInfo = JSON.parseObject(paramStr, SysUser.class);
+                if (WzStringUtil.isBlank(userInfo.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
+                }
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
                     //个人与企业用户无权执行该操作
                     if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
-                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                        //如果不是平台用户，登录用户与修改用户ID不同则不能修改
+                        if(!userInfo.getId().equals(userTemp.getId())){
+                            return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                        }
                     }
                 }else{
                     return new MessageResponse(RunningResult.AUTH_OVER_TIME);
@@ -450,9 +456,7 @@ public class SysUserController extends BaseController {
                         || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if (WzStringUtil.isBlank(userInfo.getId())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
-                }
+
                 //密码不可以由这个接口修改，清空上传的密码参数
                 userInfo.setPassword(null);
                 //手机号码不可以由这个接口个改，清空上传的手机号码
@@ -1000,4 +1004,67 @@ public class SysUserController extends BaseController {
             return mr;
         }
     }
+
+    /**
+     * 实名认证审批接口.
+     * @param approvalParam 用户ID与实名状态
+     * <pre>
+     *     {
+     *         userId:用户ID,
+     *         flag:实名状态（认证、驳回）
+     *     }
+     * </pre>
+     * @param request HttpServletRequest
+     * @return 审批结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/approval")
+    public MessageResponse approval(@RequestBody String approvalParam, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(approvalParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(approvalParam, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //个人用户无权执行该操作
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                if (WzStringUtil.isBlank(param.get("userId")) || WzStringUtil.isBlank(param.get("flag"))) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if(!RealNameAuthFlag.AUTHORIZED.toString().equals(param.get("flag"))
+                        || !RealNameAuthFlag.REJECTAUTHORIZED.toString().equals(param.get("flag"))){
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                sysUserService.approval(param.get("userId"),param.get("flag"),userTemp.getOrgId());
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
 }

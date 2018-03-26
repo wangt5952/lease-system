@@ -5,6 +5,7 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.model.BizVehicleBatteryParts;
+import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
@@ -56,6 +57,13 @@ public interface SysUserService {
      * @param ids 待删除的用户ID列表
      */
     public void deleteSysUser(List<String> ids);
+
+
+    /**
+     * 修改用户密码.
+     * @param user 用户信息
+     */
+    public void updatePassword(SysUser user);
 
     /**
      * 给用户分配角色.
@@ -125,4 +133,12 @@ public interface SysUserService {
      * @param user 用户修改的信息
      */
     public void modifyInformation(SysUser user);
+
+    /**
+     * 修改个人实名认证状态.
+     * @param userId 用户ID
+     * @param authFlag 验证状态
+     * @param orgId 企业ID
+     */
+    public void approval(String userId,String authFlag,String orgId);
 }

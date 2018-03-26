@@ -12,6 +12,7 @@ import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.*;
 import com.elextec.persist.field.enums.OrgAndUserType;
+import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
@@ -209,6 +210,8 @@ public class SysUserServcieImpl implements SysUserService {
         }
     }
 
+
+
     @Override
     @Transactional
     public void updateSysUser(SysUser userInfo) {
@@ -320,6 +323,11 @@ public class SysUserServcieImpl implements SysUserService {
     }
 
     @Override
+    public void updatePassword(SysUser user) {
+        sysUserMapperExt.updateByPrimaryKeySelective(user);
+    }
+
+    @Override
     @Transactional
     public void refSysUserAndRoles(RefUserRolesParam params){
         int i = 0;
@@ -420,13 +428,15 @@ public class SysUserServcieImpl implements SysUserService {
         SysUserExample userExample = new SysUserExample();
         SysUserExample.Criteria selectUserCriteria = userExample.createCriteria();
         selectUserCriteria.andIdEqualTo(userId);
+        //平台用户与企业用户下面不可以绑定车辆
+        selectUserCriteria.andUserTypeEqualTo(OrgAndUserType.INDIVIDUAL);
         selectUserCriteria.andUserStatusEqualTo(RecordStatus.NORMAL);
         if(null != orgId){
             selectUserCriteria.andOrgIdEqualTo(orgId);
         }
         List<SysUserExt> user = sysUserMapperExt.selectExtByExample(userExample);
         if(user.size() < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或已作废或用户不在企业名下");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不存在或已作废");
         }
 
         //判定车辆是否存在或已作废
@@ -592,6 +602,27 @@ public class SysUserServcieImpl implements SysUserService {
     @Transactional
     public void modifyInformation(SysUser user) {
         sysUserMapperExt.updateByPrimaryKeySelective(user);
+    }
+
+    @Override
+    public void approval(String userId,String authFlag,String orgId) {
+        SysUserExample example = new SysUserExample();
+        SysUserExample.Criteria selectMobile = example.createCriteria();
+        selectMobile.andIdEqualTo(userId);
+        selectMobile.andOrgIdEqualTo(orgId);
+        selectMobile.andUserStatusEqualTo(RecordStatus.NORMAL);
+        selectMobile.andUserTypeEqualTo(OrgAndUserType.INDIVIDUAL);
+        List<SysUser> user = sysUserMapperExt.selectByExample(example);
+        if(user.size() != 1){
+            throw new BizException(RunningResult.NO_USER.code(),"用户不存在或已作废");
+        }
+        if(RealNameAuthFlag.AUTHORIZED.toString().equals(user.get(0).getUserRealNameAuthFlag().toString())){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不能重复认证");
+        }
+        SysUser temp = new SysUser();
+        temp.setId(userId);
+        temp.setUserRealNameAuthFlag(RealNameAuthFlag.valueOf(authFlag));
+        sysUserMapperExt.updateByPrimaryKeySelective(temp);
     }
 
 }
