@@ -401,7 +401,6 @@ export default {
         const { code, message } = (await this.$http.post('/api/manager/user/vehicleunbind', form)).body;
         if (code !== '200') throw new Error(message);
         // row.id = form.userId;
-        // a
         await this.bindVehicleForm({ ...row, id: form.userId });
         this.$message.success('解绑成功');
       } catch (e) {

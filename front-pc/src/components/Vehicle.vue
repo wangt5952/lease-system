@@ -621,7 +621,6 @@ export default {
         const { code, message } = (await this.$http.post('/api/manager/parts/partsUnBind', form)).body;
         if (code !== '200') throw new Error(message);
         // row.id = form.vehicleId;
-        // a
         await this.showHoldBindPartForm({ ...row, id: form.vehicleId });
         this.$message.success('解绑成功');
       } catch (e) {
