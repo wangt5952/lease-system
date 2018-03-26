@@ -138,5 +138,11 @@ public interface BizVehicleService {
      */
     public PageResponse<BizVehicleExt> selectExtUnbindExtByParams(boolean needPaging, BizVehicleParam pr);
 
+    /**
+     * 查询该企业下有多少车
+     * @param orgId 车子id
+     * @return 车数
+     */
+    public int orgCountVehicle(String orgId);
 
 }

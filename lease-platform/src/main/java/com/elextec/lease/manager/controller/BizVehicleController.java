@@ -1529,4 +1529,50 @@ public class BizVehicleController extends BaseController {
         }
     }
 
+    /**
+     * <pre>
+     *     [orgId]
+     * </pre>
+     * 查询该企业下有多少俩车
+     * @param orgInfo 企业id
+     * @param request 登录信息
+     * @return 车辆个数
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *
+     *         ]
+     *     }
+     */
+    @RequestMapping(value = "/orgCountVehicle",method = RequestMethod.POST)
+    public MessageResponse orgCountVehicle(@RequestBody String orgInfo,HttpServletRequest request){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(orgInfo)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        } else {
+            // 参数解析错误报“参数解析错误”
+            try {
+                String orgStr = URLDecoder.decode(orgInfo, "utf-8");
+                Map<String,Object> map = JSONObject.parseObject(orgStr,Map.class);
+                if (WzStringUtil.isBlank(map.get("orgId").toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser sysUser = this.getLoginUserInfo(request);
+                if (sysUser == null) {
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                if (sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                    return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                }
+                return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.orgCountVehicle(map.get("orgId").toString()));
+            } catch(BizException ex){
+                throw ex;
+            } catch(Exception ex){
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
+            }
+        }
+    }
+
 }

@@ -673,4 +673,19 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         }
         return presp;
     }
+
+    @Override
+    public int orgCountVehicle(String orgId) {
+        BizOrganizationExample org = new BizOrganizationExample();
+        BizOrganizationExample.Criteria criteria = org.createCriteria();
+        criteria.andIdEqualTo(orgId);
+        criteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
+        if (bizOrganizationMapperExt.countByExample(org) < 0) {
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"未查询到该企业");
+        }
+        BizVehicleParam paramMap = new BizVehicleParam();
+        paramMap.setOrgId(orgId);
+        paramMap.setVehicleStatus(RecordStatus.NORMAL.toString());
+        return bizVehicleMapperExt.selectExtByParam(paramMap).size();
+    }
 }
