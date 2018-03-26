@@ -6,6 +6,7 @@ import Resource from 'vue-resource';
 
 import ElementUI from 'element-ui';
 import BaiduMap from 'vue-baidu-map';
+import VueBase64FileUpload from 'vue-base64-file-upload';
 
 import 'element-ui/lib/theme-chalk/index.css';
 
@@ -18,6 +19,7 @@ Vue.use(ElementUI, { size: 'small' });
 Vue.use(BaiduMap, {
   ak: 'NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0',
 });
+Vue.component('vue-base64-file-upload', VueBase64FileUpload);
 
 Vue.config.productionTip = false;
 
