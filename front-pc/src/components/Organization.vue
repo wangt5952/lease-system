@@ -291,9 +291,9 @@ export default {
     },
     // 绑定企业
     async saveBindFormOrg() {
+      const $form = this.$refs.bindFormOrg;
+      await $form.validate();
       try {
-        const $form = this.$refs.bindFormOrg;
-        await $form.validate();
         const { ...form } = this.bindFormOrg;
         form.count = String(this.bindFormOrg.count);
         const { code, message } = (await this.$http.post('/api/manager/user/batchvehiclebind', form)).body;

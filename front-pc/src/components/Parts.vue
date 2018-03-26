@@ -33,6 +33,12 @@
       <el-table-column prop="partsParameters" label="参数"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="partsStatusText" label="状态"></el-table-column>
+      <el-table-column label="绑定车辆">
+        <template slot-scope="{row}">
+          <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
+          <template v-else><span style="color:#17BE45">已绑定</span></template>
+        </template>
+      </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-parts-modify') >= 0">
         <el-table-column label="操作" width="100">
@@ -194,7 +200,6 @@ export default {
       this.pageSize = pageSize;
       await this.reload();
     },
-
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/parts/list', {

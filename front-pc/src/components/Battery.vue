@@ -34,8 +34,8 @@
       <el-table-column prop="batteryStatusText" label="状态"></el-table-column>
       <el-table-column label="绑定车辆">
         <template slot-scope="{row}">
-          <template v-if="!row.vehicleId">未绑定</template>
-          <template v-else>已绑定</template>
+          <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
+          <template v-else><span style="color:#17BE45">已绑定</span></template>
         </template>
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->

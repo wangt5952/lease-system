@@ -22,7 +22,6 @@
         </el-form-item>
       </el-form>
     </div>
-
     <el-table :data="list" height="100%"  style="width: 100%;margin-top:10px;">
       <el-table-column prop="loginName" label="用户名"></el-table-column>
       <el-table-column prop="userMobile" label="手机号"></el-table-column>
@@ -33,9 +32,12 @@
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="key_user_info.userType === 'PLATFORM'">
-        <el-table-column label="操作" width="220">
+        <el-table-column label="操作" width="250">
           <template slot-scope="{row}">
-            <el-button icon="el-icon-search" size="mini" type="text" @click="searchUserInfo(row)">查看</el-button>
+            <template v-if="row.userType === 'INDIVIDUAL'">
+              <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
+            </template>
+            <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
           </template>
@@ -96,7 +98,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="userPid" :rules="[{required:true, message:'请选择企业'}]" label="身份证号">
+            <el-form-item prop="userPid" :rules="[{required:true, message:'请填写身份证号码'}]" label="身份证号">
               <el-input v-model="form.userPid" placeholder="请选择企业" auto-complete="off" :disabled="disabledForm"></el-input>
             </el-form-item>
           </el-col>
@@ -154,6 +156,73 @@
         <el-button :disabled="loading" type="primary" @click="saveAssignRoleForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
+
+    <!-- 车辆列表 -->
+    <el-dialog title="车辆列表" :visible.sync="vehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
+      <el-form :inline="true">
+        <el-form-item>
+          <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="vehicleSearch.vehicleStatus" placeholder="请选择状态" style="width:100%;">
+            <el-option v-for="o in searchVehicleStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="vehicleSearch.isBind" placeholder="请选择状态" style="width:100%;">
+            <el-option v-for="o in searchVehicleIsBindList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+
+      <el-table :data="vehicleList" style="width: 100%">
+        <el-table-column prop="vehicleCode" label="编号"></el-table-column>
+        <el-table-column prop="vehiclePn" label="型号"></el-table-column>
+        <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
+        <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
+        <el-table-column prop="mfrsName" label="生产商"></el-table-column>
+        <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
+        <template v-if="res['FUNCTION'].indexOf('manager-parts-modify') >= 0">
+          <el-table-column label="操作" width="100">
+            <template slot-scope="{row}">
+              <el-button v-if="!row.vehicleId" type="primary" @click="bindVehicle(row)">绑定</el-button>
+            </template>
+          </el-table-column>
+        </template>
+      </el-table>
+
+      <el-pagination v-if="vehicleTotal" style="margin-top:10px;"
+        @size-change="vehicleHandleSizeChange"
+        @current-change="vehicleReload"
+        :current-page.sync="vehicleCurrentPage"
+        :page-sizes="vehiclePageSizes"
+        :page-size="vehiclePageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="vehicleTotal">
+      </el-pagination>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeVehicleForm">取消</el-button>
+        <el-button type="primary" @click="saveVehicleForm">保存</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="用户车辆列表" :visible.sync="userVehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
+      <el-table :data="userVehicleList" style="width: 100%">
+        <el-table-column prop="vehicleCode" label="编号"></el-table-column>
+        <el-table-column prop="vehiclePn" label="型号"></el-table-column>
+        <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
+        <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
+        <el-table-column prop="mfrsName" label="生产商"></el-table-column>
+        <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
+        <el-table-column label="操作" width="100">
+          <template slot-scope="{row}">
+            <el-button type="info" @click="unBindVehicle(row)">解绑</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -167,20 +236,42 @@ export default {
   data() {
     return {
       loading: false,
-      list: [],
+      // 车辆
+      vehicleList: [],
+      vehicleSearch: {
+        vehicleStatus: 'NORMAL',
+        isBind: 'UNBIND',
+      },
+      vehiclePageSizes: [1, 10, 50, 100],
+      vehicleCurrentPage: 1,
+      vehiclePageSize: 10,
+      vehicleTotal: 0,
+      vehicleForm: {},
+      searchVehicleStatusList: [
+        { id: 'NORMAL', name: '正常' },
+      ],
+      searchVehicleIsBindList: [
+        { id: 'UNBIND', name: '未绑定' },
+      ],
+      // 用户车辆列表
+      userVehicleFormVisible: false,
+      userVehicleList: [],
+      userVehicleForm: {},
 
+      // 用户
+      list: [],
       search: {
         userType: '',
         userStatus: '',
       },
-
       pageSizes: [10, 50, 100, 200],
       currentPage: 1,
       pageSize: 10,
       total: 0,
-
       formVisible: false,
       disabledForm: false,
+      // 车辆列表窗口
+      vehicleFormVisible: false,
       form: {},
       typeList: [
         { id: 'PLATFORM', name: '平台' },
@@ -229,8 +320,99 @@ export default {
       },
       deep: true,
     },
+    vehicleSearch: {
+      async handler() {
+        await this.vehicleReload();
+      },
+      deep: true,
+    },
   },
   methods: {
+    // 车辆
+    async vehicleHandleSizeChange(vehiclePageSize) {
+      this.vehiclePageSize = vehiclePageSize;
+      await this.vehicleReload();
+    },
+    async vehicleReload(row) {
+      this.vehicleForm = { userId: row.id };
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
+          orgId: row.orgId, ...this.vehicleSearch, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize,
+        })).body;
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
+        if (code !== '200') throw new Error(message);
+        const { total, rows } = respData;
+        this.vehicleTotal = total;
+        this.vehicleList = _.map(rows, o => ({
+          ...o,
+          vehicleStatusText: (_.find(this.statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
+        }));
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      this.vehicleFormVisible = true;
+    },
+    async bindVehicle(row) {
+      const { ...form } = this.vehicleForm;
+      form.vehicleId = row.id;
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/user/vehiclebind', form)).body;
+        if (code !== '200') throw new Error(message);
+        row.id = form.userId;
+        await this.vehicleReload(row);
+        this.$message.success('绑定成功');
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    closeVehicleForm() {
+      this.vehicleFormVisible = false;
+    },
+    saveVehicleForm() {
+      this.$message.success('保存成功');
+      this.vehicleFormVisible = false;
+    },
+
+    // 用户车辆
+    async bindVehicleForm(row) {
+      this.userVehicleFormVisible = true;
+      this.userVehicleForm = { userId: row.id };
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getVehicleByUserId', {
+          id: row.id,
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.userVehicleList = _.map(respData, o => ({
+          ...o,
+          vehicleStatusText: (_.find(this.statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
+        }));
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    // 用户与车辆解绑
+    async unBindVehicle(row) {
+      const { ...form } = this.userVehicleForm;
+      form.vehicleId = row.id;
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/user/vehicleunbind', form)).body;
+        if (code !== '200') throw new Error(message);
+        row.id = form.userId;
+        await this.bindVehicleForm(row);
+        this.$message.success('解绑成功');
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+
+    // 用户
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();
@@ -273,8 +455,6 @@ export default {
       }
     },
     showForm(form = { }) {
-      const $form = this.$refs.form;
-      if ($form) $form.resetFields();
       this.form = _.pick(form, [
         'id',
         'loginName',
@@ -292,8 +472,13 @@ export default {
         'orgId',
       ]);
       this.formVisible = true;
-      if (form.id) this.disabledForm = true;
-      else this.disabledForm = false;
+      if (form.id) {
+        this.disabledForm = true;
+      } else {
+        const $form = this.$refs.form;
+        if ($form) $form.resetFields();
+        this.disabledForm = false;
+      }
     },
     closeForm() {
       this.form = {};

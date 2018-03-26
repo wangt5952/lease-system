@@ -15,7 +15,7 @@
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆当前位置</div>
         </div>
         <div @click="showBatteryDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.value}}</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.value}}%</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
         <div @click="showUserDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
@@ -65,7 +65,7 @@
       <div style="flex:1;overflow:scroll;font-size:14px;">
         <div @click="handleSelectItem(o)" v-for="o in vehicleList" :key="o.id" :style="selectedId == o.id ? {backgroundColor:'#39a0f6', color:'#fff'} : {backgroundColor:'#e7eef5', color:'#9096ad'}" style="display:flex;align-items:center;height:36px;margin-bottom:5px;border-radius:3px;text-align:center;cursor:pointer;">
           <div style="flex:1;">{{o.vehicleCode}}</div>
-          <div style="width:80px;">{{o.value}}</div>
+          <div style="width:80px;">{{o.value}}%</div>
         </div>
       </div>
 
@@ -121,6 +121,7 @@ export default {
       selectedId: '1',
       vehicleList: [],
       searchLocList: {},
+      vehicleInfo: {},
       // vehicleList: [
       //   { id: '1', code: 'aima001', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.822436, lat: 32.029365, path: [{ lng: 118.822436, lat: 32.029365 }, ...path] },
       //   { id: '2', code: 'aima002', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799044, lat: 32.040109, path: [{ lng: 118.799044, lat: 32.040109 }, ...path] },
@@ -185,23 +186,39 @@ export default {
     handleMapClick() {
     },
 
-    handleSelectItem(item) {
+    async handleSelectItem(item) {
+      console.log(item);
       this.mapCenter = {
         lng: item.lng, lat: item.lat,
       };
-      // this.mapCenter = {
-      //   lng: 131.950098881728703, lat: 118.86545776052435,
-      // };
       this.selectedId = item.id;
+      // const { vehicleList } = this;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
+          id: item.id, flag: 'true',
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.vehicleInfo = respData;
+        // this.vehicleInfo = _.map(vehicleList, (o) => {
+        //   const info = _.find(vehicleInfo, { VeicleID: o.id });
+        //   if (!info) return o;
+        //   return {
+        //     ...o,
+        //     info,
+        //   }
+        // });
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
       const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
-        needPaging: false,
+        needPaging: false, vehicleStatus: 'NORMAL',
       })).body;
       if (code !== '200') throw new Error(message);
       this.vehicleList = respData.rows;
-
       if (this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, { id: this.selectedId })) {
         this.selectedId = this.vehicleList[0].id;
       }
@@ -224,7 +241,7 @@ export default {
         };
       });
     },
-    // 获取车辆电池信息
+    // 获取车辆电池电量信息
     async reloadVehiclePower() {
       const { vehicleList } = this;
       try {
