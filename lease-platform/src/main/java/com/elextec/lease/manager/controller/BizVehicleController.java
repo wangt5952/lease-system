@@ -1098,7 +1098,7 @@ public class BizVehicleController extends BaseController {
             JSONObject dLoc = null;
             for (String deviceKey : deviceKeys) {
                 dLoc = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_LOC_MAP, deviceKey);
-                double dist = WzGPSUtil.calcDistanceByM(locAndRadiusParam.getLat(), locAndRadiusParam.getLng(), dLoc.getDouble(DeviceApiConstants.REQ_LAT), dLoc.getDouble(DeviceApiConstants.REQ_LON));
+                double dist = WzGPSUtil.calcDistanceByM(wgsLatLng[0], wgsLatLng[1], dLoc.getDouble(DeviceApiConstants.REQ_LAT), dLoc.getDouble(DeviceApiConstants.REQ_LON));
                 if (dist < locAndRadiusParam.getRadius()) {
                     deviceLocsCache.put(dLoc.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID), dLoc);
                     deviceCds.add(dLoc.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID));
@@ -1109,7 +1109,7 @@ public class BizVehicleController extends BaseController {
                 return new MessageResponse(RunningResult.AUTH_OVER_TIME);
             }
             Map<String, Object> paramTemp = new HashMap<String, Object>();
-            deviceCds.add("123456");
+//            deviceCds.add("123456");
             paramTemp.put("batteryCodes", deviceCds);
             if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
                 paramTemp.put("orgId", userTemp.getOrgId());
