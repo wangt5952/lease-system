@@ -177,7 +177,6 @@ export default {
 
         if (password !== password2) throw new Error('新密码两次输入不一致');
         const authTime = moment().unix() * 1000;
-        console.log(authTime);
         const { loginName } = this.key_user_info;
         const form = {
           oldAuthStr: md5(loginName + md5(password0).toUpperCase() + authTime).toUpperCase(),
