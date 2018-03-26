@@ -17,11 +17,13 @@ import com.elextec.persist.model.mybatis.SysApply;
 import com.elextec.persist.model.mybatis.SysApplyExample;
 import com.elextec.persist.model.mybatis.ext.SysApplyExt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class SysApplyServiceImpl implements SysApplyService {
 
     @Autowired
