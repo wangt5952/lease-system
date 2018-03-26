@@ -1,6 +1,7 @@
 package com.elextec.persist.dao.mybatis;
 
 import com.elextec.lease.manager.request.SysApplyParam;
+import com.elextec.persist.model.mybatis.SysApplyExample;
 import com.elextec.persist.model.mybatis.ext.SysApplyExt;
 
 import java.util.List;
@@ -19,4 +20,10 @@ public interface SysApplyMapperExt extends SysApplyMapper {
      * @return 申请扩展信息记录数
      */
     int countExtByParam(SysApplyParam sysApplyParam);
+
+
+    /**
+     * 根据ID查询申请信息扩展类
+     * */
+    List<SysApplyExt> selectExtByExample(SysApplyExample example);
 }
