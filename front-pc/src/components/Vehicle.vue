@@ -47,7 +47,7 @@
             <el-button v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-      </template> 
+      </template>
       <template v-if="key_user_info.userType !== 'ENTERPRISE'">
         <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
