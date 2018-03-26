@@ -192,6 +192,10 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
                     && !OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgType().toString()) ){
                 throw new BizException(RunningResult.DB_ERROR.code(), "平台不能修改类型");
             }
+            if(!OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())
+                    && OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgType().toString())){
+                throw new BizException(RunningResult.DB_ERROR.code(), "企业不能修改为平台");
+            }
         }
         bizOrganizationMapperExt.updateByPrimaryKeySelective(orgInfo);
     }
