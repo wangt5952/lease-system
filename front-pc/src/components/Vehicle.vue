@@ -620,8 +620,8 @@ export default {
       try {
         const { code, message } = (await this.$http.post('/api/manager/parts/partsUnBind', form)).body;
         if (code !== '200') throw new Error(message);
-        row.id = form.vehicleId;
-        await this.showHoldBindPartForm(row);
+        // row.id = form.vehicleId;
+        await this.showHoldBindPartForm({ ...row, id: form.vehicleId });
         this.$message.success('解绑成功');
       } catch (e) {
         const message = e.statusText || e.message;

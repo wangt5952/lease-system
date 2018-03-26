@@ -359,8 +359,8 @@ export default {
       try {
         const { code, message } = (await this.$http.post('/api/manager/user/vehiclebind', form)).body;
         if (code !== '200') throw new Error(message);
-        row.id = form.userId;
-        await this.vehicleReload(row);
+        // row.id = form.userId;
+        await this.vehicleReload({ ...row, id: form.userId });
         this.$message.success('绑定成功');
       } catch (e) {
         const message = e.statusText || e.message;
@@ -400,8 +400,8 @@ export default {
       try {
         const { code, message } = (await this.$http.post('/api/manager/user/vehicleunbind', form)).body;
         if (code !== '200') throw new Error(message);
-        row.id = form.userId;
-        await this.bindVehicleForm(row);
+        // row.id = form.userId;
+        await this.bindVehicleForm({ ...row, id: form.userId });
         this.$message.success('解绑成功');
       } catch (e) {
         const message = e.statusText || e.message;
