@@ -100,13 +100,37 @@ public class SysApplyServiceImpl implements SysApplyService {
     }
 
     @Override
-    public void deleteSysApply(List<String> ids) {
+    public void deleteSysApply(List<String> ids,String userId) {
+        int i = 0;
+        try {
+            for (; i < ids.size(); i++) {
+                SysApplyExample example = new SysApplyExample();
+                SysApplyExample.Criteria criteria = example.createCriteria();
+                criteria.andIdEqualTo(ids.get(i));
+                criteria.andApplyUserIdEqualTo(userId);
+                int count = sysApplyMapperExt.countByExample(example);
+                if(count != 1){
+                    throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误,你没有权限删除ID为["+ids.get(i)+"]的申请");
+                }
+                sysApplyMapperExt.deleteByExample(example);
+            }
+        } catch (BizException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.DB_ERROR.code(), "第" + i + "条记录删除时发生错误", ex);
+        }
 
     }
 
     @Override
     public SysApplyExt getExtById(SysApplyExample example) {
-//        SysApplyExt apply = sysApplyMapperExt.selectExtByExample()
-        return null;
+        List<SysApplyExt> apply = sysApplyMapperExt.selectExtByExample(example);
+        if (null == apply || 0 == apply.size()) {
+            throw new BizException(RunningResult.NO_USER);
+        }
+        if (1 != apply.size()) {
+            throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "查询到重复申请信息");
+        }
+        return apply.get(0);
     }
 }
