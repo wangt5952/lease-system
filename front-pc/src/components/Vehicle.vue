@@ -40,10 +40,11 @@
       <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-vehicle-batterybind') >= 0">
-        <el-table-column label="电池">
+        <el-table-column label="电池" width="150">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
             <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
+            <el-button v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
       </template>
@@ -74,7 +75,8 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="车辆信息" :visible.sync="formVisible" :close-on-click-modal="false">
+    <!-- 添加车辆 -->
+    <el-dialog title="添加车辆" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="form" ref="form">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -120,13 +122,70 @@
           </el-col>
         </el-row>
       </el-form>
+      <template v-if="flag === '0'">
+        <el-form class="edit-form" :model="batteryForm" ref="batteryForm">
+          <el-row :gutter="10">
+            <el-col :span="8">
+              <el-form-item prop="batteryCode" :rules="[{required:true, message:'请填写编号'}]" label="电池编号">
+                <el-input v-model="batteryForm.batteryCode" auto-complete="off" :disabled="form.id"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item prop="batteryName" :rules="[{required:true, message:'请填写电池货名'}]" label="电池货名">
+                <el-input v-model="batteryForm.batteryName" auto-complete="off"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item prop="batteryBrand" :rules="[{required:true, message:'请填写品牌'}]" label="电池品牌">
+                <el-input v-model="batteryForm.batteryBrand" auto-complete="off"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item prop="batteryPn" :rules="[{required:true, message:'请填写型号'}]" label="电池型号">
+                <el-input v-model="batteryForm.batteryPn" auto-complete="off"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item prop="batteryParameters" :rules="[{required:true, message:'请填写参数'}]" label="电池参数">
+                <el-input v-model="batteryForm.batteryParameters" auto-complete="off"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="电池生产商">
+                <el-select v-model="batteryForm.mfrsId" placeholder="请选择生产商" style="width:100%;">
+                  <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item prop="batteryStatus" :rules="[{required:true, message:'请选择状态'}]" label="电池状态">
+                <el-select v-model="batteryForm.batteryStatus" placeholder="请选择状态" style="width:100%;">
+                  <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </template>
+      <template v-if="flag === '1'">
+        <el-form class="edit-form" :model="bindForm" ref="bindForm">
+          <el-form-item prop="id" :rules="[{required:true, message:'请选择电池'}]" label="电池">
+            <el-select style="width:100%;" v-model="bindForm.id" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :loading="bindForm_batteryLoading">
+              <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
+                <span style="float: left">{{ o.batteryBrand }}</span>
+                <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </template>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeForm">取消</el-button>
-        <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button type="primary" @click="saveForm">添加</el-button>
       </span>
     </el-dialog>
     <!-- 编辑车辆信息 -->
-    <el-dialog title="车辆信息" :visible.sync="editFormVisible" :close-on-click-modal="false">
+    <el-dialog title="编辑车辆" :visible.sync="editFormVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="editForm" ref="editForm">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -257,7 +316,7 @@
         </template>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="holdSavePartsForm">保存</el-button>
+        <el-button type="primary" @click="holdSavePartsForm">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 企业批量归还车辆 -->
@@ -272,54 +331,19 @@
         <el-button type="primary" @click="saveReturnVehicleForm">确定</el-button>
       </span>
     </el-dialog>
-    <!-- 添加新电池信息 -->
-    <el-dialog title="电池信息" :visible.sync="batteryFormVisible" :close-on-click-modal="false">
-      <el-form class="edit-form" :model="batteryForm" ref="batteryForm">
-        <el-row :gutter="10">
-          <el-col :span="8">
-            <el-form-item prop="batteryCode" :rules="[{required:true, message:'请填写编号'}]" label="编号">
-              <el-input v-model="batteryForm.batteryCode" auto-complete="off" :disabled="form.id"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="batteryName" :rules="[{required:true, message:'请填写电池货名'}]" label="电池货名">
-              <el-input v-model="batteryForm.batteryName" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="batteryBrand" :rules="[{required:true, message:'请填写品牌'}]" label="品牌">
-              <el-input v-model="batteryForm.batteryBrand" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="batteryPn" :rules="[{required:true, message:'请填写型号'}]" label="型号">
-              <el-input v-model="batteryForm.batteryPn" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="batteryParameters" :rules="[{required:true, message:'请填写参数'}]" label="参数">
-              <el-input v-model="batteryForm.batteryParameters" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="生产商">
-              <el-select v-model="batteryForm.mfrsId" placeholder="请选择生产商" style="width:100%;">
-                <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="batteryStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
-              <el-select v-model="batteryForm.batteryStatus" placeholder="请选择状态" style="width:100%;">
-                <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
+
+    <el-dialog title="已有电池" :visible.sync="bindBatteryFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
+      <el-table :data="batteryList" style="width: 100%;margin-top:10px;">
+        <el-table-column prop="batteryCode" label="编号"></el-table-column>
+        <el-table-column prop="batteryName" label="电池货名"></el-table-column>
+        <el-table-column prop="batteryBrand" label="品牌"></el-table-column>
+        <el-table-column prop="batteryPn" label="型号"></el-table-column>
+        <el-table-column prop="batteryParameters" label="参数"></el-table-column>
+        <el-table-column prop="mfrsName" label="生产商"></el-table-column>
+        <el-table-column prop="batteryStatusText" label="状态"></el-table-column>
+      </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeBatteryForm">取消</el-button>
-        <el-button type="primary" @click="saveBatteryForm">{{form.id ? '保存' : '添加'}}</el-button>
+        <el-button type="primary" @click="saveBatteryForm">关闭</el-button>
       </span>
     </el-dialog>
   </div>
@@ -410,7 +434,7 @@ export default {
         vehicleStatus: '',
         isBind: '',
       },
-      pageSizes: [10, 50, 100],
+      pageSizes: [5, 10, 50, 100],
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -451,13 +475,19 @@ export default {
       mfrsList: [],
       // 电池
       flag: '2',
-      batteryFormVisible: false,
       isBattery: [
         { id: '0', name: '新电池' },
         { id: '1', name: '旧电池' },
         { id: '2', name: '无电池' },
       ],
       batteryForm: {},
+      bindBatteryFormVisible: false,
+      batteryList: [],
+      batteryStatusList: [
+        { id: 'NORMAL', name: '正常' },
+        { id: 'FREEZE', name: '冻结/维保' },
+        { id: 'INVALID', name: '作废' },
+      ],
     };
   },
   computed: {
@@ -483,18 +513,25 @@ export default {
   },
   methods: {
     // 电池信息
-    async onBatteryChange(v){
-      if (v === '0') {
-        this.batteryFormVisible = true;
+    saveBatteryForm (){
+      this.bindBatteryFormVisible = false;
+    },
+    async showHoldBindBatteryForm(row) {
+      this.bindBatteryFormVisible = true;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
+          id: row.id, flag: 'true',
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.batteryList = _.map(respData.bizBatteries, o =>({
+          ...o,
+          batteryStatusText: (_.find(this.statusList, { id: o.batteryStatus }) || { name: o.batteryStatus }).name,
+        }));
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
       }
-    },
-    saveBatteryForm() {
-      this.$message.success('电池信息保存成功');
-      this.batteryFormVisible = false;
-    },
-    closeBatteryForm() {
-      this.batteryFormVisible = false;
-      console.log(this.batteryForm);
     },
     // 车辆
     // 批量归还车辆
@@ -535,8 +572,6 @@ export default {
     },
     // 保存配件列表
     async holdSavePartsForm() {
-      // await this.partsReload();
-      this.$message.success('保存成功');
       this.bindPartsFormVisible = false;
     },
     // 分页下拉
@@ -689,17 +724,55 @@ export default {
     async saveForm() {
       const { loginName } = this.key_user_info;
       try {
-        const $form = this.$refs.form;
-        await $form.validate();
-        const { ...form } = this.form;
-        if (form.parent === '') form.parent = null;
-        form.create_user = loginName;
-        form.update_user = loginName;
-        const { code, message } = (await this.$http.post('/api/manager/vehicle/addone', {
-          bizVehicleInfo: form, flag: '2',
-        })).body;
-        if (code !== '200') throw new Error(message);
-        this.$message.success('添加成功');
+        if (this.flag === '0') {
+          const $form = this.$refs.form;
+          await $form.validate();
+
+          const $batteryForm = this.$refs.batteryForm;
+          await $batteryForm.validate();
+          
+          const { ...form } = this.form;
+          if (form.parent === '') form.parent = null;
+          form.create_user = loginName;
+          form.update_user = loginName;
+          const { ...batteryForm } = this.batteryForm;
+          batteryForm.create_user = loginName;
+          batteryForm.update_user = loginName;
+          const { code, message } = (await this.$http.post('/api/manager/vehicle/addone', {
+            bizVehicleInfo: form, flag: this.flag, batteryInfo: batteryForm,
+          })).body;
+          if (code !== '200') throw new Error(message);
+          this.$message.success('添加成功');
+        } else if (this.flag === '1') {
+          const $form = this.$refs.form;
+          await $form.validate();
+
+          const $bindForm = this.$refs.bindForm;
+          await $bindForm.validate();
+          
+          const { ...form } = this.form;
+          if (form.parent === '') form.parent = null;
+          form.create_user = loginName;
+          form.update_user = loginName;
+          const { ...bindForm } = this.bindForm;
+          const { code, message } = (await this.$http.post('/api/manager/vehicle/addone', {
+            bizVehicleInfo: form, flag: this.flag, batteryInfo: bindForm,
+          })).body;
+          if (code !== '200') throw new Error(message);
+          this.$message.success('添加成功');
+        } else if (this.flag === '2') {
+          const $form = this.$refs.form;
+          await $form.validate();
+          const { ...form } = this.form;
+          if (form.parent === '') form.parent = null;
+          form.create_user = loginName;
+          form.update_user = loginName;
+          const { code, message } = (await this.$http.post('/api/manager/vehicle/addone', {
+            bizVehicleInfo: form, flag: this.flag,
+          })).body;
+          if (code !== '200') throw new Error(message);
+          this.$message.success('添加成功');
+        }
         await this.reload();
         this.closeForm();
       } catch (e) {
@@ -787,7 +860,7 @@ export default {
     },
     async handleUnbind({ id, vehicleCode, batteryId }) {
       try {
-        await this.$confirm(`确认解绑${vehicleCode}的电池, 是否继续?`, '提示', { type: 'warning' });
+        await this.$confirm(`确认解绑该车电池, 是否继续?`, '提示', { type: 'warning' });
         const { code, message } = (await this.$http.post('/api/manager/vehicle/batteryunbind', { vehicleId: id, batteryId })).body;
         if (code !== '200') throw new Error(message);
         await this.reload();
@@ -837,6 +910,6 @@ export default {
 
 <style scoped>
 .edit-form >>> .el-form-item {
-  height: 73px;
+  height: 50px;
 }
 </style>
