@@ -34,6 +34,7 @@ public interface SysApplyService {
      * @param applyInfo 申请信息
      */
     public void insertSysApply(SysApply applyInfo,String userType);
+    
 
     /**
      * 修改申请信息.
