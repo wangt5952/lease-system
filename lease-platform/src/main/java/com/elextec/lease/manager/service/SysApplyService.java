@@ -46,7 +46,7 @@ public interface SysApplyService {
      * 批量删除申请.
      * @param ids 待删除的用户ID列表
      */
-    public void deleteSysApply(List<String> ids);
+    public void deleteSysApply(List<String> ids,String userId);
 
     /**
      * 根据ID查询申请扩展信息.

@@ -311,23 +311,18 @@ public class SysApplyController extends BaseController {
      *         respData:{
      *             key_user_info:{
      *                 id:ID,
-     *                 loginName:用户名,
-     *                 userMobile:用户手机号码,
-     *                 userType:用户类型（平台、企业或个人）,
-     *                 userIcon:用户LOGO路径,
-     *                 password:密码,
-     *                 nickName:昵称,
-     *                 userName:姓名,
-     *                 userRealNameAuthFlag:用户实名认证标志（已实名、未实名）,
-     *                 userPid:身份证号,
-     *                 userIcFront:身份证正面照片路径,
-     *                 userIcBack:身份证背面照片路径,
-     *                 userIcGroup:用户手举身份证合照路径,
-     *                 orgId:所属组织ID,
-     *                 userStatus:用户状态（正常、冻结、作废）,
-     *                 createUser:创建人,
+     *                 applyTitle:申请标题,
+     *                 applyContent:申请内容,
+     *                 applyType:申请类型（暂时只有车辆申请）,
+     *                 applyStatus:申请状态（同意、驳回、待审批）,
+     *                 applyUserId:申请人ID,
+     *                 applyUserName:申请人名称,
+     *                 applyOrgId:申请企业ID,
+     *                 applyOrgName:申请企业名称,
+     *                 examineOrgId:审批企业ID,
+     *                 examineUserId:审批人ID,
+     *                 examineContent:审批内容,
      *                 createTime:创建时间,
-     *                 updateUser:更新人,
      *                 updateTime:更新时间
      *             }
      *         }
@@ -380,4 +375,52 @@ public class SysApplyController extends BaseController {
             return mr;
         }
     }
+
+    /**
+     * 批量删除申请.
+     * @param deleteParam 删除ID列表JSON
+     * <pre>
+     *     [ID1,ID2,......]
+     * </pre>
+     * @param request HttpServletRequest
+     * @return 批量删除结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/delete")
+    public MessageResponse delete(@RequestBody String deleteParam, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(deleteParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> applyIds = null;
+            try {
+                String paramStr = URLDecoder.decode(deleteParam, "utf-8");
+                applyIds = JSON.parseArray(paramStr, String.class);
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp == null){
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                if (null == applyIds || 0 == applyIds.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                sysApplyService.deleteSysApply(applyIds,userTemp.getId());
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
 }
