@@ -47,7 +47,7 @@
             <el-button v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-      </template> 
+      </template>
       <template v-if="key_user_info.userType !== 'ENTERPRISE'">
         <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
@@ -221,7 +221,6 @@
                 <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
-          </el-col>
           </el-col>
         </el-row>
       </el-form>
@@ -438,7 +437,6 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
-      
       form: {},
       formVisible: false,
 
@@ -513,7 +511,7 @@ export default {
   },
   methods: {
     // 电池信息
-    saveBatteryForm (){
+    saveBatteryForm() {
       this.bindBatteryFormVisible = false;
     },
     async showHoldBindBatteryForm(row) {
@@ -523,7 +521,7 @@ export default {
           id: row.id, flag: 'true',
         })).body;
         if (code !== '200') throw new Error(message);
-        this.batteryList = _.map(respData.bizBatteries, o =>({
+        this.batteryList = _.map(respData.bizBatteries, o => ({
           ...o,
           batteryStatusText: (_.find(this.statusList, { id: o.batteryStatus }) || { name: o.batteryStatus }).name,
         }));
@@ -712,8 +710,6 @@ export default {
       if (form.id) {
         this.vehicleIdForm = true;
       } else {
-        // const $form = this.$refs.form;
-        // if ($form) $form.resetFields();
         this.vehicleIdForm = false;
       }
       this.formVisible = true;
@@ -730,7 +726,6 @@ export default {
 
           const $batteryForm = this.$refs.batteryForm;
           await $batteryForm.validate();
-          
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;
           form.create_user = loginName;
@@ -749,7 +744,6 @@ export default {
 
           const $bindForm = this.$refs.bindForm;
           await $bindForm.validate();
-          
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;
           form.create_user = loginName;
@@ -820,7 +814,7 @@ export default {
           const { code, message } = (await this.$http.post('/api/manager/vehicle/modify', form)).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('编辑成功');
-        } 
+        }
         await this.reload();
         this.closeEditForm();
       } catch (e) {
@@ -858,9 +852,9 @@ export default {
     closeBindPartsForm() {
       this.allPartsFormVisible = false;
     },
-    async handleUnbind({ id, vehicleCode, batteryId }) {
+    async handleUnbind({ id, batteryId }) {
       try {
-        await this.$confirm(`确认解绑该车电池, 是否继续?`, '提示', { type: 'warning' });
+        await this.$confirm('确认解绑该车电池, 是否继续?', '提示', { type: 'warning' });
         const { code, message } = (await this.$http.post('/api/manager/vehicle/batteryunbind', { vehicleId: id, batteryId })).body;
         if (code !== '200') throw new Error(message);
         await this.reload();

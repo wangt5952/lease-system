@@ -187,7 +187,6 @@ export default {
     },
 
     async handleSelectItem(item) {
-      console.log(item);
       this.mapCenter = {
         lng: item.lng, lat: item.lat,
       };

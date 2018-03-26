@@ -31,8 +31,7 @@
       <el-table-column prop="userName" label="姓名"></el-table-column>
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      
-      <el-table-column label="操作" width="250"> 
+      <el-table-column label="操作" width="250">
         <template slot-scope="{row}">
           <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
             <template v-if="row.userType === 'INDIVIDUAL'">
@@ -46,7 +45,6 @@
           </template>
         </template>
       </el-table-column>
-      
     </el-table>
 
     <el-pagination v-if="total" style="margin-top:10px;"
