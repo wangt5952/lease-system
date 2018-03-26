@@ -1,6 +1,7 @@
 package com.elextec.lease.manager.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -482,6 +484,63 @@ public class SysUserController extends BaseController {
     }
 
     /**
+     * <pre>
+     *     {
+     *         id:ID（必填）,
+     *         nickName:昵称,
+     *         userName:姓名,
+     *         updateUser:更新人
+     *     }
+     * </pre>
+     * @param modifyInformation 用户修改信息
+     * @param request 登录信息
+     * @return 修改结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/modifyInformation",method = RequestMethod.POST)
+    public MessageResponse modifyInformation(@RequestBody String modifyInformation,HttpServletRequest request){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(modifyInformation)){
+            return new MessageResponse(RunningResult.NO_PARAM);
+        } else {
+            // 参数解析错误报“参数解析错误”
+            SysUser userInfo = null;
+            try {
+                String paramStr = URLDecoder.decode(modifyInformation, "utf-8");
+                userInfo = JSONObject.parseObject(paramStr,SysUser.class);
+                if (userInfo.getId() == null || WzStringUtil.isBlank(userInfo.getId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"请求参数不能为空");
+                }
+                //获取用户登录信息
+                SysUser userTemp = getLoginUserInfo(request);
+                //用户登录的id和修改用户的id是否一致
+                if (!userTemp.getId().equals(userInfo.getId())){
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"登录用户和修改用户不一致");
+                } else {
+                    userInfo.setLoginName(userTemp.getLoginName());
+                    userInfo.setUserMobile(userTemp.getUserMobile());
+                    userInfo.setUserType(userTemp.getUserType());
+                    userInfo.setPassword(userTemp.getPassword());
+                    userInfo.setUserRealNameAuthFlag(userTemp.getUserRealNameAuthFlag());
+                    userInfo.setUserStatus(userTemp.getUserStatus());
+                    sysUserService.modifyInformation(userInfo);
+                    return new MessageResponse(RunningResult.SUCCESS.code(),"当前登录用户信息修改成功");
+                }
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+        }
+    }
+
+    /**
      * 批量删除用户.
      * @param deleteParam 删除ID列表JSON
      * <pre>
@@ -674,8 +733,13 @@ public class SysUserController extends BaseController {
             SysUserExample.Criteria reListCri = reListParam.createCriteria();
             reListCri.andIdEqualTo(userId.get(0));
             //平台用户可以查询全部
-            if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+            if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                 reListCri.andOrgIdEqualTo(userTemp.getOrgId());
+            }
+            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                if(!userId.get(0).equals(userTemp.getId())){
+                    return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                }
             }
             SysUserExt user = sysUserService.getExtById(reListParam);
 //            SysUser user = sysUserService.getSysUserByPrimaryKey(userId.get(0));

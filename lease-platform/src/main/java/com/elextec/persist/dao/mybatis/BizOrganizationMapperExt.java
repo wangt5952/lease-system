@@ -2,6 +2,7 @@ package com.elextec.persist.dao.mybatis;
 
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.persist.model.mybatis.BizOrganization;
+import com.elextec.persist.model.mybatis.BizVehicle;
 
 import java.util.List;
 

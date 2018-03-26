@@ -17,6 +17,7 @@ import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
+import com.sun.prism.impl.Disposer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,9 @@ public class BizVehicleServcieImpl implements BizVehicleService {
 
     @Autowired
     private BizOrganizationMapperExt bizOrganizationMapperExt;
+
+    @Autowired
+    private SysUserMapperExt sysUserMapperExt;
 
 
     @Override
@@ -391,8 +395,36 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             BizRefOrgVehicle orgRef = new BizRefOrgVehicle();
             orgRef.setUnbindTime(new Date());
             bizRefOrgVehicleMapperExt.updateByExampleSelective(orgRef,delOrgExample);
+        } else if(RecordStatus.FREEZE.toString().equals(vehicle.getVehicleStatus().toString())){
+            BizRefUserVehicleExample example = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
+            criteria.andUnbindTimeIsNull();
+            criteria.andVehicleIdEqualTo(vehicle.getId());
+            int count = bizRefUserVehicleMapperExt.countByExample(example);
+            if(count >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定用户,无法冻结");
+            }
+            //验证车辆是否有企业绑定(平台除外)
+            BizOrganizationExample organizationExample = new BizOrganizationExample();
+            BizOrganizationExample.Criteria organizationCriteria = organizationExample.createCriteria();
+            organizationCriteria.andOrgTypeEqualTo(OrgAndUserType.PLATFORM);
+            List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(organizationExample);
+            if(org.size() != 1){
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "平台信息有误");
+            }
 
-        }else{
+            BizRefOrgVehicleExample orgExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria orgCriteria = orgExample.createCriteria();
+            orgCriteria.andUnbindTimeIsNull();
+            orgCriteria.andVehicleIdEqualTo(vehicle.getId());
+            //查询时需要将平台企业ID排除在外
+            orgCriteria.andOrgIdNotEqualTo(org.get(0).getId());
+            int orgCot = bizRefOrgVehicleMapperExt.countByExample(orgExample);
+            if(orgCot >= 1){
+                throw new BizException(RunningResult.HAVE_BIND.code(), "车辆已绑定企业,无法冻结");
+            }
+            bizVehicleMapperExt.updateByPrimaryKeySelective(vehicle);
+        } else{
             //校验车辆制造商是否存在（状态为正常）
             if(WzStringUtil.isNotBlank(vehicle.getMfrsId())){
                 BizManufacturerExample manuExample = new BizManufacturerExample();
@@ -508,10 +540,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         BizVehicleExample vehicleExample = new BizVehicleExample();
         BizVehicleExample.Criteria selectVehicleCriteria = vehicleExample.createCriteria();
         selectVehicleCriteria.andIdEqualTo(vehicleId);
-        selectVehicleCriteria.andVehicleStatusEqualTo(RecordStatus.NORMAL);
+        selectVehicleCriteria.andVehicleStatusNotEqualTo(RecordStatus.INVALID);
         int vehicleCount = bizVehicleMapperExt.countByExample(vehicleExample);
         if(vehicleCount < 1){
-            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在或已冻结、作废");
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "车辆不存在或已作废");
         }
 
         //判定电池是否存在或已作废
@@ -595,5 +627,50 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         criteria.andOrgIdEqualTo(orgId);
         criteria.andUnbindTimeIsNull();
         return bizRefOrgVehicleMapperExt.countByExample(example);
+    }
+
+    @Override
+    public List<BizVehicle> getVehicleByUserId(String sysUserId,String orgId) {
+        //orgId不为空代表是企业，为空代表是平台
+        if (WzStringUtil.isNotBlank(orgId)) {
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria criteria = sysUserExample.createCriteria();
+            criteria.andIdEqualTo(sysUserId);
+            criteria.andOrgIdEqualTo(orgId);
+            if (sysUserMapperExt.countByExample(sysUserExample) == 1) {
+                return bizRefUserVehicleMapperExt.getVehicleByUserId(sysUserId);
+            } else {
+                throw new BizException(RunningResult.NO_FUNCTION_PERMISSION);
+            }
+        } else {
+            return bizRefUserVehicleMapperExt.getVehicleByUserId(sysUserId);
+        }
+    }
+
+    @Override
+    public PageResponse<BizVehicleExt> selectExtUnbindExtByParams(boolean needPaging, BizVehicleParam pr) {
+        // 查询总记录数
+        int vehicleTotal = 0;
+        if (null != pr.getTotal() && 0 < pr.getTotal()) {
+            vehicleTotal = pr.getTotal();
+        } else {
+            vehicleTotal = bizVehicleMapperExt.countExtUnbindExtByParam(pr);
+        }
+        // 分页查询
+        if (needPaging) {
+            pr.setPageBegin();
+        }
+        List<BizVehicleExt> vehicleLs = bizVehicleMapperExt.selectExtUnbindExtByParams(pr);
+        // 组织并返回结果
+        PageResponse<BizVehicleExt> presp = new PageResponse<BizVehicleExt>();
+        presp.setCurrPage(pr.getCurrPage());
+        presp.setPageSize(pr.getPageSize());
+        presp.setTotal(vehicleTotal);
+        if (null == vehicleLs) {
+            presp.setRows(new ArrayList<BizVehicleExt>());
+        } else {
+            presp.setRows(vehicleLs);
+        }
+        return presp;
     }
 }

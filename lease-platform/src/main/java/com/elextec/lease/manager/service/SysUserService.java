@@ -119,4 +119,10 @@ public interface SysUserService {
      * @return 用户信息
      */
     public SysUser getByMobile(String mobile);
+
+    /**
+     * 修改登录用户自己的信息
+     * @param user 用户修改的信息
+     */
+    public void modifyInformation(SysUser user);
 }

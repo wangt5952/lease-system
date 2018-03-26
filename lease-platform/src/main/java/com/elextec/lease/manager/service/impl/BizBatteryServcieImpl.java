@@ -170,14 +170,15 @@ public class BizBatteryServcieImpl implements BizBatteryService {
     @Transactional
     public void updateBattery(BizBattery batteryInfo) {
         //电池作废需要验证电池是否绑定了车辆
-        if(RecordStatus.INVALID.toString().equals(batteryInfo.getBatteryStatus().toString())){
+        if(RecordStatus.INVALID.toString().equals(batteryInfo.getBatteryStatus().toString())
+                || RecordStatus.FREEZE.toString().equals(batteryInfo.getBatteryStatus().toString())){
             BizRefVehicleBatteryExample example = new BizRefVehicleBatteryExample();
             BizRefVehicleBatteryExample.Criteria criteria = example.createCriteria();
             criteria.andBatteryIdEqualTo(batteryInfo.getId());
             criteria.andUnbindTimeIsNull();
             int count = bizRefVehicleBatteryMapperExt.countByExample(example);
             if(count >= 1){
-                throw new BizException(RunningResult.HAVE_BIND.code(), "电池已绑定车辆,无法作废");
+                throw new BizException(RunningResult.HAVE_BIND.code(), "电池已绑定车辆,无法作废或冻结");
             }
         }
         //校验制造商是否存在（状态为正常）

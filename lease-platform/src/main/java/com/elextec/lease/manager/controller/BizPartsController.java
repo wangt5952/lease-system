@@ -111,21 +111,23 @@ public class BizPartsController extends BaseController {
                     if (null == bizPartsParam.getCurrPage() || null == bizPartsParam.getPageSize()) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "需要分页参数");
                     }
-                    SysUser userTemp = getLoginUserInfo(request);
-                    if(userTemp != null){
-                        //根据用户类型添加条件
-                        //个人用户需要添加userId为条件
-                        if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                            bizPartsParam.setUserId(userTemp.getId());
-                        }
-                        //企业用户需要添加orgId为条件
-                        if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
-                            bizPartsParam.setOrgId(userTemp.getOrgId());
-                        }
-                    }else{
-                        return new MessageResponse(RunningResult.AUTH_OVER_TIME.code(),"登录信息已失效");
-                    }
                     bizPartsParam.setNeedPaging("true");
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //根据用户类型添加条件
+                    //个人用户需要添加userId为条件
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        bizPartsParam.setUserId(userTemp.getId());
+                        bizPartsParam.setIsBind("BIND");
+                    }
+                    //企业用户需要添加orgId为条件
+                    if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
+                        bizPartsParam.setOrgId(userTemp.getOrgId());
+                        bizPartsParam.setIsBind("BIND");
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME.code(),"登录信息已失效");
                 }
             } catch (BizException ex) {
                 throw ex;

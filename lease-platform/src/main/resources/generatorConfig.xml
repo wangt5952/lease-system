@@ -83,6 +83,10 @@
         </table>
         <table schema="" tableName="biz_ref_org_vehicle" domainObjectName="BizRefOrgVehicle">
         </table>
+        <table schema="" tableName="sys_apply" domainObjectName="SysApply">
+            <columnOverride column="apply_type" property="applyType" javaType="com.elextec.persist.field.enums.ApplyTypeAndStatus" jdbcType="VARCHAR"></columnOverride>
+            <columnOverride column="apply_status" property="applyStatus" javaType="com.elextec.persist.field.enums.ApplyTypeAndStatus" jdbcType="VARCHAR"></columnOverride>
+        </table>
         <!--
         <table schema="" tableName="jme_item_warning" domainObjectName="ItemWarning">
             <generatedKey column="id" sqlStatement="JDBC" identity="true"/>

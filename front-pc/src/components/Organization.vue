@@ -2,9 +2,11 @@
   <div v-loading="loading" style="padding:10px;">
 
     <div style="display:flex;">
-      <div style="margin-right:10px;">
-        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加组织</el-button>
-      </div>
+      <template v-if="res['FUNCTION'].indexOf('manager-org-addone') >= 0">
+        <div style="margin-right:10px;">
+          <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加组织</el-button>
+        </div>
+      </template>
       <el-form :inline="true">
         <el-form-item>
           <el-input style="width:500px;" v-model="search.keyStr" placeholder="组织Code/组织名称/组织介绍/组织地址/联系人/联系电话/营业执照号码"></el-input>
@@ -35,10 +37,9 @@
       <el-table-column label="操作" width="180">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="allotVehicle(row)">分配车辆</el-button>
-          <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-          <el-tooltip content="删除" placement="top">
-            <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-          </el-tooltip>
+          <template v-if="res['FUNCTION'].indexOf('manager-org-modify') >= 0">
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -201,6 +202,7 @@ export default {
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
+      res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
     }),
   },
   watch: {
@@ -289,9 +291,9 @@ export default {
     },
     // 绑定企业
     async saveBindFormOrg() {
+      const $form = this.$refs.bindFormOrg;
+      await $form.validate();
       try {
-        const $form = this.$refs.bindFormOrg;
-        await $form.validate();
         const { ...form } = this.bindFormOrg;
         form.count = String(this.bindFormOrg.count);
         const { code, message } = (await this.$http.post('/api/manager/user/batchvehiclebind', form)).body;
@@ -337,7 +339,9 @@ export default {
     },
   },
   async mounted() {
+    this.loading = true;
     await this.reload();
+    this.loading = false;
   },
 };
 </script>

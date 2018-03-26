@@ -4,8 +4,10 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.persist.model.mybatis.BizOrganization;
+import com.elextec.persist.model.mybatis.BizVehicle;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 公司组织Service

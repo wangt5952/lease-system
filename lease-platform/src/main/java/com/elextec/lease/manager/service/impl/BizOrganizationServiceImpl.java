@@ -4,6 +4,7 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.service.BizOrganizationService;
@@ -22,6 +23,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BizOrganizationServiceImpl implements BizOrganizationService {
@@ -124,6 +126,11 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
 
     @Override
     public void insertBizOrganization(BizOrganization orgInfo) {
+
+        //平台企业只能创建一个且不能通过接口创建
+        if(OrgAndUserType.PLATFORM.toString().equals(orgInfo.getOrgType().toString())){
+            throw new BizException(RunningResult.DB_ERROR.code(), "平台企业只能创建一个");
+        }
         // 资源code重复提示错误
         BizOrganizationExample lnExample = new BizOrganizationExample();
         BizOrganizationExample.Criteria lnCriteria = lnExample.createCriteria();
@@ -234,4 +241,5 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
     public BizOrganization getBizOrganizationByPrimaryKey(String id) {
         return bizOrganizationMapperExt.selectByPrimaryKey(id);
     }
+
 }

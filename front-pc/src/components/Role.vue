@@ -1,6 +1,5 @@
 <template>
   <div v-loading="loading && !formVisible && !assignResFormVisible" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
-
     <div style="display:flex;">
       <div style="margin-right:10px;">
         <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加角色</el-button>
@@ -143,9 +142,7 @@ export default {
       this.pageSize = pageSize;
       await this.reload();
     },
-
     async reload() {
-      this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/role/list', {
           currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
@@ -163,7 +160,6 @@ export default {
           userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
-        this.loading = false;
       } catch (e) {
         this.loading = false;
         const message = e.statusText || e.message;
@@ -245,7 +241,6 @@ export default {
     async saveAssignResForm() {
       try {
         const { id } = this.assignResForm;
-
         const resourceIds = this.$refs.resTree.getCheckedKeys().join(',');
         if (resourceIds) {
           const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, resourceIds })).body;
@@ -269,7 +264,9 @@ export default {
       currPage: 1, pageSize: 999,
     })).body;
     if (code === '200') this.resList = respData.rows;
+    this.loading = true;
     await this.reload();
+    this.loading = false;
   },
 };
 </script>
