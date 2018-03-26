@@ -112,6 +112,8 @@ public class SysAuthServcieImpl implements SysAuthService {
             throw new BizException(RunningResult.AUTH_OVER_TIME);
         }
         String chkStr = loginName + password + authTime;
+        String chkStrTemp = WzEncryptUtil.getMD5(chkStr, true);
+        System.out.println(chkStrTemp);
         if (authStr.equals(WzEncryptUtil.getMD5(chkStr, true))) {
             return true;
         } else {
