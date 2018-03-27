@@ -370,6 +370,24 @@ public class BizPartsController extends BaseController {
                 if (WzStringUtil.isBlank(bizParts.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定待修改的记录");
                 }
+                if(null != bizParts.getPartsStatus()){
+                    if (!bizParts.getPartsStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !bizParts.getPartsStatus().toString().equals(RecordStatus.INVALID.toString())
+                            && !bizParts.getPartsStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的配件状态");
+                    }
+                }
+                if(null != bizParts.getPartsType()){
+                    if (!bizParts.getPartsType().toString().equals(PartsType.BELL.toString())
+                            && !bizParts.getPartsType().toString().equals(PartsType.DASHBOARD.toString())
+                            && !bizParts.getPartsType().toString().equals(PartsType.FRAME.toString())
+                            && !bizParts.getPartsType().toString().equals(PartsType.HANDLEBAR.toString())
+                            && !bizParts.getPartsType().toString().equals(PartsType.PEDAL.toString())
+                            && !bizParts.getPartsType().toString().equals(PartsType.SEATS.toString())
+                            && !bizParts.getPartsType().toString().equals(PartsType.TYRE.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的配件类型");
+                    }
+                }
                 bizPartsService.updateBizParts(bizParts);
             } catch (BizException ex) {
                 throw ex;

@@ -436,6 +436,13 @@ public class BizVehicleController extends BaseController {
                 if (WzStringUtil.isBlank(vehicleInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无法确定待修改的记录");
                 }
+                if(null != vehicleInfo.getVehicleStatus()){
+                    if (!vehicleInfo.getVehicleStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !vehicleInfo.getVehicleStatus().toString().equals(RecordStatus.INVALID.toString())
+                            && !vehicleInfo.getVehicleStatus().toString().equals(RecordStatus.NORMAL.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的车辆状态");
+                    }
+                }
                 bizVehicleService.updateVehicle(vehicleInfo);
             } catch (BizException ex) {
                 throw ex;

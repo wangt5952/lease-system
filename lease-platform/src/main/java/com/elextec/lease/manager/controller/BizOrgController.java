@@ -297,12 +297,10 @@ public class BizOrgController extends BaseController {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "企业参数有误");
                 }
                 if (!orgInfo.getOrgType().toString().equals(OrgAndUserType.PLATFORM.toString())
-                        && !orgInfo.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
-                        && !orgInfo.getOrgType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                        && !orgInfo.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业类别");
                 }
                 if (!orgInfo.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
-                        && !orgInfo.getOrgStatus().toString().equals(RecordStatus.FREEZE.toString())
                         && !orgInfo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
                 }
@@ -391,6 +389,18 @@ public class BizOrgController extends BaseController {
                 }
                 if (WzStringUtil.isBlank(org.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
+                }
+                if(null != org.getOrgStatus()){
+                    if (!org.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
+                            && !org.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
+                    }
+                }
+                if(null != org.getOrgType()){
+                    if (!org.getOrgType().toString().equals(OrgAndUserType.PLATFORM.toString())
+                            && !org.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业类别");
+                    }
                 }
                 //企业营业执照如果不为空空
                 if (WzStringUtil.isNotBlank(org.getOrgBusinessLicenceFront())){
