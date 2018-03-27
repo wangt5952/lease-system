@@ -335,9 +335,15 @@ public class BizBatteryController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 batteryInfo = JSON.parseObject(paramStr, BizBattery.class);
-                if (null == batteryInfo
-                        || WzStringUtil.isBlank(batteryInfo.getUpdateUser())) {
+                if (null == batteryInfo || WzStringUtil.isBlank(batteryInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isNotBlank(batteryInfo.getBatteryStatus().toString())) {
+                    if (!batteryInfo.getBatteryStatus().toString().equals(RecordStatus.NORMAL.toString())
+                            && !batteryInfo.getBatteryStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !batteryInfo.getBatteryStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"无效的电池状态");
+                    }
                 }
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){

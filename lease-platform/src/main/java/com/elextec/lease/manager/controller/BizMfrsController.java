@@ -328,9 +328,22 @@ public class BizMfrsController extends BaseController {
             try {
                 String paramStr = URLDecoder.decode(modifyParam, "utf-8");
                 mfrs = JSON.parseObject(paramStr, BizManufacturer.class);
-                if (null == mfrs
-                        || WzStringUtil.isBlank(mfrs.getUpdateUser())) {
+                if (null == mfrs || WzStringUtil.isBlank(mfrs.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (WzStringUtil.isNotBlank(mfrs.getMfrsStatus().toString())) {
+                    if (!mfrs.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
+                            && !mfrs.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
+                            && !mfrs.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"无效的制造商状态");
+                    }
+                }
+                if (WzStringUtil.isNotBlank(mfrs.getMfrsType().toString())) {
+                    if (!mfrs.getMfrsType().toString().equals(MfrsType.BATTERY.toString())
+                            && !mfrs.getMfrsType().toString().equals(MfrsType.VEHICLE.toString())
+                            && !mfrs.getMfrsType().toString().equals(MfrsType.PARTS.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"无效的制造商类别");
+                    }
                 }
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
