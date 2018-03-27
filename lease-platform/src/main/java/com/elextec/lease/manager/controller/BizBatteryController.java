@@ -338,7 +338,7 @@ public class BizBatteryController extends BaseController {
                 if (null == batteryInfo || WzStringUtil.isBlank(batteryInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if (WzStringUtil.isNotBlank(batteryInfo.getBatteryStatus().toString())) {
+                if (batteryInfo.getBatteryStatus() != null) {
                     if (!batteryInfo.getBatteryStatus().toString().equals(RecordStatus.NORMAL.toString())
                             && !batteryInfo.getBatteryStatus().toString().equals(RecordStatus.FREEZE.toString())
                             && !batteryInfo.getBatteryStatus().toString().equals(RecordStatus.INVALID.toString())) {
