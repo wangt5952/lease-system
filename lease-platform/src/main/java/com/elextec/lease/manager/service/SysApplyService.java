@@ -55,4 +55,12 @@ public interface SysApplyService {
      */
     public SysApplyExt getExtById(SysApplyExample example);
 
+
+    /**
+     * 审批申请
+     * @param applyId 申请ID
+     * @param orgId 企业ID
+     */
+    public void approval(String applyId,String authFlag,String orgId);
+
 }

@@ -423,4 +423,66 @@ public class SysApplyController extends BaseController {
         }
     }
 
+    /**
+     * 申请审批接口.
+     * @param approvalParam 申请ID与申批状态
+     * <pre>
+     *     {
+     *         applyId:申请ID,
+     *         flag:申批状态（同意、驳回）
+     *     }
+     * </pre>
+     * @param request HttpServletRequest
+     * @return 审批结果
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/applyapproval")
+    public MessageResponse approval(@RequestBody String approvalParam, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(approvalParam)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            Map<String,String> param = null;
+            try {
+                String paramStr = URLDecoder.decode(approvalParam, "utf-8");
+                param = JSON.parseObject(paramStr, Map.class);
+                if (null == param || 0 == param.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                SysUser userTemp = getLoginUserInfo(request);
+                if(userTemp != null){
+                    //个人用户无权执行该操作
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }
+                }else{
+                    return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+                }
+                if (WzStringUtil.isBlank(param.get("applyId")) || WzStringUtil.isBlank(param.get("flag"))) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if(!ApplyTypeAndStatus.AGREE.toString().equals(param.get("flag"))
+                        || !ApplyTypeAndStatus.REJECT.toString().equals(param.get("flag"))){
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                sysApplyService.approval(param.get("applyId"),param.get("flag"),userTemp.getOrgId());
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 组织返回结果并返回
+            MessageResponse mr = new MessageResponse(RunningResult.SUCCESS);
+            return mr;
+        }
+    }
+
 }

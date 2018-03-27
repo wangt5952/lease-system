@@ -133,4 +133,24 @@ public class SysApplyServiceImpl implements SysApplyService {
         }
         return apply.get(0);
     }
+
+    @Override
+    public void approval(String applyId,String authFlag,String orgId) {
+        SysApplyExample example = new SysApplyExample();
+        SysApplyExample.Criteria criteria = example.createCriteria();
+        criteria.andIdEqualTo(applyId);
+        criteria.andExamineOrgIdEqualTo(orgId);
+        List<SysApply> apply = sysApplyMapperExt.selectByExample(example);
+        if(apply.size() != 1){
+            throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(),"申请不存在");
+        }
+        if(ApplyTypeAndStatus.REJECT.toString().equals(apply.get(0).getApplyStatus().toString())
+                || ApplyTypeAndStatus.AGREE.toString().equals(apply.get(0).getApplyStatus().toString())){
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "申请不能重复审核");
+        }
+        SysApply temp = new SysApply();
+        temp.setId(applyId);
+        temp.setApplyStatus(ApplyTypeAndStatus.valueOf(authFlag));
+        sysApplyMapperExt.updateByPrimaryKeySelective(temp);
+    }
 }

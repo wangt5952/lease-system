@@ -1024,7 +1024,7 @@ public class SysUserController extends BaseController {
      *     }
      * </pre>
      */
-    @RequestMapping(path = "/approval")
+    @RequestMapping(path = "/userapproval")
     public MessageResponse approval(@RequestBody String approvalParam, HttpServletRequest request) {
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(approvalParam)) {
