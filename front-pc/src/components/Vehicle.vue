@@ -51,7 +51,7 @@
         <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
-            <el-button icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
+            <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="">
@@ -68,7 +68,7 @@
         </el-table-column>
         <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">            
-            <el-button icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm2(row)">查看配件</el-button>
+            <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm2(row)">查看配件</el-button>
           </template>
         </el-table-column>
       </template>
@@ -617,6 +617,7 @@ export default {
         const { code, message } = (await this.$http.post('/api/manager/parts/partBind', form)).body;
         if (code !== '200') throw new Error(message);
         await this.partsReload();
+        await this.reload();
         this.$message.success('绑定成功');
       } catch (e) {
         const message = e.statusText || e.message;
@@ -664,6 +665,7 @@ export default {
         if (code !== '200') throw new Error(message);
         // row.id = form.vehicleId;
         await this.showHoldBindPartForm({ ...row, id: form.vehicleId });
+        await this.reload();
         this.$message.success('解绑成功');
         // await this.partsReload();
       } catch (e) {
