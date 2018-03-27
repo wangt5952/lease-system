@@ -479,9 +479,8 @@ public class SysUserController extends BaseController {
                         || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())
-                        || userInfo.getId().equals(userTemp.getId())){
-                    //用户不可以修改自己的状态，企业用户无法修改用户状态
+                if(userInfo.getId().equals(userTemp.getId())){
+                    //用户不可以修改自己的状态
                     userInfo.setUserStatus(null);
                 }
                 //实名状态不能修改

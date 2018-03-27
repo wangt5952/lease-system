@@ -195,11 +195,12 @@ public class BizMfrsController extends BaseController {
                             && !insMfrsVo.getMfrsType().toString().equals(MfrsType.PARTS.toString())) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录制造商类别无效");
                     }
-                    if (!insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
-                            && !insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
-                            && !insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录制造商状态无效");
-                    }
+//                    if (!insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
+//                            && !insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
+//                            && !insMfrsVo.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
+//                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录制造商状态无效");
+//                    }
+                    insMfrsVo.setMfrsStatus(RecordStatus.NORMAL);
                 }
                 bizManufacturerService.insertBizManufacturers(mfrsInfos);
             } catch (BizException ex) {
@@ -275,11 +276,12 @@ public class BizMfrsController extends BaseController {
                         && !mfrsInfo.getMfrsType().toString().equals(MfrsType.PARTS.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的制造商类别");
                 }
-                if (!mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
-                        && !mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
-                        && !mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
-                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的制造商状态");
-                }
+//                if (!mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
+//                        && !mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
+//                       && !mfrsInfo.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
+//                   return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的制造商状态");
+//                }
+                mfrsInfo.setMfrsStatus(RecordStatus.NORMAL);
                 bizManufacturerService.insertBizManufacturers(mfrsInfo);
             } catch (BizException ex) {
                 throw ex;
@@ -333,7 +335,6 @@ public class BizMfrsController extends BaseController {
                 }
                 if (mfrs.getMfrsStatus() != null) {
                     if (!mfrs.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
-                            && !mfrs.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
                             && !mfrs.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
                         return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"无效的制造商状态");
                     }

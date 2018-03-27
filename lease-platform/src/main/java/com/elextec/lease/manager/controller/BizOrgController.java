@@ -212,15 +212,15 @@ public class BizOrgController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业参数有误");
                     }
                     if (!insOrgVo.getOrgType().toString().equals(OrgAndUserType.PLATFORM.toString())
-                            && !insOrgVo.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
-                            && !insOrgVo.getOrgType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                            && !insOrgVo.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业类别无效");
                     }
-                    if (!insOrgVo.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
-                            && !insOrgVo.getOrgStatus().toString().equals(RecordStatus.FREEZE.toString())
-                            && !insOrgVo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业状态无效");
-                    }
+//                    if (!insOrgVo.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
+//                            && !insOrgVo.getOrgStatus().toString().equals(RecordStatus.FREEZE.toString())
+//                            && !insOrgVo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
+//                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录企业状态无效");
+//                    }
+                    insOrgVo.setOrgStatus(RecordStatus.NORMAL);
                 }
                 bizOrganizationService.insertBizOrganization(orgInfos);
             } catch (BizException ex) {
@@ -300,10 +300,11 @@ public class BizOrgController extends BaseController {
                         && !orgInfo.getOrgType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业类别");
                 }
-                if (!orgInfo.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
-                        && !orgInfo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
-                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
-                }
+//                if (!orgInfo.getOrgStatus().toString().equals(RecordStatus.NORMAL.toString())
+//                        && !orgInfo.getOrgStatus().toString().equals(RecordStatus.INVALID.toString())) {
+//                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业状态");
+//                }
+                orgInfo.setOrgStatus(RecordStatus.NORMAL);
                 //上传企业营业执照
                 if (WzStringUtil.isNotBlank(orgInfo.getOrgBusinessLicenceFront())) {
                     //把唯一时间作为照片名字
@@ -402,7 +403,7 @@ public class BizOrgController extends BaseController {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的企业类别");
                     }
                 }
-                //企业营业执照如果不为空空
+                //企业营业执照如果不为空
                 if (WzStringUtil.isNotBlank(org.getOrgBusinessLicenceFront())){
                     //获取原企业营业执照
                     BizOrganization bizOrganization = bizOrganizationService.getBizOrganizationByPrimaryKey(org.getId());
