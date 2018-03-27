@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
-import com.elextec.framework.common.request.LoginParam;
-import com.elextec.framework.common.request.ModifyPasswordParam;
-import com.elextec.framework.common.request.ResetPasswordParam;
-import com.elextec.framework.common.request.SmsParam;
+import com.elextec.framework.common.request.*;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.sms.SmsClient;
@@ -445,6 +442,78 @@ public class SysAuthController extends BaseController {
             updateVo.setPassword(resetParam.getNewPassword());
             updateVo.setUpdateUser(user.getId());
             // 更新密码
+            sysUserService.updateSysUser(updateVo);
+            // 缓存中的手机号码删除掉
+            redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
+            return new MessageResponse(RunningResult.SUCCESS);
+        }
+    }
+
+    /**
+     * 更换手机号码.
+     * @param request 请求
+     * @param smsTokenAndNewMobile 更换手机号码参数JSON
+     * <pre>
+     *     {
+     *         smsToken:重置密码用短信验证码Token,
+     *         smsVCode:短信验证码,
+     *         newMobile:新手机号码
+     *     }
+     * </pre>
+     * @return 更换结果
+     * <pre>
+     *     {
+     *          code:处理Code,
+     *          message:处理消息,
+     *          respData:""
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = {"/updatemobile"})
+    public MessageResponse updateMobile(@RequestBody String smsTokenAndNewMobile, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(smsTokenAndNewMobile)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            UpdateMobileParam resetParam = null;
+            try {
+                String paramStr = URLDecoder.decode(smsTokenAndNewMobile, "utf-8");
+                resetParam = JSON.parseObject(paramStr, UpdateMobileParam.class);
+                if (null == resetParam
+                        || WzStringUtil.isBlank(resetParam.getSmsVCode())
+                        || WzStringUtil.isBlank(resetParam.getSmsToken())
+                        || WzStringUtil.isBlank(resetParam.getNewMobile())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                // 验证短信验证码
+                // 获得预存短信验证码
+                String vCode = (String) redisClient.valueOperations().get(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
+                // 短信验证码过期报错
+                if (WzStringUtil.isBlank(vCode)) {
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
+                }
+                // 验证码不一致报错
+                if (!vCode.equalsIgnoreCase(resetParam.getSmsVCode())) {
+                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
+                }
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 只要进行验证后，不管成功失败均将之前验证码作废
+            redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
+
+            // 获得登录用户信息
+            String userMobile = (String) redisClient.valueOperations().get(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
+            SysUser user = sysUserService.getByMobile(userMobile);
+            SysUser updateVo = new SysUser();
+            updateVo.setId(user.getId());
+            updateVo.setUserMobile(resetParam.getNewMobile());
+            updateVo.setUpdateUser(user.getId());
+            // 更新手机号
             sysUserService.updateSysUser(updateVo);
             // 缓存中的手机号码删除掉
             redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
