@@ -10,6 +10,9 @@
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="showPasswordForm">密码修改</el-dropdown-item>
           <el-dropdown-item command="handleLogout">退出系统</el-dropdown-item>
+          <template v-if="key_user_info.userType === 'INDIVIDUAL'">
+            <el-dropdown-item @command="showForm(key_user_info.id)">个人信息</el-dropdown-item>
+          </template>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -67,6 +70,7 @@
         <el-button type="primary" @click="confirmLoginForm">登录</el-button>
       </span>
     </el-dialog>
+
   </div>
 </template>
 
@@ -131,6 +135,8 @@ export default {
 
       loginFormVisible: this.$store.state.relogin,
       loginForm: {},
+
+      formVisible: false,
     };
   },
   computed: {
@@ -160,6 +166,32 @@ export default {
     },
   },
   methods: {
+    async showForm(id) {
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/user/getbypk', [id])).body;
+        if (code !== '200') throw new Error(message);
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      // this.form = _.pick(form, [
+      //   'id',
+      //   'loginName',
+      //   'userMobile',
+      //   'userType',
+      //   'userIcon',
+      //   'nickName',
+      //   'userName',
+      //   'userRealNameAuthFlag',
+      //   'userPid',
+      //   'userIcFront',
+      //   'userIcBack',
+      //   'userIcGroup',
+      //   'userStatus',
+      //   'orgId',
+      // ]);
+    },
     async handleLogout() {
       await this.$store.commit('logout');
       this.$router.replace('/login');

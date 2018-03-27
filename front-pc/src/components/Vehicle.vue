@@ -28,10 +28,9 @@
         </div>
       </template>
     </div>
-  
     <!-- {{ res }} -->
     <!-- {{ key_user_info }} -->
-    <el-table :data="list" height="85%" style="width: 100%">
+    <el-table :data="list" style="width: 100%">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
@@ -67,7 +66,7 @@
           </template>
         </el-table-column>
         <el-table-column label="配件" width="200">
-          <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">            
+          <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm2(row)">查看配件</el-button>
           </template>
         </el-table-column>
@@ -365,7 +364,6 @@
         <el-button @click="saveBatteryForm2">关闭</el-button>
       </span>
     </el-dialog>
-    
   </div>
 </template>
 

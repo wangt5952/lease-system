@@ -11,7 +11,7 @@
       </el-form>
     </div>
 
-    <el-table :data="list" height="100%" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="roleName" label="角色名"></el-table-column>
       <el-table-column prop="roleIntroduce" label="说明"></el-table-column>
       <el-table-column label="操作" width="200">
