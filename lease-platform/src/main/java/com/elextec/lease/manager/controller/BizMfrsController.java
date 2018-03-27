@@ -331,14 +331,14 @@ public class BizMfrsController extends BaseController {
                 if (null == mfrs || WzStringUtil.isBlank(mfrs.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if (WzStringUtil.isNotBlank(mfrs.getMfrsStatus().toString())) {
+                if (mfrs.getMfrsStatus() != null) {
                     if (!mfrs.getMfrsStatus().toString().equals(RecordStatus.NORMAL.toString())
                             && !mfrs.getMfrsStatus().toString().equals(RecordStatus.FREEZE.toString())
                             && !mfrs.getMfrsStatus().toString().equals(RecordStatus.INVALID.toString())) {
                         return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"无效的制造商状态");
                     }
                 }
-                if (WzStringUtil.isNotBlank(mfrs.getMfrsType().toString())) {
+                if (mfrs.getMfrsType() != null) {
                     if (!mfrs.getMfrsType().toString().equals(MfrsType.BATTERY.toString())
                             && !mfrs.getMfrsType().toString().equals(MfrsType.VEHICLE.toString())
                             && !mfrs.getMfrsType().toString().equals(MfrsType.PARTS.toString())) {
