@@ -141,7 +141,7 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
     @Transactional
     public void updateBizManufacturer(BizManufacturer mfrsInfo) {
         //制造商作废，判定是否绑定了设备
-        if(RecordStatus.INVALID.toString().equals(mfrsInfo.getMfrsStatus().toString())){
+        if(null != mfrsInfo.getMfrsStatus() && RecordStatus.INVALID.toString().equals(mfrsInfo.getMfrsStatus().toString())){
             //验证是否有车辆绑定
             BizVehicleExample vehicleExample = new BizVehicleExample();
             BizVehicleExample.Criteria vehicleCriteria = vehicleExample.createCriteria();

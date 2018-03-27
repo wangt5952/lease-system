@@ -167,7 +167,7 @@ public class BizPartsServiceImpl implements BizPartsService {
     @Transactional
     public void updateBizParts(BizParts partsInfo) {
         //判定配件是否绑定了车辆
-        if(RecordStatus.INVALID.toString().equals(partsInfo.getPartsStatus())
+        if(null != partsInfo.getPartsStatus() && RecordStatus.INVALID.toString().equals(partsInfo.getPartsStatus().toString())
                 || RecordStatus.FREEZE.toString().equals(partsInfo.getPartsStatus())){
             BizRefVehiclePartsExample example = new BizRefVehiclePartsExample();
             BizRefVehiclePartsExample.Criteria criteria = example.createCriteria();

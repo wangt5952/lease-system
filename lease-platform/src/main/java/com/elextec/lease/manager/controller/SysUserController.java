@@ -228,8 +228,8 @@ public class SysUserController extends BaseController {
                             || WzStringUtil.isBlank(insUserChkVo.getUserMobile())
                             || null == insUserChkVo.getUserType()
                             || null == insUserChkVo.getOrgId()
-                            || null == insUserChkVo.getUserRealNameAuthFlag()
-                            || null == insUserChkVo.getUserStatus()
+//                            || null == insUserChkVo.getUserRealNameAuthFlag()
+//                            || null == insUserChkVo.getUserStatus()
                             || WzStringUtil.isBlank(insUserChkVo.getCreateUser())
                             || WzStringUtil.isBlank(insUserChkVo.getUpdateUser())) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户信息参数有误");
@@ -243,17 +243,19 @@ public class SysUserController extends BaseController {
                             && !insUserChkVo.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户类别无效");
                     }
-                    if (!insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.AUTHORIZED.toString())
-                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.UNAUTHORIZED.toString())
-                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.TOAUTHORIZED.toString())
-                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.REJECTAUTHORIZED.toString())) {
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户实名认证标志无效");
-                    }
-                    if (!insUserChkVo.getUserStatus().toString().equals(RecordStatus.NORMAL.toString())
-                            && !insUserChkVo.getUserStatus().toString().equals(RecordStatus.FREEZE.toString())
-                            && !insUserChkVo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
-                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户状态无效");
-                    }
+//                    if (!insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.AUTHORIZED.toString())
+//                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.UNAUTHORIZED.toString())
+//                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.TOAUTHORIZED.toString())
+//                            && !insUserChkVo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.REJECTAUTHORIZED.toString())) {
+//                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户实名认证标志无效");
+//                    }
+//                    if (!insUserChkVo.getUserStatus().toString().equals(RecordStatus.NORMAL.toString())
+//                            && !insUserChkVo.getUserStatus().toString().equals(RecordStatus.FREEZE.toString())
+//                            && !insUserChkVo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
+//                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录用户状态无效");
+//                    }
+                    userInfos.get(i).setUserRealNameAuthFlag(RealNameAuthFlag.AUTHORIZED);
+                    userInfos.get(i).setUserStatus(RecordStatus.NORMAL);
                     userInfos.get(i).setPassword(WzEncryptUtil.getMD5(defaultPassword,true));
                 }
                 sysUserService.insertSysUsers(userInfos);
@@ -330,8 +332,8 @@ public class SysUserController extends BaseController {
                         || WzStringUtil.isBlank(userInfo.getUserMobile())
                         || null == userInfo.getUserType()
                         || null == userInfo.getOrgId()
-                        || null == userInfo.getUserRealNameAuthFlag()
-                        || null == userInfo.getUserStatus()
+//                        || null == userInfo.getUserRealNameAuthFlag()
+//                        || null == userInfo.getUserStatus()
                         || WzStringUtil.isBlank(userInfo.getCreateUser())
                         || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "用户参数有误");
@@ -346,17 +348,19 @@ public class SysUserController extends BaseController {
                         && !userInfo.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户类别");
                 }
-                if (!userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.AUTHORIZED.toString())
-                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.UNAUTHORIZED.toString())
-                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.TOAUTHORIZED.toString())
-                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.REJECTAUTHORIZED.toString())) {
-                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的实名认证标志");
-                }
-                if (!userInfo.getUserStatus().toString().equals(RecordStatus.NORMAL.toString())
-                        && !userInfo.getUserStatus().toString().equals(RecordStatus.FREEZE.toString())
-                        && !userInfo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
-                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户状态");
-                }
+//                if (!userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.AUTHORIZED.toString())
+//                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.UNAUTHORIZED.toString())
+//                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.TOAUTHORIZED.toString())
+//                        && !userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.REJECTAUTHORIZED.toString())) {
+//                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的实名认证标志");
+//                }
+//                if (!userInfo.getUserStatus().toString().equals(RecordStatus.NORMAL.toString())
+//                        && !userInfo.getUserStatus().toString().equals(RecordStatus.FREEZE.toString())
+//                        && !userInfo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
+//                    return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户状态");
+//                }
+                userInfo.setUserRealNameAuthFlag(RealNameAuthFlag.AUTHORIZED);
+                userInfo.setUserStatus(RecordStatus.NORMAL);
                 userInfo.setPassword(WzEncryptUtil.getMD5(defaultPassword,true));
                 sysUserService.insertSysUser(userInfo);
             } catch (BizException ex) {
@@ -439,12 +443,32 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank(userInfo.getId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(), "无法确定需要修改的数据");
                 }
+                if(null != userInfo.getUserStatus()){
+                    if (!userInfo.getUserStatus().toString().equals(RecordStatus.NORMAL.toString())
+                            && !userInfo.getUserStatus().toString().equals(RecordStatus.INVALID.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户状态");
+                    }
+                }
+                if(null != userInfo.getUserType()){
+                    //个人用户无法通过电脑端创建
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userInfo.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION.code(),"无法创建个人用户");
+                    }
+
+                    if (!userInfo.getUserType().toString().equals(OrgAndUserType.PLATFORM.toString())
+                            && !userInfo.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
+                        return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户类别");
+                    }
+                }
                 SysUser userTemp = getLoginUserInfo(request);
                 if(userTemp != null){
-                    //个人与企业用户无权执行该操作
-                    if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
+                    //个人用户无权执行该操作
+                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                        return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                    }else{
                         //如果不是平台用户，登录用户与修改用户ID不同则不能修改
-                        if(!userInfo.getId().equals(userTemp.getId())){
+                        if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())
+                               && !userInfo.getId().equals(userTemp.getId())){
                             return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                         }
                     }
@@ -456,14 +480,19 @@ public class SysUserController extends BaseController {
                         || WzStringUtil.isBlank(userInfo.getUpdateUser())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-
+                if(!OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())
+                        || userInfo.getId().equals(userTemp.getId())){
+                    //用户不可以修改自己的状态，企业用户无法修改用户状态
+                    userInfo.setUserStatus(null);
+                }
+                //实名状态不能修改
+                userInfo.setUserRealNameAuthFlag(null);
                 //密码不可以由这个接口修改，清空上传的密码参数
                 userInfo.setPassword(null);
                 //手机号码不可以由这个接口个改，清空上传的手机号码
                 userInfo.setUserMobile(null);
                 //用户名不可修改
                 userInfo.setLoginName(null);
-
                 sysUserService.updateSysUser(userInfo);
             } catch (BizException ex) {
                 throw ex;

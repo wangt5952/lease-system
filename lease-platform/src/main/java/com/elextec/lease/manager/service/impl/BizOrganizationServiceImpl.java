@@ -159,7 +159,7 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         orgCriteria.andIdEqualTo(orgInfo.getId());
         List<BizOrganization> org = bizOrganizationMapperExt.selectByExample(orgExample);
         //作废操作时，验证企业下面是否有用户和车辆
-        if(RecordStatus.INVALID.toString().equals(orgInfo.getOrgStatus().toString())){
+        if(null != orgInfo.getOrgStatus() && RecordStatus.INVALID.toString().equals(orgInfo.getOrgStatus().toString())){
             //平台企业无法作废
             if(org.size() >= 1){
                 if(OrgAndUserType.PLATFORM.toString().equals(org.get(0).getOrgType().toString())){

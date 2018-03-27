@@ -170,7 +170,7 @@ public class BizBatteryServcieImpl implements BizBatteryService {
     @Transactional
     public void updateBattery(BizBattery batteryInfo) {
         //电池作废需要验证电池是否绑定了车辆
-        if(RecordStatus.INVALID.toString().equals(batteryInfo.getBatteryStatus().toString())
+        if(null != batteryInfo.getBatteryStatus() && RecordStatus.INVALID.toString().equals(batteryInfo.getBatteryStatus().toString())
                 || RecordStatus.FREEZE.toString().equals(batteryInfo.getBatteryStatus().toString())){
             BizRefVehicleBatteryExample example = new BizRefVehicleBatteryExample();
             BizRefVehicleBatteryExample.Criteria criteria = example.createCriteria();

@@ -342,7 +342,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     @Transactional
     public void updateVehicle(BizVehicle vehicle) {
         //如果车辆做报废的话，需要判定车辆是否已绑定用户并将已绑定的电池与配件全部解绑
-        if(RecordStatus.INVALID.toString().equals(vehicle.getVehicleStatus().toString())){
+        if(null != vehicle.getVehicleStatus() && RecordStatus.INVALID.toString().equals(vehicle.getVehicleStatus().toString())){
             BizRefUserVehicleExample example = new BizRefUserVehicleExample();
             BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
             criteria.andUnbindTimeIsNull();
@@ -395,7 +395,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             BizRefOrgVehicle orgRef = new BizRefOrgVehicle();
             orgRef.setUnbindTime(new Date());
             bizRefOrgVehicleMapperExt.updateByExampleSelective(orgRef,delOrgExample);
-        } else if(RecordStatus.FREEZE.toString().equals(vehicle.getVehicleStatus().toString())){
+        } else if(null != vehicle.getVehicleStatus() && RecordStatus.FREEZE.toString().equals(vehicle.getVehicleStatus().toString())){
             BizRefUserVehicleExample example = new BizRefUserVehicleExample();
             BizRefUserVehicleExample.Criteria criteria = example.createCriteria();
             criteria.andUnbindTimeIsNull();
