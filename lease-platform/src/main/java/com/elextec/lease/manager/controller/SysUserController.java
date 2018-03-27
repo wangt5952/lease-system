@@ -344,8 +344,7 @@ public class SysUserController extends BaseController {
                 }
 
                 if (!userInfo.getUserType().toString().equals(OrgAndUserType.PLATFORM.toString())
-                        && !userInfo.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
-                        && !userInfo.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                        && !userInfo.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
                     return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "无效的用户类别");
                 }
 //                if (!userInfo.getUserRealNameAuthFlag().toString().equals(RealNameAuthFlag.AUTHORIZED.toString())
