@@ -17,6 +17,17 @@ public class BizVehicleBatteryParts extends BizVehicleExt {
     //车辆下所有配件信息
     public List<BizPartsExt> bizPartss;
 
+    //配件数量
+    public Integer partCount;
+
+    public Integer getPartCount() {
+        return partCount;
+    }
+
+    public void setPartCount(Integer partCount) {
+        this.partCount = partCount;
+    }
+
     public List<BizBatteryExt> getBizBatteries() {
         return bizBatteries;
     }
