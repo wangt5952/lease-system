@@ -24,7 +24,7 @@
       </el-form>
     </div>
     <!-- a -->
-    <el-table :data="list" height="82%" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="batteryCode" label="编号"></el-table-column>
       <el-table-column prop="batteryName" label="电池货名"></el-table-column>
       <el-table-column prop="batteryBrand" label="品牌"></el-table-column>

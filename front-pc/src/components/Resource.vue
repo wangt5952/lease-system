@@ -5,7 +5,7 @@
       <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm({resType:'CATALOG'})">添加目录</el-button>
     </div>
 
-    <el-table :data="tableTree" row-key="id" height="100%" style="width: 100%;margin-top:10px;">
+    <el-table :data="tableTree" row-key="id" style="width: 100%;margin-top:10px;">
       <el-table-column width="80">
         <template slot-scope="{row}">
           <template v-if="row.children && row.children.length">

@@ -8,7 +8,7 @@
         </div>
         <div @click="showVehicleDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.code}}</div>
-          <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码 {{ searchLocList }}</div>
+          <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码</div>
         </div>
         <div @click="showVehiclePath" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;">南京市雨花台区大数据产业园</div>

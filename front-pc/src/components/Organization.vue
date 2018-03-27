@@ -23,7 +23,7 @@
       </el-form>
     </div>
     <!-- a -->
-    <el-table :data="list" height="82%" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="orgCode" label="编码"></el-table-column>
       <el-table-column prop="orgName" label="组织名称"></el-table-column>
       <el-table-column prop="orgTypeText" label="类别"></el-table-column>
