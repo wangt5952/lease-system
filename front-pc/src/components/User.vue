@@ -218,6 +218,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeBindList">关闭</el-button>
+      </span>
     </el-dialog>
 
   </div>
@@ -326,6 +329,9 @@ export default {
   },
   methods: {
     // 车辆
+    closeBindList() {
+      this.userVehicleFormVisible = false;
+    },
     async vehicleHandleSizeChange(vehiclePageSize) {
       this.vehiclePageSize = vehiclePageSize;
       await this.vehicleReload();

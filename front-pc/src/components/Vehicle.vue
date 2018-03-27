@@ -271,7 +271,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <el-table :data="partsList" style="width: 101%;margin-top:10px;">
+      <el-table :data="partsList" style="margin-top:10px;">
         <el-table-column prop="partsCode" label="编码"></el-table-column>
         <el-table-column prop="partsName" label="配件货名"></el-table-column>
         <el-table-column prop="partsBrand" label="品牌"></el-table-column>
@@ -298,12 +298,11 @@
         :total="partsTotal">
       </el-pagination>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closePartsForm">取消</el-button>
-        <el-button type="primary" @click="savePartsForm">保存</el-button>
+        <el-button @click="closePartsForm">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 查看当前车辆下已绑定的配件 -->
-    <el-dialog title="已有配件" :visible.sync="bindPartsFormVisible" style="margin-top:-50px" :close-on-click-modal="false" :close-on-press-escape="false" width="80%">
+    <el-dialog title="已有配件" :visible.sync="bindPartsFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-table :data="holdPartsList" style="width: 100%;margin-top:10px;">
         <el-table-column prop="partsCode" label="编码"></el-table-column>
         <el-table-column prop="partsName" label="配件货名"></el-table-column>
@@ -322,7 +321,7 @@
         </template>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="info" @click="holdSavePartsForm">关闭</el-button>
+        <el-button @click="holdSavePartsForm">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 企业批量归还车辆 -->
@@ -348,7 +347,7 @@
         <el-table-column prop="batteryStatusText" label="状态"></el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="info" @click="saveBatteryForm">关闭</el-button>
+        <el-button @click="saveBatteryForm">关闭</el-button>
       </span>
     </el-dialog>
     <el-dialog title="已有配件" :visible.sync="bindPartsFormVisible2" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
@@ -363,7 +362,7 @@
         <el-table-column prop="partsStatusText" label="状态"></el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="info" @click="saveBatteryForm2">关闭</el-button>
+        <el-button @click="saveBatteryForm2">关闭</el-button>
       </span>
     </el-dialog>
     
@@ -608,6 +607,7 @@ export default {
     async showBindPartForm(row) {
       this.allPartsFormVisible = true;
       this.bindPartsForm = { vehicleId: row.id };
+      await this.partsReload();
     },
     // 绑定配件
     async bindPart(row) {
@@ -665,11 +665,11 @@ export default {
         // row.id = form.vehicleId;
         await this.showHoldBindPartForm({ ...row, id: form.vehicleId });
         this.$message.success('解绑成功');
+        // await this.partsReload();
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      await this.partsReload();
     },
     // 关闭配件页面
     closePartsForm() {
