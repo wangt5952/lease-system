@@ -23,8 +23,8 @@
         </el-form-item>
       </el-form>
     </div>
-
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <!-- a -->
+    <el-table :data="list" height="82%" style="width: 100%;margin-top:10px;">
       <el-table-column prop="partsCode" label="编码"></el-table-column>
       <el-table-column prop="partsName" label="配件货名"></el-table-column>
       <el-table-column prop="partsBrand" label="品牌"></el-table-column>

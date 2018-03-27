@@ -1,6 +1,5 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
-
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-org-addone') >= 0">
         <div style="margin-right:10px;">
@@ -23,8 +22,8 @@
         </el-form-item>
       </el-form>
     </div>
-
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <!-- a -->
+    <el-table :data="list" height="82%" style="width: 100%;margin-top:10px;">
       <el-table-column prop="orgCode" label="编码"></el-table-column>
       <el-table-column prop="orgName" label="组织名称"></el-table-column>
       <el-table-column prop="orgTypeText" label="类别"></el-table-column>
@@ -59,7 +58,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="orgCode" :rules="[{required:true, message:'请填写编码'}]" label="编码">
-              <el-input v-model="form.orgCode" auto-complete="off"></el-input>
+              <el-input v-model="form.orgCode" auto-complete="off" :disabled="form.id"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -256,6 +255,8 @@ export default {
     },
 
     showForm(form = { }) {
+      const $form = this.$refs.form;
+      if ($form) $form.resetFields();
       this.form = _.pick(form, [
         'id',
         'orgCode',

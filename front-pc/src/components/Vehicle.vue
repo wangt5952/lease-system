@@ -28,10 +28,10 @@
         </div>
       </template>
     </div>
-
+  
     <!-- {{ res }} -->
     <!-- {{ key_user_info }} -->
-    <el-table :data="list" style="width: 100%">
+    <el-table :data="list" height="85%" style="width: 100%">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
@@ -39,27 +39,36 @@
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <template v-if="res['FUNCTION'].indexOf('manager-vehicle-batterybind') >= 0">
+      <template v-if="key_user_info.userType === 'PLATFORM'">
+        <!-- v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" -->
         <el-table-column label="电池" width="150">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
             <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
-            <el-button v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
+            <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-      </template>
-      <template v-if="key_user_info.userType !== 'ENTERPRISE'">
         <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
             <el-button icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
           </template>
         </el-table-column>
-      </template>
-      <template v-if="res['FUNCTION'].indexOf('manager-vehicle-modify') >= 0">
         <el-table-column label="操作" width="">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">编辑</el-button>
+          </template>
+        </el-table-column>
+      </template>
+      <template v-if="key_user_info.userType === 'ENTERPRISE'">
+        <el-table-column label="电池" width="150">
+          <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
+            <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="配件" width="200">
+          <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">            
+            <el-button icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm2(row)">查看配件</el-button>
           </template>
         </el-table-column>
       </template>
@@ -229,7 +238,6 @@
         <el-button type="primary" @click="saveEditForm">保存</el-button>
       </span>
     </el-dialog>
-
     <el-dialog title="绑定电池" :visible.sync="bindFormVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="bindForm" ref="bindForm">
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择电池'}]" label="电池">
@@ -246,7 +254,6 @@
         <el-button type="primary" @click="saveBindForm">{{form.id ? '保存' : '绑定'}}</el-button>
       </span>
     </el-dialog>
-
     <!-- 查看所有未绑定配件-->
     <el-dialog title="配件列表" :visible.sync="allPartsFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-form :inline="true">
@@ -264,7 +271,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <el-table :data="partsList" style="width: 101%;margin-top:10px;">
+      <el-table :data="partsList" style="margin-top:10px;">
         <el-table-column prop="partsCode" label="编码"></el-table-column>
         <el-table-column prop="partsName" label="配件货名"></el-table-column>
         <el-table-column prop="partsBrand" label="品牌"></el-table-column>
@@ -291,12 +298,11 @@
         :total="partsTotal">
       </el-pagination>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closePartsForm">取消</el-button>
-        <el-button type="primary" @click="savePartsForm">保存</el-button>
+        <el-button @click="closePartsForm">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 查看当前车辆下已绑定的配件 -->
-    <el-dialog title="已有配件" :visible.sync="bindPartsFormVisible" style="margin-top:-50px" :close-on-click-modal="false" :close-on-press-escape="false" width="80%">
+    <el-dialog title="已有配件" :visible.sync="bindPartsFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-table :data="holdPartsList" style="width: 100%;margin-top:10px;">
         <el-table-column prop="partsCode" label="编码"></el-table-column>
         <el-table-column prop="partsName" label="配件货名"></el-table-column>
@@ -315,7 +321,7 @@
         </template>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="holdSavePartsForm">关闭</el-button>
+        <el-button @click="holdSavePartsForm">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 企业批量归还车辆 -->
@@ -330,7 +336,6 @@
         <el-button type="primary" @click="saveReturnVehicleForm">确定</el-button>
       </span>
     </el-dialog>
-
     <el-dialog title="已有电池" :visible.sync="bindBatteryFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-table :data="batteryList" style="width: 100%;margin-top:10px;">
         <el-table-column prop="batteryCode" label="编号"></el-table-column>
@@ -342,9 +347,25 @@
         <el-table-column prop="batteryStatusText" label="状态"></el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="saveBatteryForm">关闭</el-button>
+        <el-button @click="saveBatteryForm">关闭</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="已有配件" :visible.sync="bindPartsFormVisible2" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
+      <el-table :data="holdPartsList2" style="width: 100%;margin-top:10px;">
+        <el-table-column prop="partsCode" label="编码"></el-table-column>
+        <el-table-column prop="partsName" label="配件货名"></el-table-column>
+        <el-table-column prop="partsBrand" label="品牌"></el-table-column>
+        <el-table-column prop="partsPn" label="型号"></el-table-column>
+        <el-table-column prop="partsTypeText" label="类别"></el-table-column>
+        <el-table-column prop="partsParameters" label="参数"></el-table-column>
+        <el-table-column prop="mfrsName" label="生产商"></el-table-column>
+        <el-table-column prop="partsStatusText" label="状态"></el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="saveBatteryForm2">关闭</el-button>
+      </span>
+    </el-dialog>
+    
   </div>
 </template>
 
@@ -480,7 +501,9 @@ export default {
       ],
       batteryForm: {},
       bindBatteryFormVisible: false,
+      bindPartsFormVisible2: false,
       batteryList: [],
+      holdPartsList2: [],
       batteryStatusList: [
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
@@ -513,6 +536,9 @@ export default {
     // 电池信息
     saveBatteryForm() {
       this.bindBatteryFormVisible = false;
+    },
+    saveBatteryForm2() {
+      this.bindPartsFormVisible2 = false;
     },
     async showHoldBindBatteryForm(row) {
       this.bindBatteryFormVisible = true;
@@ -581,6 +607,7 @@ export default {
     async showBindPartForm(row) {
       this.allPartsFormVisible = true;
       this.bindPartsForm = { vehicleId: row.id };
+      await this.partsReload();
     },
     // 绑定配件
     async bindPart(row) {
@@ -613,6 +640,21 @@ export default {
         this.$message.error(message);
       }
     },
+    async showHoldBindPartForm2(row) {
+      this.bindPartsFormVisible2 = true;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypr', [row.id])).body;
+        if (code !== '200') throw new Error(message);
+        this.holdPartsList2 = _.map(respData, o => ({
+          ...o,
+          partsTypeText: (_.find(this.partsTypeList, { id: o.partsType }) || { name: o.partsType }).name,
+          partsStatusText: (_.find(this.partsStatusList, { id: o.partsStatus }) || { name: o.partsStatus }).name,
+        }));
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
     // 解绑配件
     async unbindPart(row) {
       const { ...form } = this.unBindPartsForm;
@@ -623,11 +665,11 @@ export default {
         // row.id = form.vehicleId;
         await this.showHoldBindPartForm({ ...row, id: form.vehicleId });
         this.$message.success('解绑成功');
+        // await this.partsReload();
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      await this.partsReload();
     },
     // 关闭配件页面
     closePartsForm() {
