@@ -775,6 +775,11 @@ public class BizVehicleController extends BaseController {
                                 errMsgs.append("未查询到车辆[ID:" + batteryCode + "]对应设备的定位信息;");
                                 continue;
                             }
+                            double latTmp = locData.getDoubleValue(DeviceApiConstants.REQ_LAT);
+                            double lngTmp = locData.getDoubleValue(DeviceApiConstants.REQ_LON);
+                            double[] bdLatLng = WzGPSUtil.wgs2bd(latTmp, lngTmp);
+                            locData.put(DeviceApiConstants.REQ_LAT, bdLatLng[0]);
+                            locData.put(DeviceApiConstants.REQ_LON, bdLatLng[1]);
                             locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, vId);
                             locData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, batteryId);
                             locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryCode);
