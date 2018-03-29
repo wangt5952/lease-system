@@ -30,7 +30,7 @@
     </div>
     <!-- {{ res }} -->
     <!-- {{ key_user_info }} -->
-    <el-table :data="list"  style="width: 100%;height:85%">
+    <el-table :data="list" height="85%" style="width: 100%">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
