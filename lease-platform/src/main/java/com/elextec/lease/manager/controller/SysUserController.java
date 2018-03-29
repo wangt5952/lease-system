@@ -1094,4 +1094,75 @@ public class SysUserController extends BaseController {
         }
     }
 
+    /**
+     * <pre>
+     *     [id]
+     * </pre>
+     * 根据车辆的id 查找用户信息
+     * @param id 车辆id
+     * @param request 用户登录信息
+     * @return 用户信息
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 loginName:用户名,
+     *                 userMobile:用户手机号码,
+     *                 userType:用户类型（平台、企业或个人）,
+     *                 userIcon:用户LOGO路径,
+     *                 password:密码,
+     *                 nickName:昵称,
+     *                 userName:姓名,
+     *                 userRealNameAuthFlag:用户实名认证标志（已实名、未实名）,
+     *                 userPid:身份证号,
+     *                 userIcFront:身份证正面照片路径,
+     *                 userIcBack:身份证背面照片路径,
+     *                 userIcGroup:用户手举身份证合照路径,
+     *                 orgId:所属组织ID,
+     *                 orgCode:组织单位Code,
+     *                 orgName:组织单位名,
+     *                 userStatus:用户状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/getUserByVehicle",method = RequestMethod.POST)
+    public MessageResponse getUserByVehicle(@RequestBody String id,HttpServletRequest request){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(id)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> list = null;
+            try {
+                String paramStr = URLDecoder.decode(id, "utf-8");
+                list = JSONObject.parseObject(paramStr,List.class);
+                SysUser sysUser = super.getLoginUserInfo(request);
+                if (list == null || list.size() == 0 || WzStringUtil.isBlank(list.get(0))) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if (sysUser != null) {
+                    if (sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                        return new MessageResponse(RunningResult.SUCCESS,sysUserService.getUserByVehicle(list.get(0),sysUser.getId(),null));
+                    }
+                    if (sysUser.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
+                        return new MessageResponse(RunningResult.SUCCESS,sysUserService.getUserByVehicle(list.get(0),null,sysUser.getOrgId()));
+                    }
+                }
+                return new MessageResponse(RunningResult.SUCCESS,sysUserService.getUserByVehicle(list.get(0),null,null));
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+        }
+    }
+
 }

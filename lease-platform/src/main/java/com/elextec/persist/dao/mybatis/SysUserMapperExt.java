@@ -41,4 +41,11 @@ public interface SysUserMapperExt extends SysUserMapper {
      * @return 用户扩展信息记录数
      */
     int countExtByParam(SysUserParam sysUserParam);
+
+    /**
+     * 根据车辆id查询用户信息
+     * @param vehicleId 车辆id
+     * @return 用户信息
+     */
+    SysUser getUserByVehicle(String vehicleId);
 }

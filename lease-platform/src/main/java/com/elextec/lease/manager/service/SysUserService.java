@@ -141,4 +141,12 @@ public interface SysUserService {
      * @param orgId 企业ID
      */
     public void approval(String userId,String authFlag,String orgId);
+
+    /**
+     * 根据车辆id查找用户信息
+     * @param vehicleId 车辆id
+     * @return 用户信息
+     */
+    public SysUser getUserByVehicle(String vehicleId,String userId,String orgId);
+
 }

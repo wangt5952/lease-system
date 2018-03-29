@@ -174,4 +174,33 @@
             </if>
         </where>
     </select>
+
+    <select id="getUserByVehicle" parameterType="java.lang.String" resultMap="SysUserExtResultMap">
+        SELECT
+        u.id,
+        u.login_name,
+        u.user_mobile,
+        u.user_type,
+        u.password,
+        u.nick_name,
+        u.user_name,
+        u.user_real_name_auth_flag,
+        u.user_pid,
+        u.user_ic_front,
+        u.user_ic_back,
+        u.user_ic_group,
+        u.user_status,
+        u.create_user,
+        u.create_time,
+        u.update_user,
+        u.update_time,
+        u.org_id,
+        o.org_code,
+        o.org_name
+        FROM sys_user u
+        LEFT JOIN biz_organization o ON o.id = u.org_id
+        LEFT JOIN biz_ref_user_vehicle r ON r.user_id = u.id AND unbind_time IS NULL
+        WHERE r.vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

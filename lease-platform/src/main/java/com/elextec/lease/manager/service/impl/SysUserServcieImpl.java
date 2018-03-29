@@ -628,4 +628,38 @@ public class SysUserServcieImpl implements SysUserService {
         sysUserMapperExt.updateByPrimaryKeySelective(temp);
     }
 
+    @Override
+    public SysUser getUserByVehicle(String vehicleId,String userId,String orgId) {
+        //个人
+        if (WzStringUtil.isNotBlank(userId) && WzStringUtil.isBlank(orgId)) {
+            BizRefUserVehicleExample bizRefUserVehicleExample = new BizRefUserVehicleExample();
+            BizRefUserVehicleExample.Criteria criteria = bizRefUserVehicleExample.createCriteria();
+            criteria.andUserIdEqualTo(userId);
+            criteria.andVehicleIdEqualTo(vehicleId);
+            criteria.andUnbindTimeIsNull();
+            if (bizRefUserVehicleMapperExt.countByExample(bizRefUserVehicleExample) == 0) {
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"无权查看该车信息");
+            }
+            return sysUserMapperExt.getUserByVehicle(vehicleId);
+        }
+        //企业
+        if (WzStringUtil.isBlank(userId) && WzStringUtil.isNotBlank(orgId)) {
+            BizRefOrgVehicleExample bizRefOrgVehicleExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria criteria = bizRefOrgVehicleExample.createCriteria();
+            criteria.andOrgIdEqualTo(orgId);
+            criteria.andVehicleIdEqualTo(vehicleId);
+            criteria.andUnbindTimeIsNull();
+            if (bizRefOrgVehicleMapperExt.countByExample(bizRefOrgVehicleExample) == 0) {
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"该车辆不属于以所属的企业");
+            }
+            return sysUserMapperExt.getUserByVehicle(vehicleId);
+        }
+        //平台
+        if (WzStringUtil.isBlank(userId) && WzStringUtil.isBlank(orgId)) {
+            return sysUserMapperExt.getUserByVehicle(vehicleId);
+        } else {
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR);
+        }
+    }
+
 }
