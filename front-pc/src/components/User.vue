@@ -320,7 +320,7 @@ export default {
       this.vehicleSearch.keyStr = v;
       const { vehicleForm } = this;
       await this.vehicleReload(vehicleForm);
-      console.log(vehicleForm);
+      // console.log(vehicleForm);
     },
     // vehicleSearch: {
     //   async handler() {
@@ -343,7 +343,7 @@ export default {
       const { vehicleForm } = this;
       vehicleForm.userId = row.id;
       vehicleForm.orgId = row.orgId;
-      console.log(row);
+      // console.log(row);
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
           orgId: row.orgId, ...this.vehicleSearch, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize,
@@ -368,7 +368,7 @@ export default {
     async bindVehicle(row) {
       const { ...form } = this.vehicleForm;
       form.vehicleId = row.id;
-      console.log(form);
+      // console.log(form);
       try {
         const { code, message } = (await this.$http.post('/api/manager/user/vehiclebind', form)).body;
         if (code !== '200') throw new Error(message);
