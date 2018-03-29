@@ -1,6 +1,5 @@
 <template>
   <div style="display:flex;flex-direction:column;height:100%;">
-
     <div style="background:#05002a;height:64px;display:flex;align-items:center;padding:0 10px;">
       <div style="flex:1;"></div>
       <el-dropdown @command="command => this[command]()">
@@ -9,10 +8,21 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="showPasswordForm">密码修改</el-dropdown-item>
-          <el-dropdown-item command="handleLogout">退出系统</el-dropdown-item>
           <template v-if="key_user_info.userType === 'INDIVIDUAL'">
-            <el-dropdown-item @command="showForm(key_user_info.id)">个人信息</el-dropdown-item>
+            <div @click="showForm(key_user_info.id)">
+              <el-dropdown-item command="showForms">
+                查看个人信息
+              </el-dropdown-item>
+            </div>
           </template>
+          <template v-if="key_user_info.userType === 'ENTERPRISE'">
+            <div @click="showEnterpriseForm(key_user_info)">
+              <el-dropdown-item command="showForms">
+                修改企业信息
+              </el-dropdown-item>
+            </div>
+          </template>
+          <el-dropdown-item command="handleLogout">退出系统</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -70,6 +80,61 @@
         <el-button type="primary" @click="confirmLoginForm">登录</el-button>
       </span>
     </el-dialog>
+    <!-- 人员信息 -->
+    <el-dialog title="人员信息" :visible.sync="formVisible" width="80%" :before-close="closeForms" :close-on-click-modal="false">
+      <el-table :data="list"  style="width: 100%;margin-top:10px;">
+        <el-table-column prop="loginName" label="用户名"></el-table-column>
+        <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
+        <el-table-column prop="nickName" label="昵称"></el-table-column>
+        <el-table-column prop="userName" label="姓名"></el-table-column>
+        <el-table-column prop="orgName" label="所属企业"></el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeForm">关闭</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="企业信息" :visible.sync="enterpriseVisible" :close-on-click-modal="false">
+      <el-form class="edit-form" :model="form" ref="form">
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
+              <el-input v-model="form.loginName" placeholder="请填写用户名" auto-complete="off" :disabled="disabledForm"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="userType" :rules="[{required:true, message:'请选择用户类型'}]" label="用户类型">
+              <el-select v-model="form.userType" placeholder="请选择用户类型" style="width:100%;" :disabled="disabledForm">
+                <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="userStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
+              <el-select v-model="form.userStatus" placeholder="请选择状态" style="width:100%;" :disabled="disabledForm">
+                <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
+              <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="昵称">
+              <el-input v-model="form.nickName" placeholder="请输入昵称" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeEnterpiseForm">取消</el-button>
+        <el-button type="primary" @click="saveEnterpiserForm">保存</el-button>
+      </span>
+    </el-dialog>
 
   </div>
 </template>
@@ -123,6 +188,7 @@ const menuTree = [
       { name: '用户管理', path: '/user', resCode: 'manager-user-list' },
       { name: '角色管理', path: '/role', resCode: 'manager-role-list' },
       { name: '资源管理', path: '/resource', resCode: 'manager-res-listicon' },
+      { name: '申请管理', path: '/apply', resCode: 'manager-res-listicon' },
     ],
   },
 ];
@@ -135,8 +201,27 @@ export default {
 
       loginFormVisible: this.$store.state.relogin,
       loginForm: {},
-
       formVisible: false,
+      list: [],
+      statusList: [
+        { id: 'NORMAL', name: '正常' },
+        { id: 'INVALID', name: '作废' },
+      ],
+      typeList: [
+        { id: 'PLATFORM', name: '平台' },
+        { id: 'ENTERPRISE', name: '企业' },
+        { id: 'INDIVIDUAL', name: '个人' },
+      ],
+      authList: [
+        { id: 'AUTHORIZED', name: '已实名' },
+        { id: 'UNAUTHORIZED', name: '未实名' },
+      ],
+      // 企业
+      enterpriseVisible: false,
+      disabledForm: false,
+      form: {},
+      orgList: [],
+
     };
   },
   computed: {
@@ -166,31 +251,70 @@ export default {
     },
   },
   methods: {
-    async showForm(id) {
+    // 企业
+    closeEnterpiseForm() {
+      this.enterpriseVisible = false;
+    },
+    async showEnterpriseForm({ id }) {
+      this.enterpriseVisible = true;
+      this.disabledForm = true;
       try {
-        const { code, message } = (await this.$http.post('/api/manager/user/getbypk', [id])).body;
+        const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [id])).body;
         if (code !== '200') throw new Error(message);
+        const { key_user_info } = respData;
+        this.form = key_user_info;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      // this.form = _.pick(form, [
-      //   'id',
-      //   'loginName',
-      //   'userMobile',
-      //   'userType',
-      //   'userIcon',
-      //   'nickName',
-      //   'userName',
-      //   'userRealNameAuthFlag',
-      //   'userPid',
-      //   'userIcFront',
-      //   'userIcBack',
-      //   'userIcGroup',
-      //   'userStatus',
-      //   'orgId',
-      // ]);
+    },
+    async saveEnterpiserForm() {
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/user/modify', this.form)).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('保存成功');
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      this.enterpriseVisible = false;
+    },
+    async getOrgList() {
+      const { code, respData } = (await this.$http.post('/api/manager/org/list', {
+        currPage: 1, pageSize: 999,
+      })).body;
+      if (code === '200') this.orgList = respData.rows;
+    },
+    // 取消
+    closeForm() {
+      this.list = [];
+      this.formVisible = false;
+    },
+    // 关闭之前的回调
+    closeForms() {
+      this.formVisible = false;
+      this.list = [];
+    },
+    showForms() {
+    },
+    async showForm(id) {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [id])).body;
+        if (code !== '200') throw new Error(message);
+        const { key_user_info } = respData;
+        this.list.push(key_user_info);
+        this.list = _.map(this.list, o => ({
+          ...o,
+          userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
+        }));
+        this.formVisible = true;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     async handleLogout() {
       await this.$store.commit('logout');
@@ -248,6 +372,11 @@ export default {
       }
       // this.$router.push('/');
     },
+  },
+  async mounted() {
+    this.loading = true;
+    await this.getOrgList();
+    this.loading = false;
   },
 };
 </script>

@@ -56,7 +56,7 @@
         </div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;width:250px;background:#eff5f8;padding:10px 20px;">
+    <div style="display:flex;flex-direction:column;width:250px;background:#eff5f8;padding:10px 20px;overflow:auto;">
       <div style="color:#9096ad;font-size:16px;">车辆列表（可用）</div>
       <div style="display:flex;align-items:center;font-size:14px;height:36px;margin-bottom:5px;text-align:center;">
         <div style="flex:1;">车辆编号</div>

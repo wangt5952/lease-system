@@ -44,6 +44,7 @@
         <el-table-column label="操作" width="100">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+            <!-- <el-button icon="el-icon-edit" size="mini" type="text" @click="next(row)">下一步</el-button> -->
           </template>
         </el-table-column>
       </template>
@@ -196,6 +197,9 @@ export default {
     },
   },
   methods: {
+    // next(row) {
+    //   this.$router.push({ path: 'battery', query: { aaaa: '12312' }})
+    // },
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();

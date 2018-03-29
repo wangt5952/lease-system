@@ -1,8 +1,14 @@
 <template>
   <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
-
-    <div>
-      <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm({resType:'CATALOG'})">添加目录</el-button>
+    <div style="display:flex;">
+      <div style="margin-right:10px;">
+        <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm({resType:'CATALOG'})">添加目录</el-button>
+      </div>
+      <!-- <el-form :inline="true">
+        <el-form-item>
+          <el-input style="width:500px;" v-model="search.keyStr" placeholder="资源Code/资源名"></el-input>
+        </el-form-item>
+      </el-form>    -->
     </div>
 
     <el-table :data="tableTree" row-key="id" style="width: 100%;margin-top:10px;">
@@ -102,7 +108,7 @@ export default {
     return {
       loading: false,
       list: [],
-
+      search: {},
       formVisible: false,
       form: {},
 
@@ -162,6 +168,12 @@ export default {
         $form.resetFields();
       }
     },
+    search: {
+      async handler() {
+        await this.reload();
+      },
+      deep: true,
+    },
   },
   methods: {
     showChildren(id, value) {
@@ -174,7 +186,7 @@ export default {
       this.loading = true;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
-          currPage: 1, pageSize: 999,
+          currPage: 1, pageSize: 999, keyStr: this.search.keyStr,
         })).body;
 
         if (code === '40106') {

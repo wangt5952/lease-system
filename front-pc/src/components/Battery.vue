@@ -23,7 +23,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- a -->
+    <!-- {{ id }} -->
     <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="batteryCode" label="编号"></el-table-column>
       <el-table-column prop="batteryName" label="电池货名"></el-table-column>
@@ -122,7 +122,7 @@ export default {
     return {
       loading: false,
       list: [],
-
+      // id: this.$route.query.aaaa,
       search: {
         batteryStatus: '',
         isBind: '',
@@ -175,6 +175,11 @@ export default {
     },
   },
   methods: {
+
+    // getParams() {
+    //   let routerParams = this.$route.params.aaaa;
+    //   this.id = routerParams;
+    // },
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();

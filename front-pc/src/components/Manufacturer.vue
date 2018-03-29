@@ -135,7 +135,7 @@ export default {
       ],
       statusList: [
         { id: 'NORMAL', name: '正常' },
-        { id: 'FREEZE', name: '冻结/维保' },
+        // { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
 
@@ -148,7 +148,7 @@ export default {
       searchStatusList: [
         { id: '', name: '全部状态' },
         { id: 'NORMAL', name: '正常' },
-        { id: 'FREEZE', name: '冻结/维保' },
+        // { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
     };

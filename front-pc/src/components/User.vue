@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
     <div style="display:flex;">
-      <template v-if="res['FUNCTION'].indexOf('manager-user-addone') >= 0">
+      <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加人员</el-button>
         </div>
@@ -22,10 +22,15 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-table :data="list"  style="width: 100%;margin-top:10px;">
+    <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="loginName" label="用户名"></el-table-column>
       <el-table-column prop="userMobile" label="手机号"></el-table-column>
       <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
+      <el-table-column prop="orgName" label="所属企业名称">
+        <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
+          {{ scope.row.orgName }}
+        </template>
+      </el-table-column>
       <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
       <el-table-column prop="nickName" label="昵称"></el-table-column>
       <el-table-column prop="userName" label="姓名"></el-table-column>
@@ -40,7 +45,9 @@
             </template>
           </template>
           <template v-if="key_user_info.userType === 'PLATFORM'">
-            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+            <template v-if="row.userType === 'ENTERPRISE'">
+              <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+            </template>
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
           </template>
         </template>
@@ -166,16 +173,6 @@
         <el-form-item>
           <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-select v-model="vehicleSearch.vehicleStatus" placeholder="请选择状态" style="width:100%;">
-            <el-option v-for="o in searchVehicleStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-select v-model="vehicleSearch.isBind" placeholder="请选择状态" style="width:100%;">
-            <el-option v-for="o in searchVehicleIsBindList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-          </el-select>
-        </el-form-item>
       </el-form>
       <el-table :data="vehicleList" style="width: 100%">
         <el-table-column prop="vehicleCode" label="编号"></el-table-column>
@@ -285,7 +282,6 @@ export default {
       ],
       statusList: [
         { id: 'NORMAL', name: '正常' },
-        { id: 'FREEZE', name: '冻结' },
         { id: 'INVALID', name: '作废' },
       ],
       searchTypeList: [
@@ -297,7 +293,6 @@ export default {
       searchStatusList: [
         { id: '', name: '全部状态' },
         { id: 'NORMAL', name: '正常' },
-        { id: 'FREEZE', name: '冻结' },
         { id: 'INVALID', name: '作废' },
       ],
       assignRoleFormVisible: false,
@@ -321,14 +316,21 @@ export default {
       },
       deep: true,
     },
-    vehicleSearch: {
-      async handler() {
-        await this.vehicleReload();
-      },
-      deep: true,
+    async 'vehicleSearch.keyStr'(v) {
+      this.vehicleSearch.keyStr = v;
+      const { vehicleForm } = this;
+      await this.vehicleReload(vehicleForm);
+      console.log(vehicleForm);
     },
+    // vehicleSearch: {
+    //   async handler() {
+    //     await this.vehicleReload();
+    //   },
+    //   deep: true,
+    // },
   },
   methods: {
+
     // 车辆
     closeBindList() {
       this.userVehicleFormVisible = false;
@@ -338,7 +340,10 @@ export default {
       await this.vehicleReload();
     },
     async vehicleReload(row) {
-      this.vehicleForm = { userId: row.id };
+      const { vehicleForm } = this;
+      vehicleForm.userId = row.id;
+      vehicleForm.orgId = row.orgId;
+      console.log(row);
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
           orgId: row.orgId, ...this.vehicleSearch, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize,
@@ -363,11 +368,12 @@ export default {
     async bindVehicle(row) {
       const { ...form } = this.vehicleForm;
       form.vehicleId = row.id;
+      console.log(form);
       try {
         const { code, message } = (await this.$http.post('/api/manager/user/vehiclebind', form)).body;
         if (code !== '200') throw new Error(message);
-        // row.id = form.userId;
-        await this.vehicleReload({ ...row, id: form.userId });
+        await this.vehicleReload({ ...row, id: form.userId, orgId: form.orgId });
+        // await this.vehicleReload(form);
         this.$message.success('绑定成功');
       } catch (e) {
         const message = e.statusText || e.message;
