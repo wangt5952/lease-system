@@ -1,0 +1,16 @@
+{
+  "apps": [{
+    "name": "lease-system",
+    "script": "build",
+    "cwd": "",
+    "exec_mode": "cluster",
+    "instances": 1,
+    "max_memory_restart": "1G",
+    "autorestart": true,
+    "node_args": [],
+    "args": [],
+    "env": {
+      "NODE_ENV":"production"
+    }
+  }]
+}
