@@ -137,10 +137,11 @@ public class SysApplyController extends BaseController {
                     //企业用户需要添加orgId为条件
                     if(OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())){
                         //企业用户分两种查询，查询所有待审批的申请和查询自己提交的申请
-                        if(WzStringUtil.isNotBlank(pagingParam.getFlag())
-                                && !"0".equals(pagingParam.getFlag())
-                                && !"1".equals(pagingParam.getFlag())){
-                            return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数为空或不正确");
+                        if(WzStringUtil.isBlank(pagingParam.getFlag())){
+                            return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数为空");
+                        }
+                        if(!"0".equals(pagingParam.getFlag()) && !"1".equals(pagingParam.getFlag())){
+                            return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "参数不正确");
                         }
                         if("0".equals(pagingParam.getFlag())){
                             pagingParam.setOrgId(userTemp.getOrgId());
