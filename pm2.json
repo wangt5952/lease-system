@@ -1,7 +1,7 @@
 {
   "apps": [{
     "name": "lease-system",
-    "script": "build",
+    "script": "/front-pc/src/main.js",
     "cwd": "",
     "exec_mode": "cluster",
     "instances": 1,
