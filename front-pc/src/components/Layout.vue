@@ -188,7 +188,7 @@ const menuTree = [
       { name: '用户管理', path: '/user', resCode: 'manager-user-list' },
       { name: '角色管理', path: '/role', resCode: 'manager-role-list' },
       { name: '资源管理', path: '/resource', resCode: 'manager-res-listicon' },
-      { name: '申请管理', path: '/apply', resCode: 'manager-res-listicon' },
+      { name: '申请管理', path: '/apply', resCode: 'manager-user-list' },
     ],
   },
 ];

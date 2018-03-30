@@ -262,7 +262,7 @@ export default {
         userType: '',
         userStatus: '',
       },
-      pageSizes: [10, 50, 100, 200],
+      pageSizes: [5, 10, 50, 100, 200],
       currentPage: 1,
       pageSize: 10,
       total: 0,

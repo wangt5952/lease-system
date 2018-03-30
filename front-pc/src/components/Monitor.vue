@@ -7,11 +7,11 @@
           <el-input v-model="search.keyword" style="margin-top:5px;" size="mini" suffix-icon="el-icon-search" />
         </div>
         <div @click="showVehicleDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.code}}</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{vehicleInfo.vehicleCode}}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码</div>
         </div>
         <div @click="showVehiclePath" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;">南京市雨花台区大数据产业园</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;"></div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆当前位置</div>
         </div>
         <div @click="showBatteryDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
@@ -19,7 +19,7 @@
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
         <div @click="showUserDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">张三</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ userInfo.userName }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">使用人</div>
         </div>
       </div>
@@ -72,34 +72,76 @@
     </div>
 
     <el-dialog title="车辆信息" :visible.sync="vehicleDialogVisible" width="30%">
-      <div class="item"><div class="item-name">车辆编号</div><div class="item-value">{{selectedItem.code}}</div></div>
-      <div class="item"><div class="item-name">车辆型号</div><div class="item-value">{{selectedItem.clxh}}</div></div>
-      <div class="item"><div class="item-name">车辆品牌</div><div class="item-value">{{selectedItem.clpp}}</div></div>
-      <div class="item"><div class="item-name">车辆产地</div><div class="item-value">{{selectedItem.clcd}}</div></div>
-      <div class="item"><div class="item-name">生产商ID</div><div class="item-value">{{selectedItem.scsid}}</div></div>
-      <div class="item"><div class="item-name">车辆状态</div><div class="item-value">{{selectedItem.status}}</div></div>
+      <div class="item"><div class="item-name">车辆编号</div><div class="item-value">{{vehicleInfo.vehicleCode}}</div></div>
+      <div class="item"><div class="item-name">车辆型号</div><div class="item-value">{{vehicleInfo.vehiclePn}}</div></div>
+      <div class="item"><div class="item-name">车辆品牌</div><div class="item-value">{{vehicleInfo.vehicleBrand}}</div></div>
+      <div class="item"><div class="item-name">车辆产地</div><div class="item-value">{{vehicleInfo.vehicleMadeIn}}</div></div>
+      <div class="item"><div class="item-name">生产商名称</div><div class="item-value">{{vehicleInfo.mfrsName}}</div></div>
+      <div class="item"><div class="item-name">车辆状态</div>
+        <template v-if="vehicleInfo.vehicleStatus === 'NORMAL'">
+          <div class="item-value">正常</div>
+        </template>
+        <template v-if="vehicleInfo.vehicleStatus === 'FREEZE'">
+          <div class="item-value">冻结/维保</div>
+        </template>
+        <template v-if="vehicleInfo.vehicleStatus === 'INVALID'">
+          <div class="item-value">作废</div>
+        </template>
+      </div>
     </el-dialog>
 
     <el-dialog title="电池信息" :visible.sync="batteryDialogVisible" width="30%">
-      <div class="item"><div class="item-name">电池编号</div><div class="item-value">dc001</div></div>
-      <div class="item"><div class="item-name">电池货名</div><div class="item-value">电池A</div></div>
-      <div class="item"><div class="item-name">电池品牌</div><div class="item-value">某电池品牌</div></div>
-      <div class="item"><div class="item-name">电池型号</div><div class="item-value">xh-001</div></div>
-      <div class="item"><div class="item-name">电池参数</div><div class="item-value">参数详情</div></div>
-      <div class="item"><div class="item-name">生产商ID</div><div class="item-value">某电池生产商dc001</div></div>
-      <div class="item"><div class="item-name">电池状态</div><div class="item-value">正常</div></div>
+      <div class="item"><div class="item-name">电池编号</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryCode}}</div></div>
+      <div class="item"><div class="item-name">电池货名</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryName}}</div></div>
+      <div class="item"><div class="item-name">电池品牌</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryBrand}}</div></div>
+      <div class="item"><div class="item-name">电池型号</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryPn}}</div></div>
+      <div class="item"><div class="item-name">电池参数</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryParameters}}</div></div>
+      <div class="item"><div class="item-name">生产商名称</div><div class="item-value">{{vehicleInfo.bizBatteries[0].mfrsName}}</div></div>
+      <div class="item"><div class="item-name">电池状态</div>
+        <template v-if="vehicleInfo.bizBatteries[0].batteryStatus === 'NORMAL'">
+          <div class="item-value">正常</div>
+        </template>
+        <template v-if="vehicleInfo.bizBatteries[0].batteryStatus === 'FREEZE'">
+          <div class="item-value">冻结</div>
+        </template>
+        <template v-if="vehicleInfo.bizBatteries[0].batteryStatus === 'INVALID'">
+          <div class="item-value">作废</div>
+        </template>
+      </div>
     </el-dialog>
 
     <el-dialog title="用户信息" :visible.sync="userDialogVisible" width="30%">
-      <div class="item"><div class="item-name">用户名</div><div class="item-value">张三</div></div>
-      <div class="item"><div class="item-name">手机号码</div><div class="item-value">18225520167</div></div>
-      <div class="item"><div class="item-name">用户类别</div><div class="item-value">个人</div></div>
-      <div class="item"><div class="item-name">昵称</div><div class="item-value"></div></div>
-      <div class="item"><div class="item-name">姓名</div><div class="item-value">张三</div></div>
-      <div class="item"><div class="item-name">实名认证标示</div><div class="item-value">已认证</div></div>
-      <div class="item"><div class="item-name">身份证号</div><div class="item-value">340222199409291234</div></div>
-      <div class="item"><div class="item-name">所属组织ID</div><div class="item-value">正常</div></div>
-      <div class="item"><div class="item-name">用户状态</div><div class="item-value">正常</div></div>
+      <div class="item"><div class="item-name">用户名</div><div class="item-value">{{ userInfo.loginName }}</div></div>
+      <div class="item"><div class="item-name">手机号码</div><div class="item-value">{{ userInfo.userMobile }}</div></div>
+
+      <div class="item"><div class="item-name">用户类别</div>
+        <template v-if="userInfo.userType === 'INDIVIDUAL'">
+          <div class="item-value">个人</div>
+        </template>
+      </div>
+      <div class="item"><div class="item-name">昵称</div><div class="item-value">{{ userInfo.nickName }}</div></div>
+      <div class="item"><div class="item-name">姓名</div><div class="item-value">{{ userInfo.userName }}</div></div>
+      <div class="item"><div class="item-name">实名认证标示</div>
+        <template v-if="userInfo.userRealNameAuthFlag === 'AUTHORIZED'">
+          <div class="item-value">已实名</div>
+        </template>
+        <template v-else>
+          <div class="item-value">未实名</div>
+        </template>
+      </div>
+      <div class="item"><div class="item-name">身份证号</div><div class="item-value">{{ userInfo.userPid }}</div></div>
+      <div class="item"><div class="item-name">所属企业</div><div class="item-value">{{ userInfo.orgName }}</div></div>
+      <div class="item"><div class="item-name">用户状态</div>
+        <template v-if="userInfo.userStatus === 'NORMAL'">
+          <div class="item-value">正常</div>
+        </template>
+        <template v-if="userInfo.userStatus === 'FREEZE'">
+          <div class="item-value">冻结</div>
+        </template>
+        <template v-if="userInfo.userStatus === 'INVALID'">
+          <div class="item-value">作废</div>
+        </template>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -122,6 +164,7 @@ export default {
       vehicleList: [],
       searchLocList: {},
       vehicleInfo: {},
+      userInfo: {},
       // vehicleList: [
       //   { id: '1', code: 'aima001', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.822436, lat: 32.029365, path: [{ lng: 118.822436, lat: 32.029365 }, ...path] },
       //   { id: '2', code: 'aima002', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799044, lat: 32.040109, path: [{ lng: 118.799044, lat: 32.040109 }, ...path] },
@@ -191,35 +234,65 @@ export default {
         lng: item.lng, lat: item.lat,
       };
       this.selectedId = item.id;
-      // const { vehicleList } = this;
+      // 根据定位点及半径获得范围内的所有车辆信息及定位、电池电量数据.
+      // try {
+      //   // 经度 纬度 半径范围
+      //   const { code: veCode, message: veMessage, respData: veRespData }
+      //   const { code: veCode, message: veMessage } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+      //     lng: item.lat, lat: item.lng, radius: 1000,
+      //   })).body;
+      //   if (veCode !== '200') throw new Error(veMessage);
+      // } catch (e) {
+      //   const veMessage = e.statusText || e.veMessage;
+      //   this.$message.error(veMessage);
+      // }
+
+      // 车辆、电池、使用人信息
       try {
+        // 车辆、电池信息
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
           id: item.id, flag: 'true',
         })).body;
         if (code !== '200') throw new Error(message);
         this.vehicleInfo = respData;
-        // this.vehicleInfo = _.map(vehicleList, (o) => {
-        //   const info = _.find(vehicleInfo, { VeicleID: o.id });
-        //   if (!info) return o;
-        //   return {
-        //     ...o,
-        //     info,
-        //   }
-        // });
+        // 使用人信息
+        const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.id])).body;
+        if (userCode !== '200') throw new Error(userMessage);
+        this.userInfo = userRespData;
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
+
+        const userMessage = e.statusText || e.userMessage;
+        this.$message.error(userMessage);
       }
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
       const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
-        needPaging: false, vehicleStatus: 'NORMAL',
+        needPaging: false, vehicleStatus: 'NORMAL', isBind: 'BIND',
       })).body;
       if (code !== '200') throw new Error(message);
       this.vehicleList = respData.rows;
       if (this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, { id: this.selectedId })) {
         this.selectedId = this.vehicleList[0].id;
+      }
+      // 初始化车辆、电池、使用人信息
+      try {
+        const { code: veCode, message: veMessage, respData: veRespData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
+          id: this.vehicleList[0].id, flag: 'true',
+        })).body;
+        if (veCode !== '200') throw new Error(veMessage);
+        this.vehicleInfo = veRespData;
+        const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [this.vehicleList[0].id])).body;
+        if (userCode !== '200') throw new Error(userMessage);
+        this.userInfo = userRespData;
+      } catch (e) {
+        const veMessage = e.statusText || e.veMessage;
+        this.$message.error(veMessage);
+
+        const userMessage = e.statusText || e.userMessage;
+        this.$message.error(userMessage);
       }
       await this.reloadVehicleLoc();
       await this.reloadVehiclePower();
