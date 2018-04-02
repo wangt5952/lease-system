@@ -24,10 +24,13 @@
         </div>
       </div>
 
-      <baidu-map @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="15" @moveend="syncCenterAndZoom" @zoomend="syncCenterAndZoom">
+      <baidu-map @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="15" @moveend="syncCenterAndZoom" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+        <!-- 右上角控件 -->
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
         <template v-if="vehiclePathVisible">
-          <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
+          <!-- 路线折线图 -->
+          <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="4"></bm-polyline>
+          <!-- 点聚合(图片所在位置) -->
           <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.lng, lat: selectedItem.lat}"></bm-marker>
         </template>
         <bm-marker v-else v-for="o in vehicleList" :key="o.id" :icon="{url: selectedItem.id == o.id ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
@@ -91,20 +94,20 @@
     </el-dialog>
 
     <el-dialog title="电池信息" :visible.sync="batteryDialogVisible" width="30%">
-      <div class="item"><div class="item-name">电池编号</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryCode}}</div></div>
-      <div class="item"><div class="item-name">电池货名</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryName}}</div></div>
-      <div class="item"><div class="item-name">电池品牌</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryBrand}}</div></div>
-      <div class="item"><div class="item-name">电池型号</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryPn}}</div></div>
-      <div class="item"><div class="item-name">电池参数</div><div class="item-value">{{vehicleInfo.bizBatteries[0].batteryParameters}}</div></div>
-      <div class="item"><div class="item-name">生产商名称</div><div class="item-value">{{vehicleInfo.bizBatteries[0].mfrsName}}</div></div>
+      <div class="item"><div class="item-name">电池编号</div><div class="item-value">{{ powerInfo.batteryCode }}</div></div>
+      <div class="item"><div class="item-name">电池货名</div><div class="item-value">{{ powerInfo.batteryName }}</div></div>
+      <div class="item"><div class="item-name">电池品牌</div><div class="item-value">{{ powerInfo.batteryBrand }}</div></div>
+      <div class="item"><div class="item-name">电池型号</div><div class="item-value">{{ powerInfo.batteryPn }}</div></div>
+      <div class="item"><div class="item-name">电池参数</div><div class="item-value">{{ powerInfo.batteryParameters }}</div></div>
+      <div class="item"><div class="item-name">生产商名称</div><div class="item-value">{{ powerInfo.mfrsName }}</div></div>
       <div class="item"><div class="item-name">电池状态</div>
-        <template v-if="vehicleInfo.bizBatteries[0].batteryStatus === 'NORMAL'">
+        <template v-if=" powerInfo.batteryStatus === 'NORMAL'">
           <div class="item-value">正常</div>
         </template>
-        <template v-if="vehicleInfo.bizBatteries[0].batteryStatus === 'FREEZE'">
+        <template v-if=" powerInfo.batteryStatus === 'FREEZE'">
           <div class="item-value">冻结</div>
         </template>
-        <template v-if="vehicleInfo.bizBatteries[0].batteryStatus === 'INVALID'">
+        <template v-if=" powerInfo.batteryStatus === 'INVALID'">
           <div class="item-value">作废</div>
         </template>
       </div>
@@ -165,29 +168,7 @@ export default {
       searchLocList: {},
       vehicleInfo: {},
       userInfo: {},
-      // vehicleList: [
-      //   { id: '1', code: 'aima001', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.822436, lat: 32.029365, path: [{ lng: 118.822436, lat: 32.029365 }, ...path] },
-      //   { id: '2', code: 'aima002', icon: 'vehicle-low.svg', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799044, lat: 32.040109, path: [{ lng: 118.799044, lat: 32.040109 }, ...path] },
-      //   { id: '3', code: 'aima003', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.797499, lat: 32.029977, path: [{ lng: 118.797499, lat: 32.029977 }, ...path] },
-      //   { id: '4', code: 'aima004', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.7906, lat: 32.037017, path: [{ lng: 118.7906, lat: 32.037017 }, ...path] },
-      //   { id: '5', code: 'aima005', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.788229, lat: 32.028814, path: [{ lng: 118.788229, lat: 32.028814 }, ...path] },
-      //   { id: '6', code: 'aima006', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.773712, lat: 32.048587, path: [{ lng: 118.773712, lat: 32.048587 }, ...path] },
-      //   { id: '7', code: 'aima007', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.782839, lat: 32.048219, path: [{ lng: 118.782839, lat: 32.048219 }, ...path] },
-      //   { id: '8', code: 'aima008', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.765448, lat: 32.043506, path: [{ lng: 118.765448, lat: 32.043506 }, ...path] },
-      //   { id: '9', code: 'aima009', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801164, lat: 32.019875, path: [{ lng: 118.801164, lat: 32.019875 }, ...path] },
-      //   { id: '10', code: 'aima010', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.754165, lat: 32.040568, path: [{ lng: 118.754165, lat: 32.040568 }, ...path] },
-      //   { id: '11', code: 'aima011', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.746044, lat: 32.034017, path: [{ lng: 118.746044, lat: 32.034017 }, ...path] },
-      //   { id: '12', code: 'aima012', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.742595, lat: 32.021038, path: [{ lng: 118.742595, lat: 32.021038 }, ...path] },
-      //   { id: '13', code: 'aima013', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.781366, lat: 32.01268, path: [{ lng: 118.781366, lat: 32.01268 }, ...path] },
-      //   { id: '14', code: 'aima014', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.799332, lat: 32.009863, path: [{ lng: 118.799332, lat: 32.009863 }, ...path] },
-      //   { id: '15', code: 'aima015', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.801919, lat: 32.001534, path: [{ lng: 118.801919, lat: 32.001534 }, ...path] },
-      //   { id: '16', code: 'aima016', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.768574, lat: 31.997125, path: [] },
-      //   { id: '17', code: 'aima017', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.789702, lat: 32.064714, path: [] },
-      //   { id: '18', code: 'aima018', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.790852, lat: 32.057248, path: [] },
-      //   { id: '19', code: 'aima019', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.803069, lat: 32.055044, path: [] },
-      //   { id: '20', code: 'aima020', value: '60%', status: '正常', scsid: '艾玛电动车生产商am001', clcd: '江苏省南京市', clpp: '艾玛', clxh: '型号A', lng: 118.812267, lat: 32.063735, path: [] },
-      // ],
-
+      powerInfo: {},
       vehicleDialogVisible: false,
       batteryDialogVisible: false,
       userDialogVisible: false,
@@ -254,11 +235,23 @@ export default {
           id: item.id, flag: 'true',
         })).body;
         if (code !== '200') throw new Error(message);
-        this.vehicleInfo = respData;
+        if (respData) {
+          this.vehicleInfo = respData;
+          this.powerInfo = respData.bizBatteries[0];
+        } else {
+          this.$message.error('该车辆未绑定电池');
+          this.vehicleInfo = {};
+          this.powerInfo = {};
+        }
         // 使用人信息
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.id])).body;
         if (userCode !== '200') throw new Error(userMessage);
-        this.userInfo = userRespData;
+        if (userRespData) {
+          this.userInfo = userRespData;
+        } else {
+          this.$message.error('该车辆未与用户绑定');
+          this.userInfo = {};
+        }
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
@@ -279,14 +272,22 @@ export default {
       }
       // 初始化车辆、电池、使用人信息
       try {
+        // 车辆电池信息
         const { code: veCode, message: veMessage, respData: veRespData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
           id: this.vehicleList[0].id, flag: 'true',
         })).body;
         if (veCode !== '200') throw new Error(veMessage);
-        this.vehicleInfo = veRespData;
+        if (veRespData) {
+          this.vehicleInfo = veRespData;
+          this.powerInfo = veRespData.bizBatteries[0];
+        } else {
+          this.$message.error('该车辆未绑定电池');
+        }
+        // 用户信息
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [this.vehicleList[0].id])).body;
         if (userCode !== '200') throw new Error(userMessage);
-        this.userInfo = userRespData;
+        if (userRespData) this.userInfo = userRespData;
+        else this.$message.error('该车辆未与用户绑定');
       } catch (e) {
         const veMessage = e.statusText || e.veMessage;
         this.$message.error(veMessage);
