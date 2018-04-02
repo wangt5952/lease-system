@@ -127,7 +127,7 @@ public class SysApplyController extends BaseController {
                 if(userTemp != null){
                     //根据用户类型添加条件
                     //平台用户需要添加orgId为条件
-                    if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+                    if(OrgAndUserType.PLATFORM.toString().equals(userTemp.getUserType().toString())){
                         pagingParam.setOrgId(userTemp.getOrgId());
                     }
                     //个人用户需要添加userId为条件
