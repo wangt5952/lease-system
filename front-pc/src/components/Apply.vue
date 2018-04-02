@@ -24,16 +24,14 @@
             <el-table-column prop="applyTitle" label="申请标题"></el-table-column>
             <el-table-column prop="applyTypeText" label="申请类型"></el-table-column>
             <el-table-column prop="applyStatusText" label="申请状态"></el-table-column>
-            <el-table-column prop="applyContent" label="内容" width="250"></el-table-column>
+            <!-- <el-table-column prop="applyContent" label="内容" width="250"></el-table-column> -->
             <el-table-column prop="applyUserName" label="申请人名称" width="100"></el-table-column>
             <el-table-column prop="applyOrgName" label="申请企业名称" width="100"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="{row}">
-                <el-button icon="el-icon-edit" style="color:#20B648" size="mini" type="text" @click="agree(row)">同意</el-button>
-                <el-button icon="el-icon-edit" style="color:red" size="mini" type="text" @click="reject(row)">驳回</el-button>
-                <!-- <el-tooltip content="删除" placement="top">
-                  <el-button icon="el-icon-delete" size="mini" type="text" @click="handleDelete(row)"></el-button>
-                </el-tooltip> -->
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="searchInfo(row)">查看</el-button>
+                <!-- <el-button icon="el-icon-edit" style="color:#20B648" size="mini" type="text" @click="agree(row)">同意</el-button>
+                <el-button icon="el-icon-edit" style="color:red" size="mini" type="text" @click="reject(row)">驳回</el-button> -->
               </template>
             </el-table-column>
           </el-table>
@@ -48,25 +46,18 @@
             :total="total">
           </el-pagination>
 
-          <!-- <el-dialog title="查看内容" :visible.sync="showApplyFormVisible" style="margin-top:-0px" :close-on-click-modal="false" width="70%">
-            <el-table :data="unitApplyList" style="width: 100%">
-              <el-table-column prop="applyTitle" label="申请标题"></el-table-column>
-              <el-table-column prop="applyTypeText" label="申请类型"></el-table-column>
-              <el-table-column prop="applyStatusText" label="申请状态"></el-table-column>
-              <el-table-column prop="applyContent" label="内容" width="120"></el-table-column>
-              <el-table-column prop="applyUserName" label="申请人名称"></el-table-column>
-              <el-table-column prop="applyOrgName" label="申请企业名称"></el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="{row}">
-                  <el-button icon="el-icon-edit" size="mini" type="text"  @click="agree(row)">同意</el-button>
-                  <el-button icon="el-icon-edit" size="mini" type="text"  @click="peject(row)">驳回</el-button>
-                </template>
-              </el-table-column>
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="closeUnitApplyForm">关闭</el-button>
-              </span>
-            </el-table>
-          </el-dialog> -->
+          <el-dialog title="查看内容" :visible.sync="showApplyFormVisible" style="margin-top:-0px" :close-on-click-modal="false" width="70%">
+            <el-form ref="applyForm" :model="applyForm" label-width="80px">
+              <el-form-item label="内容">
+                <el-input type="textarea" v-model="applyForm.applyContent"></el-input>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="closeUnitApplyForm">关闭</el-button>
+              <el-button icon="el-icon-edit" size="mini" type="text"  @click="agree(row)">同意</el-button>
+              <el-button icon="el-icon-edit" size="mini" type="text"  @click="peject(row)">驳回</el-button>
+            </span>
+          </el-dialog>
 
         </el-tab-pane>
         <el-tab-pane label="我的申请" name="first">
@@ -140,7 +131,7 @@ export default {
     return {
       activeName: 'second',
       applyList: [],
-      unitApplyList: [],
+      applyForm: {},
       search: {
         keyStr: '',
         applyType: 'VEHICLEAPPLY',
@@ -235,6 +226,7 @@ export default {
         this.$message.error(message);
       }
     },
+    // 驳回
     async reject(row) {
       try {
         const { code, message } = (await this.$http.post('/api/manager/apply/applyapproval', {
@@ -248,23 +240,18 @@ export default {
         this.$message.error(message);
       }
     },
-
-    // 查看审批列表(管理员权限)
-    // async unintReload() {
-    //   try {
-    //     const { code, message, respData } = (await this.$http.post('/api/manager/apply/getbypk', [this.key_user_info.id])).body;
-    //     if (code !== '200') throw new Error(message);
-    //     this.unitApplyList.push(respData);
-    //     this.unitApplyList = _.map(this.unitApplyList, o => ({
-    //       ...o,
-    //       applyTypeText: (_.find(this.applyTypeList, { id: o.applyType }) || { name: o.applyType }).name,
-    //       applyStatusText: (_.find(this.applyStatusList, { id: o.applyStatus }) || { name: o.applyStatus }).name,
-    //     }));
-    //   } catch (e) {
-    //     const message = e.statusText || e.message;
-    //     this.$message.error(message);
-    //   }
-    // },
+    // 查看
+    async searchInfo(row) {
+      this.showApplyFormVisible = true;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/apply/getbypk', [row.id])).body;
+        if (code !== '200') throw new Error(message);
+        this.applyForm = respData;
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
     async handleDelete(row) {
       try {
         const { code, message } = (await this.$http.post('/api/manager/apply/delete', [row.id])).body;

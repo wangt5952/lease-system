@@ -171,7 +171,7 @@
     <el-dialog title="车辆列表" :visible.sync="vehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+            <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
       </el-form>
       <el-table :data="vehicleList" style="width: 100%">
@@ -320,17 +320,9 @@ export default {
       this.vehicleSearch.keyStr = v;
       const { vehicleForm } = this;
       await this.vehicleReload(vehicleForm);
-      // console.log(vehicleForm);
     },
-    // vehicleSearch: {
-    //   async handler() {
-    //     await this.vehicleReload();
-    //   },
-    //   deep: true,
-    // },
   },
   methods: {
-
     // 车辆
     closeBindList() {
       this.userVehicleFormVisible = false;
