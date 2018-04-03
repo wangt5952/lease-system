@@ -5,6 +5,7 @@
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
         <result column="battery_id" jdbcType="VARCHAR" property="batteryId" />
         <result column="part_count" jdbcType="INTEGER" property="partCount" />
+        <result column="org_name" jdbcType="VARCHAR" property="orgName" />
     </resultMap>
 
     <select id="getVehicleInfoByUserId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
@@ -132,12 +133,14 @@
         a.update_time update_time,
         d.battery_id battery_id,
         b.mfrs_name mfrs_name,
+        o.org_name org_name,
         (select COUNT(*) FROM biz_ref_vehicle_parts where vehicle_id = a.id and unbind_time IS NULL) part_count
         FROM
         biz_vehicle a
         LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.vehicle_id AND d.unbind_time IS NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id=b.id
         LEFT JOIN biz_ref_org_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
+        LEFT JOIN biz_organization o ON r.org_id = o.id
         LEFT JOIN biz_ref_user_vehicle r1 ON a.id = r1.vehicle_id AND r1.unbind_time IS NULL
         <where>
             1=1
@@ -163,9 +166,10 @@
             <if test="isBind == 'UNBIND'">
                 and d.battery_id IS NULL
             </if>
-
         </where>
-        limit #{pageBegin} , #{pageSize}
+        <if test="needPaging=='true'">
+            limit #{pageBegin} , #{pageSize}
+        </if>
     </select>
 
     <select id="countExtByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.BizVehicleParam" >

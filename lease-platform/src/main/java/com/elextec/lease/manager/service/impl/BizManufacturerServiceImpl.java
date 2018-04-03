@@ -86,12 +86,17 @@ public class BizManufacturerServiceImpl implements BizManufacturerService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<BizManufacturer> mfrsLs = bizManufacturerMapperExt.selectByParam(pr);
         // 组织并返回结果
         PageResponse<BizManufacturer> presp = new PageResponse<BizManufacturer>();
-        presp.setCurrPage(pr.getCurrPage());
-        presp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            presp.setCurrPage(pr.getCurrPage());
+            presp.setPageSize(pr.getPageSize());
+        }
         presp.setTotal(mfrsTotal);
         if (null == mfrsLs) {
             presp.setRows(new ArrayList<BizManufacturer>());

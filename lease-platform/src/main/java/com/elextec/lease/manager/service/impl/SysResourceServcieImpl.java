@@ -92,12 +92,17 @@ public class SysResourceServcieImpl implements SysResourceService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<SysResources> resLs = sysResourcesMapperExt.selectByParam(pr);
         // 组织并返回结果
         PageResponse<SysResources> presp = new PageResponse<SysResources>();
-        presp.setCurrPage(pr.getCurrPage());
-        presp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            presp.setCurrPage(pr.getCurrPage());
+            presp.setPageSize(pr.getPageSize());
+        }
         presp.setTotal(resTotal);
         if (null == resLs) {
             presp.setRows(new ArrayList<SysResources>());

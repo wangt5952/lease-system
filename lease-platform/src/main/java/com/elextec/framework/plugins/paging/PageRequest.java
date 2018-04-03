@@ -57,7 +57,7 @@ public class PageRequest extends DataPermissionRequest {
      */
     public Integer getCurrPage() {
         if (null == currPage) {
-            return DEF_CURR_PAGE;
+            this.currPage = DEF_CURR_PAGE;
         }
         return currPage;
     }
@@ -72,7 +72,7 @@ public class PageRequest extends DataPermissionRequest {
 
     public Integer getPageSize() {
         if (null == pageSize) {
-            return DEF_PAGE_SIZE;
+            this.pageSize = DEF_PAGE_SIZE;
         }
         return pageSize;
     }

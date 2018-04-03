@@ -141,7 +141,9 @@
                 and a.org_id = #{orgId,jdbcType=VARCHAR}
             </if>
         </where>
-        limit #{pageBegin} , #{pageSize}
+        <if test="needPaging=='true'">
+            limit #{pageBegin} , #{pageSize}
+        </if>
     </select>
 
     <select id="countExtByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.SysUserParam" >

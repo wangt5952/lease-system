@@ -44,7 +44,9 @@
             </if>
         </where>
         order by update_time desc,create_time desc
-        limit #{pageBegin} , #{pageSize}
+        <if test="needPaging=='true'">
+            limit #{pageBegin} , #{pageSize}
+        </if>
     </select>
 
     <select id="countByParam" parameterType="com.elextec.lease.manager.request.BizOrganizationParam" resultType="java.lang.Integer">

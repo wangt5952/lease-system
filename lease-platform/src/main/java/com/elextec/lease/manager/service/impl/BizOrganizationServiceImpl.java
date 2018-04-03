@@ -84,12 +84,17 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<BizOrganization> orgLs = bizOrganizationMapperExt.selectByParam(pr);
         // 组织并返回结果
         PageResponse<BizOrganization> partsesp = new PageResponse<BizOrganization>();
-        partsesp.setCurrPage(pr.getCurrPage());
-        partsesp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            partsesp.setCurrPage(pr.getCurrPage());
+            partsesp.setPageSize(pr.getPageSize());
+        }
         partsesp.setTotal(orgTotal);
         if (null == orgLs) {
             partsesp.setRows(new ArrayList<BizOrganization>());

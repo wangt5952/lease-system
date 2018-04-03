@@ -120,6 +120,7 @@ public class BizVehicleController extends BaseController {
                         && "false".equals(pagingParam.getNeedPaging().toLowerCase())) {
                     pagingParam.setNeedPaging("false");
                 } else {
+                    System.out.print(pagingParam.getCurrPage());
                     if (null == pagingParam.getCurrPage() || null == pagingParam.getPageSize()) {
                         return new MessageResponse(RunningResult.PARAM_VERIFY_ERROR.code(), "未获得分页参数");
                     }

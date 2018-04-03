@@ -66,7 +66,9 @@
                 and show_flag = #{showFlg,jdbcType=VARCHAR}
             </if>
         </where>
-        limit #{pageBegin} , #{pageSize}
+        <if test="needPaging=='true'">
+            limit #{pageBegin} , #{pageSize}
+        </if>
     </select>
 
     <select id="countByParam" resultType="java.lang.Integer" parameterType="com.elextec.lease.manager.request.SysResParam" >

@@ -105,12 +105,17 @@ public class SysUserServcieImpl implements SysUserService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<SysUserExt> userLs = sysUserMapperExt.selectExtByParam(pr);
         // 组织并返回结果
         PageResponse<SysUserExt> presp = new PageResponse<SysUserExt>();
-        presp.setCurrPage(pr.getCurrPage());
-        presp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            presp.setCurrPage(pr.getCurrPage());
+            presp.setPageSize(pr.getPageSize());
+        }
         presp.setTotal(userTotal);
         if (null == userLs) {
             presp.setRows(new ArrayList<SysUserExt>());

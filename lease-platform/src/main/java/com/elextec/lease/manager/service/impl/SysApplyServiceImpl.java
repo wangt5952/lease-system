@@ -47,12 +47,17 @@ public class SysApplyServiceImpl implements SysApplyService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<SysApplyExt> userLs = sysApplyMapperExt.selectExtByParam(pr);
         // 组织并返回结果
         PageResponse<SysApplyExt> presp = new PageResponse<SysApplyExt>();
-        presp.setCurrPage(pr.getCurrPage());
-        presp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            presp.setCurrPage(pr.getCurrPage());
+            presp.setPageSize(pr.getPageSize());
+        }
         presp.setTotal(appleTotal);
         if (null == userLs) {
             presp.setRows(new ArrayList<SysApplyExt>());

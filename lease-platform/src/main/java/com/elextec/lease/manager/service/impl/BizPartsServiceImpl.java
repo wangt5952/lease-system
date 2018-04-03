@@ -88,12 +88,17 @@ public class BizPartsServiceImpl implements BizPartsService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<BizPartsExt> partsLs = bizPartsMapperExt.selectExtByParam(pr);
         // 组织并返回结果
         PageResponse<BizPartsExt> partsesp = new PageResponse<BizPartsExt>();
-        partsesp.setCurrPage(pr.getCurrPage());
-        partsesp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            partsesp.setCurrPage(pr.getCurrPage());
+            partsesp.setPageSize(pr.getPageSize());
+        }
         partsesp.setTotal(partsTotal);
         if (null == partsLs) {
             partsesp.setRows(new ArrayList<BizPartsExt>());

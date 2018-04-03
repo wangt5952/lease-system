@@ -110,12 +110,17 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<BizVehicleExt> vehicleLs = bizVehicleMapperExt.selectExtByParam(pr);
         // 组织并返回结果
         PageResponse<BizVehicleExt> presp = new PageResponse<BizVehicleExt>();
-        presp.setCurrPage(pr.getCurrPage());
-        presp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            presp.setCurrPage(pr.getCurrPage());
+            presp.setPageSize(pr.getPageSize());
+        }
         presp.setTotal(vehicleTotal);
         if (null == vehicleLs) {
             presp.setRows(new ArrayList<BizVehicleExt>());

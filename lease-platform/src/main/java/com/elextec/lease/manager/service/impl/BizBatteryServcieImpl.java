@@ -90,12 +90,17 @@ public class BizBatteryServcieImpl implements BizBatteryService {
         // 分页查询
         if (needPaging) {
             pr.setPageBegin();
+            pr.setNeedPaging("true");
+        }else{
+            pr.setNeedPaging("false");
         }
         List<BizBatteryExt> batteryLs = bizBatteryMapperExt.selectExtByParam(pr);
         // 组织并返回结果
         PageResponse<BizBatteryExt> presp = new PageResponse<BizBatteryExt>();
-        presp.setCurrPage(pr.getCurrPage());
-        presp.setPageSize(pr.getPageSize());
+        if(needPaging){
+            presp.setCurrPage(pr.getCurrPage());
+            presp.setPageSize(pr.getPageSize());
+        }
         presp.setTotal(batteryTotal);
         if (null == batteryLs) {
             presp.setRows(new ArrayList<BizBatteryExt>());

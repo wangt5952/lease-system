@@ -20,6 +20,17 @@ public class BizVehicleBatteryParts extends BizVehicleExt {
     //配件数量
     public Integer partCount;
 
+    //车辆绑定企业名称
+    public String orgName;
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
     public Integer getPartCount() {
         return partCount;
     }
