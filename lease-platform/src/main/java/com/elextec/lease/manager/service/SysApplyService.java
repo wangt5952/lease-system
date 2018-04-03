@@ -58,9 +58,9 @@ public interface SysApplyService {
 
     /**
      * 审批申请
-     * @param applyId 申请ID
+     * @param apply 申请信息
      * @param orgId 企业ID
      */
-    public void approval(String applyId,String authFlag,String orgId);
+    public void approval(SysApply apply,String orgId);
 
 }

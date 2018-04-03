@@ -432,6 +432,7 @@ public class SysApplyController extends BaseController {
      * <pre>
      *     {
      *         applyId:申请ID,
+     *         examineContent:申批意见（可以为空）,
      *         flag:申批状态（同意、驳回）
      *     }
      * </pre>
@@ -476,7 +477,12 @@ public class SysApplyController extends BaseController {
                         && !ApplyTypeAndStatus.REJECT.toString().equals(param.get("flag"))){
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                sysApplyService.approval(param.get("applyId"),param.get("flag"),userTemp.getOrgId());
+                SysApply apply = new SysApply();
+                apply.setId(param.get("applyId"));
+                apply.setExamineUserId(userTemp.getId());
+                apply.setExamineContent(param.get("examineContent"));
+                apply.setApplyStatus(ApplyTypeAndStatus.valueOf(param.get("flag")));
+                sysApplyService.approval(apply,userTemp.getOrgId());
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {

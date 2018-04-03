@@ -135,22 +135,22 @@ public class SysApplyServiceImpl implements SysApplyService {
     }
 
     @Override
-    public void approval(String applyId,String authFlag,String orgId) {
+    public void approval(SysApply apply,String orgId) {
         SysApplyExample example = new SysApplyExample();
         SysApplyExample.Criteria criteria = example.createCriteria();
-        criteria.andIdEqualTo(applyId);
+        criteria.andIdEqualTo(apply.getId());
         criteria.andExamineOrgIdEqualTo(orgId);
-        List<SysApply> apply = sysApplyMapperExt.selectByExample(example);
-        if(apply.size() != 1){
+        List<SysApply> applyList = sysApplyMapperExt.selectByExample(example);
+        if(applyList.size() != 1){
             throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(),"申请不存在");
         }
-        if(ApplyTypeAndStatus.REJECT.toString().equals(apply.get(0).getApplyStatus().toString())
-                || ApplyTypeAndStatus.AGREE.toString().equals(apply.get(0).getApplyStatus().toString())){
+        if(ApplyTypeAndStatus.REJECT.toString().equals(applyList.get(0).getApplyStatus().toString())
+                || ApplyTypeAndStatus.AGREE.toString().equals(applyList.get(0).getApplyStatus().toString())){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "申请不能重复审核");
         }
-        SysApply temp = new SysApply();
-        temp.setId(applyId);
-        temp.setApplyStatus(ApplyTypeAndStatus.valueOf(authFlag));
-        sysApplyMapperExt.updateByPrimaryKeySelective(temp);
+//        SysApply temp = new SysApply();
+//        temp.setId(apply.getId());
+//        temp.setApplyStatus(ApplyTypeAndStatus.valueOf(authFlag));
+        sysApplyMapperExt.updateByPrimaryKeySelective(apply);
     }
 }
