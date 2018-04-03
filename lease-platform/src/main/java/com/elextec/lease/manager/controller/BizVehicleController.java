@@ -1543,7 +1543,9 @@ public class BizVehicleController extends BaseController {
 
     /**
      * <pre>
-     *     [orgId]
+     *     {
+     *         orgId:企业Id
+     *     }
      * </pre>
      * 查询该企业下有多少俩车
      * @param orgInfo 企业id
