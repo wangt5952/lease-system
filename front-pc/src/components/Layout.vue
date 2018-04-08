@@ -26,7 +26,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    
+
     <div style="display:flex;flex:1;">
       <!-- 左侧导航 -->
       <div style="width:4%;">

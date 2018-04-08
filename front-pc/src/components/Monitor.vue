@@ -266,12 +266,12 @@ export default {
       }
 
       // 根据坐标反解析地址
-      const BMap = new BMap();
-      const geocoder = BMap.Geocoder();
-      const point = BMap.Point(item.lng, item.lat);
-      geocoder.getLocation(point, (geocoderResult) => {
-        this.address = geocoderResult.address;
-      });
+      // const BMap = new BMap();
+      // const geocoder = BMap.Geocoder();
+      // const point = BMap.Point(item.lng, item.lat);
+      // geocoder.getLocation(point, (geocoderResult) => {
+      //   this.address = geocoderResult.address;
+      // });
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
