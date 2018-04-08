@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <baidu-map @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="15" @moveend="syncCenterAndZoom" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+      <baidu-map class="allmap" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="15" @moveend="syncCenterAndZoom" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
         <!-- 右上角控件 -->
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
         <template v-if="vehiclePathVisible">
@@ -32,15 +32,21 @@
           <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="4"></bm-polyline>
           <!-- 点聚合(图片所在位置) -->
           <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.lng, lat: selectedItem.lat}"></bm-marker>
+          <!-- 圆形图 -->
+          <bm-circle :center="circlePath.center" :radius="circlePath.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" @lineupdate="updateCirclePath" :editing="true"></bm-circle>
         </template>
         <bm-marker v-else v-for="o in vehicleList" :key="o.id" :icon="{url: selectedItem.id == o.id ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
       </baidu-map>
-      <!-- Element日期选择器控件 -->
+
+      <!-- Element <DatePicker>日期选择器控件 -->
       <el-date-picker v-if="vehiclePathVisible"
         v-model="searchLocList.time"
+        type="datetimerange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
         value-format="yyyy-MM-dd HH:mm:ss"
-        size="mini" type="datetimerange"
-        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+        size="mini"
         style="position:absolute;top:120px;right:400px;">
       </el-date-picker>
 
@@ -168,6 +174,15 @@ import _ from 'lodash';
 export default {
   data() {
     return {
+      // 绘制圆形图
+      circlePath: {
+        center: {
+          lng: 116.404,
+          lat: 39.915,
+        },
+        radius: 500,
+      },
+
       address: '',
       search: {},
       points: [],
@@ -202,6 +217,11 @@ export default {
     },
   },
   methods: {
+    // 圆形区域
+    updateCirclePath(e) {
+      this.circlePath.center = e.target.getCenter();
+      this.circlePath.radius = e.target.getRadius();
+    },
     syncCenterAndZoom() {},
     showVehicleDialog() {
       this.vehicleDialogVisible = true;
@@ -266,7 +286,7 @@ export default {
       }
 
       // 根据坐标反解析地址
-      // const BMap = new BMap();
+      // const BMap = new BMap().Map("allmap");
       // const geocoder = BMap.Geocoder();
       // const point = BMap.Point(item.lng, item.lat);
       // geocoder.getLocation(point, (geocoderResult) => {
