@@ -24,7 +24,7 @@
       </el-form>
       <template v-if="key_user_info.userType === 'ENTERPRISE'">
         <div style="margin-right:10px;">
-          <el-button icon="el-icon-edit" type="primary" size="small" @click="returnVehicleForms(key_user_info.orgId)">批量归还车辆</el-button>
+          <el-button icon="el-icon-edit" type="primary" size="small" @click="returnVehicleForms(key_user_info)">批量归还车辆</el-button>
         </div>
       </template>
     </div>
@@ -35,6 +35,7 @@
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
       <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
+      <el-table-column prop="orgName" label="所属单位"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
       <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
@@ -328,6 +329,9 @@
       <el-form class="edit-form" :model="returnVehicleForm" ref="returnVehicleForm" :rules="rules2">
         <el-form-item prop="count" style="margin-top:10px;height:30px;" label="归还数量">
           <el-input-number v-model="returnVehicleForm.count" :step="1"></el-input-number>
+          <template>
+            <span style="margin-left:20px">(当前企业共 {{ vehicleNumTotal }} 辆车)</span>
+          </template>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -391,6 +395,7 @@ export default {
     };
     return {
       loading: false,
+      vehicleNumTotal: undefined,
       // 车辆
       returnVehicleFormVehicle: false,
       returnVehicleForm: {
@@ -441,7 +446,7 @@ export default {
       bindPartsForm: {},
       unBindPartsForm: {},
 
-      partsPageSizes: [5, 10, 50, 100],
+      partsPageSizes: [10, 50, 100],
       partsCurrentPage: 1,
       partsPageSize: 5,
       partsTotal: 0,
@@ -452,7 +457,7 @@ export default {
         vehicleStatus: '',
         isBind: '',
       },
-      pageSizes: [5, 10, 50, 100],
+      pageSizes: [10, 20, 50, 100],
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -486,8 +491,8 @@ export default {
       ],
       searchIsBindList: [
         { id: '', name: '全部' },
-        { id: 'UNBIND', name: '未绑定' },
-        { id: 'BIND', name: '已绑定' },
+        { id: 'UNBIND', name: '未绑定电池' },
+        { id: 'BIND', name: '已绑定电池' },
       ],
       mfrsList: [],
       // 电池
@@ -557,10 +562,20 @@ export default {
     },
     // 车辆
     // 批量归还车辆
-    returnVehicleForms(orgId) {
+    async returnVehicleForms({ orgId }) {
       const $form = this.$refs.returnVehicleForm;
       if ($form) $form.resetFields();
       this.returnVehicleForm = { orgId: orgId, count: this.returnVehicleForm.count };
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/orgCountVehicle', { orgId })).body;
+        if (code !== '200') throw new Error(message);
+        this.vehicleNumTotal = respData;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+
       this.returnVehicleFormVehicle = true;
     },
     // 确定归还车辆

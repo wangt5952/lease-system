@@ -1,5 +1,6 @@
 <template>
-  <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
+  <!-- <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;"> -->
+  <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
@@ -22,7 +23,8 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+
+    <el-table :data="list" style="width: 100%;">
       <el-table-column prop="loginName" label="用户名"></el-table-column>
       <el-table-column prop="userMobile" label="手机号"></el-table-column>
       <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
@@ -54,7 +56,7 @@
       </el-table-column>
     </el-table>
 
-    <el-pagination v-if="total" style="margin-top:10px;"
+    <!-- <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
       :current-page.sync="currentPage"
@@ -62,7 +64,8 @@
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
-    </el-pagination>
+    </el-pagination> -->
+
     <template v-if="key_user_info.userType === 'PLATFORM'">
       <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
         <el-form class="edit-form" :model="form" ref="form">
@@ -197,7 +200,7 @@
         :total="vehicleTotal">
       </el-pagination>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeVehicleForm">关闭</el-button>
+        <el-button @click="vehicleFormVisible = false">关闭</el-button>
         <el-button type="primary" @click="saveVehicleForm">保存</el-button>
       </span>
     </el-dialog>
@@ -217,7 +220,7 @@
         </el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeBindList">关闭</el-button>
+        <el-button @click="userVehicleFormVisible = false">关闭</el-button>
       </span>
     </el-dialog>
 
@@ -262,7 +265,7 @@ export default {
         userType: '',
         userStatus: '',
       },
-      pageSizes: [5, 10, 50, 100, 200],
+      pageSizes: [10, 20, 50, 100, 200],
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -324,9 +327,6 @@ export default {
   },
   methods: {
     // 车辆
-    closeBindList() {
-      this.userVehicleFormVisible = false;
-    },
     async vehicleHandleSizeChange(vehiclePageSize) {
       this.vehiclePageSize = vehiclePageSize;
       await this.vehicleReload();
@@ -371,9 +371,6 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    },
-    closeVehicleForm() {
-      this.vehicleFormVisible = false;
     },
     saveVehicleForm() {
       this.$message.success('保存成功');
@@ -568,5 +565,11 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   height: 65px;
+}
+>>> .el-table {
+  height: 100%;
+}
+>>> .el-table__body-wrapper {
+  height: calc(100% - 42px);
 }
 </style>

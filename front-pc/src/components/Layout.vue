@@ -26,14 +26,16 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    
     <div style="display:flex;flex:1;">
-      <div style="width:250px;">
-        <el-menu :router="true" unique-opened>
+      <!-- 左侧导航 -->
+      <div style="width:4%;">
+        <el-menu :router="true" :collapse="isCollapse" unique-opened>
           <template v-for="(o, i) in menuTree">
             <el-submenu v-if="o.children" :key="i" :index="`${i}`">
               <template slot="title">
                 <i :class="o.icon"></i>
-                <span>{{o.name}}</span>
+                <span slot="title">{{o.name}}</span>
               </template>
               <el-menu-item v-for="(p, j) in o.children" :key="j" :index="p.path">{{p.name}}</el-menu-item>
             </el-submenu>
@@ -72,7 +74,7 @@
         <el-form-item prop="loginName" :rules="[{required:true, message:'请输入用户名'}]" label="用户名">
           <el-input v-model="loginForm.loginName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item prop="password" :rules="[{required:true, message:'请输入用户名'}]" label="密码">
+        <el-form-item prop="password" :rules="[{required:true, message:'请输入密码'}]" label="密码">
           <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -196,6 +198,7 @@ const menuTree = [
 export default {
   data() {
     return {
+      isCollapse: true,
       passwordFormVisible: false,
       passwordForm: {},
 

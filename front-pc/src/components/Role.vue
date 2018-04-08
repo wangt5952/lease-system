@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading && !formVisible && !assignResFormVisible" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
+  <div v-loading="loading && !formVisible && !assignResFormVisible" style="padding:10px;">
     <div style="display:flex;">
       <div style="margin-right:10px;">
         <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加角色</el-button>

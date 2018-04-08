@@ -3,15 +3,15 @@
     <div style="display:flex;flex-direction:column;flex:1;">
       <div style="display:flex;height:100px;background:#070f3e;color:#fff;">
         <div style="flex:1;padding:10px;padding-top:25px;">
-          <div style="font-size:12px;">车辆实时情况</div>
-          <el-input v-model="search.keyword" style="margin-top:5px;" size="mini" suffix-icon="el-icon-search" />
+          <!-- <div style="font-size:12px;">车辆实时情况</div> -->
+          <el-input v-model="search.keyword" style="margin-top:5px;" size="mini" suffix-icon="el-icon-search" placeholder="请输入要查看的地址"></el-input>
         </div>
         <div @click="showVehicleDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{vehicleInfo.vehicleCode}}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码</div>
         </div>
         <div @click="showVehiclePath" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;"></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;">{{ address }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆当前位置</div>
         </div>
         <div @click="showBatteryDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
@@ -35,7 +35,14 @@
         </template>
         <bm-marker v-else v-for="o in vehicleList" :key="o.id" :icon="{url: selectedItem.id == o.id ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
       </baidu-map>
-      <el-date-picker v-if="vehiclePathVisible" v-model="searchLocList.time" value-format="yyyy-MM-dd HH:mm:ss" size="mini" type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="position:absolute;top:120px;right:400px;"></el-date-picker>
+      <!-- Element日期选择器控件 -->
+      <el-date-picker v-if="vehiclePathVisible"
+        v-model="searchLocList.time"
+        value-format="yyyy-MM-dd HH:mm:ss"
+        size="mini" type="datetimerange"
+        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+        style="position:absolute;top:120px;right:400px;">
+      </el-date-picker>
 
       <div v-if="false" style="display:flex;background:#eff5f8;height:180px;padding:10px 0;">
         <div style="flex:1;background:#fff;margin-left:10px;">
@@ -59,7 +66,8 @@
         </div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;width:250px;background:#eff5f8;padding:10px 20px;overflow:auto;">
+
+    <div style="display:flex;flex-direction:column;width:170px;background:#eff5f8;padding:10px 20px;overflow:auto;">
       <div style="color:#9096ad;font-size:16px;">车辆列表（可用）</div>
       <div style="display:flex;align-items:center;font-size:14px;height:36px;margin-bottom:5px;text-align:center;">
         <div style="flex:1;">车辆编号</div>
@@ -71,7 +79,6 @@
           <div style="width:80px;">{{o.value}}%</div>
         </div>
       </div>
-
     </div>
 
     <el-dialog title="车辆信息" :visible.sync="vehicleDialogVisible" width="30%">
@@ -161,6 +168,7 @@ import _ from 'lodash';
 export default {
   data() {
     return {
+      address: '',
       search: {},
       points: [],
       selectedId: '1',
@@ -215,20 +223,8 @@ export default {
         lng: item.lng, lat: item.lat,
       };
       this.selectedId = item.id;
-      // 根据定位点及半径获得范围内的所有车辆信息及定位、电池电量数据.
-      // try {
-      //   // 经度 纬度 半径范围
-      //   const { code: veCode, message: veMessage, respData: veRespData }
-      //   const { code: veCode, message: veMessage } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-      //     lng: item.lat, lat: item.lng, radius: 1000,
-      //   })).body;
-      //   if (veCode !== '200') throw new Error(veMessage);
-      // } catch (e) {
-      //   const veMessage = e.statusText || e.veMessage;
-      //   this.$message.error(veMessage);
-      // }
 
-      // 车辆、电池、使用人信息
+      // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
         // 车辆、电池信息
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
@@ -243,27 +239,44 @@ export default {
           this.vehicleInfo = {};
           this.powerInfo = {};
         }
+
         // 使用人信息
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.id])).body;
         if (userCode !== '200') throw new Error(userMessage);
         if (userRespData) {
           this.userInfo = userRespData;
         } else {
-          this.$message.error('该车辆未与用户绑定');
           this.userInfo = {};
         }
+
+        // 根据经度、纬度、半径范围查询信息
+        const { code: radiusCode, message: radiusMessage } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: item.lng, lat: item.lat, radius: 1000,
+        })).body;
+        if (radiusCode !== '200') throw new Error(radiusMessage);
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
 
         const userMessage = e.statusText || e.userMessage;
         this.$message.error(userMessage);
+
+        const radiusMessage = e.statusText || e.radiusMessage;
+        this.$message.error(radiusMessage);
       }
+
+      // 根据坐标反解析地址
+      const BMap = new BMap();
+      const geocoder = BMap.Geocoder();
+      const point = BMap.Point(item.lng, item.lat);
+      geocoder.getLocation(point, (geocoderResult) => {
+        this.address = geocoderResult.address;
+      });
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
       const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
-        needPaging: false, vehicleStatus: 'NORMAL', isBind: 'BIND',
+        needPaging: 'false', vehicleStatus: 'NORMAL', isBind: 'BIND',
       })).body;
       if (code !== '200') throw new Error(message);
       this.vehicleList = respData.rows;
@@ -334,7 +347,7 @@ export default {
         this.$message.error(message);
       }
     },
-    // 获取车辆在某一段时间内行驶的记录
+    // 获取车辆在某一段时间内行驶的轨迹
     async reloadLocList() {
       const { time } = this.searchLocList;
       const id = this.selectedId;
