@@ -46,6 +46,7 @@ public class BizDeviceConfController extends BaseController {
     /**
      * 查询参数设置.
      * @param paramAndPaging 查询及分页参数JSON
+     * @param request
      * <pre>
      *     {
      *         keyStr:查询关键字（非必填，模糊查询，可填写设备ID）,
@@ -125,6 +126,7 @@ public class BizDeviceConfController extends BaseController {
     /**
      * 批量增加参数设置.
      * @param addParam 批量新增参数列表JSON
+     * @param request
      * <pre>
      *     [
      *         {
@@ -203,6 +205,7 @@ public class BizDeviceConfController extends BaseController {
     /**
      * 增加设备参数.
      * @param addParam 新增参数列表JSON
+     * @param request
      * <pre>
      *     {
      *         deviceId:设备ID,
@@ -275,6 +278,7 @@ public class BizDeviceConfController extends BaseController {
     /**
      * 修改设备参数信息.
      * @param modifyParam 修改参数JSON
+     * @param request
      * <pre>
      *     {
      *         deviceId:设备ID,
@@ -348,6 +352,7 @@ public class BizDeviceConfController extends BaseController {
     /**
      * 批量删除设备参数.
      * @param deleteParam 删除ID列表JSON
+     * @param request
      * <pre>
      *     [
      *         {
@@ -405,6 +410,7 @@ public class BizDeviceConfController extends BaseController {
     /**
      * 根据设备ID和设备类别获取设置信息.
      * @param paramPK 查询参数
+     * @param request
      * <pre>
      *     {
      *         deviceId:设备ID,

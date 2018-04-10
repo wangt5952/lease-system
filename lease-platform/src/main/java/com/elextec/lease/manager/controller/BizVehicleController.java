@@ -1458,7 +1458,7 @@ public class BizVehicleController extends BaseController {
      *     }
      * </pre>
      *
-     * @param paramAndPaging
+     * @param paramAndPaging 分页参数
      * @param request 登录信息
      * @return 车辆列表
      * <pre>
@@ -1560,6 +1560,7 @@ public class BizVehicleController extends BaseController {
      *
      *         ]
      *     }
+     * </pre>
      */
     @RequestMapping(value = "/orgCountVehicle",method = RequestMethod.POST)
     public MessageResponse orgCountVehicle(@RequestBody String orgInfo,HttpServletRequest request){
