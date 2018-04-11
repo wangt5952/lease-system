@@ -703,17 +703,33 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         if (bizRefUserVehicleMapperExt.vehicleRecovery(orgId) > 0) {
             throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(),"该企业下有车辆未收回");
         } else {
-            //如果全部已经收回则代表改企业下车辆全部解绑，直接根据企业查询所有车辆
+            //如果全部已经收回,直接根据企业查询所有车辆
             BizRefOrgVehicleExample bizRefOrgVehicleExample = new BizRefOrgVehicleExample();
             BizRefOrgVehicleExample.Criteria criteria = bizRefOrgVehicleExample.createCriteria();
             criteria.andOrgIdEqualTo(orgId);
+            criteria.andUnbindTimeIsNull();
             List<BizRefOrgVehicle> list = bizRefOrgVehicleMapperExt.selectByExample(bizRefOrgVehicleExample);
-            for (int i = 0; i < list.size(); i++) {
-                BizRefOrgVehicle bizRefOrgVehicle = new BizRefOrgVehicle();
-                bizRefOrgVehicle.setOrgId(loginOrgId);
-                bizRefOrgVehicle.setVehicleId(list.get(i).getVehicleId());
-                bizRefOrgVehicle.setBindTime(new Date());
-                bizRefOrgVehicleMapperExt.insert(bizRefOrgVehicle);
+            if (list.size() != 0) {
+                for (int i = 0; i < list.size(); i++) {
+                    //解除企业关系
+                    BizRefOrgVehicleExample biz = new BizRefOrgVehicleExample();
+                    BizRefOrgVehicleExample.Criteria criteria1 = biz.createCriteria();
+                    criteria1.andOrgIdEqualTo(orgId);
+                    criteria1.andVehicleIdEqualTo(list.get(i).getVehicleId());
+                    criteria1.andUnbindTimeIsNull();
+                    BizRefOrgVehicle orgVehicle = new BizRefOrgVehicle();
+                    orgVehicle.setUnbindTime(new Date());
+                    bizRefOrgVehicleMapperExt.updateByExampleSelective(orgVehicle,biz);
+
+                    //绑定平台关系
+                    BizRefOrgVehicle bizRefOrgVehicle = new BizRefOrgVehicle();
+                    bizRefOrgVehicle.setOrgId(loginOrgId);
+                    bizRefOrgVehicle.setVehicleId(list.get(i).getVehicleId());
+                    bizRefOrgVehicle.setBindTime(new Date());
+                    bizRefOrgVehicleMapperExt.insert(bizRefOrgVehicle);
+                }
+            } else {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(),"该企业下未绑定车辆");
             }
         }
     }
