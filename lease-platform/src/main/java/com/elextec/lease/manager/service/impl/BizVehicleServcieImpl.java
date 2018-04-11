@@ -48,6 +48,9 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     private BizPartsMapperExt bizPartsMapperExt;
 
     @Autowired
+    private BizRefOrgVehicleMapper bizRefOrgVehicleMapper;
+
+    @Autowired
     private BizRefUserVehicleMapperExt bizRefUserVehicleMapperExt;
 
     @Autowired
@@ -692,5 +695,26 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         paramMap.setOrgId(orgId);
         paramMap.setVehicleStatus(RecordStatus.NORMAL.toString());
         return bizVehicleMapperExt.selectExtByParam(paramMap).size();
+    }
+
+    @Override
+    public void vehicleRecovery(String orgId,String loginOrgId) {
+        //如果大于0代表该企业下的车没有收回
+        if (bizRefUserVehicleMapperExt.vehicleRecovery(orgId) > 0) {
+            throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(),"该企业下有车辆未收回");
+        } else {
+            //如果全部已经收回则代表改企业下车辆全部解绑，直接根据企业查询所有车辆
+            BizRefOrgVehicleExample bizRefOrgVehicleExample = new BizRefOrgVehicleExample();
+            BizRefOrgVehicleExample.Criteria criteria = bizRefOrgVehicleExample.createCriteria();
+            criteria.andOrgIdEqualTo(orgId);
+            List<BizRefOrgVehicle> list = bizRefOrgVehicleMapperExt.selectByExample(bizRefOrgVehicleExample);
+            for (int i = 0; i < list.size(); i++) {
+                BizRefOrgVehicle bizRefOrgVehicle = new BizRefOrgVehicle();
+                bizRefOrgVehicle.setOrgId(loginOrgId);
+                bizRefOrgVehicle.setVehicleId(list.get(i).getVehicleId());
+                bizRefOrgVehicle.setBindTime(new Date());
+                bizRefOrgVehicleMapperExt.insert(bizRefOrgVehicle);
+            }
+        }
     }
 }

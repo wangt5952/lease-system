@@ -39,4 +39,13 @@
         AND r.unbind_time IS NULL
     </select>
 
+    <select id="vehicleRecovery" parameterType="java.lang.String" resultType="java.lang.Integer">
+      SELECT COUNT(1) FROM biz_ref_user_vehicle u
+      LEFT JOIN biz_vehicle v on u.vehicle_id = v.id
+      LEFT JOIN biz_ref_org_vehicle o on o.vehicle_id = v.id
+      WHERE u.unbind_time IS NULL
+      AND o.unbind_time IS NULL
+      AND o.org_id = #{orgId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
