@@ -357,13 +357,18 @@ export default {
         this.$message.error(radiusMessage);
       }
 
-      // 根据坐标反解析地址
-      const BMap = new BMap();
-      const geocoder = BMap.Geocoder();
-      const point = BMap.Point(item.LON, item.LAT);
-      geocoder.getLocation(point, (geocoderResult) => {
-        this.address = geocoderResult.address;
-      });
+      const loc = await this.getLocation(item.LON, item.LAT);
+      console.log(loc);
+
+      this.address = loc.address;
+
+      // // 根据坐标反解析地址
+      // const BMap = new BMap();
+      // const geocoder = BMap.Geocoder();
+      // const point = BMap.Point(item.LON, item.LAT);
+      // geocoder.getLocation(point, (geocoderResult) => {
+      //   this.address = geocoderResult.address;
+      // });
     },
 
     // 获取所有车辆信息
@@ -480,10 +485,17 @@ export default {
         this.$message.error(message);
       }
     },
+
+    getLocation(lng, lat) {
+      return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)))
+    }
   },
   async mounted() {
     await this.reloadVehicleList();
-    this.getMapScript();
+
+    const loc = await this.getLocation(116.307852,40.057031);
+    console.log(loc);
+    // this.getMapScript();
     // this.reset();
   },
 };
