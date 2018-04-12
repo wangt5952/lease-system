@@ -72,7 +72,7 @@
           <div>
             <el-form :inline="true">
               <el-form-item>
-                <el-input style="width:500px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+                <el-input style="width:500px;" v-model="search.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
               </el-form-item>
               <el-form-item>
                 <el-select v-model="search.applyType" placeholder="请选择申请类别" style="width:100%;">
@@ -222,7 +222,7 @@
               </div>
               <el-form :inline="true">
                 <el-form-item>
-                  <el-input style="width:500px;" v-model="individualSearch.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+                  <el-input style="width:500px;" v-model="individualSearch.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
                 </el-form-item>
                 <el-form-item>
                   <el-select v-model="individualSearch.applyType" placeholder="请选择申请类别" style="width:100%;">

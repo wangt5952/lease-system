@@ -15,7 +15,7 @@
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆当前位置</div>
         </div>
         <div @click="showBatteryDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.value}}%</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{selectedItem.RSOC}}%</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
         <div @click="showUserDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
@@ -25,20 +25,22 @@
       </div>
 
       <baidu-map class="allmap" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="15" @moveend="syncCenterAndZoom" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+        <!-- 圆形图 -->
+        <bm-circle :center="circlePath.center" :radius="circlePath.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="1" @lineupdate="updateCirclePath" :fill-opacity="0.1"></bm-circle>
+        <!-- 比列尺 -->
+        <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
         <template v-if="vehiclePathVisible">
           <!-- 路线折线图 -->
-          <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="4"></bm-polyline>
+          <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
           <!-- 点聚合(图片所在位置) -->
-          <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.lng, lat: selectedItem.lat}"></bm-marker>
-          <!-- 圆形图 -->
-          <bm-circle :center="circlePath.center" :radius="circlePath.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" @lineupdate="updateCirclePath" :editing="true"></bm-circle>
+          <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
         </template>
-        <bm-marker v-else v-for="o in vehicleList" :key="o.id" :icon="{url: selectedItem.id == o.id ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.lng, lat: o.lat}"></bm-marker>
+        <bm-marker v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
       </baidu-map>
 
-      <!-- Element <DatePicker>日期选择器控件 -->
+      <!-- Element <DateTimePicker>日期选择器控件 -->
       <el-date-picker v-if="vehiclePathVisible"
         v-model="searchLocList.time"
         type="datetimerange"
@@ -46,6 +48,7 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         value-format="yyyy-MM-dd HH:mm:ss"
+        @change="reloadLocList"
         size="mini"
         style="position:absolute;top:120px;right:400px;">
       </el-date-picker>
@@ -73,6 +76,7 @@
       </div>
     </div>
 
+    <!-- 右侧车辆列表 -->
     <div style="display:flex;flex-direction:column;width:170px;background:#eff5f8;padding:10px 20px;overflow:auto;">
       <div style="color:#9096ad;font-size:16px;">车辆列表（可用）</div>
       <div style="display:flex;align-items:center;font-size:14px;height:36px;margin-bottom:5px;text-align:center;">
@@ -80,9 +84,10 @@
         <div style="width:80px;">剩余电量</div>
       </div>
       <div style="flex:1;overflow:scroll;font-size:14px;">
-        <div @click="handleSelectItem(o)" v-for="o in vehicleList" :key="o.id" :style="selectedId == o.id ? {backgroundColor:'#39a0f6', color:'#fff'} : {backgroundColor:'#e7eef5', color:'#9096ad'}" style="display:flex;align-items:center;height:36px;margin-bottom:5px;border-radius:3px;text-align:center;cursor:pointer;">
+        <div @click="handleSelectItem(o)" v-for="o in radiusVehicleList" :key="o.vehicleId" :style="selectedId == o.vehicleId ? {backgroundColor:'#39a0f6', color:'#fff'} : {backgroundColor:'#e7eef5', color:'#9096ad'}"
+          style="display:flex;align-items:center;height:36px;margin-bottom:5px;border-radius:3px;text-align:center;cursor:pointer;">
           <div style="flex:1;">{{o.vehicleCode}}</div>
-          <div style="width:80px;">{{o.value}}%</div>
+          <div style="width:80px;">{{o.RSOC}}%</div>
         </div>
       </div>
     </div>
@@ -141,8 +146,11 @@
         <template v-if="userInfo.userRealNameAuthFlag === 'AUTHORIZED'">
           <div class="item-value">已实名</div>
         </template>
-        <template v-else>
+        <template v-else-if="userInfo.userRealNameAuthFlag === 'UNAUTHORIZED'">
           <div class="item-value">未实名</div>
+        </template>
+        <template v-else>
+          <div class="item-value"></div>
         </template>
       </div>
       <div class="item"><div class="item-name">身份证号</div><div class="item-value">{{ userInfo.userPid }}</div></div>
@@ -164,7 +172,7 @@
 
 <script>
 import _ from 'lodash';
-
+// import BMap from 'BMap';
 // const path = [
 //   { lng: 118.790852, lat: 32.057248 },
 //   { lng: 118.803069, lat: 32.055044 },
@@ -177,10 +185,10 @@ export default {
       // 绘制圆形图
       circlePath: {
         center: {
-          lng: 116.404,
-          lat: 39.915,
+          lng: 0,
+          lat: 0,
         },
-        radius: 500,
+        radius: 1000,
       },
 
       address: '',
@@ -197,11 +205,13 @@ export default {
       userDialogVisible: false,
       vehiclePathVisible: false,
       mapCenter: '南京',
+
+      radiusVehicleList: [],
     };
   },
   computed: {
     selectedItem() {
-      const vehicleListInfo = (_.find(this.vehicleList, { id: this.selectedId }) || {});
+      const vehicleListInfo = (_.find(this.radiusVehicleList, { vehicleId: this.selectedId }) || {});
       return vehicleListInfo;
     },
   },
@@ -209,12 +219,12 @@ export default {
     'search.keyword'(v) {
       this.mapCenter = v;
     },
-    searchLocList: {
-      async handler() {
-        this.reloadLocList();
-      },
-      deep: true,
-    },
+    // searchLocList: {
+    //   async handler() {
+    //     this.reloadLocList();
+    //   },
+    //   deep: true,
+    // },
   },
   methods: {
     // 圆形区域
@@ -222,7 +232,12 @@ export default {
       this.circlePath.center = e.target.getCenter();
       this.circlePath.radius = e.target.getRadius();
     },
-    syncCenterAndZoom() {},
+    // 更改地图缩放级别时触发该事件
+    syncCenterAndZoom() {
+      // const { lng, lat } = e.target.getCenter();
+      // this.circlePath.radius += 200;
+      // console.log(this.circlePath.radius);
+    },
     showVehicleDialog() {
       this.vehicleDialogVisible = true;
     },
@@ -238,17 +253,52 @@ export default {
     handleMapClick() {
     },
 
+    // 百度地图初始化————————————————————————————————————————————————————————————————————————————————————
+    initMap (BMap) {
+      this.BMap = BMap
+      // this.init(BMap)
+    },
+    getMapScript () {
+      if (!global.BMap) {
+        const ak = this.ak || this._BMap().ak
+        global.BMap = {}
+        global.BMap._preloader = new Promise((resolve, reject) => {
+          global._initBaiduMap = function () {
+            resolve(global.BMap)
+            global.document.body.removeChild($script)
+            global.BMap._preloader = null
+            global._initBaiduMap = null
+          }
+          const $script = document.createElement('script')
+          global.document.body.appendChild($script)
+          $script.src = `https://api.map.baidu.com/api?v=2.0&ak=${ak}&callback=_initBaiduMap`
+        })
+        return global.BMap._preloader
+        console.log(BMap);
+      } else if (!global.BMap._preloader) {
+        return Promise.resolve(global.BMap)
+      } else {
+        return global.BMap._preloader
+      }
+    },
+    reset () {
+      const {getMapScript, initMap} = this
+      getMapScript()
+        .then(initMap)
+    },
+    // —————————————————————————————————————————————————————————————————————————————————————————————————
+    // 车辆单击事件
     async handleSelectItem(item) {
       this.mapCenter = {
-        lng: item.lng, lat: item.lat,
+        lng: item.LON, lat: item.LAT,
       };
-      this.selectedId = item.id;
+      this.selectedId = item.vehicleId;
 
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
         // 车辆、电池信息
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
-          id: item.id, flag: 'true',
+          id: item.vehicleId, flag: 'true',
         })).body;
         if (code !== '200') throw new Error(message);
         if (respData) {
@@ -260,8 +310,8 @@ export default {
           this.powerInfo = {};
         }
 
-        // 使用人信息
-        const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.id])).body;
+        // 使用人信息 (如果没有用户则不显示用户信息)
+        const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.vehicleId])).body;
         if (userCode !== '200') throw new Error(userMessage);
         if (userRespData) {
           this.userInfo = userRespData;
@@ -270,10 +320,32 @@ export default {
         }
 
         // 根据经度、纬度、半径范围查询信息
-        const { code: radiusCode, message: radiusMessage } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: item.lng, lat: item.lat, radius: 1000,
-        })).body;
-        if (radiusCode !== '200') throw new Error(radiusMessage);
+        // const { code: radiusCode, message: radiusMessage } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+        //   lng: item.LON, lat: item.LAT, radius: 1000,
+        // })).body;
+        // if (radiusCode !== '200') throw new Error(radiusMessage);
+
+        // 车辆某段时间内行驶路径
+        const { time } = this.searchLocList;
+        const id = item.vehicleId;
+        if (this.vehiclePathVisible) {
+          const { respData: timeRespData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1] })).body;
+          // if (code !== '200') throw new Error(message);
+          const locList = timeRespData;
+          this.mapCenter = {
+            lng: locList[0].LON, lat: locList[0].LAT,
+          };
+          this.vehicleList = _.map(this.vehicleList, (o) => {
+            if (o.id !== id) return o;
+            return {
+              ...o,
+              path: _.map(locList, i => ({
+                lng: i.LON,
+                lat: i.LAT,
+              })),
+            };
+          });
+        }
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
@@ -286,13 +358,14 @@ export default {
       }
 
       // 根据坐标反解析地址
-      // const BMap = new BMap().Map("allmap");
-      // const geocoder = BMap.Geocoder();
-      // const point = BMap.Point(item.lng, item.lat);
-      // geocoder.getLocation(point, (geocoderResult) => {
-      //   this.address = geocoderResult.address;
-      // });
+      const BMap = new BMap();
+      const geocoder = BMap.Geocoder();
+      const point = BMap.Point(item.LON, item.LAT);
+      geocoder.getLocation(point, (geocoderResult) => {
+        this.address = geocoderResult.address;
+      });
     },
+
     // 获取所有车辆信息
     async reloadVehicleList() {
       const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
@@ -300,10 +373,11 @@ export default {
       })).body;
       if (code !== '200') throw new Error(message);
       this.vehicleList = respData.rows;
-      if (this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, { id: this.selectedId })) {
-        this.selectedId = this.vehicleList[0].id;
-      }
-      // 初始化车辆、电池、使用人信息
+
+      // if (this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, { id: this.selectedId })) {
+      //   this.selectedId = this.vehicleList[0].id;
+      // }
+      // 初始化区间范围内车辆、电池、使用人信息
       try {
         // 车辆电池信息
         const { code: veCode, message: veMessage, respData: veRespData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
@@ -320,7 +394,7 @@ export default {
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [this.vehicleList[0].id])).body;
         if (userCode !== '200') throw new Error(userMessage);
         if (userRespData) this.userInfo = userRespData;
-        else this.$message.error('该车辆未与用户绑定');
+        // else this.$message.error('该车辆未与用户绑定');
       } catch (e) {
         const veMessage = e.statusText || e.veMessage;
         this.$message.error(veMessage);
@@ -329,7 +403,25 @@ export default {
         this.$message.error(userMessage);
       }
       await this.reloadVehicleLoc();
-      await this.reloadVehiclePower();
+      // await this.reloadVehiclePower();
+
+      // 以所有车辆中某辆车的定位信息 为条件 设置 区间范围
+      const { code: radiusCode, message: radiusMessage, respData: radiusRespData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+        lng: this.vehicleList[4].lng, lat: this.vehicleList[4].lat, radius: 1000,
+      })).body;
+      if (radiusCode !== '200') throw new Error(radiusMessage);
+
+      this.radiusVehicleList = radiusRespData;
+      if (this.radiusVehicleList && this.radiusVehicleList.length && !_.find(this.radiusVehicleList, { vehicleId: this.selectedId })) {
+        this.selectedId = this.radiusVehicleList[0].vehicleId;
+      }
+      // 把区间范围内第一个车辆当前坐标设为地图中心点
+      this.mapCenter = {
+        lng: this.radiusVehicleList[0].LON, lat: this.radiusVehicleList[0].LAT,
+      };
+      // 给当前车辆设置 图形范围
+      this.circlePath.center.lng = this.radiusVehicleList[0].LON;
+      this.circlePath.center.lat = this.radiusVehicleList[0].LAT;
     },
     // 获取车辆定位(经、纬度)
     async reloadVehicleLoc() {
@@ -348,25 +440,20 @@ export default {
       });
     },
     // 获取车辆电池电量信息
-    async reloadVehiclePower() {
-      const { vehicleList } = this;
-      try {
-        const { respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk', _.map(vehicleList, 'id'))).body;
-        // if (code !== '200') throw new Error(message);
-        const locList = respData;
-        this.vehicleList = _.map(vehicleList, (o) => {
-          const power = _.find(locList, { VehicleID: o.id });
-          if (!power) return o;
-          return {
-            ...o,
-            value: power.RSOC,
-          };
-        });
-      } catch (e) {
-        const message = e.statusText || e.message;
-        this.$message.error(message);
-      }
-    },
+    // async reloadVehiclePower() {
+    //   const { vehicleList } = this;
+    //   const { respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk', _.map(vehicleList, 'id'))).body;
+    //   // if (code !== '200') throw new Error(message);
+    //   const locList = respData;
+    //   this.vehicleList = _.map(vehicleList, (o) => {
+    //     const power = _.find(locList, { VehicleID: o.id });
+    //     if (!power) return o;
+    //     return {
+    //       ...o,
+    //       value: power.RSOC,
+    //     };
+    //   });
+    // },
     // 获取车辆在某一段时间内行驶的轨迹
     async reloadLocList() {
       const { time } = this.searchLocList;
@@ -378,8 +465,8 @@ export default {
         this.mapCenter = {
           lng: locList[0].LON, lat: locList[0].LAT,
         };
-        this.vehicleList = _.map(this.vehicleList, (o) => {
-          if (o.id !== id) return o;
+        this.radiusVehicleList = _.map(this.radiusVehicleList, (o) => {
+          if (o.vehicleId !== id) return o;
           return {
             ...o,
             path: _.map(locList, i => ({
@@ -388,16 +475,6 @@ export default {
             })),
           };
         });
-        // this.vehicleList = _.map(vehicleList, o => {
-        //   const loc = _.find(locList, {VehicleID: o.id});
-        //   if (!loc) return o;
-        //   return {
-        //     ...o,
-        //     lat: loc.LAT,
-        //     lng: loc.LON,
-        //     LocTime: loc.LocTime,
-        //   }
-        // })
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
@@ -406,6 +483,8 @@ export default {
   },
   async mounted() {
     await this.reloadVehicleList();
+    this.getMapScript();
+    // this.reset();
   },
 };
 </script>
