@@ -6,11 +6,11 @@
     :show.sync="drawerVisibility"
     :show-mode="showModeValue"
     :placement="showPlacementValue"
-    :drawer-style="{'background-color':'#35495e', width: '200px'}">
+    >
 
       <div slot="drawer">
         <group title="<span class='bg-dr_profile'><img src='/static/images/users/1.jpg' class='dr_profile'></span>">
-          <cell title="我的车辆" link="/car_info" @click="info">
+          <cell title="我的车辆" link="/info">
             <i slot="icon" class="iconfont icon-chelun"></i>
           </cell>
           <cell title="个人资料" link="/tab2">
@@ -33,13 +33,13 @@
           <span  class="bg-profile" slot="overwrite-left" @click="drawerVisibility = !drawerVisibility">
             <img src="/static/images/users/1.jpg" class="profile">
           </span>
-          <a slot="right"><i slot="icon" class="iconfont icon-guiji"></i></a>
+          <a slot="right" href="/track"><i slot="icon" class="iconfont icon-guiji"></i></a>
         </x-header>
 
         <baidu-map :center="center" :zoom="zoom" @ready="handler" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
         </baidu-map>
-        <a class="btn">
+        <a class="btn" href="/info">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
           <span>车辆信息</span>
         </a>
@@ -51,26 +51,16 @@
 </template>
 
 <script>
-import { Radio, Group, Cell, Badge, Drawer, Actionsheet, ButtonTab, ButtonTabItem, ViewBox, XHeader, Tabbar, TabbarItem, Loading, TransferDom } from 'vux';
+import { Group, Cell, Drawer, ViewBox, XHeader } from 'vux';
 
 export default {
-  directives: {
-    TransferDom,
-  },
+
   components: {
-    Radio,
     Group,
     Cell,
-    Badge,
     Drawer,
-    ButtonTab,
-    ButtonTabItem,
     ViewBox,
     XHeader,
-    Tabbar,
-    TabbarItem,
-    Loading,
-    Actionsheet,
   },
   computed: {
     leftOptions() {
@@ -105,7 +95,7 @@ export default {
 
 .vux-header {
   width:100%;
-  height: 65px;
+  height: 85px;
   background: -webkit-linear-gradient(#16D0A2,#20C987)!important;
   background: -o-linear-gradient(#16D0A2,#20C987)!important;
   background: -moz-linear-gradient(#16D0A2,#20C987)!important;
@@ -117,7 +107,7 @@ export default {
 }
 
 .vux-header-right a{
-  margin:8px 8px!important;
+  margin:28px 8px!important;
 }
 
 .vux-header-right a .iconfont{
@@ -128,7 +118,7 @@ export default {
   width: 50px;
   height:50px;
   position: absolute;
-  bottom:-45px;
+  bottom:-65px;
   background-color: white;
   border-radius: 100%;
 }
@@ -138,8 +128,11 @@ export default {
   margin:2.5px 2.5px;
   border-radius: 100%;
 }
+.vux-header-title {
+  height:100%!important;
+}
 .vux-header-title span{
-  margin:8px auto;
+  margin-top:28px;
 }
 .weui-cells__title {
   width:100%;
@@ -155,7 +148,7 @@ export default {
   width:65px;
   height:65px;
   position: absolute;
-  top: 35px;
+  top: 55px;
   left: 10px;
   background-color: white;
   border-radius: 100%;
@@ -182,6 +175,7 @@ export default {
   overflow: hidden;
 }
 .vux-drawer > .vux-drawer-active {
+  width:200px;
   background: white!important;
 }
 .vux-drawer > .drawer-left {

@@ -22,7 +22,7 @@ import router from './router';
 Vue.use(Vuex);
 Vue.use(Mint);
 Vue.use(Resource);
-Vue.use(BaiduMap, { ak: 'NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0'});
+Vue.use(BaiduMap, { ak: 'NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0' });
 
 _.forEach([
   XInput, XButton,
