@@ -9,9 +9,9 @@
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="showPasswordForm">密码修改</el-dropdown-item>
           <template v-if="key_user_info.userType === 'INDIVIDUAL'">
-            <div @click="showForm(key_user_info.id)">
+            <div @click="showEnterpriseForm(key_user_info)">
               <el-dropdown-item command="showForms">
-                查看个人信息
+                修改个人信息
               </el-dropdown-item>
             </div>
           </template>
@@ -22,6 +22,13 @@
               </el-dropdown-item>
             </div>
           </template>
+          <template v-if="key_user_info.userType === 'PLATFORM'">
+            <div @click="showEnterpriseForm(key_user_info)">
+              <el-dropdown-item command="showForms">
+                修改平台信息
+              </el-dropdown-item>
+            </div>
+          </template>
           <el-dropdown-item command="handleLogout">退出系统</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -29,9 +36,13 @@
 
     <div style="display:flex;flex:1;">
       <!-- 左侧导航 -->
-      <div style="width:4%;">
+      <div :style="isCollapse ? { 'width': '4%' } : { 'width': '16%' }">
         <el-menu :router="true" :collapse="isCollapse" unique-opened>
+          <div style="padding-left:10px" @click="shrinkChang">
+            <a href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a>
+          </div>
           <template v-for="(o, i) in menuTree">
+            <!-- 有子集 -->
             <el-submenu v-if="o.children" :key="i" :index="`${i}`">
               <template slot="title">
                 <i :class="o.icon"></i>
@@ -39,6 +50,7 @@
               </template>
               <el-menu-item v-for="(p, j) in o.children" :key="j" :index="p.path">{{p.name}}</el-menu-item>
             </el-submenu>
+            <!-- 无子集 -->
             <el-menu-item v-else :key="i" :index="`${i}`">
               <template slot="title">
                 <i :class="o.icon"></i>
@@ -96,7 +108,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="企业信息" :visible.sync="enterpriseVisible" :close-on-click-modal="false">
+    <el-dialog title="信息" :visible.sync="enterpriseVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="form" ref="form">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -198,7 +210,7 @@ const menuTree = [
 export default {
   data() {
     return {
-      isCollapse: true,
+      isCollapse: false,
       passwordFormVisible: false,
       passwordForm: {},
 
@@ -254,6 +266,9 @@ export default {
     },
   },
   methods: {
+    shrinkChang() {
+      this.isCollapse = !this.isCollapse;
+    },
     // 企业
     closeEnterpiseForm() {
       this.enterpriseVisible = false;
@@ -274,7 +289,7 @@ export default {
     },
     async saveEnterpiserForm() {
       try {
-        const { code, message } = (await this.$http.post('/api/manager/user/modify', this.form)).body;
+        const { code, message } = (await this.$http.post('/api/manager/user/modifyInformation', this.form)).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('保存成功');
       } catch (e) {

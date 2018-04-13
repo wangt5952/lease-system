@@ -145,4 +145,11 @@ public interface BizVehicleService {
      */
     public int orgCountVehicle(String orgId);
 
+    /**
+     * 车辆回收
+     * @param orgId 企业Id
+     * @param loginOrgId 登录用户Id
+     */
+    public void vehicleRecovery(String orgId,String loginOrgId);
+
 }

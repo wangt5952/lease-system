@@ -7,21 +7,23 @@
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加人员</el-button>
         </div>
       </template>
-      <el-form :inline="true">
-        <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-select v-model="search.userStatus" placeholder="请选择状态" style="width:100%;">
-            <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-select v-model="search.userType" placeholder="请选择类型" style="width:100%;">
-            <el-option v-for="o in searchTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
+      <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
+        <el-form :inline="true">
+          <el-form-item>
+            <el-input style="width:500px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-select v-model="search.userStatus" placeholder="请选择状态" style="width:100%;">
+              <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-select v-model="search.userType" placeholder="请选择类型" style="width:100%;">
+              <el-option v-for="o in searchTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </template>
     </div>
 
     <el-table :data="list" style="width: 100%;">
@@ -49,6 +51,10 @@
           <template v-if="key_user_info.userType === 'PLATFORM'">
             <template v-if="row.userType === 'ENTERPRISE'">
               <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+              <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看营业执照</el-button>
+            </template>
+            <template v-if="row.userType === 'INDIVIDUAL'">
+              <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看身份证</el-button>
             </template>
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
           </template>
@@ -68,7 +74,7 @@
 
     <template v-if="key_user_info.userType === 'PLATFORM'">
       <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
-        <el-form class="edit-form" :model="form" ref="form">
+        <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
           <el-row :gutter="10">
             <el-col :span="8">
               <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
@@ -76,7 +82,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="userMobile" :rules="[{required:true, message:'请填写手机号码'}]" label="手机号码">
+              <el-form-item prop="userMobile" label="手机号码">
                 <el-input v-model="form.userMobile" placeholder="请填写手机号码" auto-complete="off" :disabled="disabledForm"></el-input>
               </el-form-item>
             </el-col>
@@ -107,26 +113,6 @@
                 <el-select v-model="form.userRealNameAuthFlag" placeholder="请选择实名认证类型" style="width:100%;">
                   <el-option v-for="o in authList" :key="o.id" :label="o.name" :value="o.id"></el-option>
                 </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="userPid" label="身份证号">
-                <el-input v-model="form.userPid" placeholder="请选择企业" auto-complete="off" :disabled="disabledForm"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="身份证正面">
-                <el-input v-model="form.userIcFront" auto-complete="off" :disabled="disabledForm"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="身份证背面">
-                <el-input v-model="form.userIcBack" auto-complete="off" :disabled="disabledForm"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="手举身份证合照">
-                <el-input v-model="form.userIcGroup" auto-complete="off" :disabled="disabledForm"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
@@ -224,17 +210,29 @@
       </span>
     </el-dialog>
 
+    <!-- 照片表单 -->
+    <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
+// import file2base64 from '../util/file2base64';
 import {
   mapState,
 } from 'vuex';
 
 export default {
   data() {
+    const checkPhone = (rule, value, callback) => {
+      if (!/^\d+$/.test(value)) {
+        callback(new Error('请输入正确手机格式'));
+      } else {
+        callback();
+      }
+      return false;
+    };
     return {
       loading: false,
       // 车辆
@@ -304,6 +302,15 @@ export default {
       },
       roleList: [],
       orgList: [],
+      // 照片表单
+      photoFormVisible: false,
+
+      // 表单效验
+      rules2: {
+        userMobile: [
+          { validator: checkPhone, trigger: 'blur' },
+        ],
+      },
     };
   },
   computed: {
@@ -326,6 +333,11 @@ export default {
     },
   },
   methods: {
+    // 查看营业执照或者身份证照片
+    // async showPhoto(row) {
+    //   this.photoFormVisible = true;
+    // <input id="uploadFile" type="file" accept="image/*" @change="onFileChange">
+    // },
     // 车辆
     async vehicleHandleSizeChange(vehiclePageSize) {
       this.vehiclePageSize = vehiclePageSize;

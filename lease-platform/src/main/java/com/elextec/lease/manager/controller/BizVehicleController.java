@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sun.misc.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
@@ -1584,6 +1585,57 @@ public class BizVehicleController extends BaseController {
                 }
                 return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.orgCountVehicle(map.get("orgId").toString()));
             } catch(BizException ex){
+                throw ex;
+            } catch(Exception ex){
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
+            }
+        }
+    }
+
+    /**
+     * <pre>
+     *     {
+     *         orgId:企业id
+     *     }
+     * </pre>
+     * @param orgId 企业id
+     * @param request 用户登录信息
+     * @return 是否已批量收回
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/vehicleRecovery",method = RequestMethod.POST)
+    public MessageResponse vehicleRecovery(@RequestBody String orgId,HttpServletRequest request){
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(orgId)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        } else {
+            // 参数解析错误报“参数解析错误”
+            try {
+                String orgStr = URLDecoder.decode(orgId,"utf-8");
+                Map<String,Object> map = JSONObject.parseObject(orgStr,Map.class);
+                //只有平台才能操作
+                if (!super.getLoginUserInfo(request).getUserType().toString().equals(OrgAndUserType.PLATFORM.toString())) {
+                    return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+                }
+                //企业用户id不能为空
+                if (WzStringUtil.isBlank(map.get("orgId").toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                //登录用户的企业id不能为空
+                if (WzStringUtil.isBlank(super.getLoginUserInfo(request).getOrgId())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                bizVehicleService.vehicleRecovery(map.get("orgId").toString(),super.getLoginUserInfo(request).getOrgId());
+                return new MessageResponse(RunningResult.SUCCESS,"批量归还成功");
+            }catch(BizException ex){
                 throw ex;
             } catch(Exception ex){
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR.code(), ex.getMessage(), ex);
