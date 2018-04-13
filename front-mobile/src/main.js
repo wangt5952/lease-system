@@ -2,9 +2,10 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import Vuex from 'vuex';
+import Mint from 'mint-ui';
 import Resource from 'vue-resource';
 import _ from 'lodash';
-
+import BaiduMap from 'vue-baidu-map';
 import {
   XInput, XButton,
   Tabbar, TabbarItem,
@@ -19,7 +20,9 @@ import App from './App';
 import router from './router';
 
 Vue.use(Vuex);
+Vue.use(Mint);
 Vue.use(Resource);
+Vue.use(BaiduMap, { ak: 'NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0'});
 
 _.forEach([
   XInput, XButton,

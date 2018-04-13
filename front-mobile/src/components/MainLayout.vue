@@ -1,57 +1,234 @@
 <template>
-  <div>
+  <div style="height:100%;">
 
-    <router-view />
-    <tabbar>
-      <tabbar-item link="/tab1">
-        <i slot="icon" class="lt lt-jifenxinxi"></i>
-        <span slot="label">车辆信息</span>
-      </tabbar-item>
-      <tabbar-item link="/tab2">
-        <i slot="icon" class="lt lt-guanligenjin"></i>
-        <span slot="label">提交报修</span>
-      </tabbar-item>
-      <tabbar-item link="/tab3">
-        <i slot="icon" class="lt lt-huxingsousuo"></i>
-        <span slot="label">查询报修</span>
-      </tabbar-item>
-      <tabbar-item link="/tab4">
-        <i slot="icon" class="lt lt-renxiang"></i>
-        <span slot="label">个人中心</span>
-      </tabbar-item>
-    </tabbar>
+    <drawer
+    width="200px;"
+    :show.sync="drawerVisibility"
+    :show-mode="showModeValue"
+    :placement="showPlacementValue"
+    :drawer-style="{'background-color':'#35495e', width: '200px'}">
+
+      <div slot="drawer">
+        <group title="<span class='bg-dr_profile'><img src='/static/images/users/1.jpg' class='dr_profile'></span>">
+          <cell title="我的车辆" link="/car_info" @click="info">
+            <i slot="icon" class="iconfont icon-chelun"></i>
+          </cell>
+          <cell title="个人资料" link="/tab2">
+            <i slot="icon" class="iconfont icon-weibiaoti1"></i>
+          </cell>
+          <cell title="修改密码" link="tab3">
+            <i slot="icon" class="iconfont icon-icon-"></i>
+          </cell>
+          <cell title="关联企业" link="/tab4">
+            <i slot="icon" class="iconfont icon-qiyetupu"></i>
+          </cell>
+        </group>
+      </div>
+
+      <view-box ref="viewBox">
+
+        <x-header slot="header"
+        :left-options="leftOptions"
+        title="小哥乐途">
+          <span  class="bg-profile" slot="overwrite-left" @click="drawerVisibility = !drawerVisibility">
+            <img src="/static/images/users/1.jpg" class="profile">
+          </span>
+          <a slot="right"><i slot="icon" class="iconfont icon-guiji"></i></a>
+        </x-header>
+
+        <baidu-map :center="center" :zoom="zoom" @ready="handler" :dragging="true" :pinch-to-zoom="true" class="bm-view">
+          <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+        </baidu-map>
+        <a class="btn">
+          <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
+          <span>车辆信息</span>
+        </a>
+        <span class="bg-btn"></span>
+      </view-box>
+    </drawer>
+
   </div>
 </template>
 
 <script>
+import { Radio, Group, Cell, Badge, Drawer, Actionsheet, ButtonTab, ButtonTabItem, ViewBox, XHeader, Tabbar, TabbarItem, Loading, TransferDom } from 'vux';
+
 export default {
+  directives: {
+    TransferDom,
+  },
+  components: {
+    Radio,
+    Group,
+    Cell,
+    Badge,
+    Drawer,
+    ButtonTab,
+    ButtonTabItem,
+    ViewBox,
+    XHeader,
+    Tabbar,
+    TabbarItem,
+    Loading,
+    Actionsheet,
+  },
+  computed: {
+    leftOptions() {
+      return {
+        showback: false,
+      };
+    },
+  },
   data() {
     return {
-      msg: 'Welcome to Your Vue.js App',
+      showMenu: false,
+      drawerVisibility: false,
+      showMode: 'push',
+      showModeValue: 'push',
+      showPlacement: 'left',
+      showPlacementValue: 'left',
+      center: { lng: 0, lat: 0 },
+      zoom: 3,
     };
+  },
+  methods: {
+    handler() {
+      this.center.lng = 116.404;
+      this.center.lat = 39.915;
+      this.zoom = 15;
+    },
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="less">
 
->>> .weui-tabbar__item .weui-tabbar__icon {
-  width: auto;
-  height: auto;
+.vux-header {
+  width:100%;
+  height: 65px;
+  background: -webkit-linear-gradient(#16D0A2,#20C987)!important;
+  background: -o-linear-gradient(#16D0A2,#20C987)!important;
+  background: -moz-linear-gradient(#16D0A2,#20C987)!important;
+  background: linear-gradient(#16D0A2,#20C987)!important;
+  position:absolute;
+  left:0;
+  top:0;
+  z-index:100;
+}
 
-}
->>> .weui-tabbar__item i {
-  color: #d6e7e0;
+.vux-header-right a{
+  margin:8px 8px!important;
 }
 
->>> .weui-tabbar__item.weui-bar__item_on i {
-  color: #26bf81 !important;
+.vux-header-right a .iconfont{
+  font-size: 20pt;
+  color: black;
 }
->>> .weui-tabbar__item .weui-tabbar__label {
-  color: #d6e7e0;
+.bg-profile {
+  width: 50px;
+  height:50px;
+  position: absolute;
+  bottom:-45px;
+  background-color: white;
+  border-radius: 100%;
 }
->>> .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label {
-  color: #26bf81 !important;
+.profile {
+  width:45px;
+  height: 45px;
+  margin:2.5px 2.5px;
+  border-radius: 100%;
+}
+.vux-header-title span{
+  margin:8px auto;
+}
+.weui-cells__title {
+  width:100%;
+  height: 135px;
+  margin: 0 auto!important;
+  padding: 0!important;
+  background: -webkit-linear-gradient(#16D0A2,#20C987);
+  background: -o-linear-gradient(#16D0A2,#20C987);
+  background: -moz-linear-gradient(#16D0A2,#20C987);
+  background: linear-gradient(#16D0A2,#20C987);
+}
+.bg-dr_profile {
+  width:65px;
+  height:65px;
+  position: absolute;
+  top: 35px;
+  left: 10px;
+  background-color: white;
+  border-radius: 100%;
+}
+.dr_profile {
+  width:60px;
+  height:60px;
+  margin: 2.5px 2.5px;
+  border-radius: 100%;
+}
+.weui-cell {
+  height:50px;
+}
+.vux-label {
+  font-size: 15pt;
+}
+.weui-cell__hd {
+  margin-right: 10px;
+}
+.weui-cell__hd .iconfont {
+  font-size: 25px;
+}
+.vux-drawer {
+  overflow: hidden;
+}
+.vux-drawer > .vux-drawer-active {
+  background: white!important;
+}
+.vux-drawer > .drawer-left {
+  background: white!important;
+}
+.weui-btn {
+  width:120px;
+  height:120px;
+  border-radius: 100%;
+}
+.bg-btn {
+  width:400px;
+  height:200px;
+  background: #fff;
+  position: absolute;
+  left:-12.5px;
+  bottom: 0;
+  z-index: 2;
+  border-radius:400px 400px 0 0;
+}
+.btn {
+  width:120px;
+  height:120px;
+  position: absolute;
+  left:127.5px;
+  bottom: 120px;
+  background: #16D0A1;
+  opacity: 100%;
+  box-shadow: 0 2px 9px;
+  border-radius: 100%;
+  z-index: 3;
+}
+.btn span {
+  font-size: 18px;
+  font-weight: 400;
+  color: #fff;
+  position: absolute;
+  left:24px;
+  bottom: 30px;
+}
+.btn .iconfont {
+  margin-left: 33.5px;
+  color: #fff;
+  font-size: 40pt;
+}
+.bm-view {
+  width:100%;
+  height:100%;
 }
 </style>
