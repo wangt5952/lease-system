@@ -95,18 +95,24 @@ export default {
     background: #fff;
     margin-bottom: 20px;
     position: absolute;
-    top:450px;
+    top:610px;
     left:5%;
     box-shadow: 0 2px 5px;
     border-radius: 10px;
     z-index: 1;
   }
->>>.weui-cells__title {
+  .weui-cell {
+    height:50px;
+  }
+ >>>.weui-cells__title {
     height:40px;
     font-size: 18px;
     color: #000;
     background-color: #fff;
     text-align: center;
+  }
+>>>.vux-label {
+    font-size: 15pt;
   }
   .kong {
     height:20px;
@@ -115,7 +121,7 @@ export default {
     width: 8px;
     height:45px;
     position: absolute;
-    top:420px;
+    top:580px;
     left:50px;
     background-image: url(/static/images/bg-huan.jpg);
     z-index: 2;
@@ -124,7 +130,7 @@ export default {
     width: 8px;
     height:45px;
     position: absolute;
-    top:420px;
+    top:580px;
     left:70px;
     background-image: url(/static/images/bg-huan.jpg);
     z-index: 2;
@@ -133,7 +139,7 @@ export default {
     width: 8px;
     height:45px;
     position: absolute;
-    top:420px;
+    top:580px;
     right:50px;
     background-image: url(/static/images/bg-huan.jpg);
     z-index: 2;
@@ -142,7 +148,7 @@ export default {
     width: 8px;
     height:45px;
     position: absolute;
-    top:420px;
+    top:580px;
     right:70px;
     background-image: url(/static/images/bg-huan.jpg);
     z-index: 2;

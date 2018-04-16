@@ -134,7 +134,7 @@ export default {
 .vux-header-title span{
   margin-top:28px;
 }
-.weui-cells__title {
+ .vux-drawer .weui-cells__title {
   width:100%;
   height: 135px;
   margin: 0 auto!important;
