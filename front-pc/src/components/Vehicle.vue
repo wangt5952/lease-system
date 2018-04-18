@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
-     <button @click="getLocation()">试一下</button>
-    {{ aaaa }} 
+     <!-- <button @click="getLocation()">试一下</button>
+    {{ aaaa }}  -->
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-vehicle-addone') >= 0">
