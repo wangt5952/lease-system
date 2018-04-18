@@ -24,16 +24,18 @@
         </div>
       </div>
 
-      <baidu-map class="allmap" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="15" @moveend="syncCenterAndZoom" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+      <baidu-map class="allmap" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @moveend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
         <!-- 圆形图 -->
         <bm-circle :center="circlePath.center" :radius="circlePath.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="1" @lineupdate="updateCirclePath" :fill-opacity="0.1"></bm-circle>
         <!-- 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+        <!-- 定位控件 -->
+        <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true" @locationSuccess="positionSuccess" @locationError="positionError"></bm-geolocation>
         <template v-if="vehiclePathVisible">
           <!-- 路线折线图 -->
-          <bm-polyline :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
+          <bm-polyline v-if="selectedItem.path" :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
           <!-- 点聚合(图片所在位置) -->
           <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
         </template>
@@ -205,7 +207,9 @@ export default {
       userDialogVisible: false,
       vehiclePathVisible: false,
       mapCenter: '南京',
+      zoomNum: 15,
 
+      // 指定范围内的车辆集合
       radiusVehicleList: [],
     };
   },
@@ -227,16 +231,52 @@ export default {
     // },
   },
   methods: {
+
+    // 单击右下角的定位
+    positionSuccess() {
+    },
+    positionError() {
+    },
     // 圆形区域
     updateCirclePath(e) {
       this.circlePath.center = e.target.getCenter();
       this.circlePath.radius = e.target.getRadius();
     },
-    // 更改地图缩放级别时触发该事件
-    syncCenterAndZoom() {
-      // const { lng, lat } = e.target.getCenter();
-      // this.circlePath.radius += 200;
-      // console.log(this.circlePath.radius);
+
+    // 地图更改缩放级别结束时触发触发此事件
+    async syncCenterAndZoom(e) {
+      // 获取地图中心点
+      const { lng, lat } = e.target.getCenter();
+      // 或者缩放等级
+      const zoomNum = e.target.getZoom();
+      let num = 0;
+      if (zoomNum > 10) {
+        switch (zoomNum) {
+          // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
+          case 16: this.circlePath.radius = 900; num = 900; break;
+          // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
+          case 15: this.circlePath.radius = 2000; num = 2000; break;
+          case 14: this.circlePath.radius = 2000; num = 2000; break;
+          case 13: this.circlePath.radius = 4000; num = 4000; break;
+          case 12: this.circlePath.radius = 10000; num = 10000; break;
+          case 11: this.circlePath.radius = 20000; num = 20000; break;
+          default: this.circlePath.radius = 200000; num = 1000;
+        }
+        const { code, message } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: lng, lat: lat, radius: num,
+        })).body;
+        if (code !== '200') throw new Error(message);
+      }
+    },
+    // 地图移动结束时触发此事件
+    async syncCenterAndZooms(e) {
+      const { lng, lat } = e.target.getCenter();
+      this.circlePath.center = e.target.getCenter();
+      this.circlePath.radius = 2000;
+      const { code, message } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+        lng: lng, lat: lat, radius: 2000,
+      })).body;
+      if (code !== '200') throw new Error(message);
     },
     showVehicleDialog() {
       this.vehicleDialogVisible = true;
@@ -253,40 +293,6 @@ export default {
     handleMapClick() {
     },
 
-    // 百度地图初始化————————————————————————————————————————————————————————————————————————————————————
-    initMap (BMap) {
-      this.BMap = BMap
-      // this.init(BMap)
-    },
-    getMapScript () {
-      if (!global.BMap) {
-        const ak = this.ak || this._BMap().ak
-        global.BMap = {}
-        global.BMap._preloader = new Promise((resolve, reject) => {
-          global._initBaiduMap = function () {
-            resolve(global.BMap)
-            global.document.body.removeChild($script)
-            global.BMap._preloader = null
-            global._initBaiduMap = null
-          }
-          const $script = document.createElement('script')
-          global.document.body.appendChild($script)
-          $script.src = `https://api.map.baidu.com/api?v=2.0&ak=${ak}&callback=_initBaiduMap`
-        })
-        return global.BMap._preloader
-        console.log(BMap);
-      } else if (!global.BMap._preloader) {
-        return Promise.resolve(global.BMap)
-      } else {
-        return global.BMap._preloader
-      }
-    },
-    reset () {
-      const {getMapScript, initMap} = this
-      getMapScript()
-        .then(initMap)
-    },
-    // —————————————————————————————————————————————————————————————————————————————————————————————————
     // 车辆单击事件
     async handleSelectItem(item) {
       this.mapCenter = {
@@ -318,12 +324,6 @@ export default {
         } else {
           this.userInfo = {};
         }
-
-        // 根据经度、纬度、半径范围查询信息
-        // const { code: radiusCode, message: radiusMessage } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-        //   lng: item.LON, lat: item.LAT, radius: 1000,
-        // })).body;
-        // if (radiusCode !== '200') throw new Error(radiusMessage);
 
         // 车辆某段时间内行驶路径
         const { time } = this.searchLocList;
@@ -358,17 +358,9 @@ export default {
       }
 
       const loc = await this.getLocation(item.LON, item.LAT);
-      console.log(loc);
+      // console.log(loc);
 
       this.address = loc.address;
-
-      // // 根据坐标反解析地址
-      // const BMap = new BMap();
-      // const geocoder = BMap.Geocoder();
-      // const point = BMap.Point(item.LON, item.LAT);
-      // geocoder.getLocation(point, (geocoderResult) => {
-      //   this.address = geocoderResult.address;
-      // });
     },
 
     // 获取所有车辆信息
@@ -379,9 +371,6 @@ export default {
       if (code !== '200') throw new Error(message);
       this.vehicleList = respData.rows;
 
-      // if (this.vehicleList && this.vehicleList.length && !_.find(this.vehicleList, { id: this.selectedId })) {
-      //   this.selectedId = this.vehicleList[0].id;
-      // }
       // 初始化区间范围内车辆、电池、使用人信息
       try {
         // 车辆电池信息
@@ -408,11 +397,10 @@ export default {
         this.$message.error(userMessage);
       }
       await this.reloadVehicleLoc();
-      // await this.reloadVehiclePower();
 
       // 以所有车辆中某辆车的定位信息 为条件 设置 区间范围
       const { code: radiusCode, message: radiusMessage, respData: radiusRespData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-        lng: this.vehicleList[4].lng, lat: this.vehicleList[4].lat, radius: 1000,
+        lng: this.vehicleList[0].lng, lat: this.vehicleList[0].lat, radius: 1000,
       })).body;
       if (radiusCode !== '200') throw new Error(radiusMessage);
 
@@ -444,29 +432,20 @@ export default {
         };
       });
     },
-    // 获取车辆电池电量信息
-    // async reloadVehiclePower() {
-    //   const { vehicleList } = this;
-    //   const { respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk', _.map(vehicleList, 'id'))).body;
-    //   // if (code !== '200') throw new Error(message);
-    //   const locList = respData;
-    //   this.vehicleList = _.map(vehicleList, (o) => {
-    //     const power = _.find(locList, { VehicleID: o.id });
-    //     if (!power) return o;
-    //     return {
-    //       ...o,
-    //       value: power.RSOC,
-    //     };
-    //   });
-    // },
     // 获取车辆在某一段时间内行驶的轨迹
     async reloadLocList() {
       const { time } = this.searchLocList;
       const id = this.selectedId;
+      const param = { id };
+      if (time) {
+        param.startTime = time[0];
+        param.endTime = time[1];
+      }
       try {
-        const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1] })).body;
+        const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
         // if (code !== '200') throw new Error(message);
         const locList = respData;
+        if (!locList.length) throw new Error('该时间段没有行驶轨迹');
         this.mapCenter = {
           lng: locList[0].LON, lat: locList[0].LAT,
         };
@@ -486,17 +465,14 @@ export default {
       }
     },
 
+    // 逆地址解析
     getLocation(lng, lat) {
-      return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)))
-    }
+      return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+    },
   },
   async mounted() {
+    await this.getLocation(118.77807441, 32.0572355);
     await this.reloadVehicleList();
-
-    const loc = await this.getLocation(116.307852,40.057031);
-    console.log(loc);
-    // this.getMapScript();
-    // this.reset();
   },
 };
 </script>
