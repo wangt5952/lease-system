@@ -9,14 +9,24 @@
     >
 
       <div slot="drawer">
-        <group title="<span class='bg-dr_profile'><img src='/static/images/users/1.jpg' class='dr_profile'></span>">
-          <cell title="我的车辆" link="/info">
+        <div class="head">
+          <span class="bg-dr_profile">
+            <img src="/static/images/users/1.jpg" class="dr_profile">
+          </span>
+          <div class="info">
+            <p class="name">{{key_user_info.userName}}</p>
+            <p class="realname">{{key_user_info.userRealNameAuthFlag==true?'已实名':'未实名'}}</p>
+          </div>
+        </div>
+
+        <group>
+          <cell title="我的车辆" link="/mycar">
             <i slot="icon" class="iconfont icon-chelun"></i>
           </cell>
-          <cell title="个人资料" link="/tab2">
+          <cell title="个人资料" link="/profile">
             <i slot="icon" class="iconfont icon-weibiaoti1"></i>
           </cell>
-          <cell title="修改密码" link="tab3">
+          <cell title="修改密码" link="/tab3">
             <i slot="icon" class="iconfont icon-icon-"></i>
           </cell>
           <cell title="关联企业" link="/tab4">
@@ -52,9 +62,9 @@
 
 <script>
 import { Group, Cell, Drawer, ViewBox, XHeader } from 'vux';
+import { mapState } from 'vuex';
 
 export default {
-
   components: {
     Group,
     Cell,
@@ -68,6 +78,11 @@ export default {
         showback: false,
       };
     },
+    ...mapState({
+      key_user_info: state => state.key_user_info,
+
+      relogin: state => state.relogin,
+    }),
   },
   data() {
     return {
@@ -114,6 +129,7 @@ export default {
   font-size: 20pt;
   color: black;
 }
+
 .bg-profile {
   width: 50px;
   height:50px;
@@ -122,28 +138,35 @@ export default {
   background-color: white;
   border-radius: 100%;
 }
+
 .profile {
   width:45px;
   height: 45px;
   margin:2.5px 2.5px;
   border-radius: 100%;
 }
+
 .vux-header-title {
   height:100%!important;
 }
+
 .vux-header-title span{
   margin-top:28px;
 }
- .vux-drawer .weui-cells__title {
+
+.head {
   width:100%;
-  height: 135px;
-  margin: 0 auto!important;
-  padding: 0!important;
-  background: -webkit-linear-gradient(#16D0A2,#20C987);
-  background: -o-linear-gradient(#16D0A2,#20C987);
-  background: -moz-linear-gradient(#16D0A2,#20C987);
-  background: linear-gradient(#16D0A2,#20C987);
+  height:135px;
+  background: -webkit-linear-gradient(#16D0A2,#20C987)!important;
+  background: -o-linear-gradient(#16D0A2,#20C987)!important;
+  background: -moz-linear-gradient(#16D0A2,#20C987)!important;
+  background: linear-gradient(#16D0A2,#20C987)!important;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  z-index: -1;
 }
+
 .bg-dr_profile {
   width:65px;
   height:65px;
@@ -153,39 +176,53 @@ export default {
   background-color: white;
   border-radius: 100%;
 }
+
 .dr_profile {
   width:60px;
   height:60px;
   margin: 2.5px 2.5px;
   border-radius: 100%;
 }
+
+.weui-cells {
+  margin:0!important;
+}
+
 .weui-cell {
   height:50px;
 }
+
 .vux-label {
   font-size: 15pt;
 }
+
 .weui-cell__hd {
   margin-right: 10px;
 }
+
 .weui-cell__hd .iconfont {
   font-size: 25px;
 }
+
 .vux-drawer {
   overflow: hidden;
 }
+
 .vux-drawer > .vux-drawer-active {
   width:200px;
   background: white!important;
 }
+
 .vux-drawer > .drawer-left {
   background: white!important;
 }
+
 .weui-btn {
   width:120px;
   height:120px;
   border-radius: 100%;
 }
+
 .bg-btn {
   width:400px;
   height:200px;
@@ -196,6 +233,7 @@ export default {
   z-index: 2;
   border-radius:400px 400px 0 0;
 }
+
 .btn {
   width:120px;
   height:120px;
@@ -208,6 +246,7 @@ export default {
   border-radius: 100%;
   z-index: 3;
 }
+
 .btn span {
   font-size: 18px;
   font-weight: 400;
@@ -216,13 +255,38 @@ export default {
   left:24px;
   bottom: 30px;
 }
+
 .btn .iconfont {
   margin-left: 33.5px;
   color: #fff;
   font-size: 40pt;
 }
+
 .bm-view {
   width:100%;
   height:100%;
+}
+
+.info {
+  position: absolute;
+  left:90px;
+  top:60px;
+}
+
+.info .name {
+  margin-left: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.info .realname {
+  width:80px;
+  background-color: #666;
+  font-size: 15px;
+  font-weight: 400;
+  color: #fff;
+  border-radius: 10px;
+  text-align: center;
 }
 </style>

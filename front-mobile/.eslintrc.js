@@ -53,5 +53,6 @@ module.exports = {
     'max-len': 'off',
     'camelcase': 'off',
     'linebreak-style': 'off',
+    'no-console':'off',
   }
 }

@@ -38,7 +38,6 @@ export default {
   data() {
     return {
       form: {},
-      msg: 'Welcome to Your Vue.js App',
     };
   },
   methods: {
@@ -53,7 +52,6 @@ export default {
         if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_user_info } = respData;
         await this.$store.commit('login', { key_login_token, key_user_info });
-
         this.$vux.toast.show({ text: '登录成功', type: 'success', width: '10em' });
         this.$router.push('/');
       } catch (e) {

@@ -2,16 +2,16 @@
   <div>
     <div class="head">
       <div class="left"><a @click="back"><i slot="icon" class="iconfont icon-fanhui"></i></a></div>
-      <div class="tlte"><span>车辆信息</span></div>
+      <div class="tlte"><span>我的车辆</span></div>
     </div>
-    <div class="battery_info">
-      <group title="电池信息">
-        <cell title="电池编号" value="dc00001" ></cell>
-        <cell title="剩余电量" value="80%"></cell>
-        <cell title="生产厂商" value="南京第一电池厂"></cell>
-        <cell title="型号" value="锂电池"></cell>
-        <cell title="参数" value="48V20A"></cell>
-        <cell title="状态" value="正常"></cell>
+    <div class="vehicle_info">
+      <group title="车辆信息">
+        <cell title="车辆编号" :value="list.vehicleCode" ></cell>
+        <cell title="车辆型号" :value="list.vehiclePn"></cell>
+        <cell title="车辆品牌" :value="list.vehicleBrand"></cell>
+        <cell title="车辆产地" :value="list.vehicleMadeIn"></cell>
+        <cell title="车辆生产商" :value="list.vehicleMfrsName"></cell>
+        <cell title="车辆状态" :value="list.vehicleStatus"></cell>
         <cell title="" value="" class="kong"></cell>
       </group>
     </div>
@@ -19,34 +19,46 @@
     <div class="left2-huan"></div>
     <div class="right1-huan"></div>
     <div class="right2-huan"></div>
-    <div class="part_info">
-      <group title="配件信息">
-        <cell title="配件编号" value="pj00001" ></cell>
-        <cell title="配件货品" value="锡柴"></cell>
-        <cell title="品牌" value="南京第一配件"></cell>
-        <cell title="型号" value="XXX"></cell>
-        <cell title="参数" value="XXX"></cell>
-        <cell title="状态" value="正常"></cell>
+    <div class="battery_info">
+      <group title="电池信息" v-for="o in batteryList">
+        <cell title="电池编号" :value="o.batteryCode" ></cell>
+        <cell title="电池货品" :value="o.batteryName"></cell>
+        <cell title="电池品牌" :value="o.batteryBrand"></cell>
+        <cell title="电池型号" :value="o.batteryPn"></cell>
+        <cell title="参数" :value="o.batteryParameters"></cell>
+        <cell title="生产厂商" :value="o.batteryMfrsName"></cell>
+        <cell title="电池状态" :value="o.batteryStatus"></cell>
+        <cell title="" value="" class="kong"></cell>
       </group>
     </div>
   </div>
 </template>
 
 <script>
-import { Cell, CellBox, CellFormPreview, Group, Badge } from 'vux';
+import { Cell, Group } from 'vux';
 
 export default {
   components: {
     Group,
     Cell,
-    CellFormPreview,
-    CellBox,
-    Badge,
+  },
+  data() {
+    return {
+      list: {},
+      batteryList: [],
+      partsList: [],
+    };
   },
   methods: {
     back() {
       window.history.go(-1);
     },
+  },
+  async mounted() {
+    const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', { id: this.$route.params.id, flag: 'true' })).body;
+    if (code !== '200') throw new Error(message || code);
+    this.list = respData;
+    this.batteryList = respData.bizBatteries;
   },
 };
 </script>
@@ -80,7 +92,7 @@ export default {
     left:40%;
     top:25px;
   }
-  .battery_info {
+  .vehicle_info {
     width:90%;
     background: #fff;
     position: absolute;
@@ -90,7 +102,7 @@ export default {
     border-radius: 10px;
     z-index: 1;
   }
-  .part_info {
+  .battery_info {
     width:90%;
     background: #fff;
     margin-bottom: 20px;

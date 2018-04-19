@@ -6,11 +6,13 @@ Vue.use(Router);
 export default new Router({
   mode: 'history',
   routes: [
-    { path: '/', component: () => import('@/components/MainLayout') },
     { path: '/login', component: () => import('@/components/Login') },
     { path: '/join', component: () => import('@/components/Join') },
     { path: '/reset', component: () => import('@/components/Reset') },
-    { path: '/info', component: () => import('@/components/Info') },
+    { path: '/', component: () => import('@/components/MainLayout') },
+    { path: '/info/:id', component: () => import('@/components/Info') },
     { path: '/track', component: () => import('@/components/Track') },
+    { path: '/mycar', component: () => import('@/components/MyCar') },
+    { path: '/profile', component: () => import('@/components/Profile') },
   ],
 });
