@@ -136,7 +136,6 @@
     <el-dialog title="用户信息" :visible.sync="userDialogVisible" width="30%">
       <div class="item"><div class="item-name">用户名</div><div class="item-value">{{ userInfo.loginName }}</div></div>
       <div class="item"><div class="item-name">手机号码</div><div class="item-value">{{ userInfo.userMobile }}</div></div>
-
       <div class="item"><div class="item-name">用户类别</div>
         <template v-if="userInfo.userType === 'INDIVIDUAL'">
           <div class="item-value">个人</div>
@@ -231,7 +230,6 @@ export default {
     // },
   },
   methods: {
-
     // 单击右下角的定位
     positionSuccess() {
     },
@@ -262,10 +260,15 @@ export default {
           case 11: this.circlePath.radius = 20000; num = 20000; break;
           default: this.circlePath.radius = 200000; num = 1000;
         }
-        const { code, message } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: lng, lat: lat, radius: num,
-        })).body;
-        if (code !== '200') throw new Error(message);
+        try {
+          const { code, message } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+            lng: lng, lat: lat, radius: num,
+          })).body;
+          if (code !== '200') throw new Error(message);
+        } catch (err) {
+          const message = err.statusText || err.message;
+          this.$message.error(message);
+        }
       }
     },
     // 地图移动结束时触发此事件
@@ -273,10 +276,15 @@ export default {
       const { lng, lat } = e.target.getCenter();
       this.circlePath.center = e.target.getCenter();
       this.circlePath.radius = 2000;
-      const { code, message } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-        lng: lng, lat: lat, radius: 2000,
-      })).body;
-      if (code !== '200') throw new Error(message);
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: lng, lat: lat, radius: this.circlePath.radius,
+        })).body;
+        if (code !== '200') throw new Error(message);
+      } catch (err) {
+        const message = err.statusText || err.message;
+        this.$message.error(message);
+      }
     },
     showVehicleDialog() {
       this.vehicleDialogVisible = true;
@@ -399,12 +407,20 @@ export default {
       await this.reloadVehicleLoc();
 
       // 以所有车辆中某辆车的定位信息 为条件 设置 区间范围
-      const { code: radiusCode, message: radiusMessage, respData: radiusRespData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-        lng: this.vehicleList[0].lng, lat: this.vehicleList[0].lat, radius: 1000,
-      })).body;
-      if (radiusCode !== '200') throw new Error(radiusMessage);
+      // const { code: radiusCode, message: radiusMessage, respData: radiusRespData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+      //   lng: this.vehicleList[0].lng, lat: this.vehicleList[0].lat, radius: 1000,
+      // })).body;
+      try {
+        const { code: radiusCode, message: radiusMessage, respData: radiusRespData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: 118.74594531868764, lat: 31.973434835225518, radius: 1000,
+        })).body;
+        if (radiusCode !== '200') throw new Error(radiusMessage);
+        this.radiusVehicleList = radiusRespData;
+      } catch (e) {
+        const radiusMessage = e.statusText || e.radiusMessage;
+        this.$message.error(radiusMessage);
+      }
 
-      this.radiusVehicleList = radiusRespData;
       if (this.radiusVehicleList && this.radiusVehicleList.length && !_.find(this.radiusVehicleList, { vehicleId: this.selectedId })) {
         this.selectedId = this.radiusVehicleList[0].vehicleId;
       }
@@ -469,9 +485,26 @@ export default {
     getLocation(lng, lat) {
       return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
     },
+    // 百度地图定位
+    getLocations(lng, lat) {
+      return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition((r) => {
+        if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+          var mk = new BMap.Marker(r.point);
+          map.addOverlay(mk);
+          map.panTo(r.point);
+          alert(`您的位置：${r.point.lng} ,${r.point.lat}`);
+        }
+        else {
+          alert('failed' + this.getStatus());
+        }
+      },{enableHighAccuracy: true}));
+    },
   },
   async mounted() {
-    await this.getLocation(118.77807441, 32.0572355);
+    const locs = await this.getLocations(118.75761510569, 31.977260789187);
+    console.log(locs);
+    const loc = await this.getLocation(118.75761510569, 31.977260789187);
+    console.log(loc);
     await this.reloadVehicleList();
   },
 };

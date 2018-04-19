@@ -239,7 +239,6 @@
         <el-button :disabled="loading" type="primary" @click="identification">通过</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 

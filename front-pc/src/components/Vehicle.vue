@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
-     <!-- <button @click="getLocation()">试一下</button>
-    {{ aaaa }}  -->
+     <!--<button @click="getLocation()">试一下</button>
+    {{ aaaa }}-->
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-vehicle-addone') >= 0">
@@ -542,12 +542,14 @@ export default {
     // html5定位
     getLocation() {
       if (navigator.geolocation) {
+        console.log(navigator);
         navigator.geolocation.getCurrentPosition(this.showPosition, this.showError);
       } else {
         this.aaaa = '此浏览器不支持地理位置';
       }
     },
     showPosition(position) {
+      alert(2);
       this.aaaa = `经度: ${position.coords.longitude} ，纬度: ${position.coords.latitude}`;
     },
     showError(error) {
