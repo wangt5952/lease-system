@@ -36,7 +36,8 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = "/manager/parts")
-public class BizPartsController extends BaseController {
+public class
+BizPartsController extends BaseController {
 
     /*日志*/
     private final Logger logger = LoggerFactory.getLogger(BizPartsController.class);

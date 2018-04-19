@@ -1113,10 +1113,13 @@ public class BizVehicleController extends BaseController {
             for (String deviceKey : deviceKeys) {
                 dLoc = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_LOC_MAP, deviceKey);
                 double dist = WzGPSUtil.calcDistanceByM(wgsLatLng[0], wgsLatLng[1], dLoc.getDouble(DeviceApiConstants.REQ_LAT), dLoc.getDouble(DeviceApiConstants.REQ_LON));
-                if (dist < locAndRadiusParam.getRadius()) {
+                if (dist <= locAndRadiusParam.getRadius()) {
                     deviceLocsCache.put(dLoc.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID), dLoc);
                     deviceCds.add(dLoc.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID));
                 }
+            }
+            if (null == deviceCds || 0 == deviceCds.size()) {
+                return new MessageResponse(RunningResult.NOT_FOUND.code(), "未发现车辆");
             }
             SysUser userTemp = getLoginUserInfo(request);
             if (userTemp == null) {
