@@ -208,7 +208,7 @@
     </select>
 
     <select id="selectExtByBatteryCodes" parameterType="java.util.Map" resultType="java.util.Map">
-        select
+        SELECT
         b.id batteryId,
         b.battery_code batteryCode,
         v.id vehicleId,
@@ -223,22 +223,25 @@
         v.update_user updateUser,
         v.update_time updateTime,
         m.mfrs_name mfrsName
-        from
+        FROM
         biz_battery b
-        inner join biz_ref_vehicle_battery vb on b.id = vb.battery_id and vb.unbind_time IS NULL
-        inner join biz_vehicle v on vb.vehicle_id = v.id
-        LEFT join biz_manufacturer m on v.mfrs_id = m.id
+        INNER JOIN biz_ref_vehicle_battery vb ON b.id = vb.battery_id and vb.unbind_time IS NULL
+        INNER JOIN biz_vehicle v ON vb.vehicle_id = v.id
+        LEFT JOIN biz_manufacturer m ON v.mfrs_id = m.id
         LEFT JOIN biz_ref_org_vehicle r ON v.id = r.vehicle_id AND r.unbind_time IS NULL
         LEFT JOIN biz_ref_user_vehicle r1 ON v.id = r1.vehicle_id AND r1.unbind_time IS NULL
-        where
-        <foreach collection="batteryCodes" item="batteryCode" index="index"  open="(" separator="or" close=")">
-            b.battery_code = #{batteryCode}
-        </foreach>
+        WHERE 1 = 1
+        <if test="batteryCodes != null and batteryCodes.size > 0" >
+            AND
+          <foreach collection="batteryCodes" item="batteryCode" index="index"  open="(" separator="or" close=")">
+              b.battery_code = #{batteryCode}
+          </foreach>
+        </if>
         <if test="userId != null and userId != ''" >
-            and r1.user_id = #{userId,jdbcType=VARCHAR}
+            AND r1.user_id = #{userId,jdbcType=VARCHAR}
         </if>
         <if test="orgId != null and orgId != ''" >
-            and r.org_id = #{orgId,jdbcType=VARCHAR}
+            AND r.org_id = #{orgId,jdbcType=VARCHAR}
         </if>
     </select>
 
