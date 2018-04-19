@@ -25,44 +25,43 @@
         </el-form>
       </template>
     </div>
-
-
-    <el-table :data="list" style="width: 100%;">
-      <el-table-column prop="loginName" label="用户名"></el-table-column>
-      <el-table-column prop="userMobile" label="手机号"></el-table-column>
-      <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
-      <el-table-column prop="orgName" label="所属企业名称">
-        <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
-          {{ scope.row.orgName }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
-      <el-table-column prop="nickName" label="昵称"></el-table-column>
-      <el-table-column prop="userName" label="姓名"></el-table-column>
-      <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
-      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <el-table-column label="操作" width="270">
-        <template slot-scope="{row}">
-          <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
-            <template v-if="row.userType === 'INDIVIDUAL'">
-              <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
-              <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
-              <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看身份证</el-button>
+    <div>
+      <el-table :data="list" style="width: 100%;">
+        <el-table-column prop="loginName" label="用户名"></el-table-column>
+        <el-table-column prop="userMobile" label="手机号"></el-table-column>
+        <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
+        <el-table-column prop="orgName" label="所属企业名称">
+          <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
+            {{ scope.row.orgName }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
+        <el-table-column prop="nickName" label="昵称"></el-table-column>
+        <el-table-column prop="userName" label="姓名"></el-table-column>
+        <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
+        <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+        <el-table-column label="操作" width="270">
+          <template slot-scope="{row}">
+            <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
+              <template v-if="row.userType === 'INDIVIDUAL'">
+                <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
+                <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
+                <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看身份证</el-button>
+              </template>
+            </template>
+            <template v-if="key_user_info.userType === 'PLATFORM'">
+              <template v-if="row.userType === 'ENTERPRISE'">
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="retrieveVehicle(row)">批量收回车辆</el-button>
+              </template>
+              <!-- <template v-if="row.userType !== 'INDIVIDUAL'">
+              </template> -->
+              <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
             </template>
           </template>
-          <template v-if="key_user_info.userType === 'PLATFORM'">
-            <template v-if="row.userType === 'ENTERPRISE'">
-              <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-              <el-button icon="el-icon-edit" size="mini" type="text" @click="retrieveVehicle(row)">批量收回车辆</el-button>
-            </template>
-            <!-- <template v-if="row.userType !== 'INDIVIDUAL'">
-            </template> -->
-            <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
-          </template>
-        </template>
-      </el-table-column>
-    </el-table>
-
+        </el-table-column>
+      </el-table>
+    </div>
     <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
@@ -73,90 +72,88 @@
       :total="total">
     </el-pagination>
 
-    <template v-if="key_user_info.userType === 'PLATFORM'">
-      <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
-        <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
-          <el-row :gutter="10">
+    <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
+      <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
+              <el-input v-model="form.loginName" placeholder="请填写用户名" auto-complete="off" :disabled="disabledForm"></el-input>
+            </el-form-item>
+          </el-col>
+          <template>
             <el-col :span="8">
-              <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
-                <el-input v-model="form.loginName" placeholder="请填写用户名" auto-complete="off" :disabled="disabledForm"></el-input>
+              <el-form-item prop="userMobile" label="手机号码" :rules="[{required:true, message:'请填写手机号码'}]">
+                <el-input v-model="form.userMobile" placeholder="请填写手机号码" auto-complete="off" :disabled="disabledForm"></el-input>
               </el-form-item>
             </el-col>
-            <template>
-              <el-col :span="8">
-                <el-form-item prop="userMobile" label="手机号码" :rules="[{required:true, message:'请填写手机号码'}]">
-                  <el-input v-model="form.userMobile" placeholder="请填写手机号码" auto-complete="off" :disabled="disabledForm"></el-input>
-                </el-form-item>
-              </el-col>
-            </template>
-            <el-col :span="8">
-              <el-form-item prop="userType" :rules="[{required:true, message:'请选择用户类型'}]" label="用户类型">
-                <el-select v-model="form.userType" placeholder="请选择用户类型" style="width:100%;" :disabled="disabledForm">
-                  <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="LOGO路径">
-                <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="昵称">
-                <el-input v-model="form.nickName" placeholder="请输入昵称" auto-complete="off"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
-                <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="userRealNameAuthFlag" :rules="[{required:true, message:'请选择实名认证类型'}]" label="实名认证">
-                <el-select v-model="form.userRealNameAuthFlag" placeholder="请选择实名认证类型" style="width:100%;">
-                  <el-option v-for="o in authList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="userStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
-                <el-select v-model="form.userStatus" placeholder="请选择状态" style="width:100%;">
-                  <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="orgId" :rules="[{required:true, message:'请选择企业'}]" label="所属企业">
-                <el-select v-model="form.orgId" placeholder="请选择企业" style="width:100%;" >
-                  <el-option v-for="o in orgList" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="closeForm">取消</el-button>
-          <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
-        </span>
-      </el-dialog>
-      <el-dialog :title="`分配角色 ( ${assignRoleForm.name} ) `" :visible.sync="assignRoleFormVisible" :close-on-click-modal="false">
-        <el-form :model="form" ref="form" v-loading="loading && assignRoleFormVisible">
-          <el-row :gutter="10">
-            <el-col :span="24">
-              <el-form-item label="角色">
-                <el-select v-model="assignRoleForm.list" :placeholder="`请选择角色`" style="width:100%;" multiple>
-                  <el-option v-for="o in roleList" :key="o.id" :label="o.roleName" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-        <span slot="footer" class="dialog-footer" >
-          <el-button @click="assignRoleFormVisible = false">取消</el-button>
-          <el-button :disabled="loading" type="primary" @click="saveAssignRoleForm">{{assignRoleForm.id ? '保存' : '添加'}}</el-button>
-        </span>
-      </el-dialog>
-    </template>
+          </template>
+          <el-col :span="8">
+            <el-form-item prop="userType" :rules="[{required:true, message:'请选择用户类型'}]" label="用户类型">
+              <el-select v-model="form.userType" placeholder="请选择用户类型" style="width:100%;" :disabled="disabledForm">
+                <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="LOGO路径">
+              <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="昵称">
+              <el-input v-model="form.nickName" placeholder="请输入昵称" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
+              <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="userRealNameAuthFlag" :rules="[{required:true, message:'请选择实名认证类型'}]" label="实名认证">
+              <el-select v-model="form.userRealNameAuthFlag" placeholder="请选择实名认证类型" style="width:100%;">
+                <el-option v-for="o in authList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="userStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
+              <el-select v-model="form.userStatus" placeholder="请选择状态" style="width:100%;">
+                <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="orgId" :rules="[{required:true, message:'请选择企业'}]" label="所属企业">
+              <el-select v-model="form.orgId" placeholder="请选择企业" style="width:100%;" >
+                <el-option v-for="o in orgList" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeForm">取消</el-button>
+        <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog :title="`分配角色 ( ${assignRoleForm.name} ) `" :visible.sync="assignRoleFormVisible" :close-on-click-modal="false">
+      <el-form :model="form" ref="form" v-loading="loading && assignRoleFormVisible">
+        <el-row :gutter="10">
+          <el-col :span="24">
+            <el-form-item label="角色">
+              <el-select v-model="assignRoleForm.list" :placeholder="`请选择角色`" style="width:100%;" multiple>
+                <el-option v-for="o in roleList" :key="o.id" :label="o.roleName" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer" >
+        <el-button @click="assignRoleFormVisible = false">取消</el-button>
+        <el-button :disabled="loading" type="primary" @click="saveAssignRoleForm">{{assignRoleForm.id ? '保存' : '添加'}}</el-button>
+      </span>
+    </el-dialog>
 
     <!-- 车辆列表 -->
     <el-dialog title="车辆列表" :visible.sync="vehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
@@ -226,7 +223,7 @@
       </span>
     </el-dialog>
 
-    <!-- 照片表单a -->
+    <!-- 照片表单 -->
     <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <!-- 身份证正面 -->
       <img :src="`data:image/jpg;base64,${cardPhotoFront}`"/>
