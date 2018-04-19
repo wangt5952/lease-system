@@ -490,7 +490,9 @@ export default {
       return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition((r) => {
         if (this.getStatus() === BMAP_STATUS_SUCCESS) {
           var mk = new BMap.Marker(r.point);
+          // 向地图中添加图标
           // map.addOverlay(mk);
+          // 把当前坐标设为中心点
           this.mapCenter = r.point;
           alert(`您的位置：${r.point.lng} ,${r.point.lat}`);
         }
