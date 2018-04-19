@@ -25,7 +25,7 @@
         </el-form>
       </template>
     </div>
-    <div>
+    <div style="">
       <el-table :data="list" style="width: 100%;">
         <el-table-column prop="loginName" label="用户名"></el-table-column>
         <el-table-column prop="userMobile" label="手机号"></el-table-column>
