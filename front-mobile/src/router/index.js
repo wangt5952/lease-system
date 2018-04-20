@@ -14,5 +14,6 @@ export default new Router({
     { path: '/track', component: () => import('@/components/Track') },
     { path: '/mycar', component: () => import('@/components/MyCar') },
     { path: '/profile', component: () => import('@/components/Profile') },
+    { path: '/parts/:id', component: () => import('@/components/Parts') },
   ],
 });

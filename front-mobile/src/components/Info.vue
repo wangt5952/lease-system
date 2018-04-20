@@ -22,7 +22,7 @@
     <div class="battery_info">
       <group title="电池信息" v-for="o in batteryList">
         <cell title="电池编号" :value="o.batteryCode" ></cell>
-        <cell title="电池货品" :value="o.batteryName"></cell>
+        <cell title="电池类型" :value="o.batteryName"></cell>
         <cell title="电池品牌" :value="o.batteryBrand"></cell>
         <cell title="电池型号" :value="o.batteryPn"></cell>
         <cell title="参数" :value="o.batteryParameters"></cell>
@@ -31,28 +31,37 @@
         <cell title="" value="" class="kong"></cell>
       </group>
     </div>
+    <box class="parts" gap="10px 10px">
+        <x-button class="parts" @click.native="skip('/parts')">查看车辆配件信息</x-button>
+        <x-button type="primary">设为默认车辆</x-button>
+    </box>
   </div>
 </template>
 
 <script>
-import { Cell, Group } from 'vux';
+import { Cell, Group, XButton, Box } from 'vux';
 
 export default {
   components: {
     Group,
     Cell,
+    XButton,
+    Box,
   },
   data() {
     return {
       list: {},
       batteryList: [],
-      partsList: [],
     };
   },
   methods: {
     back() {
       window.history.go(-1);
     },
+    skip(a) {
+      a= a + '/' + this.$route.params.id;
+      this.$router.push(a);
+    }
   },
   async mounted() {
     const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', { id: this.$route.params.id, flag: 'true' })).body;
@@ -105,7 +114,6 @@ export default {
   .battery_info {
     width:90%;
     background: #fff;
-    margin-bottom: 20px;
     position: absolute;
     top:610px;
     left:5%;
@@ -164,5 +172,11 @@ export default {
     right:70px;
     background-image: url(/static/images/bg-huan.jpg);
     z-index: 2;
+  }
+  .parts {
+    margin-top:1150px;
+  }
+  .weui-btn {
+    width:95%;
   }
 </style>

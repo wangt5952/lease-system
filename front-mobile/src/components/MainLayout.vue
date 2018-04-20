@@ -217,12 +217,6 @@ export default {
   background: white!important;
 }
 
-.weui-btn {
-  width:120px;
-  height:120px;
-  border-radius: 100%;
-}
-
 .bg-btn {
   width:400px;
   height:200px;
