@@ -46,7 +46,7 @@
           <a slot="right" href="/track"><i slot="icon" class="iconfont icon-guiji"></i></a>
         </x-header>
 
-        <baidu-map :center="center" :zoom="zoom" @ready="handler" :dragging="true" :pinch-to-zoom="true" class="bm-view">
+        <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
         </baidu-map>
         <a class="btn" href="/info">
@@ -92,16 +92,25 @@ export default {
       showModeValue: 'push',
       showPlacement: 'left',
       showPlacementValue: 'left',
-      center: { lng: 0, lat: 0 },
-      zoom: 3,
+      mapCenter: '北京',
+      zoomNum: 15,
+      vehicleIds: [],
     };
   },
   methods: {
     handler() {
-      this.center.lng = 116.404;
-      this.center.lat = 39.915;
-      this.zoom = 15;
+      return new Promise(() => (new BMap.LocalCity()).get((r) => {
+        this.mapCenter = r.name;
+      }, { enableHighAccuracy: true },
+      ));
     },
+  },
+  async mounted() {
+
+    // this.vehicleIds.push(localStorage.getItem('vehicleId'));
+    // const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleIds)).body;
+    // if (code !== '200') throw new Error(message || code);
+    // console.log(respData);
   },
 };
 </script>

@@ -21,13 +21,12 @@
 </template>
 
 <script>
-import { Cell, Group, CellFormPreview, } from 'vux';
+import { Cell, Group } from 'vux';
 
 export default {
   components: {
     Group,
     Cell,
-    CellFormPreview,
   },
   data() {
     return {
@@ -43,7 +42,7 @@ export default {
     const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypr', [this.$route.params.id])).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
-   },
+  },
 };
 </script>
 

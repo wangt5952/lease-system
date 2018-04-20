@@ -59,9 +59,9 @@ export default {
       window.history.go(-1);
     },
     skip(a) {
-      a= a + '/' + this.$route.params.id;
+      a = a + '/' + this.$route.params.id;
       this.$router.push(a);
-    }
+    },
   },
   async mounted() {
     const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', { id: this.$route.params.id, flag: 'true' })).body;
