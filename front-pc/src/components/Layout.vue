@@ -33,13 +33,14 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-
     <div style="display:flex;flex:1;">
       <!-- 左侧导航 -->
       <div :style="isCollapse ? { 'width': '4%' } : { 'width': '16%' }">
         <el-menu :router="true" :collapse="isCollapse" unique-opened>
-          <div style="padding-left:10px" @click="shrinkChang">
-            <a href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a>
+          <div style="padding:15px" @click="shrinkChang">
+            <i style="color:#fff;font-size:28px;" class="lt" :class="{ 'arrow-double-left': !isCollapse, 'arrow-double-right': isCollapse }"></i>
+            <!-- <a href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a> -->
+            <!-- <a href="javascript:void(0)" :icon="{ isCollapse ? lt-left-sorting:lt-arrow-double-right }"></a> -->
           </div>
           <template v-for="(o, i) in menuTree">
             <!-- 有子集 -->
@@ -400,6 +401,11 @@ export default {
 </script>
 
 <style scoped>
+.lt-arrow-double-left {
+  position: relative !important;
+  left: 85%;
+  /* font-size: 40px; */
+}
 >>> .el-menu {
   height: 100%;
   background: #1c2166;

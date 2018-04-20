@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <div style="margin-right:10px;">
         <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm({resType:'CATALOG'})">添加目录</el-button>
@@ -10,7 +10,6 @@
         </el-form-item>
       </el-form>    -->
     </div>
-
     <el-table :data="tableTree" row-key="id" style="width: 100%;margin-top:10px;">
       <el-table-column width="80">
         <template slot-scope="{row}">
@@ -137,7 +136,6 @@ export default {
 
     tree() {
       const { list } = this;
-
       const buildChildren = (parent, tabs) => {
         const childrenList = parent ? _.filter(list, { parent }) : _.filter(list, o => !o.parent);
         if (!childrenList.length) return null;
@@ -147,7 +145,6 @@ export default {
           return { ...o, children, tabs };
         });
       };
-
       return buildChildren(null, 0);
     },
 

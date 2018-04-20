@@ -1078,8 +1078,10 @@ public class SysUserController extends BaseController {
                 if (WzStringUtil.isBlank(param.get("userId")) || WzStringUtil.isBlank(param.get("flag"))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                if(!RealNameAuthFlag.AUTHORIZED.toString().equals(param.get("flag"))
-                        || !RealNameAuthFlag.REJECTAUTHORIZED.toString().equals(param.get("flag"))){
+                if(RealNameAuthFlag.TOAUTHORIZED.toString().equals(param.get("flag").toString())) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+                if(RealNameAuthFlag.UNAUTHORIZED.toString().equals(param.get("flag").toString())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 sysUserService.approval(param.get("userId"),param.get("flag"),userTemp.getOrgId());

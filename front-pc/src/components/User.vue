@@ -4,7 +4,7 @@
     <div style="display:flex;">
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
-          <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加人员</el-button>
+          <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加用户</el-button>
         </div>
       </template>
       <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
@@ -25,44 +25,44 @@
         </el-form>
       </template>
     </div>
-
-    <el-table :data="list" style="width: 100%;">
-      <el-table-column prop="loginName" label="用户名"></el-table-column>
-      <el-table-column prop="userMobile" label="手机号"></el-table-column>
-      <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
-      <el-table-column prop="orgName" label="所属企业名称">
-        <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
-          {{ scope.row.orgName }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
-      <el-table-column prop="nickName" label="昵称"></el-table-column>
-      <el-table-column prop="userName" label="姓名"></el-table-column>
-      <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
-      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <el-table-column label="操作" width="250">
-        <template slot-scope="{row}">
-          <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
-            <template v-if="row.userType === 'INDIVIDUAL'">
-              <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
-              <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
+    <div style="">
+      <el-table :data="list" style="width: 100%;">
+        <el-table-column prop="loginName" label="用户名"></el-table-column>
+        <el-table-column prop="userMobile" label="手机号"></el-table-column>
+        <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
+        <el-table-column prop="orgName" label="所属企业名称">
+          <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
+            {{ scope.row.orgName }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
+        <el-table-column prop="nickName" label="昵称"></el-table-column>
+        <el-table-column prop="userName" label="姓名"></el-table-column>
+        <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
+        <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+        <el-table-column label="操作" width="270">
+          <template slot-scope="{row}">
+            <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
+              <template v-if="row.userType === 'INDIVIDUAL'">
+                <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
+                <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
+                <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看身份证</el-button>
+              </template>
+            </template>
+            <template v-if="key_user_info.userType === 'PLATFORM'">
+              <template v-if="row.userType === 'ENTERPRISE'">
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="retrieveVehicle(row)">批量收回车辆</el-button>
+              </template>
+              <!-- <template v-if="row.userType !== 'INDIVIDUAL'">
+              </template> -->
+              <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
             </template>
           </template>
-          <template v-if="key_user_info.userType === 'PLATFORM'">
-            <template v-if="row.userType === 'ENTERPRISE'">
-              <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-              <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看营业执照</el-button>
-            </template>
-            <template v-if="row.userType === 'INDIVIDUAL'">
-              <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看身份证</el-button>
-            </template>
-            <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
-          </template>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- <el-pagination v-if="total" style="margin-top:10px;"
+        </el-table-column>
+      </el-table>
+    </div>
+    <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
       :current-page.sync="currentPage"
@@ -70,97 +70,96 @@
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
-    </el-pagination> -->
+    </el-pagination>
 
-    <template v-if="key_user_info.userType === 'PLATFORM'">
-      <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
-        <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
-          <el-row :gutter="10">
+    <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
+      <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
+              <el-input v-model="form.loginName" placeholder="请填写用户名" auto-complete="off" :disabled="disabledForm"></el-input>
+            </el-form-item>
+          </el-col>
+          <template>
             <el-col :span="8">
-              <el-form-item prop="loginName" :rules="[{required:true, message:'请填写用户名'}]" label="用户名">
-                <el-input v-model="form.loginName" placeholder="请填写用户名" auto-complete="off" :disabled="disabledForm"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="userMobile" label="手机号码">
+              <el-form-item prop="userMobile" label="手机号码" :rules="[{required:true, message:'请填写手机号码'}]">
                 <el-input v-model="form.userMobile" placeholder="请填写手机号码" auto-complete="off" :disabled="disabledForm"></el-input>
               </el-form-item>
             </el-col>
-            <el-col :span="8">
-              <el-form-item prop="userType" :rules="[{required:true, message:'请选择用户类型'}]" label="用户类型">
-                <el-select v-model="form.userType" placeholder="请选择用户类型" style="width:100%;" :disabled="disabledForm">
-                  <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="LOGO路径">
-                <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="昵称">
-                <el-input v-model="form.nickName" placeholder="请输入昵称" auto-complete="off"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
-                <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="userRealNameAuthFlag" :rules="[{required:true, message:'请选择实名认证类型'}]" label="实名认证">
-                <el-select v-model="form.userRealNameAuthFlag" placeholder="请选择实名认证类型" style="width:100%;">
-                  <el-option v-for="o in authList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="userStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
-                <el-select v-model="form.userStatus" placeholder="请选择状态" style="width:100%;">
-                  <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item prop="orgId" :rules="[{required:true, message:'请选择企业'}]" label="企业">
-                <el-select v-model="form.orgId" placeholder="请选择企业" style="width:100%;" >
-                  <el-option v-for="o in orgList" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="closeForm">取消</el-button>
-          <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
-        </span>
-      </el-dialog>
-
-      <el-dialog :title="`分配角色 ( ${assignRoleForm.name} ) `" :visible.sync="assignRoleFormVisible" :close-on-click-modal="false">
-        <el-form :model="form" ref="form" v-loading="loading && assignRoleFormVisible">
-          <el-row :gutter="10">
-            <el-col :span="24">
-              <el-form-item label="角色">
-                <el-select v-model="assignRoleForm.list" :placeholder="`请选择角色`" style="width:100%;" multiple>
-                  <el-option v-for="o in roleList" :key="o.id" :label="o.roleName" :value="o.id"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-        <span slot="footer" class="dialog-footer" >
-          <el-button @click="closeAssignRoleForm">取消</el-button>
-          <el-button :disabled="loading" type="primary" @click="saveAssignRoleForm">{{form.id ? '保存' : '添加'}}</el-button>
-        </span>
-      </el-dialog>
-    </template>
+          </template>
+          <el-col :span="8">
+            <el-form-item prop="userType" :rules="[{required:true, message:'请选择用户类型'}]" label="用户类型">
+              <el-select v-model="form.userType" placeholder="请选择用户类型" style="width:100%;" :disabled="disabledForm">
+                <el-option v-for="o in typeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="LOGO路径">
+              <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="昵称">
+              <el-input v-model="form.nickName" placeholder="请输入昵称" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
+              <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="userRealNameAuthFlag" :rules="[{required:true, message:'请选择实名认证类型'}]" label="实名认证">
+              <el-select v-model="form.userRealNameAuthFlag" placeholder="请选择实名认证类型" style="width:100%;">
+                <el-option v-for="o in authList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="userStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
+              <el-select v-model="form.userStatus" placeholder="请选择状态" style="width:100%;">
+                <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="orgId" :rules="[{required:true, message:'请选择企业'}]" label="所属企业">
+              <el-select v-model="form.orgId" placeholder="请选择企业" style="width:100%;" >
+                <el-option v-for="o in orgList" :key="o.id" :label="o.orgName" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeForm">取消</el-button>
+        <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog :title="`分配角色 ( ${assignRoleForm.name} ) `" :visible.sync="assignRoleFormVisible" :close-on-click-modal="false">
+      <el-form :model="form" ref="form" v-loading="loading && assignRoleFormVisible">
+        <el-row :gutter="10">
+          <el-col :span="24">
+            <el-form-item label="角色">
+              <el-select v-model="assignRoleForm.list" :placeholder="`请选择角色`" style="width:100%;" multiple>
+                <el-option v-for="o in roleList" :key="o.id" :label="o.roleName" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer" >
+        <el-button @click="assignRoleFormVisible = false">取消</el-button>
+        <el-button :disabled="loading" type="primary" @click="saveAssignRoleForm">{{assignRoleForm.id ? '保存' : '添加'}}</el-button>
+      </span>
+    </el-dialog>
 
     <!-- 车辆列表 -->
     <el-dialog title="车辆列表" :visible.sync="vehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-form :inline="true">
         <el-form-item>
-            <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+          <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
       </el-form>
       <el-table :data="vehicleList" style="width: 100%">
@@ -178,7 +177,7 @@
       </el-table>
       <el-pagination v-if="vehicleTotal" style="margin-top:10px;"
         @size-change="vehicleHandleSizeChange"
-        @current-change="vehicleReload"
+        @current-change="vehiclesReload"
         :current-page.sync="vehicleCurrentPage"
         :page-sizes="vehiclePageSizes"
         :page-size="vehiclePageSize"
@@ -190,7 +189,6 @@
         <el-button type="primary" @click="saveVehicleForm">保存</el-button>
       </span>
     </el-dialog>
-
     <el-dialog title="用户车辆列表" :visible.sync="userVehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-table :data="userVehicleList" style="width: 100%">
         <el-table-column prop="vehicleCode" label="编号"></el-table-column>
@@ -210,8 +208,33 @@
       </span>
     </el-dialog>
 
+    <el-dialog title="批量收回车辆" :visible.sync="returnVehicleFormVehicle" :close-on-click-modal="false">
+      <el-form class="edit-form" :model="returnVehicleForm" ref="returnVehicleForm" :rules="rules3">
+        <el-form-item prop="count" style="margin-top:10px;height:30px;" label="回收数量">
+          <el-input-number v-model="returnVehicleForm.count" :step="1"></el-input-number>
+          <template>
+            <span style="margin-left:20px">(当前企业共 {{ vehicleNumTotal }} 辆车)</span>
+          </template>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="returnVehicleFormVehicle = false">取消</el-button>
+        <el-button type="primary" @click="saveReturnVehicleForm">确定</el-button>
+      </span>
+    </el-dialog>
+
     <!-- 照片表单 -->
     <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
+      <!-- 身份证正面 -->
+      <img :src="`data:image/jpg;base64,${cardPhotoFront}`"/>
+      <!-- 身份证反面 -->
+      <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/>
+      <!-- 双手举起身份证 -->
+      <img :src="`data:image/jpg;base64,${cardPhotoGroup}`"/>
+      <span slot="footer" class="dialog-footer" >
+        <el-button type="info" @click="overrule">驳回</el-button>
+        <el-button :disabled="loading" type="primary" @click="identification">通过</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -233,6 +256,20 @@ export default {
       }
       return false;
     };
+    // 车辆表单效验
+    const checkVehicleNum = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('数量不能为空'));
+      }
+      setTimeout(() => {
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入非负正整数'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
     return {
       loading: false,
       // 车辆
@@ -246,6 +283,8 @@ export default {
       vehiclePageSize: 10,
       vehicleTotal: 0,
       vehicleForm: {},
+
+      vehicleForms: {},
       searchVehicleStatusList: [
         { id: 'NORMAL', name: '正常' },
       ],
@@ -309,8 +348,29 @@ export default {
       rules2: {
         userMobile: [
           { validator: checkPhone, trigger: 'blur' },
+          { required: true, message: '请选择用户类型' },
         ],
       },
+
+      // 批量回收车辆
+      returnVehicleFormVehicle: false,
+      returnVehicleForm: {
+        count: 1,
+      },
+      vehicleNumTotal: undefined,
+      rules3: {
+        count: [
+          { validator: checkVehicleNum, trigger: 'blur' },
+        ],
+      },
+      // 用户验证表单
+      cardForm: {},
+      // 身份证正面照片
+      cardPhotoFront: undefined,
+      // 身份证反面照片
+      cardPhotoBack: undefined,
+      // 双手举起身份证照片
+      cardPhotoGroup: undefined,
     };
   },
   computed: {
@@ -326,58 +386,167 @@ export default {
       },
       deep: true,
     },
-    async 'vehicleSearch.keyStr'(v) {
-      this.vehicleSearch.keyStr = v;
-      const { vehicleForm } = this;
-      await this.vehicleReload(vehicleForm);
+    async 'vehicleSearch.keyStr'() {
+      await this.vehiclesReload();
     },
   },
   methods: {
     // 查看营业执照或者身份证照片
-    // async showPhoto(row) {
-    //   this.photoFormVisible = true;
-    // <input id="uploadFile" type="file" accept="image/*" @change="onFileChange">
-    // },
-    // 车辆
-    async vehicleHandleSizeChange(vehiclePageSize) {
-      this.vehiclePageSize = vehiclePageSize;
-      await this.vehicleReload();
-    },
-    async vehicleReload(row) {
-      const { vehicleForm } = this;
-      vehicleForm.userId = row.id;
-      vehicleForm.orgId = row.orgId;
-      // console.log(row);
+    async showPhoto(row) {
+      this.cardForm = row;
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
-          orgId: row.orgId, ...this.vehicleSearch, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize,
-        })).body;
-        if (code === '40106') {
-          this.$store.commit('relogin');
-          throw new Error('认证超时，请重新登录');
-        }
+        const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
+        const data = respData.key_user_info;
+        // this.cardPhotoFront = data.userIcFront;
+        this.cardPhotoBack = data.userIcBack;
+        this.cardPhotoGroup = data.userIcGroup;
         if (code !== '200') throw new Error(message);
-        const { total, rows } = respData;
-        this.vehicleTotal = total;
-        this.vehicleList = _.map(rows, o => ({
-          ...o,
-          vehicleStatusText: (_.find(this.statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
-        }));
       } catch (e) {
+        if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      this.vehicleFormVisible = true;
+      this.photoFormVisible = true;
+    },
+    // 通过
+    async identification() {
+      const { cardForm } = this;
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/user/userapproval', {
+          userId: cardForm.id, flag: 'AUTHORIZED',
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('驳回成功');
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    // 驳回
+    async overrule() {
+      const { cardForm } = this;
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/user/userapproval', {
+          userId: cardForm.id, flag: 'REJECTAUTHORIZED',
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('实名认证成功');
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    // 批量回收车辆页面
+    async retrieveVehicle(row) {
+      const $form = this.$refs.returnVehicleForm;
+      if ($form) $form.resetFields();
+      this.returnVehicleForm = { orgId: row.orgId, count: this.returnVehicleForm.count };
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/orgCountVehicle', { orgId: row.orgId })).body;
+        if (code !== '200') throw new Error(message);
+        this.vehicleNumTotal = respData;
+        this.returnVehicleForm.count = respData;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      this.returnVehicleFormVehicle = true;
+    },
+    // 确认回收车辆
+    async saveReturnVehicleForm() {
+      const $form = this.$refs.returnVehicleForm;
+      await $form.validate();
+      try {
+        const { ...form } = this.returnVehicleForm;
+        form.count = String(this.returnVehicleForm.count);
+        const { code, message } = (await this.$http.post('/api/manager/user/batchvehicleunbind', form)).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('归还车辆成功');
+        await this.reload();
+        this.returnVehicleFormVehicle = false;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    // 车辆
+    async vehicleHandleSizeChange(vehiclePageSize) {
+      this.vehiclePageSize = vehiclePageSize;
+      await this.vehiclesReload();
+    },
+    // 第一次加载车辆页面
+    async vehicleReload(row) {
+      this.vehicleForms = row;
+      const { vehicleForm } = this;
+      vehicleForm.userId = row.id;
+      vehicleForm.orgId = row.orgId;
+      if (row.orgId) {
+        try {
+          const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
+            orgId: row.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize,
+          })).body;
+          if (code === '40106') {
+            this.$store.commit('relogin');
+            throw new Error('认证超时，请重新登录');
+          }
+          if (code !== '200') throw new Error(message);
+          const { total, rows } = respData;
+          this.vehicleTotal = total;
+          this.vehicleList = _.map(rows, o => ({
+            ...o,
+            vehicleStatusText: (_.find(this.statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
+          }));
+        } catch (e) {
+          const message = e.statusText || e.message;
+          this.$message.error(message);
+        }
+        this.vehicleFormVisible = true;
+      } else {
+        this.vehicleTotal = 0;
+        this.vehicleList = [];
+        this.$message.error('该用户未绑定企业');
+      }
+    },
+    // 带参分页  加载车辆页面
+    async vehiclesReload() {
+      const { vehicleForms } = this;
+      if (vehicleForms.orgId) {
+        try {
+          const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
+            orgId: vehicleForms.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize, ...this.vehicleSearch,
+          })).body;
+          if (code === '40106') {
+            this.$store.commit('relogin');
+            throw new Error('认证超时，请重新登录');
+          }
+          if (code !== '200') throw new Error(message);
+          const { total, rows } = respData;
+          this.vehicleTotal = total;
+          this.vehicleList = _.map(rows, o => ({
+            ...o,
+            vehicleStatusText: (_.find(this.statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
+          }));
+        } catch (e) {
+          const message = e.statusText || e.message;
+          this.$message.error(message);
+        }
+      } else {
+        this.vehicleTotal = 0;
+        this.vehicleList = [];
+        this.$message.error('该用户未绑定企业');
+      }
     },
     async bindVehicle(row) {
       const { ...form } = this.vehicleForm;
       form.vehicleId = row.id;
-      // console.log(form);
       try {
         const { code, message } = (await this.$http.post('/api/manager/user/vehiclebind', form)).body;
         if (code !== '200') throw new Error(message);
-        await this.vehicleReload({ ...row, id: form.userId, orgId: form.orgId });
-        // await this.vehicleReload(form);
+        await this.vehiclesReload();
         this.$message.success('绑定成功');
       } catch (e) {
         const message = e.statusText || e.message;
@@ -526,20 +695,14 @@ export default {
     },
 
     async showAssignRoleForm({ id, loginName }) {
+      await this.getRoleList();
       this.assignRoleFormVisible = true;
-
       this.assignRoleForm = { id, name: loginName, list: [] };
-
-      this.loading = true;
       const { code, respData } = (await this.$http.post('/api/manager/user/getbypk', [id])).body;
-      this.loading = false;
       if (code === '200') {
         const { key_role_info } = respData;
         this.assignRoleForm.list = _.map(key_role_info, 'id');
       }
-    },
-    closeAssignRoleForm() {
-      this.assignRoleFormVisible = false;
     },
 
     async saveAssignRoleForm() {
@@ -548,7 +711,7 @@ export default {
         const { code, message } = (await this.$http.post('/api/manager/user/refuserandroles', { userId: id, roleIds: list.join(',') })).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('分配成功');
-        this.closeAssignRoleForm();
+        this.assignRoleFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -561,12 +724,14 @@ export default {
       })).body;
       if (code === '200') this.orgList = respData.rows;
     },
+    async getRoleList() {
+      const { code, respData } = (await this.$http.post('/api/manager/role/list', {
+        currPage: 1, pageSize: 999,
+      })).body;
+      if (code === '200') this.roleList = respData.rows;
+    },
   },
   async mounted() {
-    const { code, respData } = (await this.$http.post('/api/manager/role/list', {
-      currPage: 1, pageSize: 999,
-    })).body;
-    if (code === '200') this.roleList = respData.rows;
     this.loading = true;
     await this.reload();
     this.loading = false;

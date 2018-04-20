@@ -1,6 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
     <!-- 平台 -->
+
     <template v-if="key_user_info.userType === 'PLATFORM'">
       <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane label="审核列表" name="second">
@@ -189,7 +190,7 @@
                 </el-form-item>
               </el-form>
               <span slot="footer" class="dialog-footer">
-                <el-button @click="closeApplyForm">取消</el-button>
+                <el-button @click="applyFormVisible = false">取消</el-button>
                 <el-button type="primary" @click="saveApplyForm">保存</el-button>
               </span>
             </el-dialog>
@@ -273,7 +274,7 @@
                 <el-button @click="closeEnApplyForm">关闭</el-button>
               </span>
             </el-dialog>
-
+            <!-- a -->
             <el-dialog title="申请内容" :visible.sync="applyFormVisible" style="margin-top:-0px" :close-on-click-modal="false" width="50%">
               <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="标题:" prop="applyTitle" :rules="[{required:true, message:'请输入标题'}]">
@@ -289,7 +290,7 @@
                 </el-form-item>
               </el-form>
               <span slot="footer" class="dialog-footer">
-                <el-button @click="closeApplyForm">取消</el-button>
+                <el-button @click="applyFormVisible = false">取消</el-button>
                 <el-button type="primary" @click="saveApplyForm">保存</el-button>
               </span>
             </el-dialog>
@@ -454,9 +455,6 @@ export default {
           this.$message.error(message);
         }
       }
-      this.applyFormVisible = false;
-    },
-    closeApplyForm() {
       this.applyFormVisible = false;
     },
     // 查看申请者的信息

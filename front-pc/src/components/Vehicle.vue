@@ -1,5 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
+     <!--<button @click="getLocation()">试一下</button>
+    {{ aaaa }}-->
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-vehicle-addone') >= 0">
@@ -28,8 +30,7 @@
         </div>
       </template>
     </div>
-    <!-- {{ res }} -->
-    <!-- {{ key_user_info }} -->
+
     <el-table :data="list" style="width: 100%">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
@@ -335,10 +336,11 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeReturnVehicleForm">取消</el-button>
+        <el-button @click="returnVehicleFormVehicle = false">取消</el-button>
         <el-button type="primary" @click="saveReturnVehicleForm">确定</el-button>
       </span>
     </el-dialog>
+
     <el-dialog title="已有电池" :visible.sync="bindBatteryFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-table :data="batteryList" style="width: 100%;margin-top:10px;">
         <el-table-column prop="batteryCode" label="编号"></el-table-column>
@@ -394,6 +396,7 @@ export default {
       return false;
     };
     return {
+      aaaa: '实验坐标',
       loading: false,
       vehicleNumTotal: undefined,
       // 车辆
@@ -536,6 +539,38 @@ export default {
     },
   },
   methods: {
+    // html5定位
+    getLocation() {
+      if (navigator.geolocation) {
+        console.log(navigator);
+        navigator.geolocation.getCurrentPosition(this.showPosition, this.showError);
+      } else {
+        this.aaaa = '此浏览器不支持地理位置';
+      }
+    },
+    showPosition(position) {
+      alert(2);
+      this.aaaa = `经度: ${position.coords.longitude} ，纬度: ${position.coords.latitude}`;
+    },
+    showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          this.aaaa = '用户拒绝地理定位请求';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          this.aaaa = '位置信息不可用';
+          break;
+        case error.TIMEOUT:
+          this.aaaa = '使用户位置超时的请求';
+          break;
+        case error.UNKNOWN_ERROR:
+          this.aaaa = '发生了未知错误';
+          break;
+        default:
+          this.aaaa = '无';
+      }
+    },
+
     // 电池信息
     saveBatteryForm() {
       this.bindBatteryFormVisible = false;
@@ -575,7 +610,6 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-
       this.returnVehicleFormVehicle = true;
     },
     // 确定归还车辆
@@ -595,10 +629,6 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    },
-
-    closeReturnVehicleForm() {
-      this.returnVehicleFormVehicle = false;
     },
 
     // 配件———————————————————————————————————————————————————————————————————————————————————————————————————————

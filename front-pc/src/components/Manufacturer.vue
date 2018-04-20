@@ -8,7 +8,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="制造商名称／制造商介绍／制造商地址／联系人／联系电话"></el-input>
+          <el-input style="width:500px;" v-model="search.keyStr" placeholder="制造商名称/制造商介绍/制造商地址/联系人/联系电话"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.mfrsStatus" placeholder="请选择状态" style="width:100%;">
