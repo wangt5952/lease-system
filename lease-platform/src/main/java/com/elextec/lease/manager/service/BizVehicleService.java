@@ -140,10 +140,10 @@ public interface BizVehicleService {
 
     /**
      * 查询该企业下有多少车
-     * @param orgId 车子id
+     * @param pagingParam 车辆查询参数类.
      * @return 车数
      */
-    public int orgCountVehicle(String orgId);
+    public int orgCountVehicle(BizVehicleParam pagingParam);
 
     /**
      * 车辆回收

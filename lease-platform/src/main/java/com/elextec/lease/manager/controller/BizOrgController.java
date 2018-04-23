@@ -311,6 +311,7 @@ public class BizOrgController extends BaseController {
                     String imageName = WzUniqueValUtil.makeUniqueTimes();
                     //去掉BASE64里的空格和回车换成加号
                     String orgBusinessLicenceFront = orgInfo.getOrgBusinessLicenceFront().replace(" ","+");
+                    String[] orgFront = orgBusinessLicenceFront.split(",");
                     /**
                      * 保存文件.
                      * fileBase64Data 文件内容Base64字符串
@@ -319,7 +320,7 @@ public class BizOrgController extends BaseController {
                      * fileName 文件名（不带扩展名）
                      * ext 扩展名
                      */
-                    WzFileUtil.save(orgBusinessLicenceFront, uploadOrgIconRoot, "", imageName, WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(orgFront[1], uploadOrgIconRoot, "", imageName, WzFileUtil.EXT_JPG);
                     orgInfo.setOrgBusinessLicenceFront(imageName + WzFileUtil.EXT_JPG);
                 }
                 bizOrganizationService.insertBizOrganization(orgInfo);
