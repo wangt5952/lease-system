@@ -50,9 +50,7 @@ export default {
 
       try {
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/login', form)).body;
-        if (code !== '200') {
-          this.$vux.toast.show({ text: message, type: 'warn', width: '10em', position: 'top' });
-        }
+        if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_user_info, key_vehicle_info } = respData;
         const vehicleList = [];
         vehicleList.push(_.map(key_vehicle_info, 'id'));

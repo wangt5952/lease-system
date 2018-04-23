@@ -5,7 +5,7 @@
       <div class="tlte"><span>车辆配件信息</span></div>
     </div>
 
-    <div class="bg-parts" v-for="o in list">
+    <div class="bg-parts" v-for="o in list" :key="o.id">
       <group :title="o.partsType">
         <cell title="配件编号" :value="o.partsCode"></cell>
         <cell title="配件货名" :value="o.partsName"></cell>

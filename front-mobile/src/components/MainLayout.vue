@@ -46,10 +46,11 @@
           <a slot="right" href="/track"><i slot="icon" class="iconfont icon-guiji"></i></a>
         </x-header>
 
-        <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
+        <baidu-map @ready="handler" :center="initMap?mapCenter:Center" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+          <bm-marker :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{url: '/static/images/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} }}"></bm-marker>
         </baidu-map>
-        <a class="btn" href="/info">
+        <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
           <span>车辆信息</span>
         </a>
@@ -63,6 +64,7 @@
 <script>
 import { Group, Cell, Drawer, ViewBox, XHeader } from 'vux';
 import { mapState } from 'vuex';
+import _ from 'lodash';
 
 export default {
   components: {
@@ -95,6 +97,8 @@ export default {
       mapCenter: '北京',
       zoomNum: 15,
       vehicleIds: [],
+      initMap: 'true',
+      Center: { lng: '0', lat: '0' },
     };
   },
   methods: {
@@ -104,13 +108,19 @@ export default {
       }, { enableHighAccuracy: true },
       ));
     },
+    location() {
+      this.initMap = false;
+    },
   },
   async mounted() {
-
-    // this.vehicleIds.push(localStorage.getItem('vehicleId'));
-    // const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleIds)).body;
-    // if (code !== '200') throw new Error(message || code);
-    // console.log(respData);
+    this.vehicleIds = _.split(localStorage.getItem('vehicleId'), ',');
+    const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleIds)).body;
+    // /if (code !== '200') throw new Error(message || code);
+    console.log(respData);
+    // this.Center.lng = respData[0].LON;
+    // this.Center.lat = respData[0].LAT;
+    // console.log(this.Center.lng);
+    // console.log(this.Center.lat);
   },
 };
 </script>
@@ -227,22 +237,24 @@ export default {
 }
 
 .bg-btn {
-  width:400px;
-  height:200px;
+  width:100%;
+  height:0;
+  padding-bottom: 50%;
   background: #fff;
   position: absolute;
-  left:-12.5px;
+  left:0;
   bottom: 0;
   z-index: 2;
-  border-radius:400px 400px 0 0;
+  border-radius:100% 100% 0 0;
 }
 
 .btn {
+  --AllWidht:100%;
   width:120px;
   height:120px;
   position: absolute;
-  left:127.5px;
-  bottom: 120px;
+  left:34%;
+  bottom: 18%;
   background: #16D0A1;
   opacity: 100%;
   box-shadow: 0 2px 9px;

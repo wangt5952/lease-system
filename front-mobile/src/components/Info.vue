@@ -20,7 +20,7 @@
     <div class="right1-huan"></div>
     <div class="right2-huan"></div>
     <div class="battery_info">
-      <group title="电池信息" v-for="o in batteryList">
+      <group title="电池信息" v-for="o in batteryList" :key="o.id">
         <cell title="电池编号" :value="o.batteryCode" ></cell>
         <cell title="电池类型" :value="o.batteryName"></cell>
         <cell title="电池品牌" :value="o.batteryBrand"></cell>
@@ -59,8 +59,7 @@ export default {
       window.history.go(-1);
     },
     skip(a) {
-      a = a + '/' + this.$route.params.id;
-      this.$router.push(a);
+      this.$router.push(a + '/' + this.$route.params.id);
     },
   },
   async mounted() {

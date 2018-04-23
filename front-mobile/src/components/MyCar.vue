@@ -5,7 +5,7 @@
       <div class="tlte"><span>我的车辆</span></div>
     </div>
 
-    <group v-for="(item,index) in list">
+    <group v-for="(item,index) in list" :key="item.id">
       <cell v-if="`${index+1}`==1" :title="`我的车辆${index+1}`"  value="默认车辆" :link="`/info/${item.id}`"></cell>
       <cell v-else :title="`我的车辆${index+1}`" :link="`/info/${item.id}`"></cell>
     </group>
