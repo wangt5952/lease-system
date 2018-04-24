@@ -419,8 +419,9 @@ public class BizOrgController extends BaseController {
                     String orgImgTime = WzUniqueValUtil.makeUniqueTimes();
                     //去掉BASE64里的空格和回车换成加号
                     String orgBusinessLicenceFront = org.getOrgBusinessLicenceFront().replace(" ","+");
+                    String[] orgFront = orgBusinessLicenceFront.split(",");
                     //保存企业营业执照
-                    WzFileUtil.save(orgBusinessLicenceFront, uploadOrgIconRoot, "", orgImgTime, WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(orgFront[1], uploadOrgIconRoot, "", orgImgTime, WzFileUtil.EXT_JPG);
                     //把时间和图片格式拼一起，库里只保存照片名
                     org.setOrgBusinessLicenceFront(orgImgTime + WzFileUtil.EXT_JPG);
                 }
