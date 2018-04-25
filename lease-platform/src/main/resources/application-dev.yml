@@ -55,13 +55,15 @@ mybatis:
 logging:
   config: classpath:logback.xml
 localsetting:
-  upload-root: D:/Project_Dev/tools/apache-tomcat-8.5.11/webapps/leaseupload
+  upload-root: D:/apache-tomcat-8.5.30/webapps/leaseupload
   download-prefix: http://127.0.0.1:8080/leaseupload
-  upload-captcha-root: D:/Project_Dev/tools/apache-tomcat-8.5.11/webapps/leaseupload/captcha
+  upload-captcha-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/captcha
   download-captcha-prefix: http://127.0.0.1:8080/leaseupload/captcha
-  upload-user-icon-root: D:/Project_Dev/tools/apache-tomcat-8.5.11/webapps/leaseupload/usericon
+  upload-user-icon-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/usericon
   download-user-icon-prefix: http://127.0.0.1:8080/leaseupload/usericon
-  upload-user-realname-root: D:/Project_Dev/tools/apache-tomcat-8.5.11/webapps/leaseupload/userrealname
+  upload-user-realname-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/userrealname
   download-user-realname-prefix: http://127.0.0.1:8080/leaseupload/userrealname
-  upload-res-icon-root: D:/Project_Dev/tools/apache-tomcat-8.5.11/webapps/leaseupload/resicon
+  upload-res-icon-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/resicon
   download-res-icon-prefix: http://127.0.0.1:8080/leaseupload/resicon
+  upload-other-img-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/otherimg
+  download-other-img-prefix: http://127.0.0.1:8080/leaseupload/otherimg

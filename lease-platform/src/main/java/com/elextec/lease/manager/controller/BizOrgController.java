@@ -52,6 +52,12 @@ public class BizOrgController extends BaseController {
     @Value("${localsetting.download-res-icon-prefix}")
     private String downloadOrgIconPrefix;
 
+    @Value("${localsetting.upload-other-img-root}")
+    private String  uploadOtherImgRoot;
+
+    @Value("${localsetting.download-other-img-prefix}")
+    private String  downloadOtherImgPrefix;
+
     /**
      * 查询公司组织.
      * @param paramAndPaging 查询及分页参数JSON
@@ -320,7 +326,7 @@ public class BizOrgController extends BaseController {
                      * fileName 文件名（不带扩展名）
                      * ext 扩展名
                      */
-                    WzFileUtil.save(orgFront[1], uploadOrgIconRoot, "", imageName, WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(orgFront[1], uploadOtherImgRoot, "", imageName, WzFileUtil.EXT_JPG);
                     orgInfo.setOrgBusinessLicenceFront(imageName + WzFileUtil.EXT_JPG);
                 }
                 bizOrganizationService.insertBizOrganization(orgInfo);
@@ -412,7 +418,7 @@ public class BizOrgController extends BaseController {
                     if (orgImg != null || !orgImg.equals("")) {
                         //删除库里的营业执照
                         if (WzStringUtil.isNotBlank(orgImg)) {
-                            WzFileUtil.deleteFile(uploadOrgIconRoot,orgImg);
+                            WzFileUtil.deleteFile(uploadOtherImgRoot,orgImg);
                         }
                     }
                     //把唯一时间作为照片名字
@@ -421,7 +427,7 @@ public class BizOrgController extends BaseController {
                     String orgBusinessLicenceFront = org.getOrgBusinessLicenceFront().replace(" ","+");
                     String[] orgFront = orgBusinessLicenceFront.split(",");
                     //保存企业营业执照
-                    WzFileUtil.save(orgFront[1], uploadOrgIconRoot, "", orgImgTime, WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(orgFront[1], uploadOtherImgRoot, "", orgImgTime, WzFileUtil.EXT_JPG);
                     //把时间和图片格式拼一起，库里只保存照片名
                     org.setOrgBusinessLicenceFront(orgImgTime + WzFileUtil.EXT_JPG);
                 }
