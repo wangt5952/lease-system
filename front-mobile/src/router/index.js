@@ -15,5 +15,7 @@ export default new Router({
     { path: '/mycar', component: () => import('@/components/MyCar') },
     { path: '/profile', component: () => import('@/components/Profile') },
     { path: '/parts/:id', component: () => import('@/components/Parts') },
+    { path: '/authentication', component: () => import('@/components/Authentication') },
+    { path: '/nickName', component: () => import('@/components/NickName') },
   ],
 });

@@ -33,7 +33,7 @@
     </div>
     <box class="parts" gap="10px 10px">
         <x-button class="parts" @click.native="skip('/parts')">查看车辆配件信息</x-button>
-        <x-button type="primary">设为默认车辆</x-button>
+        <x-button type="primary" @click.native="deft">设为默认车辆</x-button>
     </box>
   </div>
 </template>
@@ -59,7 +59,16 @@ export default {
       window.history.go(-1);
     },
     skip(a) {
-      this.$router.push(a + '/' + this.$route.params.id);
+      this.$router.push(`${a}/${this.$route.params.id}`);
+    },
+    deft() {
+      const localID = localStorage.getItem('vehicleId');
+      if (localID === this.$route.params.id) {
+        this.$vux.toast.show({ text: '该车辆已经为默认车辆', type: 'cancel', width: '10em' });
+      } else {
+        localStorage.setItem('vehicleId', this.$route.params.id);
+        this.$vux.toast.show({ text: '设置成功', type: 'success', width: '10em' });
+      }
     },
   },
   async mounted() {

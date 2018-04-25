@@ -5,12 +5,40 @@
       <div class="tlte"><span>个人资料</span></div>
     </div>
 
+    <group>
+      <cell title="用户头像" link="/">
+        <div class="icon_val">
+          <i slot="icon" class="iconfont icon-shenfenzheng"></i>
+        </div>
+      </cell>
+      <cell title="用户类型" :value="key_user_info.userType"></cell>
+      <cell title="用户" :value="key_user_info.userName"></cell>
+      <cell title="昵称" :value="key_user_info.nickName" link="/nickName"></cell>
+      <cell title="身份证号" :value="key_user_info.userPid"></cell>
+      <cell title="手机号" :value="key_user_info.userMobile"></cell>
+      <cell title="所属企业" :value="key_user_info.orgName"></cell>
+      <cell title="用户状态" :value="key_user_info.userStatus"></cell>
+    </group>
 
   </div>
 </template>
 
 <script>
+import { Cell, Group } from 'vux';
+import { mapState } from 'vuex';
+
 export default {
+  components: {
+    Group,
+    Cell,
+  },
+  computed: {
+    ...mapState({
+      key_user_info: state => state.key_user_info,
+
+      relogin: state => state.relogin,
+    }),
+  },
   data() {
     return {
 
@@ -27,7 +55,7 @@ export default {
 <style scoped>
   .head {
     width:100%;
-    height:89px;
+    height:65px;
     background: -webkit-linear-gradient(#16D0A2,#20C987)!important;
     background: -o-linear-gradient(#16D0A2,#20C987)!important;
     background: -moz-linear-gradient(#16D0A2,#20C987)!important;
@@ -52,5 +80,20 @@ export default {
     position: absolute;
     left:40%;
     top:25px;
+  }
+  .weui-cell {
+    height:50px;
+  }
+  >>>.weui-cells {
+    margin:0;
+  }
+  >>>.vux-label {
+      font-size: 15pt;
+    }
+  .icon_val {
+    display: inline-block!important;
+  }
+  .icon_val .iconfont {
+    font-size: 17pt;
   }
 </style>
