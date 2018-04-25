@@ -97,7 +97,6 @@
           <el-col :span="8">
             <el-form-item label="LOGO路径">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
-
             </el-form-item>
           </el-col>
           <el-col :span="8">

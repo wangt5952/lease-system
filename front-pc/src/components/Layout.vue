@@ -4,7 +4,7 @@
       <div style="flex:1;"></div>
       <el-dropdown @command="command => this[command]()">
         <span class="el-dropdown-link" style="cursor:pointer;color:#fff;">
-          {{key_user_info.userName}} <i class="el-icon-arrow-down el-icon--right"></i>
+          {{key_user_info.nickName}} <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="showPasswordForm">密码修改</el-dropdown-item>
@@ -135,7 +135,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
-              <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
+              <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off" :disabled="disabledForm"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
