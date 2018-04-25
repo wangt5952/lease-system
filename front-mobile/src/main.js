@@ -6,6 +6,7 @@ import Mint from 'mint-ui';
 import Resource from 'vue-resource';
 import _ from 'lodash';
 import BaiduMap from 'vue-baidu-map';
+
 import {
   XInput, XButton,
   Tabbar, TabbarItem,

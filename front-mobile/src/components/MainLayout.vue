@@ -48,7 +48,7 @@
 
         <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" :showZoomInfo="true"></bm-navigation>
-          <bm-marker :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{url: '/static/images/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} }}"></bm-marker>
+          <bm-marker v-if="Center" :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{url: '/static/images/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} }}"></bm-marker>
         </baidu-map>
         <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
@@ -64,6 +64,7 @@
 <script>
 import { Group, Cell, Drawer, ViewBox, XHeader } from 'vux';
 import { mapState } from 'vuex';
+import _ from 'lodash';
 
 export default {
   components: {
@@ -94,17 +95,27 @@ export default {
       showPlacement: 'left',
       showPlacementValue: 'left',
       mapCenter: '北京',
-      Center: { lng: 0, lat: 0 },
+      Center: null,
       zoomNum: 10,
       vehicleId: [],
     };
   },
   methods: {
-    handler() {
-      return new Promise(() => (new BMap.Geolocation()).getCurrentPosition((r) => {
-        if (r.point) {
-          this.mapCenter = r.point;
-        }
+    async handler() {
+      // return new Promise(() => (new BMap.Geolocation()).getCurrentPosition((r) => {
+      //   if (r.point) {
+      //     this.mapCenter = r.point;
+      //   }
+      // }, { enableHighAccuracy: true }));
+
+      const r = await this.getCurrentPosition();
+      this.mapCenter = r.point;
+    },
+
+    getCurrentPosition() {
+      /* eslint-disable func-names */
+      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function (r) {
+        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) resolve(r); else reject(this.getStatus());
       }, { enableHighAccuracy: true }));
     },
     location() {
@@ -116,8 +127,10 @@ export default {
     this.vehicleId.push(localStorage.getItem('vehicleId'));
     const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
     if (code !== '200') throw new Error(message || code);
-    this.Center.lng = respData[0].LON;
-    this.Center.lat = respData[0].LAT;
+    const v = _.find(respData, o => o.LON && o.LAT);
+    this.Center = {
+      lng: v.LON, lat: v.LAT,
+    };
   },
 };
 </script>

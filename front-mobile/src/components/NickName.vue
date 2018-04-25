@@ -50,7 +50,7 @@ export default {
         throw new Error(message || code);
       } else {
         this.$vux.toast.show({ text: '修改成功', type: 'success', width: '10em' });
-        setTimeOut(() => { window.history.go(-1); }, 100);
+        setTimeout(() => { window.history.go(-1); }, 100);
       }
     },
   },
