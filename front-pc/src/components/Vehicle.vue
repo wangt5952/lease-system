@@ -1,7 +1,5 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
-     <!--<button @click="getLocation()">试一下</button>
-    {{ aaaa }}-->
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-vehicle-addone') >= 0">
@@ -87,10 +85,10 @@
 
     <!-- 添加车辆 -->
     <el-dialog title="添加车辆" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form class="edit-form" :model="form" ref="form">
+      <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item prop="vehicleCode" :rules="[{required:true, message:'请填写编号'}]" label="编号">
+            <el-form-item prop="vehicleCode" label="编号">
               <el-input v-model="form.vehicleCode" auto-complete="off" :disabled="vehicleIdForm"></el-input>
             </el-form-item>
           </el-col>
@@ -331,7 +329,7 @@
         <el-form-item prop="count" style="margin-top:10px;height:30px;" label="归还数量">
           <el-input-number v-model="returnVehicleForm.count" :step="1"></el-input-number>
           <template>
-            <span style="margin-left:20px">(当前企业共 {{ vehicleNumTotal }} 辆车)</span>
+            <span style="margin-left:20px">(当前企业闲置 {{ vehicleNumTotal }} 辆车)</span>
           </template>
         </el-form-item>
       </el-form>
@@ -395,14 +393,32 @@ export default {
       }, 500);
       return false;
     };
+    const checkVehicleId = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('编号不能为空'));
+      }
+      setTimeout(() => {
+        if (/[\u4E00-\u9FA5]/g.test(value)) {
+          callback(new Error('编号不能为汉字'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
     return {
-      aaaa: '实验坐标',
       loading: false,
       vehicleNumTotal: undefined,
       // 车辆
       returnVehicleFormVehicle: false,
       returnVehicleForm: {
         count: 1,
+      },
+      rules1: {
+        vehicleCode: [
+          { required: true, message: '请填写编码' },
+          { validator: checkVehicleId, trigger: 'blur' },
+        ],
       },
       rules2: {
         count: [
@@ -449,7 +465,7 @@ export default {
       bindPartsForm: {},
       unBindPartsForm: {},
 
-      partsPageSizes: [10, 50, 100],
+      partsPageSizes: [10, 20, 50, 100],
       partsCurrentPage: 1,
       partsPageSize: 5,
       partsTotal: 0,
@@ -539,38 +555,6 @@ export default {
     },
   },
   methods: {
-    // html5定位
-    getLocation() {
-      if (navigator.geolocation) {
-        console.log(navigator);
-        navigator.geolocation.getCurrentPosition(this.showPosition, this.showError);
-      } else {
-        this.aaaa = '此浏览器不支持地理位置';
-      }
-    },
-    showPosition(position) {
-      alert(2);
-      this.aaaa = `经度: ${position.coords.longitude} ，纬度: ${position.coords.latitude}`;
-    },
-    showError(error) {
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          this.aaaa = '用户拒绝地理定位请求';
-          break;
-        case error.POSITION_UNAVAILABLE:
-          this.aaaa = '位置信息不可用';
-          break;
-        case error.TIMEOUT:
-          this.aaaa = '使用户位置超时的请求';
-          break;
-        case error.UNKNOWN_ERROR:
-          this.aaaa = '发生了未知错误';
-          break;
-        default:
-          this.aaaa = '无';
-      }
-    },
-
     // 电池信息
     saveBatteryForm() {
       this.bindBatteryFormVisible = false;
@@ -600,10 +584,10 @@ export default {
     async returnVehicleForms({ orgId }) {
       const $form = this.$refs.returnVehicleForm;
       if ($form) $form.resetFields();
-      this.returnVehicleForm = { orgId: orgId, count: this.returnVehicleForm.count };
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/orgCountVehicle', { orgId })).body;
         if (code !== '200') throw new Error(message);
+        this.returnVehicleForm = { orgId: orgId, count: respData };
         this.vehicleNumTotal = respData;
       } catch (e) {
         if (!e) return;
@@ -991,6 +975,6 @@ export default {
 
 <style scoped>
 .edit-form >>> .el-form-item {
-  height: 50px;
+  height: 55px;
 }
 </style>

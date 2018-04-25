@@ -161,6 +161,7 @@ export default {
           this.$message.success({
             message: '重置密码成功！',
           });
+          this.$router.push('/login');
         } catch (e) {
           const message = e.statusText || e.message;
           this.$message.error(message);

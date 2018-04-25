@@ -64,14 +64,14 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="request" label="硬件复位标志">
+            <el-form-item prop="reset" label="硬件复位标志">
               <el-select v-model="form.reset" placeholder="请选择硬件复位标志" style="width:100%;">
                 <el-option v-for="o in resetTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="reset" label="主动请求数据标志">
+            <el-form-item prop="request" label="主动请求数据标志">
               <el-select v-model="form.request" placeholder="请选择主动请求数据标志" style="width:100%;">
                 <el-option v-for="o in requestTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
@@ -108,6 +108,19 @@ export default {
       }, 500);
       return false;
     };
+    const checkDeviceId = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('编号不能为空'));
+      }
+      setTimeout(() => {
+        if (/[\u4E00-\u9FA5]/g.test(value)) {
+          callback(new Error('编号不能为汉字'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
     return {
       loading: false,
       formVisible: false,
@@ -117,7 +130,7 @@ export default {
       search: {},
       form: {},
 
-      pageSizes: [1, 10, 50, 100, 200],
+      pageSizes: [10, 20, 50, 100],
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -140,6 +153,7 @@ export default {
       rules2: {
         deviceId: [
           { required: true, message: '请输入编号' },
+          { validator: checkDeviceId, trigger: 'blur' },
         ],
         deviceType: [
           { required: true, message: '请输入设备类别' },
@@ -147,10 +161,10 @@ export default {
         perSet: [
           { validator: checkTime, trigger: 'blur' },
         ],
-        request: [
+        reset: [
           { required: true, message: '请选择硬件复位标志' },
         ],
-        reset: [
+        request: [
           { required: true, message: '请选择主动请求数据标志' },
         ],
       },
@@ -219,6 +233,7 @@ export default {
         'request',
         'reset',
       ]);
+      this.form.perSet = 30;
       this.formVisible = true;
       this.editButtonVisible = false;
       this.addButtonVisible = true;

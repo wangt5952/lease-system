@@ -22,7 +22,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- a -->
+
     <el-table :data="list" style="width: 100%;margin-top:10px;">
       <el-table-column prop="orgCode" label="编码"></el-table-column>
       <el-table-column prop="orgName" label="组织名称"></el-table-column>
@@ -53,12 +53,12 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form class="edit-form" :model="form" ref="form">
+    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false" :before-close="closeForm">
+      <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item prop="orgCode" :rules="[{required:true, message:'请填写编码'}]" label="编码">
-              <el-input v-model="form.orgCode" auto-complete="off" :disabled="form.id"></el-input>
+            <el-form-item prop="orgCode" label="编码">
+              <el-input v-model="form.orgCode" auto-complete="off" :disabled="disabledFromId"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -89,13 +89,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="联系电话">
+            <el-form-item prop="orgPhone" label="联系电话">
               <el-input v-model="form.orgPhone" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="营业执照号码">
-              <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -105,12 +100,42 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item prop="orgBusinessLicences" label="营业执照号">
+              <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="营业执照">
+              <!-- <input id="uploadFile" type="file" accept="image/*" @change="selectedFile"> -->
+              <!-- <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input> -->
+              <el-upload
+                class="avatar-uploader"
+                action=""
+                list-type="picture-card"
+                :show-file-list="false"
+                :auto-upload="false"
+                :on-change="changeFile">
+                <img id="giftImg" v-if="imageUrl" :src="imageUrl" class="avatar">
+                <el-button v-else slot="trigger" size="small" type="primary">选取文件</el-button>
+              </el-upload>
+              <div>
+                <el-button size="small" type="primary" @click="checkPhoto">点击查看</el-button>
+              </div>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeForm">取消</el-button>
         <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
+    </el-dialog>
+
+    <el-dialog :visible.sync="dialogVisible">
+      <img width="100%" :src="imageUrl" alt="">
     </el-dialog>
 
     <el-dialog title="绑定企业" :visible.sync="bindFormVehicle" :close-on-click-modal="false">
@@ -129,9 +154,7 @@
 
 <script>
 import _ from 'lodash';
-import {
-  mapState,
-} from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   data() {
@@ -148,8 +171,40 @@ export default {
         }
       }, 500);
       return false;
+      // callback();
+    };
+    const checkOrgId = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('编号不能为空'));
+      }
+      setTimeout(() => {
+        if (/[\u4E00-\u9FA5]/g.test(value)) {
+          callback(new Error('编号不能为汉字'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
+    // 汉字验证
+    const checkSinogram = (rule, value, callback) => {
+      setTimeout(() => {
+        if (/[\u4E00-\u9FA5]/g.test(value)) {
+          callback(new Error('输入内容不能含有汉字'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
     };
     return {
+      disabledFromId: false,
+      imageUrl: '',
+      // 最大文件上传大小(单位:M)
+      customImageMaxSize: 3,
+
+      base64: '',
+
       loading: false,
       list: [],
       bindForm_orgList: [],
@@ -158,13 +213,14 @@ export default {
         orgStatus: '',
       },
 
-      pageSizes: [10, 50, 100, 200],
+      pageSizes: [10, 20, 50, 100],
       currentPage: 1,
       pageSize: 10,
       total: 0,
 
       formVisible: false,
       bindFormVehicle: false,
+      dialogVisible: false,
       form: {},
       bindFormOrg: {
         count: 1,
@@ -190,17 +246,31 @@ export default {
         // { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
+      rules1: {
+        orgCode: [
+          { required: true, message: '请填写编码' },
+          { validator: checkOrgId, trigger: 'blur' },
+        ],
+        orgPhone: [
+          { validator: checkSinogram, trigger: 'blur' },
+        ],
+        orgBusinessLicences: [
+          { validator: checkSinogram, trigger: 'blur' },
+        ],
+      },
       rules2: {
         count: [
           { validator: checkVehicleNum, trigger: 'blur' },
         ],
       },
+
     };
   },
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
       res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
+      orgPhotoPath: state => state.orgPhotoPath,
     }),
   },
   watch: {
@@ -212,6 +282,20 @@ export default {
     },
   },
   methods: {
+    checkPhoto() {
+      this.dialogVisible = true;
+    },
+    // changeFile(file, fileList) {
+    changeFile(file) {
+      const This = this;
+      // this.imageUrl = URL.createObjectURL(file.raw);
+      const reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      // reader.onload = function(e) {
+      reader.onload = function () {
+        This.imageUrl = this.result;
+      };
+    },
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();
@@ -253,9 +337,16 @@ export default {
       }
     },
 
-    showForm(form = { }) {
+    showForm(form = {}) {
       const $form = this.$refs.form;
       if ($form) $form.resetFields();
+      if (form.id) {
+        this.disabledFromId = true;
+        // form.orgBusinessLicenceFront = this.orgPhotoPath + form.orgBusinessLicenceFront;
+        // this.imageUrl = form.orgBusinessLicenceFront;
+        // form.orgBusinessLicenceFront = this.orgPhotoPath + form.orgBusinessLicenceFront;
+        this.imageUrl = this.orgPhotoPath + form.orgBusinessLicenceFront;
+      }
       this.form = _.pick(form, [
         'id',
         'orgCode',
@@ -266,12 +357,17 @@ export default {
         'orgContacts',
         'orgPhone',
         'orgBusinessLicences',
+        'orgBusinessLicenceFront',
         'orgStatus',
       ]);
       this.formVisible = true;
     },
     closeForm() {
+      const This = this;
       this.form = {};
+      setTimeout(() => {
+        This.imageUrl = '';
+      }, 1000);
       this.formVisible = false;
     },
     // 跳转到给企业分配车辆页面
@@ -312,22 +408,29 @@ export default {
       try {
         const $form = this.$refs.form;
         await $form.validate();
-
         if (this.form.id) {
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;
           form.update_user = loginName;
+          form.orgBusinessLicenceFront = this.imageUrl;
           const { code, message } = (await this.$http.post('/api/manager/org/modify', form)).body;
-          if (code !== '200') throw new Error(message);
-          this.$message.success('编辑成功');
+          if (code === '200') {
+            this.$message.success('添加成功');
+          } else {
+            throw new Error(message);
+          }
         } else {
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;
           form.create_user = loginName;
           form.update_user = loginName;
-          const { code, message } = (await this.$http.post('/api/manager/org/add', [form])).body;
-          if (code !== '200') throw new Error(message);
-          this.$message.success('添加成功');
+          form.orgBusinessLicenceFront = this.imageUrl;
+          const { code, message } = (await this.$http.post('/api/manager/org/addone', form)).body;
+          if (code === '200') {
+            this.$message.success('添加成功');
+          } else {
+            throw new Error(message);
+          }
         }
         await this.reload();
         this.closeForm();
@@ -350,4 +453,27 @@ export default {
 .edit-form >>> .el-form-item {
   height: 73px;
 }
+  .avatar-uploader >>> .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader >>> .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>

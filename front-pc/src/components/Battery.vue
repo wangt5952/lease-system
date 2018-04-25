@@ -59,10 +59,10 @@
     </el-pagination>
 
     <el-dialog title="电池信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form class="edit-form" :model="form" ref="form">
+      <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item prop="batteryCode" :rules="[{required:true, message:'请填写编号'}]" label="编号">
+            <el-form-item prop="batteryCode" label="编号">
               <el-input v-model="form.batteryCode" auto-complete="off" :disabled="form.id"></el-input>
             </el-form-item>
           </el-col>
@@ -119,6 +119,19 @@ import {
 
 export default {
   data() {
+    const checkBattreryId = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('编号不能为空'));
+      }
+      setTimeout(() => {
+        if (/[\u4E00-\u9FA5]/g.test(value)) {
+          callback(new Error('编号不能为汉字'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
     return {
       loading: false,
       list: [],
@@ -128,7 +141,7 @@ export default {
         isBind: '',
       },
 
-      pageSizes: [10, 50, 100, 200],
+      pageSizes: [10, 20, 50, 200],
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -158,6 +171,12 @@ export default {
         { id: 'BIND', name: '已绑定' },
       ],
       mfrsList: [],
+      rules1: {
+        batteryCode: [
+          { required: true, message: '请填写编码' },
+          { validator: checkBattreryId, trigger: 'blur' },
+        ],
+      },
     };
   },
   computed: {
