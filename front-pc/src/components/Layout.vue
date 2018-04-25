@@ -4,7 +4,7 @@
       <div style="flex:1;"></div>
       <el-dropdown @command="command => this[command]()">
         <span class="el-dropdown-link" style="cursor:pointer;color:#fff;">
-          {{key_user_info.userName}} <i class="el-icon-arrow-down el-icon--right"></i>
+          {{key_user_info.nickName}} <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="showPasswordForm">密码修改</el-dropdown-item>
@@ -35,10 +35,10 @@
     </div>
     <div style="display:flex;flex:1;">
       <!-- 左侧导航 -->
-      <div :style="isCollapse ? { 'width': '4%' } : { 'width': '16%' }">
+      <div :style="isCollapse ? { 'width': '4%' } : { 'width': '15%' }">
         <el-menu :router="true" :collapse="isCollapse" unique-opened>
           <div style="padding:15px" @click="shrinkChang">
-            <i style="color:#fff;font-size:28px;" class="lt" :class="{ 'arrow-double-left': !isCollapse, 'arrow-double-right': isCollapse }"></i>
+            <i style="color:#ffffff;font-size:28px;" class="lt" :class="{ 'lt-arrow-double-left': !isCollapse, 'lt-arrow-double-right': isCollapse }"></i>
             <!-- <a href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a> -->
             <!-- <a href="javascript:void(0)" :icon="{ isCollapse ? lt-left-sorting:lt-arrow-double-right }"></a> -->
           </div>
@@ -135,7 +135,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
-              <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
+              <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off" :disabled="disabledForm"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">

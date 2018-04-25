@@ -88,7 +88,7 @@ export default {
 
       search: {},
 
-      pageSizes: [10, 50, 100, 200],
+      pageSizes: [10, 20, 50, 100],
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -97,8 +97,7 @@ export default {
       form: {},
 
       assignResFormVisible: false,
-      assignResForm: {
-      },
+      assignResForm: {},
 
       resList: [],
       resTypeList: [

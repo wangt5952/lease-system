@@ -683,18 +683,19 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public int orgCountVehicle(String orgId) {
+    public int orgCountVehicle(BizVehicleParam pagingParam) {
         BizOrganizationExample org = new BizOrganizationExample();
         BizOrganizationExample.Criteria criteria = org.createCriteria();
-        criteria.andIdEqualTo(orgId);
+        criteria.andIdEqualTo(pagingParam.getOrgId());
         criteria.andOrgStatusEqualTo(RecordStatus.NORMAL);
         if (bizOrganizationMapperExt.countByExample(org) < 0) {
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"未查询到该企业");
         }
-        BizVehicleParam paramMap = new BizVehicleParam();
-        paramMap.setOrgId(orgId);
-        paramMap.setVehicleStatus(RecordStatus.NORMAL.toString());
-        return bizVehicleMapperExt.selectExtByParam(paramMap).size();
+        int unbindVehicleCount = bizVehicleMapperExt.countExtUnbindExtByParam(pagingParam);
+        if (unbindVehicleCount == 0) {
+            throw new BizException(RunningResult.NO_RESOURCE.code(),"该企业下无闲置车辆");
+        }
+        return unbindVehicleCount;
     }
 
     @Override

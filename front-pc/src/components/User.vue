@@ -82,7 +82,7 @@
           </el-col>
           <template>
             <el-col :span="8">
-              <el-form-item prop="userMobile" label="手机号码" :rules="[{required:true, message:'请填写手机号码'}]">
+              <el-form-item prop="userMobile" label="手机号码">
                 <el-input v-model="form.userMobile" placeholder="请填写手机号码" auto-complete="off" :disabled="disabledForm"></el-input>
               </el-form-item>
             </el-col>
@@ -96,7 +96,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="LOGO路径">
-              <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input>
+              <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -241,19 +241,24 @@
 
 <script>
 import _ from 'lodash';
-// import file2base64 from '../util/file2base64';
 import {
   mapState,
 } from 'vuex';
 
 export default {
   data() {
+    // 手机验证
     const checkPhone = (rule, value, callback) => {
-      if (!/^\d+$/.test(value)) {
-        callback(new Error('请输入正确手机格式'));
-      } else {
-        callback();
+      if (!value) {
+        return callback(new Error('请输入手机号码'));
       }
+      setTimeout(() => {
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入正确手机格式'));
+        } else {
+          callback();
+        }
+      }, 500);
       return false;
     };
     // 车辆表单效验
@@ -302,7 +307,7 @@ export default {
         userType: '',
         userStatus: '',
       },
-      pageSizes: [10, 20, 50, 100, 200],
+      pageSizes: [10, 20, 50, 100],
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -314,7 +319,6 @@ export default {
       typeList: [
         { id: 'PLATFORM', name: '平台' },
         { id: 'ENTERPRISE', name: '企业' },
-        { id: 'INDIVIDUAL', name: '个人' },
       ],
       authList: [
         { id: 'AUTHORIZED', name: '已实名' },
@@ -348,7 +352,6 @@ export default {
       rules2: {
         userMobile: [
           { validator: checkPhone, trigger: 'blur' },
-          { required: true, message: '请选择用户类型' },
         ],
       },
 
@@ -673,16 +676,16 @@ export default {
         if (this.form.id) {
           const { ...form } = this.form;
           form.update_user = loginName;
-          const { code, message } = (await this.$http.post('/api/manager/user/modify', form)).body;
-          if (code !== '200') throw new Error(message);
+          const { code } = (await this.$http.post('/api/manager/user/modify', form)).body;
+          if (code !== '200') throw new Error('修改失败');
           this.$message.success('编辑成功');
         } else {
           const { ...form } = this.form;
           form.create_user = loginName;
           form.update_user = loginName;
           // form.password = '123';
-          const { code, message } = (await this.$http.post('/api/manager/user/add', [form])).body;
-          if (code !== '200') throw new Error(message);
+          const { code } = (await this.$http.post('/api/manager/user/add', [form])).body;
+          if (code !== '200') throw new Error('添加失败');
           this.$message.success('添加成功');
         }
         await this.reload();

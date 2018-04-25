@@ -4,12 +4,15 @@ import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.paging.PageResponse;
+import com.elextec.framework.utils.WzFileUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
+import com.elextec.lease.model.SysResourcesIcon;
+import com.elextec.lease.model.SysUserIcon;
 import com.elextec.persist.dao.mybatis.*;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
@@ -22,9 +25,11 @@ import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -36,6 +41,12 @@ public class SysUserServcieImpl implements SysUserService {
 
     /** 日志. */
     private final Logger logger = LoggerFactory.getLogger(SysUserServcieImpl.class);
+
+    @Value("${localsetting.upload-user-icon-root}")
+    private String  uploadUserIconRoot;
+
+    @Value("${localsetting.download-user-icon-prefix}")
+    private String downloadUserIconPrefix;
 
     @Autowired
     private SysUserMapperExt sysUserMapperExt;
@@ -214,8 +225,6 @@ public class SysUserServcieImpl implements SysUserService {
             throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误", ex);
         }
     }
-
-
 
     @Override
     @Transactional
@@ -664,6 +673,34 @@ public class SysUserServcieImpl implements SysUserService {
             return sysUserMapperExt.getUserByVehicle(vehicleId);
         } else {
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR);
+        }
+    }
+
+    @Override
+    public List<SysUserIcon> listSysUserIcons(){
+        if (WzStringUtil.isBlank(uploadUserIconRoot)) {
+            throw new BizException(RunningResult.NO_DIRECTORY);
+        }
+        if (WzStringUtil.isBlank(downloadUserIconPrefix)) {
+            throw new BizException(RunningResult.NOT_FOUND);
+        }
+        File iconDir = new File(uploadUserIconRoot);
+        if (iconDir.exists() && iconDir.isDirectory()) {
+            File[] iconFiles = iconDir.listFiles();
+            List<SysUserIcon> iconLs = new ArrayList<SysUserIcon>();
+            SysUserIcon iconVo = null;
+            for (int i = 0; i < iconFiles.length; i++) {
+                iconVo = new SysUserIcon();
+                iconVo.setIconName(iconFiles[i].getName());
+                //iconVo.setIconUrl(WzFileUtil.makeRequestUrl(uploadUserIconRoot, "", iconFiles[i].getName()));
+                iconLs.add(iconVo);
+            }
+            if (0 == iconLs.size()) {
+                throw new BizException(RunningResult.NOT_FOUND.code(), "未获得ICON文件");
+            }
+            return iconLs;
+        } else {
+            throw new BizException(RunningResult.NO_DIRECTORY);
         }
     }
 

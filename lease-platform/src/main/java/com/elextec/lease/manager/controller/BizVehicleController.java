@@ -1552,7 +1552,7 @@ public class BizVehicleController extends BaseController {
      *         orgId:企业Id
      *     }
      * </pre>
-     * 查询该企业下有多少俩车
+     * 查询该企业下有多少闲置车辆
      * @param orgInfo 企业id
      * @param request 登录信息
      * @return 车辆个数
@@ -1574,9 +1574,10 @@ public class BizVehicleController extends BaseController {
         } else {
             // 参数解析错误报“参数解析错误”
             try {
+                BizVehicleParam pagingParam = null;
                 String orgStr = URLDecoder.decode(orgInfo, "utf-8");
-                Map<String,Object> map = JSONObject.parseObject(orgStr,Map.class);
-                if (WzStringUtil.isBlank(map.get("orgId").toString())) {
+                pagingParam = JSONObject.parseObject(orgStr,BizVehicleParam.class);
+                if (WzStringUtil.isBlank(pagingParam.getOrgId())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
                 SysUser sysUser = this.getLoginUserInfo(request);
@@ -1586,7 +1587,7 @@ public class BizVehicleController extends BaseController {
                 if (sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
                     return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
                 }
-                return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.orgCountVehicle(map.get("orgId").toString()));
+                return new MessageResponse(RunningResult.SUCCESS,bizVehicleService.orgCountVehicle(pagingParam));
             } catch(BizException ex){
                 throw ex;
             } catch(Exception ex){

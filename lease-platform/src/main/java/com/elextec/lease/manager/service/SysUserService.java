@@ -5,6 +5,7 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.model.BizVehicleBatteryParts;
+import com.elextec.lease.model.SysUserIcon;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
@@ -148,5 +149,11 @@ public interface SysUserService {
      * @return 用户信息
      */
     public SysUser getUserByVehicle(String vehicleId,String userId,String orgId);
+
+    /**
+     * 查询资源Icon列表.
+     * @return 资源Icon列表
+     */
+    public List<SysUserIcon> listSysUserIcons();
 
 }

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sun.misc.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
@@ -1165,6 +1166,27 @@ public class SysUserController extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
         }
+    }
+
+    /**
+     * 列出用户的Icon
+     * @return
+     * * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 iconName:icon文件名
+     *             },
+     *             ......
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/listIcon",method = RequestMethod.GET)
+    public MessageResponse listIcon() {
+        return new MessageResponse(RunningResult.SUCCESS,sysUserService.listSysUserIcons());
     }
 
 }

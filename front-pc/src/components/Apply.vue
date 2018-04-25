@@ -349,7 +349,7 @@ export default {
       // 企业
       myApplyList: [],
 
-      myApplyPageSizes: [1, 5, 10, 50, 100],
+      myApplyPageSizes: [10, 20, 50, 100],
       myApplyCurrentPage: 1,
       myApplyPageSize: 10,
       myApplyTotal: 0,
@@ -363,7 +363,7 @@ export default {
       },
       individualApplyList: [],
 
-      individualApplyPageSizes: [1, 5, 10, 50, 100],
+      individualApplyPageSizes: [10, 20, 50, 100],
       individualApplyCurrentPage: 1,
       individualApplyPageSize: 10,
       individualApplyTotal: 0,
@@ -374,7 +374,7 @@ export default {
         applyStatus: 'TOBEAUDITED',
       },
       sysApplyList: [],
-      sysPageSizes: [1, 5, 10, 50, 100],
+      sysPageSizes: [10, 20, 50, 100],
       sysCurrentPage: 1,
       sysPageSize: 10,
       sysTotal: 0,
