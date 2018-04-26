@@ -263,9 +263,9 @@ public class SysUserServcieImpl implements SysUserService {
 //                userInfo.setUserType(null);
                 throw new BizException(RunningResult.DB_ERROR.code(), "系统管理员不能修改用户类型");
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                throw new BizException(RunningResult.DB_ERROR.code(), "不能修改个人用户信息");
-            }
+//            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+//                throw new BizException(RunningResult.DB_ERROR.code(), "不能修改个人用户信息");
+//            }
             //验证企业是否存在（状态为正常）
             if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
                 BizOrganizationExample orgExample = new BizOrganizationExample();
