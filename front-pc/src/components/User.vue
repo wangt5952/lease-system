@@ -72,7 +72,7 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
+    <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false" :close-on-press-escape="true" :before-close="closeForm">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -97,6 +97,11 @@
           <el-col :span="8">
             <el-form-item label="LOGO路径">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
+              <el-select v-model="form.userIcon" placeholder="请选择用户类型" style="width:100%;">
+                <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="userIconPath + o.iconName">
+                  <img :src="userIconPath + o.iconName" alt="">
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -345,6 +350,7 @@ export default {
       },
       roleList: [],
       orgList: [],
+      userIconPhoto: [],
       // 照片表单
       photoFormVisible: false,
 
@@ -380,6 +386,7 @@ export default {
     ...mapState({
       key_user_info: state => state.key_user_info,
       res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
+      userIconPath: state => state.userIconPath,
     }),
   },
   watch: {
@@ -619,6 +626,7 @@ export default {
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
         await this.getOrgList();
+        await this.getUserIcon();
       } catch (e) {
         this.loading = false;
         const message = e.statusText || e.message;
@@ -722,10 +730,26 @@ export default {
       }
     },
     async getOrgList() {
-      const { code, respData } = (await this.$http.post('/api/manager/org/list', {
-        currPage: 1, pageSize: 999,
-      })).body;
-      if (code === '200') this.orgList = respData.rows;
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/org/list', {
+          currPage: 1, pageSize: 999,
+        })).body;
+        if (code === '200') this.orgList = respData.rows;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    async getUserIcon() {
+      try {
+        const { code, message, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
+        if (code === '200') this.userIconPhoto = respData;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     async getRoleList() {
       const { code, respData } = (await this.$http.post('/api/manager/role/list', {

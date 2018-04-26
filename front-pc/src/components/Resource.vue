@@ -39,7 +39,7 @@
     </el-table>
 
     <el-dialog title="资源信息" :visible.sync="formVisible" :close-on-click-modal="false">
-      <el-form :model="form" ref="form">
+      <el-form :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="resCode" :rules="[{required:true, message:'请填写编码'}]" label="编码">
@@ -64,17 +64,17 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="groupSort" label="分组排序" :rules="[{required:true, message:'请填写分组排序'}]">
-              <el-input v-model="form.groupSort" auto-complete="off"></el-input>
+            <el-form-item prop="groupSort" label="分组排序">
+              <el-input v-model="form.groupSort" auto-complete="off" placeholder="请输入非负正整数"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="组内排序">
-              <el-input v-model="form.resSort" auto-complete="off"></el-input>
+            <el-form-item prop="resSort" label="组内排序">
+              <el-input v-model="form.resSort" auto-complete="off" placeholder="请输入非负正整数"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="resType" :rules="[{required:true, message:'请选择显示标志'}]" label="显示标志">
+            <el-form-item prop="showFlag" :rules="[{required:true, message:'请选择显示标志'}]" label="显示标志">
               <el-select v-model="form.showFlag" placeholder="请选择显示标志" style="width:100%;">
                 <el-option v-for="o in showFlagList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
@@ -104,6 +104,31 @@ import {
 
 export default {
   data() {
+    // 分组排序非数字验证
+    const checkGroupSort = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('分组排序不能为空'));
+      }
+      setTimeout(() => {
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入非负正整数'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
+    // 组内排序非数字验证
+    const checkResSort = (rule, value, callback) => {
+      setTimeout(() => {
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入非负正整数'));
+        } else {
+          callback();
+        }
+      }, 500);
+      return false;
+    };
     return {
       loading: false,
       list: [],
@@ -123,6 +148,16 @@ export default {
       ],
 
       expandItem: [],
+
+      rules1: {
+        groupSort: [
+          { required: true, message: '分组排序不能为空' },
+          { validator: checkGroupSort, trigger: 'blur' },
+        ],
+        resSort: [
+          { validator: checkResSort, trigger: 'blur' },
+        ],
+      },
     };
   },
   computed: {
@@ -241,10 +276,9 @@ export default {
     },
     async saveForm() {
       const { loginName } = this.key_user_info;
+      const $form = this.$refs.form;
+      await $form.validate();
       try {
-        const $form = this.$refs.form;
-        await $form.validate();
-
         if (this.form.id) {
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;

@@ -33,6 +33,7 @@ const store = new Vuex.Store({
       key_user_info: JSON.parse(localStorage.getItem('key_user_info') || '{}'),
       relogin: false,
       orgPhotoPath: 'http://192.168.1.123:8080/leaseupload/otherimg/', // 企业照片路径
+      userIconPath: 'http://192.168.1.123:8080/leaseupload/usericon/',  // 用户图标路径
     };
   },
   mutations: {
