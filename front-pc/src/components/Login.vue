@@ -40,6 +40,9 @@ export default {
   },
   methods: {
     async handleSubmit() {
+      if (this.form.loginName === '' || this.form.password === '') {
+        return this.$message.error('用户名或者密码不能为空');
+      }
       const { password, ...form } = this.form;
       const loginTime = moment().unix() * 1000;
       form.loginAuthStr = md5(form.loginName + md5(password).toUpperCase() + loginTime).toUpperCase();

@@ -31,7 +31,13 @@
       <el-table-column prop="batteryPn" label="型号"></el-table-column>
       <el-table-column prop="batteryParameters" label="参数"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="batteryStatusText" label="状态"></el-table-column>
+      <el-table-column prop="batteryStatusText" label="状态">
+        <template slot-scope="{row}">
+          <template v-if="row.batteryStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
+          <template v-else-if="row.batteryStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
+          <template v-else><span style="color:red">作废</span></template>
+        </template>
+      </el-table-column>
       <el-table-column label="绑定车辆">
         <template slot-scope="{row}">
           <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
@@ -63,7 +69,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="batteryCode" label="编号">
-              <el-input v-model="form.batteryCode" auto-complete="off" :disabled="form.id"></el-input>
+              <el-input v-model="form.batteryCode" auto-complete="off" :disabled="disabledFormId"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -147,6 +153,7 @@ export default {
       total: 0,
 
       formVisible: false,
+      disabledFormId: false,
       form: {},
 
       typeList: [
@@ -236,10 +243,7 @@ export default {
         this.$message.error(message);
       }
     },
-
     showForm(form = { }) {
-      const $form = this.$refs.form;
-      if ($form) $form.resetFields();
       this.form = _.pick(form, [
         'id',
         'batteryCode',
@@ -251,6 +255,13 @@ export default {
         'batteryStatus',
       ]);
       this.formVisible = true;
+      if(form.id) {
+        this.disabledFormId = true;
+      } else {
+        const $form = this.$refs.form;
+        if ($form) $form.resetFields();
+        this.disabledFormId = false;
+      }
     },
     closeForm() {
       this.formVisible = false;

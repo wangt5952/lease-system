@@ -11,21 +11,21 @@
           <template v-if="key_user_info.userType === 'INDIVIDUAL'">
             <div @click="showEnterpriseForm(key_user_info)">
               <el-dropdown-item command="showForms">
-                修改个人信息
+                修改用户信息
               </el-dropdown-item>
             </div>
           </template>
           <template v-if="key_user_info.userType === 'ENTERPRISE'">
             <div @click="showEnterpriseForm(key_user_info)">
               <el-dropdown-item command="showForms">
-                修改企业信息
+                修改用户信息
               </el-dropdown-item>
             </div>
           </template>
           <template v-if="key_user_info.userType === 'PLATFORM'">
             <div @click="showEnterpriseForm(key_user_info)">
               <el-dropdown-item command="showForms">
-                修改平台信息
+                修改用户信息
               </el-dropdown-item>
             </div>
           </template>

@@ -38,7 +38,12 @@
         <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
         <el-table-column prop="nickName" label="昵称"></el-table-column>
         <el-table-column prop="userName" label="姓名"></el-table-column>
-        <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
+        <el-table-column prop="userRealNameAuthFlagText" label="实名认证">
+          <template slot-scope="{row}">
+          <template v-if="row.userRealNameAuthFlag === 'AUTHORIZED'"><span style="color:#17BE45">已实名</span></template>
+          <template v-else><span style="color:red">未实名</span></template>
+        </template>
+        </el-table-column>
         <!-- PLATFORM:平台, ENTERPRISE:企业 -->
         <el-table-column label="操作" width="270">
           <template slot-scope="{row}">
@@ -684,16 +689,16 @@ export default {
         if (this.form.id) {
           const { ...form } = this.form;
           form.update_user = loginName;
-          const { code } = (await this.$http.post('/api/manager/user/modify', form)).body;
-          if (code !== '200') throw new Error('修改失败');
-          this.$message.success('编辑成功');
+          const { code, message } = (await this.$http.post('/api/manager/user/modify', form)).body;
+          if ( code !== '200' ) throw new Error(message);
+          this.$message.success('修改成功');
         } else {
           const { ...form } = this.form;
           form.create_user = loginName;
           form.update_user = loginName;
           // form.password = '123';
-          const { code } = (await this.$http.post('/api/manager/user/add', [form])).body;
-          if (code !== '200') throw new Error('添加失败');
+          const { code, message } = (await this.$http.post('/api/manager/user/addone', form)).body;
+          if ( code !== '200' ) throw new Error(message);
           this.$message.success('添加成功');
         }
         await this.reload();
@@ -732,7 +737,7 @@ export default {
     async getOrgList() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/org/list', {
-          currPage: 1, pageSize: 999,
+          currPage: 1, pageSize: 999, orgStatus: 'NORMAL',
         })).body;
         if (code === '200') this.orgList = respData.rows;
       } catch (e) {

@@ -92,7 +92,6 @@
         <el-button type="primary" @click="saveForm">{{form.id ? '保存' : '添加'}}</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 

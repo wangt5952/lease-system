@@ -29,15 +29,22 @@
       </template>
     </div>
 
-    <el-table :data="list" style="width: 100%">
+    <el-table :data="list" class="vehicleHeight">
       <el-table-column prop="vehicleCode" label="编号"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
       <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
       <el-table-column prop="orgName" label="所属单位"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="vehicleStatusText" label="状态"></el-table-column>
-      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <el-table-column prop="vehicleStatusText" label="状态">
+        <template slot-scope="{row}">
+          <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
+          <template v-else-if="row.vehicleStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
+          <template v-else><span style="color:red">作废</span></template>
+        </template>
+      </el-table-column>
+      <!-- PLATFORM:平台, ENTERPRISE:企业, INDIVIDUAL:'个人' -->
+      <!-- 管理员查看的信息 -->
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <!-- v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" -->
         <el-table-column label="电池" width="150">
@@ -59,7 +66,8 @@
           </template>
         </el-table-column>
       </template>
-      <template v-if="key_user_info.userType === 'ENTERPRISE'">
+      <!-- 企业和个人查看的信息 -->
+      <template v-if="key_user_info.userType === 'ENTERPRISE' || key_user_info.userType === 'INDIVIDUAL'">
         <el-table-column label="电池" width="150">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
@@ -338,7 +346,6 @@
         <el-button type="primary" @click="saveReturnVehicleForm">确定</el-button>
       </span>
     </el-dialog>
-
     <el-dialog title="已有电池" :visible.sync="bindBatteryFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-table :data="batteryList" style="width: 100%;margin-top:10px;">
         <el-table-column prop="batteryCode" label="编号"></el-table-column>
@@ -587,14 +594,18 @@ export default {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/orgCountVehicle', { orgId })).body;
         if (code !== '200') throw new Error(message);
-        this.returnVehicleForm = { orgId: orgId, count: respData };
-        this.vehicleNumTotal = respData;
+        if (code === '200') {
+          this.returnVehicleForm = { orgId: orgId, count: respData };
+          this.vehicleNumTotal = respData;
+          this.returnVehicleFormVehicle = true;
+        } else {
+          this.returnVehicleFormVehicle = false;
+        }
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      this.returnVehicleFormVehicle = true;
     },
     // 确定归还车辆
     async saveReturnVehicleForm() {
@@ -976,5 +987,23 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   height: 55px;
+}
+>>> .el-table {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  /* -webkit-box-sizing: border-box; */
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  /* -ms-flex: 1; */
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  /* font-size: 14px; */
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>

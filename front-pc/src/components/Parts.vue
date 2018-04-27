@@ -65,7 +65,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="partsCode" label="编码">
-              <el-input v-model="form.partsCode" auto-complete="off" :disabled="form.id"></el-input>
+              <el-input v-model="form.partsCode" auto-complete="off" :disabled="disabledFormId"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -158,6 +158,7 @@ export default {
       total: 0,
 
       formVisible: false,
+      disabledFormId: false,
       form: {},
 
       typeList: [
@@ -258,7 +259,7 @@ export default {
       }
     },
 
-    showForm(form = { }) {
+    showForm(form = {}) {
       this.form = _.pick(form, [
         'id',
         'partsCode',
@@ -271,6 +272,13 @@ export default {
         'partsStatus',
       ]);
       this.formVisible = true;
+      if(form.id) {
+        this.disabledFormId = true;
+      } else {
+        const $form = this.$refs.form;
+        if ($form) $form.resetFields();
+        this.disabledFormId = false;
+      }
     },
     closeForm() {
       this.form = {};
