@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
-      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <!-- PLATFORM:平台, ENTERPRISE:企业1 -->
       <template v-if="res['FUNCTION'].indexOf('manager-battery-addone') >= 0">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加电池</el-button>
@@ -255,7 +255,7 @@ export default {
         'batteryStatus',
       ]);
       this.formVisible = true;
-      if(form.id) {
+      if (form.id) {
         this.disabledFormId = true;
       } else {
         const $form = this.$refs.form;

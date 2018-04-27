@@ -104,7 +104,7 @@
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
               <el-select v-model="form.userIcon" placeholder="请选择用户类型" style="width:100%;">
                 <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="userIconPath + o.iconName">
-                  <img :src="userIconPath + o.iconName" alt="">
+                  <!-- <img :src="userIconPath + o.iconName" alt=""> -->
                 </el-option>
               </el-select>
             </el-form-item>
@@ -690,7 +690,7 @@ export default {
           const { ...form } = this.form;
           form.update_user = loginName;
           const { code, message } = (await this.$http.post('/api/manager/user/modify', form)).body;
-          if ( code !== '200' ) throw new Error(message);
+          if (code !== '200') throw new Error(message);
           this.$message.success('修改成功');
         } else {
           const { ...form } = this.form;
@@ -698,7 +698,7 @@ export default {
           form.update_user = loginName;
           // form.password = '123';
           const { code, message } = (await this.$http.post('/api/manager/user/addone', form)).body;
-          if ( code !== '200' ) throw new Error(message);
+          if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }
         await this.reload();
@@ -736,7 +736,7 @@ export default {
     },
     async getOrgList() {
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/org/list', {
+        const { code, respData } = (await this.$http.post('/api/manager/org/list', {
           currPage: 1, pageSize: 999, orgStatus: 'NORMAL',
         })).body;
         if (code === '200') this.orgList = respData.rows;
@@ -748,7 +748,7 @@ export default {
     },
     async getUserIcon() {
       try {
-        const { code, message, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
+        const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
         if (code === '200') this.userIconPhoto = respData;
       } catch (e) {
         if (!e) return;

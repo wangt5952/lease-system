@@ -299,6 +299,6 @@ export default {
   width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 /* .el-textarea__inner {
-  min-height: 80px;
+  min-height: 80px;1
 } */
 </style>

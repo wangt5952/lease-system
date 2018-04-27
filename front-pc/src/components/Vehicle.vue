@@ -992,16 +992,13 @@ export default {
   position: relative;
   overflow-x: hidden;
   overflow-y: scroll;
-  /* -webkit-box-sizing: border-box; */
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-box-flex: 1;
-  /* -ms-flex: 1; */
   -ms-flex: 1;
   flex: 1;
   width: 100%;
   max-width: 100%;
-  /* font-size: 14px; */
   color: #606266;
   height: 85%;
   max-height: 85%;

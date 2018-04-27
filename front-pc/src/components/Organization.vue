@@ -252,7 +252,7 @@ export default {
       searchStatusList: [
         { id: '', name: '全部状态' },
         { id: 'NORMAL', name: '正常' },
-        // { id: 'FREEZE', name: '冻结/维保' },
+        // { id: 'FREEZE', name: '冻结/维保'1 },
         { id: 'INVALID', name: '作废' },
       ],
       rules1: {
@@ -296,7 +296,6 @@ export default {
     },
     // changeFile(file, fileList) {
     changeFile(file) {
-      console.log(file);
       const This = this;
       // this.imageUrl = URL.createObjectURL(file.raw);
       const reader = new FileReader();
@@ -366,8 +365,6 @@ export default {
         // this.imageUrl = form.orgBusinessLicenceFront;
         // form.orgBusinessLicenceFront = this.orgPhotoPath + form.orgBusinessLicenceFront;
         this.imageUrl = this.orgPhotoPath + form.orgBusinessLicenceFront;
-        console.log(this.imageUrl);
-        console.log(form);
       } else {
         const $form = this.$refs.form;
         if ($form) $form.resetFields();
@@ -388,14 +385,14 @@ export default {
       if ($form) $form.resetFields();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/orgCountVehicle', {
-           orgId: this.key_user_info.orgId,
+          orgId: this.key_user_info.orgId,
         })).body;
         if (code !== '200') throw new Error(message);
-        if(code === '200'){
+        if (code === '200') {
           this.bindFormOrg = { orgId: row.id, count: respData };
           this.vehicleNumTotal = respData;
           this.bindFormVehicle = true;
-        }else{
+        } else {
           this.bindFormVehicle = false;
         }
       } catch (e) {
@@ -415,7 +412,6 @@ export default {
       try {
         const { ...form } = this.bindFormOrg;
         form.count = String(this.bindFormOrg.count);
-        console.log(form);
         const { code, message } = (await this.$http.post('/api/manager/user/batchvehiclebind', form)).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('绑定企业成功');
@@ -504,18 +500,15 @@ export default {
   position: relative;
   overflow-x: hidden;
   overflow-y: scroll;
-  /* -webkit-box-sizing: border-box; */
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-box-flex: 1;
-  /* -ms-flex: 1; */
   -ms-flex: 1;
   flex: 1;
   width: 100%;
   max-width: 100%;
-  /* font-size: 14px; */
   color: #606266;
   height: 85%;
   max-height: 85%;
-}  
+}
 </style>
