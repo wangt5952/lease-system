@@ -48,4 +48,11 @@
       AND o.org_id = #{orgId,jdbcType=VARCHAR}
     </select>
 
+    <select id="getOrgIdByUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+      SELECT COUNT(1) FROM biz_vehicle v
+      LEFT JOIN biz_ref_user_vehicle r on r.vehicle_id = v.id
+      LEFT JOIN sys_user u on u.id = r.user_id AND u.user_type = 'INDIVIDUAL'
+      WHERE r.unbind_time IS NULL AND u.org_id = #{orgId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

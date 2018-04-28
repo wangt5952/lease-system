@@ -10,4 +10,6 @@ public interface BizRefUserVehicleMapperExt extends BizRefUserVehicleMapper {
 
     public int vehicleRecovery(String orgId);
 
+    public int getOrgIdByUser(String orgId);
+
 }

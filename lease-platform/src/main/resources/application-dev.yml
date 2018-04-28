@@ -56,14 +56,14 @@ logging:
   config: classpath:logback.xml
 localsetting:
   upload-root: D:/apache-tomcat-8.5.30/webapps/leaseupload
-  download-prefix: http://127.0.0.1:8080/leaseupload
+  download-prefix: http://192.168.1.123:8090/leaseupload
   upload-captcha-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/captcha
-  download-captcha-prefix: http://127.0.0.1:8080/leaseupload/captcha
+  download-captcha-prefix: http://192.168.1.123:8090/leaseupload/captcha
   upload-user-icon-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/usericon
-  download-user-icon-prefix: http://127.0.0.1:8080/leaseupload/usericon
+  download-user-icon-prefix: http://192.168.1.123:8090/leaseupload/usericon
   upload-user-realname-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/userrealname
-  download-user-realname-prefix: http://127.0.0.1:8080/leaseupload/userrealname
+  download-user-realname-prefix: http://192.168.1.123:8090/leaseupload/userrealname
   upload-res-icon-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/resicon
-  download-res-icon-prefix: http://127.0.0.1:8080/leaseupload/resicon
+  download-res-icon-prefix: http://192.168.1.123:8090/leaseupload/resicon
   upload-other-img-root: D:/apache-tomcat-8.5.30/webapps/leaseupload/otherimg
-  download-other-img-prefix: http://127.0.0.1:8080/leaseupload/otherimg
+  download-other-img-prefix: http://192.168.1.123:8090/leaseupload/otherimg

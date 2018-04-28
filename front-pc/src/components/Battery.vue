@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
-      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <!-- PLATFORM:平台, ENTERPRISE:企业1 -->
       <template v-if="res['FUNCTION'].indexOf('manager-battery-addone') >= 0">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加电池</el-button>
@@ -24,14 +24,20 @@
       </el-form>
     </div>
     <!-- {{ id }} -->
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" class="batteryHeight">
       <el-table-column prop="batteryCode" label="编号"></el-table-column>
       <el-table-column prop="batteryName" label="电池货名"></el-table-column>
       <el-table-column prop="batteryBrand" label="品牌"></el-table-column>
       <el-table-column prop="batteryPn" label="型号"></el-table-column>
       <el-table-column prop="batteryParameters" label="参数"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="batteryStatusText" label="状态"></el-table-column>
+      <el-table-column prop="batteryStatusText" label="状态">
+        <template slot-scope="{row}">
+          <template v-if="row.batteryStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
+          <template v-else-if="row.batteryStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
+          <template v-else><span style="color:red">作废</span></template>
+        </template>
+      </el-table-column>
       <el-table-column label="绑定车辆">
         <template slot-scope="{row}">
           <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
@@ -63,7 +69,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="batteryCode" label="编号">
-              <el-input v-model="form.batteryCode" auto-complete="off" :disabled="form.id"></el-input>
+              <el-input v-model="form.batteryCode" auto-complete="off" :disabled="disabledFormId"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -147,6 +153,7 @@ export default {
       total: 0,
 
       formVisible: false,
+      disabledFormId: false,
       form: {},
 
       typeList: [
@@ -236,10 +243,7 @@ export default {
         this.$message.error(message);
       }
     },
-
     showForm(form = { }) {
-      const $form = this.$refs.form;
-      if ($form) $form.resetFields();
       this.form = _.pick(form, [
         'id',
         'batteryCode',
@@ -251,6 +255,13 @@ export default {
         'batteryStatus',
       ]);
       this.formVisible = true;
+      if (form.id) {
+        this.disabledFormId = true;
+      } else {
+        const $form = this.$refs.form;
+        if ($form) $form.resetFields();
+        this.disabledFormId = false;
+      }
     },
     closeForm() {
       this.formVisible = false;
@@ -301,5 +312,20 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   height: 73px;
+}
+>>> .batteryHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>

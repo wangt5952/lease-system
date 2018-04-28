@@ -22,15 +22,19 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- a -->
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" class="mrfsHeight">
       <el-table-column prop="mfrsName" label="制造商名称"></el-table-column>
-      <el-table-column prop="mfrsTypeText" label="类型"></el-table-column>
+      <el-table-column prop="mfrsTypeText" label="类型" width="80"></el-table-column>
       <el-table-column prop="mfrsIntroduce" label="介绍"></el-table-column>
       <el-table-column prop="mfrsAddress" label="地址"></el-table-column>
-      <el-table-column prop="mfrsContacts" label="联系人"></el-table-column>
-      <el-table-column prop="mfrsPhone" label="联系电话"></el-table-column>
-      <el-table-column prop="mfrsStatusText" label="状态"></el-table-column>
+      <el-table-column prop="mfrsContacts" label="联系人" width="100"></el-table-column>
+      <el-table-column prop="mfrsPhone" label="联系电话" width="150"></el-table-column>
+      <el-table-column prop="mfrsStatusText" label="状态" width="100">
+        <template slot-scope="{row}">
+          <template v-if="row.mfrsStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
+          <template v-else><span style="color:red">作废</span></template>
+        </template>
+      </el-table-column>
       <template v-if="res['FUNCTION'].indexOf('manager-mfrs-modify') >= 0">
         <el-table-column label="操作" width="100">
           <template slot-scope="{row}">
@@ -39,7 +43,7 @@
         </el-table-column>
       </template>
     </el-table>
-
+    <!-- 分页 -->
     <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
@@ -66,11 +70,6 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="介绍">
-              <el-input v-model="form.mfrsIntroduce" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
             <el-form-item label="地址">
               <el-input v-model="form.mfrsAddress" auto-complete="off"></el-input>
             </el-form-item>
@@ -90,6 +89,11 @@
               <el-select v-model="form.mfrsStatus" placeholder="请选择状态" style="width:100%;">
                 <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="介绍">
+              <el-input type="textarea" v-model="form.mfrsIntroduce" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -286,5 +290,26 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   height: 73px;
+}
+>>> .el-textarea__inner {
+  height: 90px;
+}
+.el-table >>> .cell {
+  width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+>>> .mrfsHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>

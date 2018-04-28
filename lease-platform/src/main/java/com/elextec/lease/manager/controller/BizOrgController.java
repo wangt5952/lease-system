@@ -411,7 +411,8 @@ public class BizOrgController extends BaseController {
                     }
                 }
                 //企业营业执照如果不为空
-                if (WzStringUtil.isNotBlank(org.getOrgBusinessLicenceFront())){
+                if (WzStringUtil.isNotBlank(org.getOrgBusinessLicenceFront())
+                        && -1 == org.getOrgBusinessLicenceFront().toLowerCase().indexOf(this.downloadOtherImgPrefix.toLowerCase())){
                     //获取原企业营业执照
                     BizOrganization bizOrganization = bizOrganizationService.getBizOrganizationByPrimaryKey(org.getId());
                     String orgImg = bizOrganization.getOrgBusinessLicenceFront();
@@ -430,6 +431,9 @@ public class BizOrgController extends BaseController {
                     WzFileUtil.save(orgFront[1], uploadOtherImgRoot, "", orgImgTime, WzFileUtil.EXT_JPG);
                     //把时间和图片格式拼一起，库里只保存照片名
                     org.setOrgBusinessLicenceFront(orgImgTime + WzFileUtil.EXT_JPG);
+                }
+                if (-1 < org.getOrgBusinessLicenceFront().toLowerCase().indexOf(this.downloadOtherImgPrefix.toLowerCase())) {
+                    org.setOrgBusinessLicenceFront(null);
                 }
                 bizOrganizationService.updateBizOrganization(org);
             } catch (BizException ex) {
