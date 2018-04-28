@@ -684,6 +684,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
 
     @Override
     public int orgCountVehicle(BizVehicleParam pagingParam) {
+        //查询当前用户企业是否存在
         BizOrganizationExample org = new BizOrganizationExample();
         BizOrganizationExample.Criteria criteria = org.createCriteria();
         criteria.andIdEqualTo(pagingParam.getOrgId());
@@ -691,6 +692,9 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         if (bizOrganizationMapperExt.countByExample(org) < 0) {
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"未查询到该企业");
         }
+        //查询当前企业下是否有用户绑定了车辆
+        //int bindVehicleCount = bizRefUserVehicleMapperExt.getOrgIdByUser(map.get("orgId").toString());
+        //查询未绑定用户的车辆
         int unbindVehicleCount = bizVehicleMapperExt.countExtUnbindExtByParam(pagingParam);
         if (unbindVehicleCount == 0) {
             throw new BizException(RunningResult.NO_RESOURCE.code(),"该企业下无闲置车辆");
