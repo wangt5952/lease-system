@@ -23,7 +23,7 @@
       </el-form>
     </div>
     <!-- a -->
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" class="mrfsHeight">
       <el-table-column prop="mfrsName" label="制造商名称"></el-table-column>
       <el-table-column prop="mfrsTypeText" label="类型" width="80"></el-table-column>
       <el-table-column prop="mfrsIntroduce" label="介绍"></el-table-column>
@@ -298,7 +298,19 @@ export default {
 .el-table >>> .cell {
   width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* .el-textarea__inner {
-  min-height: 80px;1
-} */
+>>> .mrfsHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
+}
 </style>

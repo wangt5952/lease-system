@@ -23,7 +23,7 @@
       </el-form>
     </div>
 
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" class="orgHeight">
       <el-table-column prop="orgCode" label="编码"></el-table-column>
       <el-table-column prop="orgName" label="组织名称"></el-table-column>
       <el-table-column prop="orgTypeText" label="类别"></el-table-column>
@@ -127,7 +127,7 @@
                 <el-button v-else slot="trigger" size="small" type="primary">选取文件</el-button>
               </el-upload>
               <div>
-                <el-button size="small" type="primary" @click="checkPhoto">点击查看</el-button>
+                <el-button size="small" type="primary" @click="searchPhoto">点击查看</el-button>
               </div>
             </el-form-item>
           </el-col>
@@ -291,7 +291,7 @@ export default {
     },
   },
   methods: {
-    checkPhoto() {
+    searchPhoto() {
       this.dialogVisible = true;
     },
     // changeFile(file, fileList) {
@@ -496,7 +496,7 @@ export default {
   height: 178px;
   display: block;
 }
->>> .el-table {
+>>> .orgHeight {
   position: relative;
   overflow-x: hidden;
   overflow-y: scroll;

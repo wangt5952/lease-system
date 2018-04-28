@@ -24,7 +24,7 @@
       </el-form>
     </div>
     <!-- {{ id }} -->
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" class="batteryHeight">
       <el-table-column prop="batteryCode" label="编号"></el-table-column>
       <el-table-column prop="batteryName" label="电池货名"></el-table-column>
       <el-table-column prop="batteryBrand" label="品牌"></el-table-column>
@@ -312,5 +312,20 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   height: 73px;
+}
+>>> .batteryHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>

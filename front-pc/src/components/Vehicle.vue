@@ -988,7 +988,7 @@ export default {
 .edit-form >>> .el-form-item {
   height: 55px;
 }
->>> .el-table {
+>>> .vehicleHeight {
   position: relative;
   overflow-x: hidden;
   overflow-y: scroll;

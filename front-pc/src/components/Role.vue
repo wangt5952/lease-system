@@ -11,7 +11,7 @@
       </el-form>
     </div>
 
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" class="roleHeight">
       <el-table-column prop="roleName" label="角色名"></el-table-column>
       <el-table-column prop="roleIntroduce" label="说明"></el-table-column>
       <el-table-column label="操作" width="200">
@@ -273,5 +273,20 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   min-height: 73px;
+}
+>>> .roleHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>
