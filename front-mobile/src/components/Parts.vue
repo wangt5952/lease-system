@@ -5,15 +5,15 @@
       <div class="tlte"><span>车辆配件信息</span></div>
     </div>
 
-    <div class="bg-parts" v-for="o in list" :key="o.id">
-      <group :title="o.partsType">
+    <div class="bg-parts" v-for="(o,index) in list" :key="o.id">
+      <group :title="p_type[index]">
         <cell title="配件编号" :value="o.partsCode"></cell>
         <cell title="配件货名" :value="o.partsName"></cell>
         <cell title="配件品牌" :value="o.partsBrand"></cell>
         <cell title="配件型号" :value="o.partsPn"></cell>
         <cell title="配件参数" :value="o.partsParameters"></cell>
         <cell title="生产商家" :value="o.mfrsName"></cell>
-        <cell title="配件状态" :value="o.partsStatus"></cell>
+        <cell title="配件状态" :value="p_status.value"></cell>
       </group>
     </div>
 
@@ -22,7 +22,47 @@
 
 <script>
 import { Cell, Group } from 'vux';
+import _ from 'lodash';
 
+const parts_type = [
+  {
+    key: '',
+    value: '全部配件',
+  }, {
+    key: 'SEATS',
+    value: '车座',
+  }, {
+    key: 'FRAME',
+    value: '车架',
+  }, {
+    key: 'HANDLEBAR',
+    value: '车把',
+  }, {
+    key: 'BELL',
+    value: '车铃',
+  }, {
+    key: 'TYRE',
+    value: '轮胎',
+  }, {
+    key: 'PEDAL',
+    value: '脚蹬',
+  }, {
+    key: 'DASHBOARD',
+    value: '仪表盘',
+  },
+];
+const parts_status = [
+  {
+    key: 'NORMAL',
+    value: '正常',
+  }, {
+    key: 'FREEZE',
+    value: '冻结/维保',
+  }, {
+    key: 'INVALID',
+    value: '作废',
+  },
+];
 export default {
   components: {
     Group,
@@ -31,6 +71,8 @@ export default {
   data() {
     return {
       list: [],
+      p_type: [],
+      p_status: '',
     };
   },
   methods: {
@@ -42,6 +84,14 @@ export default {
     const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypr', [this.$route.params.id])).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
+
+    for (let i = 0; i < respData.length; i++) {
+      const item = respData[i];
+      const obj = _.find(parts_type, o => { o.key === item.partsType; });
+      if (obj) {
+        this.p_type.push(obj.value);
+      }
+    }
   },
 };
 </script>

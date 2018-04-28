@@ -8,9 +8,9 @@
 
         <div class="time">
           <div class="dian"></div>
-          <div class="start" @click="select"><span>起始时间</span><span id="val1"></span></div>
+          <div class="start" @click="select(1)"><span>起始时间</span><span>{{val1}}</span></div>
           <div class="dx"></div>
-          <div class="end" @click="select"><span>终止时间</span><span id="val2"></span></div>
+          <div class="end" @click="select(2)"><span>终止时间</span><span>{{val2}}</span></div>
         </div>
 
         <div v-transfer-dom>
@@ -30,14 +30,21 @@
           </x-dialog>
         </div>
 
+        <mt-popup v-model="popShow" popup-transition="popup-fade">
+          <x-button @click.native="handler" type="primary">确认</x-button>
+        </mt-popup>
+
         <baidu-map :center="center" :zoom="zoom" :dragging="true" :pinch-to-zoom="true" class="bm-view">
+          <bm-polyline :path="polylinePath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
         </baidu-map>
       </view-box>
   </div>
 </template>
 
 <script>
-import { Cell, ViewBox, XDialog, DatetimeView, TransferDom } from 'vux';
+import { Cell, ViewBox, XDialog, XButton, DatetimeView, Popover, TransferDom } from 'vux';
+import moment from 'moment';
+import _ from 'lodash';
 
 export default {
   directives: {
@@ -47,6 +54,8 @@ export default {
     Cell,
     ViewBox,
     XDialog,
+    XButton,
+    Popover,
     DatetimeView,
   },
   data() {
@@ -54,22 +63,53 @@ export default {
       center: { lng: 116.404, lat: 39.915 },
       zoom: 15,
       show: false,
-      val: '2017-01-01',
+      popShow: false,
+      val: moment().format('YYYY-MM-DD h:mm'),
+      val1: '',
+      val2: '',
+      index: 0,
       format: 'YYYY-MM-DD HH:mm',
+      localID: localStorage.getItem('vehicleId'),
+      polylinePath: [],
     };
   },
   methods: {
     back() {
       window.history.go(-1);
     },
-    select() {
+    select(index) {
+      this.index = index;
       this.show = true;
     },
     close() {
       this.show = false;
     },
     confirm() {
-
+      if (this.index === 1) {
+        this.val1 = this.val;
+        this.show = false;
+      } else if (this.index === 2) {
+        this.val2 = this.val;
+        this.show = false;
+      }
+      if (this.val1 && this.val2) {
+        this.popShow = true;
+      }
+    },
+    async handler() {
+      const start = `${this.val1}:00`;
+      const end = `${this.val2}:00`;
+      const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime',
+        { id: this.localID, startTime: start, endTime: end })).body;
+      if (code !== '200') throw new Error(message || code);
+      if (respData.length !== 0) {
+        this.center.lng = respData[0].LON;
+        this.center.lat = respData[0].LAT;
+        this.polylinePath = _.map(respData, o => ({ lng: o.LON, lat: o.LAT }));
+        this.zoom = 16;
+      } else {
+        this.$vux.toast.show({ text: '当前时间段没有车辆轨迹！', type: 'warn', width: '10em' });
+      }
     },
   },
 };
@@ -108,7 +148,7 @@ export default {
   height:800px;
 }
 .time {
-  width:350px;
+  width:90%;
   height:80px;
   background-color: #fff;
   position: absolute;
@@ -185,5 +225,13 @@ export default {
 }
 .minute {
   margin-right: 20px;
+}
+.mint-popup {
+  width: 80%;
+  height:42px;
+  left:10%;
+  top:18%;
+  border-radius: 5px;
+  background-color: #fff;
 }
 </style>

@@ -6,18 +6,18 @@
     </div>
 
     <group>
-      <cell title="用户头像" link="/">
+      <cell title="用户头像" link="/upload">
         <div class="icon_val">
           <i slot="icon" class="iconfont icon-shenfenzheng"></i>
         </div>
       </cell>
-      <cell title="用户类型" :value="key_user_info.userType"></cell>
+      <cell title="用户类型" :value="u_type.value"></cell>
       <cell title="用户" :value="key_user_info.userName"></cell>
       <cell title="昵称" :value="key_user_info.nickName" link="/nickName"></cell>
       <cell title="身份证号" :value="key_user_info.userPid"></cell>
       <cell title="手机号" :value="key_user_info.userMobile"></cell>
       <cell title="所属企业" :value="key_user_info.orgName"></cell>
-      <cell title="用户状态" :value="key_user_info.userStatus"></cell>
+      <cell title="用户状态" :value="u_status.value"></cell>
     </group>
 
   </div>
@@ -26,7 +26,32 @@
 <script>
 import { Cell, Group } from 'vux';
 import { mapState } from 'vuex';
+import _ from 'lodash';
 
+const user_type = [
+  {
+    key: 'PLATFORM',
+    value: '平台',
+  }, {
+    key: 'ENTERPRISE',
+    value: '企业',
+  }, {
+    key: 'INDIVIDUAL',
+    value: '个人',
+  },
+];
+const user_status = [
+  {
+    key: 'NORMAL',
+    value: '正常',
+  }, {
+    key: 'FREEZE',
+    value: '冻结/维保',
+  }, {
+    key: 'INVALID',
+    value: '作废',
+  },
+];
 export default {
   components: {
     Group,
@@ -41,13 +66,18 @@ export default {
   },
   data() {
     return {
-
+      u_type: '',
+      u_status: '',
     };
   },
   methods: {
     back() {
       window.history.go(-1);
     },
+  },
+  async mounted() {
+    this.u_type = _.find(user_type, o => { return o.key === this.key_user_info.userType; });
+    this.u_status = _.find(user_status, o => { return o.key === this.key_user_info.userStatus; });
   },
 };
 </script>

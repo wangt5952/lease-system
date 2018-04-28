@@ -11,7 +11,7 @@
       <div slot="drawer">
         <div class="head">
           <span class="bg-dr_profile">
-            <img src="/static/images/users/1.jpg" class="dr_profile">
+            <img :src="this.portrait" class="dr_profile">
           </span>
           <div class="info">
             <p class="name">{{key_user_info.nickName}}</p>
@@ -26,11 +26,11 @@
           <cell title="个人资料" link="/profile">
             <i slot="icon" class="iconfont icon-weibiaoti1"></i>
           </cell>
-          <cell title="修改密码" link="/tab3">
+          <cell title="修改密码" link="/repassword">
             <i slot="icon" class="iconfont icon-icon-"></i>
           </cell>
-          <cell title="关联企业" link="/tab4">
-            <i slot="icon" class="iconfont icon-qiyetupu"></i>
+          <cell title="登出" @click.native="loginOut" is-link>
+            <i slot="icon" class="iconfont icon-tuichu"></i>
           </cell>
         </group>
       </div>
@@ -41,7 +41,7 @@
         :left-options="leftOptions"
         title="小哥乐途">
           <span  class="bg-profile" slot="overwrite-left" @click="drawerVisibility = !drawerVisibility">
-            <img src="/static/images/users/1.jpg" class="profile">
+            <img :src="this.portrait" class="profile">
           </span>
           <a slot="right" href="/track"><i slot="icon" class="iconfont icon-guiji"></i></a>
         </x-header>
@@ -98,33 +98,32 @@ export default {
       Center: null,
       zoomNum: 10,
       vehicleId: [],
+      portrait:'',
     };
   },
   methods: {
     async handler() {
-      // return new Promise(() => (new BMap.Geolocation()).getCurrentPosition((r) => {
-      //   if (r.point) {
-      //     this.mapCenter = r.point;
-      //   }
-      // }, { enableHighAccuracy: true }));
-
       const r = await this.getCurrentPosition();
       this.mapCenter = r.point;
     },
-
     getCurrentPosition() {
-      /* eslint-disable func-names */
-      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function (r) {
+      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
         if (this.getStatus() === global.BMAP_STATUS_SUCCESS) resolve(r); else reject(this.getStatus());
       }, { enableHighAccuracy: true }));
     },
     location() {
       this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
-      this.zoomNum = 15;
+      this.zoomNum = 18;
+    },
+    async loginOut() {
+      await this.$store.commit('logout');
+      this.$router.replace('/login');
     },
   },
   async mounted() {
     this.vehicleId.push(localStorage.getItem('vehicleId'));
+    this.portrait = localStorage.getItem('portrait');
+    this.portrait = this.portrait ==''?'/static/images/users/1.jpg':localStorage.getItem('portrait');
     const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
     if (code !== '200') throw new Error(message || code);
     const v = _.find(respData, o => o.LON && o.LAT);
@@ -217,7 +216,7 @@ export default {
   margin:0!important;
 }
 
-.weui-cell {
+.weui-cells .weui-cell {
   height:50px;
 }
 

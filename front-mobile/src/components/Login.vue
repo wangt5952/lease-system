@@ -51,9 +51,7 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/login', form)).body;
         if (code !== '200') throw new Error(message || code);
         const { key_login_token, key_user_info, key_vehicle_info } = respData;
-        const vehicleId = [];
-        vehicleId.push(key_vehicle_info[0].id);
-        localStorage.setItem('vehicleId', vehicleId);
+        localStorage.setItem('vehicleId', key_vehicle_info[0].id);
         await this.$store.commit('login', { key_login_token, key_user_info });
         this.$vux.toast.show({ text: '登录成功', type: 'success', width: '10em' });
         this.$router.push('/');

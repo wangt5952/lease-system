@@ -10,8 +10,8 @@
         <cell title="车辆型号" :value="list.vehiclePn"></cell>
         <cell title="车辆品牌" :value="list.vehicleBrand"></cell>
         <cell title="车辆产地" :value="list.vehicleMadeIn"></cell>
-        <cell title="车辆生产商" :value="list.vehicleMfrsName"></cell>
-        <cell title="车辆状态" :value="list.vehicleStatus"></cell>
+        <cell title="车辆生产商" :value="list.mfrsName"></cell>
+        <cell title="车辆状态" :value="v_status.value"></cell>
         <cell title="" value="" class="kong"></cell>
       </group>
     </div>
@@ -26,8 +26,8 @@
         <cell title="电池品牌" :value="o.batteryBrand"></cell>
         <cell title="电池型号" :value="o.batteryPn"></cell>
         <cell title="参数" :value="o.batteryParameters"></cell>
-        <cell title="生产厂商" :value="o.batteryMfrsName"></cell>
-        <cell title="电池状态" :value="o.batteryStatus"></cell>
+        <cell title="生产厂商" :value="o.mfrsName"></cell>
+        <cell title="电池状态" :value="b_status.value"></cell>
         <cell title="" value="" class="kong"></cell>
       </group>
     </div>
@@ -40,7 +40,32 @@
 
 <script>
 import { Cell, Group, XButton, Box } from 'vux';
+import _ from 'lodash';
 
+const vehicle_status = [
+  {
+    key: 'NORMAL',
+    value: '正常',
+  }, {
+    key: 'FREEZE',
+    value: '冻结/维保',
+  }, {
+    key: 'INVALID',
+    value: '作废',
+  },
+];
+const battery_status = [
+  {
+    key: 'NORMAL',
+    value: '正常',
+  }, {
+    key: 'FREEZE',
+    value: '冻结/维保',
+  }, {
+    key: 'INVALID',
+    value: '作废',
+  },
+];
 export default {
   components: {
     Group,
@@ -52,6 +77,8 @@ export default {
     return {
       list: {},
       batteryList: [],
+      v_status: '',
+      b_status: '',
     };
   },
   methods: {
@@ -76,6 +103,8 @@ export default {
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
     this.batteryList = respData.bizBatteries;
+    this.v_status = _.find(vehicle_status, o => { o.key === this.list.vehicleStatus; });
+    this.b_status = _.find(battery_status, o => { o.key === this.batteryList[0].batteryStatus; });
   },
 };
 </script>

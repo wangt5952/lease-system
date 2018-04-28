@@ -17,5 +17,7 @@ export default new Router({
     { path: '/parts/:id', component: () => import('@/components/Parts') },
     { path: '/authentication', component: () => import('@/components/Authentication') },
     { path: '/nickName', component: () => import('@/components/NickName') },
+    { path: '/repassword', component: () => import('@/components/RePassword') },
+    { path: '/upload', component: () => import('@/components/Upload') },
   ],
 });
