@@ -22,7 +22,6 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- a -->
     <el-table :data="list" class="mrfsHeight">
       <el-table-column prop="mfrsName" label="制造商名称"></el-table-column>
       <el-table-column prop="mfrsTypeText" label="类型" width="80"></el-table-column>
