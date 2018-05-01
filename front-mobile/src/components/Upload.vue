@@ -33,6 +33,7 @@
 import Cropper from 'cropperjs';
 import { XButton } from 'vux';
 import { mapState } from 'vuex';
+import _ from 'lodash';
 
 export default {
   components: {
@@ -45,83 +46,73 @@ export default {
       relogin: state => state.relogin,
     }),
   },
-  data () {
+  data() {
     return {
-      headerImage:'',
-      picValue:'',
-      cropper:'',
-      croppable:false,
-      panel:false,
-      url:'',
+      headerImage: '',
+      picValue: '',
+      cropper: '',
+      croppable: false,
+      panel: false,
+      url: '',
       path: '',
-    }
+    };
   },
-  mounted () {
-    //初始化这个裁剪框
-    var self = this;
-    var image = document.getElementById('image');
+  mounted() {
+    const self = this;
+    const image = document.getElementById('image');
     this.cropper = new Cropper(image, {
       aspectRatio: 1,
       viewMode: 1,
-      background:false,
-      zoomable:false,
-      ready: function () {
-        self.croppable = true;
-      }
+      background: false,
+      zoomable: false,
+      ready: () => { self.croppable = true; },
     });
   },
   methods: {
     back() {
       window.history.go(-1);
     },
-    getObjectURL (file) {
-      var url = null ;
-      if (window.createObjectURL!=undefined) { // basic
-        url = window.createObjectURL(file) ;
-      } else if (window.URL!=undefined) { // mozilla(firefox)
-        url = window.URL.createObjectURL(file) ;
-      } else if (window.webkitURL!=undefined) { // webkit or chrome
-        url = window.webkitURL.createObjectURL(file) ;
+    getObjectURL(file) {
+      let url = null;
+      if (window.createObjectURL !== undefined) { // basic
+        url = window.createObjectURL(file);
+      } else if (window.URL !== undefined) { // mozilla(firefox)
+        url = window.URL.createObjectURL(file);
+      } else if (window.webkitURL !== undefined) { // webkit or chrome
+        url = window.webkitURL.createObjectURL(file);
       }
-      return url ;
+      return url;
     },
-    change (e) {
-      let files = e.target.files || e.dataTransfer.files;
+    change(e) {
+      const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
       this.panel = true;
       this.picValue = files[0];
-
       this.url = this.getObjectURL(this.picValue);
-      //每次替换图片要重新得到新的url
-      if(this.cropper){
+      if (this.cropper) {
         this.cropper.replace(this.url);
       }
       this.panel = true;
-
     },
-    crop () {
-        this.panel = false;
-        var croppedCanvas;
-        var roundedCanvas;
+    crop() {
+      this.panel = false;
 
-        if (!this.croppable) {
-          return;
-        }
-        // Crop
-        croppedCanvas = this.cropper.getCroppedCanvas();
+      if (!this.croppable) {
+        return;
+      }
+      // Crop
+      const croppedCanvas = this.cropper.getCroppedCanvas();
 
-        // Round
-        roundedCanvas = this.getRoundedCanvas(croppedCanvas);
+      // Round
+      const roundedCanvas = this.getRoundedCanvas(croppedCanvas);
 
-        this.headerImage = roundedCanvas.toDataURL();
-
+      this.headerImage = roundedCanvas.toDataURL();
     },
-    getRoundedCanvas (sourceCanvas) {
-
-      var canvas = document.createElement('canvas');
-      var context = canvas.getContext('2d');
-      var width = sourceCanvas.width;
-      var height = sourceCanvas.height;
+    getRoundedCanvas(sourceCanvas) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const width = sourceCanvas.width;
+      const height = sourceCanvas.height;
 
       canvas.width = width;
       canvas.height = height;
@@ -135,19 +126,19 @@ export default {
 
       return canvas;
     },
-    async handler () {
-      this.path = _.split(this.headerImage,'data:image/png;base64,')[1];
+    async handler() {
+      this.path = _.split(this.headerImage, ',')[1];
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/uplodeusericon',
         { id: this.key_user_info.id, userIcon: this.path, updateUser: this.key_user_info.userName })).body;
       if (code !== '200') throw new Error(message || code);
-      if(respData){
+      if (respData) {
         localStorage.setItem('portrait', respData);
         this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em' });
         setTimeout(() => { this.$router.replace('/'); }, 200);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>

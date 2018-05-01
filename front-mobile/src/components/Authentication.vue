@@ -14,7 +14,7 @@
       @click.native="showContent001 = !showContent001"></cell>
 
       <template v-if="showContent001">
-        <div class="card" @click="select">
+        <div class="card" @click="select(1)">
           <img src="/static/images/front_card.jpg" style="width:100%;">
         </div>
 
@@ -28,7 +28,7 @@
 
         <div class="up" type="button">
             <img src="/static/images/add.png" style="width:100%;">
-            <input type="file" class="file" multiple>
+            <input type="file" class="file" accept="image/*" multiple @change="change">
         </div>
       </template>
 
@@ -40,7 +40,7 @@
       @click.native="showContent002 = !showContent002"></cell>
 
       <template v-if="showContent002">
-        <div class="card" @click="select1">
+        <div class="card" @click="select(2)">
           <img src="/static/images/back_card.jpg"  style="width:100%;">
         </div>
 
@@ -54,7 +54,7 @@
 
         <div class="up" type="button">
             <img src="/static/images/add.png" style="width:100%;">
-            <input type="file" class="file" multiple>
+            <input type="file" class="file" accept="image/*" @change="change" multiple>
         </div>
       </template>
 
@@ -66,7 +66,7 @@
       @click.native="showContent003 = !showContent003"></cell>
 
       <template v-if="showContent003">
-        <div class="sc_card" @click="select2">
+        <div class="sc_card" @click="select(3)">
           <img src="/static/images/sc_card.jpg" style="width:100%">
         </div>
 
@@ -80,8 +80,9 @@
 
         <div class="sc_up" type="button">
             <img src="/static/images/add1.png" style="width:100%;height:100%;">
-            <input type="file" class="file" multiple>
+            <input type="file" class="file" accept="image/*" @change="change" multiple>
         </div>
+
       </template>
     </group>
 
@@ -89,8 +90,9 @@
 </template>
 
 <script>
-import { Cell, Group, XDialog, TransferDom } from 'vux';
+import { Cell, Group, XDialog, XButton, TransferDom } from 'vux';
 import { mapState } from 'vuex';
+import _ from 'lodash';
 
 export default {
   directives: {
@@ -100,6 +102,7 @@ export default {
     Group,
     Cell,
     XDialog,
+    XButton,
     TransferDom,
   },
   computed: {
@@ -117,20 +120,43 @@ export default {
       show: false,
       show1: false,
       show2: false,
+      index: 0,
+      path: '',
     };
   },
   methods: {
     back() {
       window.history.go(-1);
     },
-    select() {
-      this.show = true;
+    select(index) {
+      this.index = index;
+      if (index === 1) {
+        this.show = true;
+      } else if (index === 2) {
+        this.show1 = true;
+      } else if (index === 3) {
+        this.show2 = true;
+      }
     },
-    select1() {
-      this.show1 = true;
+    change(e) {
+      const files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+      const _this = this;
+      const reader = new FileReader();
+      reader.readAsDataURL(files[0]);
+      reader.onload = function get() {
+        const data = this.result;
+        _this.path = _.split(data, ',')[1];
+      };
+      this.handler();
     },
-    select2() {
-      this.show2 = true;
+    handler() {
+      console.log(this);
+      console.log(JSON.stringify(this.path));
+      // const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
+      //   { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: path, userIcBack: path, userIcGroup: path, updateUser:this.key_user_info.userName })).body;
+      // if (code !== '200') throw new Error(message || code);
+      // console.log(respData);
     },
   },
 };
@@ -225,5 +251,9 @@ export default {
     padding-bottom: 70%;
     margin: 10px 10px;
     border: 1px dashed #666;
+  }
+  .weui-btn {
+    width:80%;
+    margin:20px auto;
   }
 </style>
