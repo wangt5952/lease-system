@@ -21,14 +21,14 @@
         <div v-transfer-dom>
           <x-dialog v-model="show" hide-on-blur>
             <div class="img-box">
-              <img src="/static/images/source_frontCard.jpg" style="max-width:100%">
+              <img :src="this.data" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="up" type="button">
             <img src="/static/images/add.png" style="width:100%;">
-            <input type="file" class="file" accept="image/*" multiple @change="change">
+            <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
 
@@ -47,14 +47,14 @@
         <div v-transfer-dom>
           <x-dialog v-model="show1" hide-on-blur>
             <div class="img-box">
-              <img src="/static/images/source_backCard.jpg" style="max-width:100%">
+              <img :src="this.data1" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="up" type="button">
             <img src="/static/images/add.png" style="width:100%;">
-            <input type="file" class="file" accept="image/*" @change="change" multiple>
+            <input type="file" class="file" accept="image/*" @change="change(2,$event)" multiple>
         </div>
       </template>
 
@@ -73,19 +73,19 @@
         <div v-transfer-dom>
           <x-dialog v-model="show2" hide-on-blur>
             <div class="img-box">
-              <img src="/static/images/sc_card.jpg" style="width:100%">
+              <img :src="this.data2" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="sc_up" type="button">
             <img src="/static/images/add1.png" style="width:100%;height:100%;">
-            <input type="file" class="file" accept="image/*" @change="change" multiple>
+            <input type="file" class="file" accept="image/*" @change="change(3,$event)" multiple>
         </div>
 
       </template>
     </group>
-
+    <x-button type="primary" @click.native="handler">提交</x-button>
   </div>
 </template>
 
@@ -120,8 +120,12 @@ export default {
       show: false,
       show1: false,
       show2: false,
-      index: 0,
+      data: '',
+      data1: '',
+      data2: '',
       path: '',
+      path1: '',
+      path2: '',
     };
   },
   methods: {
@@ -129,7 +133,6 @@ export default {
       window.history.go(-1);
     },
     select(index) {
-      this.index = index;
       if (index === 1) {
         this.show = true;
       } else if (index === 2) {
@@ -138,26 +141,41 @@ export default {
         this.show2 = true;
       }
     },
-    change(e) {
+    change(index,e) {
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
       const _this = this;
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
       reader.onload = function get() {
-        const data = this.result;
-        _this.path = _.split(data, ',')[1];
+        if (index === 1) {
+          _this.data = this.result;
+          _this.path = _.split(this.result, ',')[1];
+        } else if (index === 2) {
+          _this.data1 = this.result;
+          _this.path1 = _.split(this.result, ',')[1];
+        } else if (index === 3) {
+          _this.data2 = this.result;
+          _this.path2 = _.split(this.result, ',')[1];
+        }
+        _this.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
       };
-      this.handler();
     },
-    handler() {
-      console.log(this);
-      console.log(JSON.stringify(this.path));
-      // const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
-      //   { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: path, userIcBack: path, userIcGroup: path, updateUser:this.key_user_info.userName })).body;
-      // if (code !== '200') throw new Error(message || code);
-      // console.log(respData);
+    async handler() {
+      const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
+        { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser:this.key_user_info.userName })).body;
+      if (code !== '200') {
+        this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
+      }else {
+        this.$vux.toast.show({ text: respData, type: 'success', width: '10em' });
+      }
+
     },
+  },
+  async mounted() {
+    this.data = this.data === '' ? '/static/images/source_frontCard.jpg' : this.data;
+    this.data1 = this.data1 === '' ? '/static/images/source_backCard.jpg' : this.data1;
+    this.data2 = this.data2 === '' ? '/static/images/sc_card.jpg' : this.data2;
   },
 };
 </script>
