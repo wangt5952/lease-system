@@ -226,9 +226,9 @@ public class WzFileUtil {
         if (!usedFileName.startsWith("/")) {
             usedFileName = "/" + usedFileName;
         }
-        if (-1 < usedFileName.indexOf(".")) {
-            usedFileName = usedFileName.substring(0, usedFileName.indexOf("."));
-        }
+//        if (-1 < usedFileName.indexOf(".")) {
+//            usedFileName = usedFileName.substring(0, usedFileName.indexOf("."));
+//        }
         reqUrl.append(usedFileName);
         return reqUrl.toString();
     }
