@@ -43,7 +43,7 @@
         </el-table-column>
       </template>
     </el-table>
-    <!-- 分页 -->
+    <!-- 分页1 -->
     <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
