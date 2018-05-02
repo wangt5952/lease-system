@@ -173,7 +173,7 @@ public class BizPartsServiceImpl implements BizPartsService {
     public void updateBizParts(BizParts partsInfo) {
         //判定配件是否绑定了车辆
         if(null != partsInfo.getPartsStatus() && RecordStatus.INVALID.toString().equals(partsInfo.getPartsStatus().toString())
-                || RecordStatus.FREEZE.toString().equals(partsInfo.getPartsStatus())){
+                || RecordStatus.FREEZE.toString().equals(partsInfo.getPartsStatus().toString())){
             BizRefVehiclePartsExample example = new BizRefVehiclePartsExample();
             BizRefVehiclePartsExample.Criteria criteria = example.createCriteria();
             criteria.andUnbindTimeIsNull();

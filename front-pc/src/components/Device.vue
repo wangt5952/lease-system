@@ -13,7 +13,7 @@
       </el-form>
     </div>
     <!-- 列表a -->
-    <el-table :data="list" style="width:100%;margin-top:10px">
+    <el-table :data="list" class="deviceHeight">
       <el-table-column prop="deviceId" label="编号"></el-table-column>
       <el-table-column prop="deviceTypeListText" label="设备类别"></el-table-column>
       <el-table-column prop="perSet" label="请求间隔时间(单位:秒)"></el-table-column>
@@ -328,5 +328,20 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   height: 73px;
+}
+>>> .deviceHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>

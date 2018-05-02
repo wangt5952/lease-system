@@ -1,5 +1,4 @@
 <template>
-  <!-- <div v-loading="loading" style="padding:10px;display:flex:1;display:flex;flex-direction:column;"> -->
   <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
       <template v-if="key_user_info.userType === 'PLATFORM'">
@@ -25,43 +24,47 @@
         </el-form>
       </template>
     </div>
-    <div style="">
-      <el-table :data="list" style="width: 100%;">
-        <el-table-column prop="loginName" label="用户名"></el-table-column>
-        <el-table-column prop="userMobile" label="手机号"></el-table-column>
-        <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
-        <el-table-column prop="orgName" label="所属企业名称">
-          <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
-            {{ scope.row.orgName }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
-        <el-table-column prop="nickName" label="昵称"></el-table-column>
-        <el-table-column prop="userName" label="姓名"></el-table-column>
-        <el-table-column prop="userRealNameAuthFlagText" label="实名认证"></el-table-column>
-        <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-        <el-table-column label="操作" width="270">
-          <template slot-scope="{row}">
-            <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
-              <template v-if="row.userType === 'INDIVIDUAL'">
-                <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
-                <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
-                <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看身份证</el-button>
-              </template>
-            </template>
-            <template v-if="key_user_info.userType === 'PLATFORM'">
-              <template v-if="row.userType === 'ENTERPRISE'">
-                <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-                <el-button icon="el-icon-edit" size="mini" type="text" @click="retrieveVehicle(row)">批量收回车辆</el-button>
-              </template>
-              <!-- <template v-if="row.userType !== 'INDIVIDUAL'">
-              </template> -->
-              <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
+    <el-table :data="list" class="userHeight">
+      <el-table-column prop="loginName" label="用户名"></el-table-column>
+      <el-table-column prop="userMobile" label="手机号"></el-table-column>
+      <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
+      <el-table-column prop="orgName" label="所属企业名称">
+        <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
+          {{ scope.row.orgName }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
+      <el-table-column prop="nickName" label="昵称"></el-table-column>
+      <el-table-column prop="userName" label="姓名"></el-table-column>
+      <el-table-column prop="userRealNameAuthFlagText" label="实名认证">
+        <template slot-scope="{row}">
+          <template v-if="row.userRealNameAuthFlag === 'AUTHORIZED'"><span style="color:#17BE45">已实名</span></template>
+          <template v-else><span style="color:red">未实名</span></template>
+        </template>
+      </el-table-column>
+      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <el-table-column label="操作" width="270">
+        <template slot-scope="{row}">
+          <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
+            <template v-if="row.userType === 'INDIVIDUAL'">
+              <el-button icon="el-icon-plus" size="mini" type="text" @click="vehicleReload(row)">绑定车辆</el-button>
+              <el-button icon="el-icon-search" size="mini" type="text" @click="bindVehicleForm(row)">查看车辆</el-button>
+              <el-button icon="el-icon-search" size="mini" type="text" @click="showPhoto(row)">查看身份证</el-button>
             </template>
           </template>
-        </el-table-column>
-      </el-table>
-    </div>
+          <template v-if="key_user_info.userType === 'PLATFORM'">
+            <template v-if="row.userType === 'ENTERPRISE'">
+              <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+              <el-button icon="el-icon-edit" size="mini" type="text" @click="retrieveVehicle(row)">批量收回车辆</el-button>
+            </template>
+            <!-- <template v-if="row.userType !== 'INDIVIDUAL'">
+            </template> -->
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignRoleForm(row)">分配角色</el-button>
+          </template>
+        </template>
+      </el-table-column>
+    </el-table>
+
     <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
@@ -72,7 +75,7 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false">
+    <el-dialog title="人员信息" :visible.sync="formVisible" :close-on-click-modal="false" :close-on-press-escape="true" :before-close="closeForm">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules2">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -97,6 +100,11 @@
           <el-col :span="8">
             <el-form-item label="LOGO路径">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
+              <el-select v-model="form.userIcon" placeholder="请选择用户类型" style="width:100%;">
+                <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="userIconPath + o.iconName">
+                  <!-- <img :src="userIconPath + o.iconName" alt=""> -->
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -345,6 +353,7 @@ export default {
       },
       roleList: [],
       orgList: [],
+      userIconPhoto: [],
       // 照片表单
       photoFormVisible: false,
 
@@ -380,6 +389,7 @@ export default {
     ...mapState({
       key_user_info: state => state.key_user_info,
       res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
+      userIconPath: state => state.userIconPath,
     }),
   },
   watch: {
@@ -449,14 +459,16 @@ export default {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/orgCountVehicle', { orgId: row.orgId })).body;
         if (code !== '200') throw new Error(message);
-        this.vehicleNumTotal = respData;
-        this.returnVehicleForm.count = respData;
+        if (code === '200') {
+          this.vehicleNumTotal = respData;
+          this.returnVehicleForm.count = respData;
+          this.returnVehicleFormVehicle = true;
+        }
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      this.returnVehicleFormVehicle = true;
     },
     // 确认回收车辆
     async saveReturnVehicleForm() {
@@ -619,6 +631,7 @@ export default {
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
         await this.getOrgList();
+        await this.getUserIcon();
       } catch (e) {
         this.loading = false;
         const message = e.statusText || e.message;
@@ -676,16 +689,16 @@ export default {
         if (this.form.id) {
           const { ...form } = this.form;
           form.update_user = loginName;
-          const { code } = (await this.$http.post('/api/manager/user/modify', form)).body;
-          if (code !== '200') throw new Error('修改失败');
-          this.$message.success('编辑成功');
+          const { code, message } = (await this.$http.post('/api/manager/user/modify', form)).body;
+          if (code !== '200') throw new Error(message);
+          this.$message.success('修改成功');
         } else {
           const { ...form } = this.form;
           form.create_user = loginName;
           form.update_user = loginName;
           // form.password = '123';
-          const { code } = (await this.$http.post('/api/manager/user/add', [form])).body;
-          if (code !== '200') throw new Error('添加失败');
+          const { code, message } = (await this.$http.post('/api/manager/user/addone', form)).body;
+          if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }
         await this.reload();
@@ -722,10 +735,26 @@ export default {
       }
     },
     async getOrgList() {
-      const { code, respData } = (await this.$http.post('/api/manager/org/list', {
-        currPage: 1, pageSize: 999,
-      })).body;
-      if (code === '200') this.orgList = respData.rows;
+      try {
+        const { code, respData } = (await this.$http.post('/api/manager/org/list', {
+          currPage: 1, pageSize: 999, orgStatus: 'NORMAL',
+        })).body;
+        if (code === '200') this.orgList = respData.rows;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    async getUserIcon() {
+      try {
+        const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
+        if (code === '200') this.userIconPhoto = respData;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     async getRoleList() {
       const { code, respData } = (await this.$http.post('/api/manager/role/list', {
@@ -746,10 +775,26 @@ export default {
 .edit-form >>> .el-form-item {
   height: 65px;
 }
->>> .el-table {
+/* >>> .el-table {
   height: 100%;
 }
 >>> .el-table__body-wrapper {
   height: calc(100% - 42px);
+} */
+>>> .userHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: calc(100% - 2px);
+  /* width: 100%; */
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>

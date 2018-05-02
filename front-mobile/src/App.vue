@@ -3,7 +3,6 @@
     <router-view/>
   </div>
 </template>
-<script src='http://api.map.baidu.com/api?v=2.0&ak=NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0&callback=init'></script>
 <script>
 export default {
   name: 'App',
@@ -11,7 +10,7 @@ export default {
 </script>
 
 <style lang="less">
-@import url(//at.alicdn.com/t/font_622714_fg1iqo8wx5wdygb9.css);
+@import url(//at.alicdn.com/t/font_622714_kdwq3t1v8dh4obt9.css);
 @import '~vux/src/styles/reset.less';
 @import '~vux/src/styles/1px.less';
 @import '~vux/src/styles/tap.less';

@@ -263,9 +263,9 @@ public class SysUserServcieImpl implements SysUserService {
 //                userInfo.setUserType(null);
                 throw new BizException(RunningResult.DB_ERROR.code(), "系统管理员不能修改用户类型");
             }
-            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
-                throw new BizException(RunningResult.DB_ERROR.code(), "不能修改个人用户信息");
-            }
+//            if(OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())){
+//                throw new BizException(RunningResult.DB_ERROR.code(), "不能修改个人用户信息");
+//            }
             //验证企业是否存在（状态为正常）
             if(WzStringUtil.isNotBlank(userInfo.getOrgId())){
                 BizOrganizationExample orgExample = new BizOrganizationExample();
@@ -567,11 +567,20 @@ public class SysUserServcieImpl implements SysUserService {
 //        BizRefOrgVehicleExample.Criteria refCriteria = refExample.createCriteria();
 //        refCriteria.andOrgIdEqualTo(orgId);
 //        refCriteria.andUnbindTimeIsNull();
-        BizVehicleParam paramMap = new BizVehicleParam();
-        paramMap.setOrgId(orgId);
-        paramMap.setVehicleStatus(RecordStatus.NORMAL.toString());
-        List<BizVehicleExt> vehicles = bizVehicleMapperExt.selectExtByParam(paramMap);
-        if(vehicles.size() < count){
+//        List<BizRefOrgVehicle> list = bizRefOrgVehicleMapperExt.selectByExample(refExample);
+//        BizVehicleParam paramMap = new BizVehicleParam();
+//        paramMap.setOrgId(orgId);
+//        paramMap.setVehicleStatus(RecordStatus.NORMAL.toString());
+//        List<BizVehicleExt> vehicles = bizVehicleMapperExt.selectExtByParam(paramMap);
+//        if(vehicles.size() < count){
+//            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
+//        }
+        BizVehicleParam param = new BizVehicleParam();
+        param.setOrgId(orgId);
+        param.setVehicleStatus(RecordStatus.NORMAL.toString());
+        param.setIsBind("UNBIND");
+        List<BizVehicleExt> list = bizVehicleMapperExt.selectExtUnbindExtByParams(param);
+        if(list.size() < count){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "库存车辆数量不足");
         }
 
@@ -586,18 +595,31 @@ public class SysUserServcieImpl implements SysUserService {
         //将指定数量的车辆归还给平台
         for(int i=0;i<count;i++){
             //解除原有绑定关系
+//            BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
+//            BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
+//            delCriteria.andOrgIdEqualTo(orgId);
+//            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getId());
+//            delCriteria.andUnbindTimeIsNull();
+//            BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
+//            delTemp.setUnbindTime(new Date());
+//            bizRefOrgVehicleMapperExt.updateByExampleSelective(delTemp,delExample);
             BizRefOrgVehicleExample delExample = new BizRefOrgVehicleExample();
             BizRefOrgVehicleExample.Criteria delCriteria = delExample.createCriteria();
             delCriteria.andOrgIdEqualTo(orgId);
-            delCriteria.andVehicleIdEqualTo(vehicles.get(i).getId());
+            delCriteria.andVehicleIdEqualTo(list.get(i).getId());
             delCriteria.andUnbindTimeIsNull();
             BizRefOrgVehicle delTemp = new BizRefOrgVehicle();
             delTemp.setUnbindTime(new Date());
             bizRefOrgVehicleMapperExt.updateByExampleSelective(delTemp,delExample);
             //绑定新关系
+//            BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
+//            addTemp.setOrgId(plOrg.get(0).getId());
+//            addTemp.setVehicleId(vehicles.get(i).getId());
+//            addTemp.setBindTime(new Date());
+//            bizRefOrgVehicleMapperExt.insertSelective(addTemp);
             BizRefOrgVehicle addTemp = new BizRefOrgVehicle();
             addTemp.setOrgId(plOrg.get(0).getId());
-            addTemp.setVehicleId(vehicles.get(i).getId());
+            addTemp.setVehicleId(list.get(i).getId());
             addTemp.setBindTime(new Date());
             bizRefOrgVehicleMapperExt.insertSelective(addTemp);
         }

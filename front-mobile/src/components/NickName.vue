@@ -2,45 +2,57 @@
   <div>
     <div class="head">
       <div class="left"><a @click="back"><i slot="icon" class="iconfont icon-fanhui"></i></a></div>
-      <div class="tlte"><span>我的车辆</span></div>
+      <div class="tlte"><span>修改昵称</span></div>
+      <div class="right" @click="handler">确定</div>
     </div>
 
-    <group v-for="(item,index) in list" :key="item.id">
-      <cell :title="`我的车辆${index+1}`"  :value="item.id == localID?'默认车辆':''" :link="`/info/${item.id}`"></cell>
+    <group>
+      <x-input v-model="val" title="请输入昵称" required></x-input>
     </group>
+
   </div>
 </template>
 
 <script>
-import { Cell, Group } from 'vux';
+import { XInput, Group } from 'vux';
 import { mapState } from 'vuex';
 
 export default {
   components: {
     Group,
-    Cell,
-  },
-  data() {
-    return {
-      list: [],
-      localID: localStorage.getItem('vehicleId'),
-    };
+    XInput,
   },
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
+
       relogin: state => state.relogin,
     }),
+  },
+  data() {
+    return {
+      val: '',
+    };
   },
   methods: {
     back() {
       window.history.go(-1);
     },
-  },
-  async mounted() {
-    const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getVehicleByUserId', { id: this.key_user_info.id })).body;
-    if (code !== '200') throw new Error(message || code);
-    this.list = respData;
+    async handler() {
+      const { code, message } = (await this.$http.post('/api/mobile/v1/auth/updateuserinfo',
+        { id: this.key_user_info.id,
+          loginName: this.key_user_info.loginName,
+          nickName: this.val,
+          userName: this.key_user_info.userName,
+          userPid: this.key_user_info.userPid,
+          updateUser: this.key_user_info.userName })).body;
+      if (code !== '200') {
+        throw new Error(message || code);
+      } else {
+        this.$vux.toast.show({ text: '修改成功', type: 'success', width: '10em' });
+        setTimeout(() => { window.history.go(-1); }, 100);
+      }
+    },
   },
 };
 </script>
@@ -66,12 +78,18 @@ export default {
   .left .iconfont {
     font-size: 17pt;
   }
+  .right {
+    margin-top: 30px;
+    margin-right: 10px;
+    font-size: 15px;
+    color: #fff;
+  }
   .tlte span{
     font-size: 20px;
     font-weight: 400;
     color: #fff;
     position: absolute;
-    left:40%;
+    left:35%;
     top:25px;
   }
   .weui-cell {

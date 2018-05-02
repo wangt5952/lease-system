@@ -11,21 +11,21 @@
           <template v-if="key_user_info.userType === 'INDIVIDUAL'">
             <div @click="showEnterpriseForm(key_user_info)">
               <el-dropdown-item command="showForms">
-                修改个人信息
+                修改用户信息
               </el-dropdown-item>
             </div>
           </template>
           <template v-if="key_user_info.userType === 'ENTERPRISE'">
             <div @click="showEnterpriseForm(key_user_info)">
               <el-dropdown-item command="showForms">
-                修改企业信息
+                修改用户信息
               </el-dropdown-item>
             </div>
           </template>
           <template v-if="key_user_info.userType === 'PLATFORM'">
             <div @click="showEnterpriseForm(key_user_info)">
               <el-dropdown-item command="showForms">
-                修改平台信息
+                修改用户信息
               </el-dropdown-item>
             </div>
           </template>
@@ -39,7 +39,7 @@
         <el-menu :router="true" :collapse="isCollapse" unique-opened>
           <div style="padding:15px" @click="shrinkChang">
             <i style="color:#ffffff;font-size:28px;" class="lt" :class="{ 'lt-arrow-double-left': !isCollapse, 'lt-arrow-double-right': isCollapse }"></i>
-            <!-- <a href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a> -->
+            <!-- <a 1href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a> -->
             <!-- <a href="javascript:void(0)" :icon="{ isCollapse ? lt-left-sorting:lt-arrow-double-right }"></a> -->
           </div>
           <template v-for="(o, i) in menuTree">

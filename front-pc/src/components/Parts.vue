@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
-      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
+      <!-- PLATFORM:平台, ENTERPRISE:企业1 -->
       <template v-if="res['FUNCTION'].indexOf('manager-parts-addone') >= 0">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加配件</el-button>
@@ -24,7 +24,7 @@
       </el-form>
     </div>
     <!-- a -->
-    <el-table :data="list" style="width: 100%;margin-top:10px;">
+    <el-table :data="list" class="partsHeight">
       <el-table-column prop="partsCode" label="编码"></el-table-column>
       <el-table-column prop="partsName" label="配件货名"></el-table-column>
       <el-table-column prop="partsBrand" label="品牌"></el-table-column>
@@ -65,7 +65,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="partsCode" label="编码">
-              <el-input v-model="form.partsCode" auto-complete="off" :disabled="form.id"></el-input>
+              <el-input v-model="form.partsCode" auto-complete="off" :disabled="disabledFormId"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -158,6 +158,7 @@ export default {
       total: 0,
 
       formVisible: false,
+      disabledFormId: false,
       form: {},
 
       typeList: [
@@ -258,7 +259,7 @@ export default {
       }
     },
 
-    showForm(form = { }) {
+    showForm(form = {}) {
       this.form = _.pick(form, [
         'id',
         'partsCode',
@@ -271,6 +272,13 @@ export default {
         'partsStatus',
       ]);
       this.formVisible = true;
+      if (form.id) {
+        this.disabledFormId = true;
+      } else {
+        const $form = this.$refs.form;
+        if ($form) $form.resetFields();
+        this.disabledFormId = false;
+      }
     },
     closeForm() {
       this.form = {};
@@ -322,5 +330,20 @@ export default {
 <style scoped>
 .edit-form >>> .el-form-item {
   height: 73px;
+}
+>>> .partsHeight {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  color: #606266;
+  height: 85%;
+  max-height: 85%;
 }
 </style>
