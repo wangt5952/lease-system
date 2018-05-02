@@ -98,11 +98,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="LOGO路径">
+            <el-form-item label="企业图标">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
-              <el-select v-model="form.userIcon" placeholder="请选择用户类型" style="width:100%;">
-                <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="userIconPath + o.iconName">
-                  <!-- <img :src="userIconPath + o.iconName" alt=""> -->
+              <el-select v-model="form.userIcon" placeholder="请选择企业Logo" style="width:100%;">
+                <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                  <img class="companyLogo" :src="userIconPath + o.iconName" alt="">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -115,13 +115,6 @@
           <el-col :span="8">
             <el-form-item label="姓名" prop="userName" :rules="[{required:true, message:'请填写用户姓名'}]">
               <el-input v-model="form.userName" placeholder="请输入姓名" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item prop="userRealNameAuthFlag" :rules="[{required:true, message:'请选择实名认证类型'}]" label="实名认证">
-              <el-select v-model="form.userRealNameAuthFlag" placeholder="请选择实名认证类型" style="width:100%;">
-                <el-option v-for="o in authList" :key="o.id" :label="o.name" :value="o.id"></el-option>
-              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -234,11 +227,11 @@
     <!-- 照片表单 -->
     <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <!-- 身份证正面 -->
-      <img :src="`data:image/jpg;base64,${cardPhotoFront}`"/>
+      <img :src="userPidPath + cardPhotoFront" alt="">
       <!-- 身份证反面 -->
-      <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/>
+      <!-- <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/> -->
       <!-- 双手举起身份证 -->
-      <img :src="`data:image/jpg;base64,${cardPhotoGroup}`"/>
+      <!-- <img :src="`data:image/jpg;base64,${cardPhotoGroup}`"/> -->
       <span slot="footer" class="dialog-footer" >
         <el-button type="info" @click="overrule">驳回</el-button>
         <el-button :disabled="loading" type="primary" @click="identification">通过</el-button>
@@ -390,6 +383,7 @@ export default {
       key_user_info: state => state.key_user_info,
       res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
       userIconPath: state => state.userIconPath,
+      userPidPath: state => state.userPidPath,
     }),
   },
   watch: {
@@ -410,9 +404,9 @@ export default {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
         const data = respData.key_user_info;
-        // this.cardPhotoFront = data.userIcFront;
-        this.cardPhotoBack = data.userIcBack;
-        this.cardPhotoGroup = data.userIcGroup;
+        this.cardPhotoFront = data.userIcFront;
+        // this.cardPhotoBack = data.userIcBack;
+        // this.cardPhotoGroup = data.userIcGroup;
         if (code !== '200') throw new Error(message);
       } catch (e) {
         if (!e) return;
@@ -659,7 +653,6 @@ export default {
         'userIcon',
         'nickName',
         'userName',
-        'userRealNameAuthFlag',
         'userPid',
         'userIcFront',
         'userIcBack',
@@ -772,6 +765,10 @@ export default {
 </script>
 
 <style scoped>
+.companyLogo {
+  width: 30px;
+  height: 30px;
+}
 .edit-form >>> .el-form-item {
   height: 65px;
 }

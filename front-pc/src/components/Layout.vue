@@ -2,6 +2,9 @@
   <div style="display:flex;flex-direction:column;height:100%;">
     <div style="background:#05002a;height:64px;display:flex;align-items:center;padding:0 10px;">
       <div style="flex:1;"></div>
+      <div style="margin-right: 10px;">
+        <img class="userHeadPortraitImg" :src="userIconPath + key_user_info.userIcon" alt="">
+      </div>
       <el-dropdown @command="command => this[command]()">
         <span class="el-dropdown-link" style="cursor:pointer;color:#fff;">
           {{key_user_info.nickName}} <i class="el-icon-arrow-down el-icon--right"></i>
@@ -245,6 +248,7 @@ export default {
       key_user_info: state => state.key_user_info,
       key_res_info: state => state.key_res_info,
       relogin: state => state.relogin,
+      userIconPath: state => state.userIconPath,
     }),
 
     menuTree() {
@@ -401,6 +405,10 @@ export default {
 </script>
 
 <style scoped>
+.userHeadPortraitImg {
+  width: 50px;
+  height: 50px;
+}
 .lt-arrow-double-left {
   position: relative !important;
   left: 85%;
