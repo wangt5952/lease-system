@@ -84,14 +84,14 @@ export default {
     const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypr', [this.$route.params.id])).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
-
-    for (let i = 0; i < respData.length; i++) {
+    for (let i = 0; i < respData.length; i += 1) {
       const item = respData[i];
-      const obj = _.find(parts_type, o => { o.key === item.partsType; });
+      const obj = _.find(parts_type, { key: item.partsType });
       if (obj) {
         this.p_type.push(obj.value);
       }
     }
+    this.p_status = _.find(parts_status, { key: this.list[0].partsStatus });
   },
 };
 </script>

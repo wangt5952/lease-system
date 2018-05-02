@@ -76,8 +76,8 @@ export default {
     },
   },
   async mounted() {
-    this.u_type = _.find(user_type, o => { return o.key === this.key_user_info.userType; });
-    this.u_status = _.find(user_status, o => { return o.key === this.key_user_info.userStatus; });
+    this.u_type = _.find(user_type, { key: this.key_user_info.userType });
+    this.u_status = _.find(user_status, { key: this.key_user_info.userStatus });
   },
 };
 </script>
