@@ -51,6 +51,11 @@ const store = new Vuex.Store({
       state.key_res_info = key_res_info;
       state.key_user_info = key_user_info;
     },
+    // 重新获取用户信息
+    reload(state, { key_user_info }) {
+      localStorage.setItem('key_user_info', JSON.stringify(key_user_info));
+      state.key_user_info = key_user_info;
+    },
     logout(state) {
       const key_login_token = '';
       const key_res_info = [];
@@ -69,7 +74,9 @@ const store = new Vuex.Store({
   },
 });
 
+// 白名单
 const whiteList = ['/login', '/resetPassword'];
+// 全局导航守卫
 router.beforeEach(async (to, from, next) => {
   const { key_login_token } = store.state;
   if (!key_login_token && whiteList.indexOf(to.path) === -1) return next({ path: '/login' });

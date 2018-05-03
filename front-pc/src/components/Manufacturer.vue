@@ -294,7 +294,10 @@ export default {
 >>> .el-textarea__inner {
   height: 90px;
 }
-.el-table >>> .cell {
+/* .el-table >>> .cell {
+  width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+} */
+>>> td.el-table_1_column_3 .cell {
   width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 >>> .mrfsHeight {
