@@ -15,7 +15,7 @@
 
         <div v-transfer-dom>
           <x-dialog v-model="show">
-          <div class="btn">
+          <div class="butn">
             <div class="left" @click="close">取消</div>
             <div class="right" @click="confirm">确认</div>
           </div>
@@ -189,7 +189,7 @@ export default {
   margin-left: 8%;
   border-bottom:1px solid #999;
 }
-.btn {
+.butn {
   width:100%;
   height:44px;
   display: flex;
