@@ -208,7 +208,7 @@ export default {
     // 验证手机格式
     const checkPhone = (rule, value, callback) => {
       setTimeout(() => {
-        if (/^$ | ^\d+$/.test(value)) {
+        if (/^$|^\d+$/.test(value)) {
           callback();
         } else{
           callback(new Error('请输入正确手机格式'));
@@ -272,6 +272,7 @@ export default {
           { validator: checkOrgId, trigger: 'blur' },
         ],
         orgPhone: [
+          { required: true, message: '请填写手机号码' },
           { validator: checkPhone, trigger: 'blur' },
         ],
         orgBusinessLicences: [
