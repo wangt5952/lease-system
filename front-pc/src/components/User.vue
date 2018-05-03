@@ -317,6 +317,10 @@ export default {
       typeList: [
         { id: 'PLATFORM', name: '平台' },
         { id: 'ENTERPRISE', name: '企业' },
+      ],
+      typeList2: [
+        { id: 'PLATFORM', name: '平台' },
+        { id: 'ENTERPRISE', name: '企业' },
         { id: 'INDIVIDUAL', name: '个人' },
       ],
       authList: [
@@ -620,7 +624,7 @@ export default {
         this.total = total;
         this.list = _.map(rows, o => ({
           ...o,
-          userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
+          userTypeText: (_.find(this.typeList2, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
         await this.getOrgList();
