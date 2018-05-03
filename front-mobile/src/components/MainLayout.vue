@@ -122,7 +122,7 @@ export default {
   },
   async mounted() {
     this.vehicleId.push(localStorage.getItem('vehicleId'));
-    this.portrait = this.portrait === '' ? '/static/images/users/1.jpg' : localStorage.getItem('portrait');
+    this.portrait = localStorage.getItem('portrait') === null ? '/static/images/users/1.jpg' : localStorage.getItem('portrait');
     const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
     if (code !== '200') throw new Error(message || code);
     const v = _.find(respData, o => o.LON && o.LAT);
