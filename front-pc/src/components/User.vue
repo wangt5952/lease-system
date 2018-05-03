@@ -248,7 +248,7 @@ import {
 
 export default {
   data() {
-    // 手机验证
+    // 验证手机格式
     const checkPhone = (rule, value, callback) => {
       setTimeout(() => {
         if (/^$ | ^\d+$/.test(value)) {

@@ -115,6 +115,7 @@ import {
 
 export default {
   data() {
+    // 验证手机格式
     const checkMfrsPhone = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('电话不能为空'));
