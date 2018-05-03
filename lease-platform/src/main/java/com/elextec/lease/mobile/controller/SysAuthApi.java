@@ -12,12 +12,14 @@ import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.sms.SmsClient;
 import com.elextec.framework.utils.*;
+import com.elextec.lease.manager.service.BizOrganizationService;
 import com.elextec.lease.manager.service.SysAuthService;
 import com.elextec.lease.manager.service.SysUserService;
 import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
+import com.elextec.persist.model.mybatis.BizOrganization;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +69,9 @@ public class SysAuthApi extends BaseController {
 
     @Autowired
     private SysUserService sysUserService;
+
+    @Autowired
+    private BizOrganizationService bizOrganizationService;
 
     @Autowired
     private SmsClient smsClient;
@@ -800,6 +806,42 @@ public class SysAuthApi extends BaseController {
                     return mr;
                 }
         }
+    }
+
+    /**
+     *  手机端用户注册时，需要看的所有企业
+     * @return 所有企业的列表
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 id:ID,
+     *                 orgCode:组织Code,
+     *                 orgName:组织名称,
+     *                 orgType:组织类别（平台、企业）,
+     *                 orgIntroduce:组织介绍,
+     *                 orgAddress:组织地址,
+     *                 orgContacts:联系人（多人用 , 分割）,
+     *                 orgPhone:联系电话（多个电话用 , 分割）,
+     *                 orgBusinessLicences:营业执照号码,
+     *                 orgBusinessLicenceFront:营业执照正面照片路径,
+     *                 orgBusinessLicenceBack:营业执照背面照片路径,
+     *                 orgStatus:组织状态（正常、冻结、作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/userBindOrg",method = RequestMethod.GET)
+    public MessageResponse userBindOrg(){
+        return new MessageResponse(RunningResult.SUCCESS,bizOrganizationService.orgList());
     }
 
 }

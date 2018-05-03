@@ -1,6 +1,7 @@
 package com.elextec.persist.dao.mybatis;
 
 import com.elextec.lease.manager.request.SysUserParam;
+import com.elextec.persist.model.mybatis.BizOrganization;
 import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
@@ -48,4 +49,5 @@ public interface SysUserMapperExt extends SysUserMapper {
      * @return 用户信息
      */
     SysUser getUserByVehicle(String vehicleId);
+
 }
