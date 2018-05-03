@@ -777,6 +777,7 @@ export default {
       }
     },
     showForm(form = { }) {
+      console.log(mapState);
       const $form = this.$refs.form;
       if ($form) $form.resetFields();
       this.form = _.pick(form, [

@@ -7,7 +7,7 @@
       </div>
       <el-dropdown @command="command => this[command]()">
         <span class="el-dropdown-link" style="cursor:pointer;color:#fff;">
-          {{key_user_info.nickName}} <i class="el-icon-arrow-down el-icon--right"></i>
+          {{ key_user_info.nickName }} <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="showPasswordForm">密码修改</el-dropdown-item>
@@ -153,7 +153,6 @@
         <el-button type="primary" @click="saveEnterpiserForm">保存</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
@@ -296,6 +295,10 @@ export default {
       try {
         const { code, message } = (await this.$http.post('/api/manager/user/modifyInformation', this.form)).body;
         if (code !== '200') throw new Error(message);
+        const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getbypk', [this.form.id])).body;
+        if (userCode !== '200') throw new Error(userMessage);
+        const { key_user_info } = userRespData;
+        const aaa = await this.$store.commit('reload', { key_user_info });
         this.$message.success('保存成功');
       } catch (e) {
         if (!e) return;
