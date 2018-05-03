@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <x-button type="primary" @click.native="handler">提交</x-button>
+    <x-button type="primary" @click.native="handler" class="tj">提交</x-button>
   </div>
 </template>
 
@@ -574,7 +574,7 @@ export default {
   opacity: 0;
   cursor: pointer;
 }
-.weui-btn {
+.tj {
   width:88%!important;
 }
 </style>

@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { Group, Cell, Drawer, ViewBox, XHeader } from 'vux';
+import { Group, Cell, Drawer, ViewBox, XHeader, Loading } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -73,6 +73,7 @@ export default {
     Drawer,
     ViewBox,
     XHeader,
+    Loading,
   },
   computed: {
     leftOptions() {
@@ -107,6 +108,8 @@ export default {
       this.mapCenter = r.point;
     },
     getCurrentPosition() {
+      this.$vux.loading.show({ text: 'Loading' });
+      setTimeout(() => { this.$vux.loading.hide() }, 2000);
       return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
         if (this.getStatus() === global.BMAP_STATUS_SUCCESS) resolve(r); else reject(this.getStatus());
       }, { enableHighAccuracy: true }));
@@ -122,7 +125,7 @@ export default {
   },
   async mounted() {
     this.vehicleId.push(localStorage.getItem('vehicleId'));
-    this.portrait = this.portrait === '' ? '/static/images/users/1.jpg' : localStorage.getItem('portrait');
+    this.portrait = localStorage.getItem('portrait') === null ? '/static/images/users/1.jpg' : localStorage.getItem('portrait');
     const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
     if (code !== '200') throw new Error(message || code);
     const v = _.find(respData, o => o.LON && o.LAT);
