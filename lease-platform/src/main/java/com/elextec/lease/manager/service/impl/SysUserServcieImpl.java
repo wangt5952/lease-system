@@ -7,6 +7,7 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.utils.WzFileUtil;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.framework.utils.WzUniqueValUtil;
+import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;

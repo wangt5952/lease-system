@@ -251,4 +251,10 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         return bizOrganizationMapperExt.selectByPrimaryKey(id);
     }
 
+    public List<BizOrganization> orgList() {
+        BizOrganizationParam param = new BizOrganizationParam();
+        param.setNeedPaging("false");
+        return bizOrganizationMapperExt.selectByParam(param);
+    }
+
 }

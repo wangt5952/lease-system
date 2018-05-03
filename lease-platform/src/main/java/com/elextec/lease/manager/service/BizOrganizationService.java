@@ -62,4 +62,10 @@ public interface BizOrganizationService {
      */
     public BizOrganization getBizOrganizationByPrimaryKey(String id);
 
+    /**
+     * 查询所有企业
+     * @return 企业列表
+     */
+    public List<BizOrganization> orgList();
+
 }
