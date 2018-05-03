@@ -120,8 +120,8 @@ export default {
         return callback(new Error('电话不能为空'));
       }
       setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('电话不能输入汉字'));
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入正确的电话格式'));
         } else {
           callback();
         }

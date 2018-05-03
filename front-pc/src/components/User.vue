@@ -250,11 +250,8 @@ export default {
   data() {
     // 手机验证
     const checkPhone = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('请输入手机号码'));
-      }
       setTimeout(() => {
-        if (!/^\d+$/.test(value)) {
+        if (/^$ | ^\d+$/.test(value)) {
           callback(new Error('请输入正确手机格式'));
         } else {
           callback();
