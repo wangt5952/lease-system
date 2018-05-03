@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { Group, Cell, Drawer, ViewBox, XHeader } from 'vux';
+import { Group, Cell, Drawer, ViewBox, XHeader, Loading } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -73,6 +73,7 @@ export default {
     Drawer,
     ViewBox,
     XHeader,
+    Loading,
   },
   computed: {
     leftOptions() {
@@ -107,6 +108,8 @@ export default {
       this.mapCenter = r.point;
     },
     getCurrentPosition() {
+      this.$vux.loading.show({ text: 'Loading' });
+      setTimeout(() => { this.$vux.loading.hide() }, 2000);
       return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
         if (this.getStatus() === global.BMAP_STATUS_SUCCESS) resolve(r); else reject(this.getStatus());
       }, { enableHighAccuracy: true }));

@@ -56,7 +56,7 @@ export default {
           const { key_login_token, key_user_info, key_vehicle_info } = respData;
           localStorage.setItem('vehicleId', key_vehicle_info[0].id);
           await this.$store.commit('login', { key_login_token, key_user_info });
-          this.$vux.toast.show({ text: '登录成功', type: 'success', width: '10em' });
+          this.$vux.toast.show({ text: '登录成功', type: 'success', width: '10em', time: '100' });
           this.$router.push('/');
         } catch (e) {
           const message = e.statusText || e.message;
