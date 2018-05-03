@@ -210,7 +210,7 @@ export default {
       setTimeout(() => {
         if (/^$|^\d+$/.test(value)) {
           callback();
-        } else{
+        } else {
           callback(new Error('请输入正确手机格式'));
         }
       }, 500);
