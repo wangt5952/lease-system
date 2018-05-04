@@ -479,7 +479,8 @@ public class SysAuthApi extends BaseController {
      *         createUser:创建人,
      *         updateUser:更新人,
      *         smsToken:注册用短信验证码Token,
-     *         smsVCode:短信验证码
+     *         smsVCode:短信验证码,
+     *         orgId:企业Id
      *     }
      * </pre>
      * @return 用户注册结果
@@ -495,8 +496,7 @@ public class SysAuthApi extends BaseController {
     public MessageResponse register(@RequestBody String smsTokenAndUserInfo){
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(smsTokenAndUserInfo)) {
-            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
-            return mr;
+            return new MessageResponse(RunningResult.NO_PARAM);
         } else {
             RegisterParam resetParam = null;
             try{
@@ -508,46 +508,47 @@ public class SysAuthApi extends BaseController {
                 throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
             }
 
-                //断定必填参数是否为空
-                if (null == resetParam
-                        || WzStringUtil.isBlank(resetParam.getSmsVCode())
-                        || WzStringUtil.isBlank(resetParam.getSmsToken())
-                        || WzStringUtil.isBlank(resetParam.getUserMobile())) {
-                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
-                }
-                // 短信验证码过期报错// 验证短信验证码
-                // 获得预存短信验证码
-                String vCode = (String) redisClient.valueOperations().get(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
-                if (WzStringUtil.isBlank(vCode)) {
-                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
-                }
-                // 验证码不一致报错
-                if (!vCode.equals(resetParam.getSmsVCode())) {
-                    throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
-                }
-                // 只要进行验证后，不管成功失败均将之前验证码作废
-                redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
-                redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
+            //断定必填参数是否为空
+            if (null == resetParam
+                    || WzStringUtil.isBlank(resetParam.getSmsVCode())
+                    || WzStringUtil.isBlank(resetParam.getSmsToken())
+                    || WzStringUtil.isBlank(resetParam.getUserMobile())
+                    || WzStringUtil.isBlank(resetParam.getOrgId())) {
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+            }
+            // 短信验证码过期报错// 验证短信验证码
+            // 获得预存短信验证码
+            String vCode = (String) redisClient.valueOperations().get(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
+            if (WzStringUtil.isBlank(vCode)) {
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码已过期");
+            }
+            // 验证码不一致报错
+            if (!vCode.equals(resetParam.getSmsVCode())) {
+                throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "验证码验证失败");
+            }
+            // 只要进行验证后，不管成功失败均将之前验证码作废
+            redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE + resetParam.getSmsToken());
+            redisClient.valueOperations().getOperations().delete(WzConstants.GK_SMS_VCODE_MOBILE + resetParam.getSmsToken());
 
-                SysUser userTemp = new SysUser();
-                userTemp.setUserMobile(resetParam.getUserMobile());
-                userTemp.setCreateUser(resetParam.getCreateUser());
-                userTemp.setUpdateUser(resetParam.getUpdateUser());
-                userTemp.setPassword(resetParam.getPassword());
-                //判断用户是手机号码注册还是用户名注册
-                if(!WzStringUtil.isNotBlank(resetParam.getLoginName())){
-                    //用户名为空，则是手机号码注册，注入默认用户名为手机号码
-                    userTemp.setLoginName(resetParam.getUserMobile());
-                }
-                //手机注册默认是个人帐户
-                userTemp.setUserType(OrgAndUserType.INDIVIDUAL);
-                //默认状态为正常
-                userTemp.setUserStatus(RecordStatus.NORMAL);
-                //默认暂时未实名认证
-                userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.UNAUTHORIZED);
-                sysUserService.insertSysUser(userTemp);
-                return new MessageResponse(RunningResult.SUCCESS);
-
+            SysUser userTemp = new SysUser();
+            userTemp.setUserMobile(resetParam.getUserMobile());
+            userTemp.setCreateUser(resetParam.getCreateUser());
+            userTemp.setUpdateUser(resetParam.getUpdateUser());
+            userTemp.setPassword(resetParam.getPassword());
+            userTemp.setOrgId(resetParam.getOrgId());
+            //判断用户是手机号码注册还是用户名注册
+            if(!WzStringUtil.isNotBlank(resetParam.getLoginName())){
+                //用户名为空，则是手机号码注册，注入默认用户名为手机号码
+                userTemp.setLoginName(resetParam.getUserMobile());
+            }
+            //手机注册默认是个人帐户
+            userTemp.setUserType(OrgAndUserType.INDIVIDUAL);
+            //默认状态为正常
+            userTemp.setUserStatus(RecordStatus.NORMAL);
+            //默认暂时未实名认证
+            userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.UNAUTHORIZED);
+            sysUserService.insertSysUser(userTemp);
+            return new MessageResponse(RunningResult.SUCCESS);
         }
     }
 

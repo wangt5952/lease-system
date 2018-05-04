@@ -33,6 +33,6 @@ public interface BizOrganizationMapperExt extends BizOrganizationMapper {
      * 查询所有企业
      * @return 企业列表
      */
-    public BizOrganization orgList();
+    public List<BizOrganization> orgList();
 
 }
