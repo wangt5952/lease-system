@@ -109,14 +109,24 @@ export default {
     },
     getCurrentPosition() {
       this.$vux.loading.show({ text: 'Loading' });
-      setTimeout(() => { this.$vux.loading.hide() }, 2000);
+      setTimeout(() => { this.$vux.loading.hide(); }, 2000);
       return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
         if (this.getStatus() === global.BMAP_STATUS_SUCCESS) resolve(r); else reject(this.getStatus());
       }, { enableHighAccuracy: true }));
     },
-    location() {
-      this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
-      this.zoomNum = 18;
+    async location() {
+      if (this.vehicleId.length === 0) {
+        this.$vux.toast.show({ text: '请于实名认证到企业申领车辆后使用该功能', type: 'warn', width: '10em' });
+      } else {
+        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
+        if (code !== '200') throw new Error(message || code);
+        const v = _.find(respData, o => o.LON && o.LAT);
+        this.Center = {
+          lng: v.LON, lat: v.LAT,
+        };
+        this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
+        this.zoomNum = 18;
+      }
     },
     async loginOut() {
       await this.$store.commit('logout');
@@ -124,14 +134,8 @@ export default {
     },
   },
   async mounted() {
-    this.vehicleId.push(localStorage.getItem('vehicleId'));
     this.portrait = localStorage.getItem('portrait') === null ? '/static/images/users/1.jpg' : localStorage.getItem('portrait');
-    const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
-    if (code !== '200') throw new Error(message || code);
-    const v = _.find(respData, o => o.LON && o.LAT);
-    this.Center = {
-      lng: v.LON, lat: v.LAT,
-    };
+    if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
   },
 };
 </script>

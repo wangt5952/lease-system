@@ -69,7 +69,7 @@ export default {
       val2: '',
       index: 0,
       format: 'YYYY-MM-DD HH:mm',
-      localID: localStorage.getItem('vehicleId'),
+      localID: '',
       polylinePath: [],
     };
   },
@@ -97,20 +97,27 @@ export default {
       }
     },
     async handler() {
-      const start = `${this.val1}:00`;
-      const end = `${this.val2}:00`;
-      const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime',
-        { id: this.localID, startTime: start, endTime: end })).body;
-      if (code !== '200') throw new Error(message || code);
-      if (respData.length !== 0) {
-        this.center.lng = respData[0].LON;
-        this.center.lat = respData[0].LAT;
-        this.polylinePath = _.map(respData, o => ({ lng: o.LON, lat: o.LAT }));
-        this.zoom = 16;
+      if (this.localID === '') {
+        this.$vux.toast.show({ text: '请于实名认证到企业申领车辆后使用该功能', type: 'warn', width: '10em' });
       } else {
-        this.$vux.toast.show({ text: '当前时间段没有车辆轨迹！', type: 'warn', width: '10em' });
+        const start = `${this.val1}:00`;
+        const end = `${this.val2}:00`;
+        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/gettrackbytime',
+          { id: this.localID, startTime: start, endTime: end })).body;
+        if (code !== '200') throw new Error(message || code);
+        if (respData.length !== 0) {
+          this.center.lng = respData[0].LON;
+          this.center.lat = respData[0].LAT;
+          this.polylinePath = _.map(respData, o => ({ lng: o.LON, lat: o.LAT }));
+          this.zoom = 16;
+        } else {
+          this.$vux.toast.show({ text: '当前时间段没有车辆轨迹！', type: 'warn', width: '10em' });
+        }
       }
     },
+  },
+  async mounted() {
+    if (localStorage.getItem('vehicleId') !== '') this.localID = localStorage.getItem('vehicleId');
   },
 };
 </script>

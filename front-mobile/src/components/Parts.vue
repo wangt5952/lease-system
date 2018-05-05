@@ -81,7 +81,7 @@ export default {
     },
   },
   async mounted() {
-    const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypr', [this.$route.params.id])).body;
+    const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getbypr', [this.$route.params.id])).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
     for (let i = 0; i < respData.length; i += 1) {

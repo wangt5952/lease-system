@@ -38,7 +38,7 @@ export default {
     },
   },
   async mounted() {
-    const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getVehicleByUserId', { id: this.key_user_info.id })).body;
+    const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getVehicleByUserId', { id: this.key_user_info.id })).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
   },

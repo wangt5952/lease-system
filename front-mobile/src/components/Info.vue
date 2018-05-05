@@ -99,7 +99,7 @@ export default {
     },
   },
   async mounted() {
-    const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', { id: this.$route.params.id, flag: 'true' })).body;
+    const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getbypk', { id: this.$route.params.id, flag: 'true' })).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
     this.batteryList = respData.bizBatteries;

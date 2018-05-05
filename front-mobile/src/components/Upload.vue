@@ -129,11 +129,11 @@ export default {
     async handler() {
       this.path = _.split(this.headerImage, ',')[1];
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/uplodeusericon',
-        { id: this.key_user_info.id, userIcon: this.path, updateUser: this.key_user_info.userName })).body;
+        { id: this.key_user_info.id, userIcon: this.path, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') throw new Error(message || code);
       if (respData) {
         localStorage.setItem('portrait', respData);
-        this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em' });
+        this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em', time: '100' });
         setTimeout(() => { this.$router.replace('/'); }, 200);
       }
     },

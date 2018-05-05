@@ -43,9 +43,9 @@ export default {
         { id: this.key_user_info.id,
           loginName: this.key_user_info.loginName,
           nickName: this.val,
-          userName: this.key_user_info.userName,
+          userName: this.key_user_info.loginName,
           userPid: this.key_user_info.userPid,
-          updateUser: this.key_user_info.userName })).body;
+          updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
         throw new Error(message || code);
       } else {
