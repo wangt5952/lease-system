@@ -49,6 +49,8 @@ export default {
       if (code !== '200') {
         throw new Error(message || code);
       } else {
+        this.key_user_info.nickName = this.val;
+        localStorage.setItem('key_user_info', this.key_user_info);
         this.$vux.toast.show({ text: '修改成功', type: 'success', width: '10em' });
         setTimeout(() => { window.history.go(-1); }, 100);
       }
