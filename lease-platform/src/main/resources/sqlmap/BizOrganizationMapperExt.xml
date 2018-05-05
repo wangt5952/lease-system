@@ -72,4 +72,9 @@
       </where>
     </select>
 
+    <select id="orgList" resultMap="BaseResultMap">
+        SELECT DISTINCT o.id,o.org_name
+        FROM biz_organization o
+    </select>
+
 </mapper>

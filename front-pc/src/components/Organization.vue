@@ -205,6 +205,17 @@ export default {
       }, 500);
       return false;
     };
+    // 验证手机格式
+    const checkPhone = (rule, value, callback) => {
+      setTimeout(() => {
+        if (/^$|^\d+$/.test(value)) {
+          callback();
+        } else {
+          callback(new Error('请输入正确手机格式'));
+        }
+      }, 500);
+      return false;
+    };
     return {
       disabledFormId: false,
       vehicleNumTotal: undefined,
@@ -261,7 +272,8 @@ export default {
           { validator: checkOrgId, trigger: 'blur' },
         ],
         orgPhone: [
-          { validator: checkSinogram, trigger: 'blur' },
+          { required: true, message: '请填写手机号码' },
+          { validator: checkPhone, trigger: 'blur' },
         ],
         orgBusinessLicences: [
           { validator: checkSinogram, trigger: 'blur' },

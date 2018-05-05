@@ -248,16 +248,13 @@ import {
 
 export default {
   data() {
-    // 手机验证
+    // 验证手机格式
     const checkPhone = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('请输入手机号码'));
-      }
       setTimeout(() => {
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('请输入正确手机格式'));
-        } else {
+        if (/^$|^\d+$/.test(value)) {
           callback();
+        } else {
+          callback(new Error('请输入正确手机格式'));
         }
       }, 500);
       return false;
@@ -321,6 +318,11 @@ export default {
         { id: 'PLATFORM', name: '平台' },
         { id: 'ENTERPRISE', name: '企业' },
       ],
+      typeList2: [
+        { id: 'PLATFORM', name: '平台' },
+        { id: 'ENTERPRISE', name: '企业' },
+        { id: 'INDIVIDUAL', name: '个人' },
+      ],
       authList: [
         { id: 'AUTHORIZED', name: '已实名' },
         { id: 'UNAUTHORIZED', name: '未实名' },
@@ -353,6 +355,7 @@ export default {
       // 表单效验
       rules2: {
         userMobile: [
+          { required: true, message: '请填写手机号码' },
           { validator: checkPhone, trigger: 'blur' },
         ],
       },
@@ -606,7 +609,7 @@ export default {
       this.pageSize = pageSize;
       await this.reload();
     },
-
+    // 加载
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
@@ -621,7 +624,7 @@ export default {
         this.total = total;
         this.list = _.map(rows, o => ({
           ...o,
-          userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
+          userTypeText: (_.find(this.typeList2, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
         await this.getOrgList();

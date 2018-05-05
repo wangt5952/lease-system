@@ -24,6 +24,8 @@ public class RegisterParam extends BaseModel {
     private String smsToken;
     /** 短信验证码. */
     private String smsVCode;
+    /** 企业ID.*/
+    private String orgId;
 
     /*
      * Getter 和 Setter 方法.
@@ -82,5 +84,13 @@ public class RegisterParam extends BaseModel {
 
     public void setSmsVCode(String smsVCode) {
         this.smsVCode = smsVCode;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
     }
 }

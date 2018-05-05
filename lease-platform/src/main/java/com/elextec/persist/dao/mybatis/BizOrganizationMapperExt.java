@@ -29,4 +29,10 @@ public interface BizOrganizationMapperExt extends BizOrganizationMapper {
      */
     public int countByParam(BizOrganizationParam bizOrganizationParam);
 
+    /**
+     * 查询所有企业
+     * @return 企业列表
+     */
+    public List<BizOrganization> orgList();
+
 }

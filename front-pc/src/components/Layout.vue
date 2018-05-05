@@ -298,7 +298,7 @@ export default {
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getbypk', [this.form.id])).body;
         if (userCode !== '200') throw new Error(userMessage);
         const { key_user_info } = userRespData;
-        const aaa = await this.$store.commit('reload', { key_user_info });
+        await this.$store.commit('reload', { key_user_info });
         this.$message.success('保存成功');
       } catch (e) {
         if (!e) return;
