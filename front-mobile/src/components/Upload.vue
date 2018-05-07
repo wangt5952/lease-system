@@ -6,13 +6,12 @@
       <div class="tlte"><span>修改头像</span></div>
     </div>
 
-    <div class="container" v-show="panel">
+    <div class="container" v-if="panel">
       <div>
         <img id="image" :src="url" alt="Picture">
       </div>
 
       <button type="button" id="button" @click="crop">确定</button>
-
     </div>
 
     <div style="padding:20px;">
@@ -42,7 +41,6 @@ export default {
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
-
       relogin: state => state.relogin,
     }),
   },
@@ -73,6 +71,7 @@ export default {
       window.history.go(-1);
     },
     getObjectURL(file) {
+      console.log(file);      
       let url = null;
       if (window.createObjectURL !== undefined) { // basic
         url = window.createObjectURL(file);
@@ -84,11 +83,18 @@ export default {
       return url;
     },
     change(e) {
+      // 图片大小不能超过100KB
+      if (e.target.files[0].size > 500 * 1000) {
+        this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
+        return;
+      }
+      console.log(e);
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
       this.panel = true;
       this.picValue = files[0];
       this.url = this.getObjectURL(this.picValue);
+      console.log(this.url);
       if (this.cropper) {
         this.cropper.replace(this.url);
       }
@@ -96,7 +102,6 @@ export default {
     },
     crop() {
       this.panel = false;
-
       if (!this.croppable) {
         return;
       }
@@ -123,9 +128,9 @@ export default {
       context.beginPath();
       context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
       context.fill();
-
       return canvas;
     },
+
     async handler() {
       this.path = _.split(this.headerImage, ',')[1];
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/uplodeusericon',
