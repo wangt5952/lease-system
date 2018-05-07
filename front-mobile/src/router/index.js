@@ -6,19 +6,10 @@ Vue.use(Router);
 export default new Router({
   mode: 'history',
   routes: [
-    { path: '/login', 
-      component: () => import('@/components/Login'),
-    },
-    { path: '/join', component: () => import('@/components/Join'), },
-    { 
-      path: '/reset', 
-      component: () => import('@/components/Reset')
-    },
-    { path: '/', component: () => import('@/components/MainLayout'),
-      meta:{
-        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-      },
-    },
+    { path: '/login', component: () => import('@/components/Login') },
+    { path: '/join', component: () => import('@/components/Join') },
+    { path: '/reset', component: () => import('@/components/Reset') },
+    { path: '/', component: () => import('@/components/MainLayout') },
     { path: '/info/:id', component: () => import('@/components/Info') },
     { path: '/track', component: () => import('@/components/Track') },
     { path: '/mycar', component: () => import('@/components/MyCar') },

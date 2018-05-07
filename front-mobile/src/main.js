@@ -76,11 +76,11 @@ const whiteList = ['/login', '/join', '/reset'];
 router.beforeEach(async (to, from, next) => {
   const { key_login_token } = store.state;
   if (!key_login_token && whiteList.indexOf(to.path) === -1 && to.fullPath !== '/login') {
-    next({ 
+    return next({ 
       path: '/login',
     });
   }else{
-    next();
+    return next();
   }
 });
 
