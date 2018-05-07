@@ -6,7 +6,7 @@
       <div class="tlte"><span>修改头像</span></div>
     </div>
 
-    <div class="container" v-if="panel">
+    <div class="container" v-show="panel">
       <div>
         <img id="image" :src="url" alt="Picture">
       </div>
@@ -71,7 +71,7 @@ export default {
       window.history.go(-1);
     },
     getObjectURL(file) {
-      console.log(file);      
+      // console.log(file);
       let url = null;
       if (window.createObjectURL !== undefined) { // basic
         url = window.createObjectURL(file);
@@ -84,17 +84,17 @@ export default {
     },
     change(e) {
       // 图片大小不能超过100KB
-      if (e.target.files[0].size > 500 * 1000) {
-        this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
-        return;
-      }
-      console.log(e);
+      // if (e.target.files[0].size > 500 * 1000) {
+      //   this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
+      //   return;
+      // }
+      // console.log(e);
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
       this.panel = true;
       this.picValue = files[0];
       this.url = this.getObjectURL(this.picValue);
-      console.log(this.url);
+      // console.log(this.url);
       if (this.cropper) {
         this.cropper.replace(this.url);
       }
