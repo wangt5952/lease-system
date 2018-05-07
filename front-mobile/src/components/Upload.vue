@@ -83,11 +83,11 @@ export default {
       return url;
     },
     change(e) {
-      // 图片大小不能超过100KB
-      // if (e.target.files[0].size > 500 * 1000) {
-      //   this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
-      //   return;
-      // }
+      // 图片大小不能超过500KB
+      if (e.target.files[0].size > 500 * 1000) {
+        this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
+        return;
+      }
       // console.log(e);
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
