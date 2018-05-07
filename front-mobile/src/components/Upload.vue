@@ -84,10 +84,10 @@ export default {
     },
     change(e) {
       // 图片大小不能超过500KB
-      if (e.target.files[0].size > 500 * 1000) {
-        this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
-        return;
-      }
+      // if (e.target.files[0].size > 500 * 1000) {
+      //   this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
+      //   return;
+      // }
       // console.log(e);
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
@@ -116,8 +116,8 @@ export default {
     getRoundedCanvas(sourceCanvas) {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      const width = sourceCanvas.width;
-      const height = sourceCanvas.height;
+      const width = sourceCanvas.width/2;
+      const height = sourceCanvas.height/2;
 
       canvas.width = width;
       canvas.height = height;
