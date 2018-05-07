@@ -1,5 +1,6 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
+    <!--  -->
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-org-addone') >= 0">
         <div style="margin-right:10px;">
@@ -307,6 +308,7 @@ export default {
       this.dialogVisible = true;
     },
     // changeFile(file, fileList) {
+    // 以HTML5 方式把图片转换成Base64
     changeFile(file) {
       const This = this;
       // this.imageUrl = URL.createObjectURL(file.raw);
@@ -321,6 +323,7 @@ export default {
       this.pageSize = pageSize;
       await this.reload();
     },
+    // 加载
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/org/list', {
@@ -482,6 +485,9 @@ export default {
 </script>
 
 <style scoped>
+>>> td.el-table_1_column_12 .cell {
+  width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .edit-form >>> .el-form-item {
   height: 73px;
 }
