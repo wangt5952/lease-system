@@ -123,7 +123,6 @@ export default {
       }, { enableHighAccuracy: true }));
     },
     async location() {
-      console.log(this.key_user_info.userIcon);
       if (this.vehicleId.length === 0) {
         this.$vux.toast.show({ text: '请于实名认证到企业申领车辆后使用该功能', type: 'warn', width: '10em' });
       } else {
@@ -143,7 +142,7 @@ export default {
     },
   },
   async mounted() {
-    if (this.key_user_info.userIcon === null || 'undefinded' || '') this.portrait = '/static/images/users/1.jpg';
+    if (!this.key_user_info.userIcon) this.portrait = '/static/images/users/1.jpg';
     else this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
     if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
   },

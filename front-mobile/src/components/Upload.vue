@@ -134,7 +134,7 @@ export default {
       if (code !== '200') throw new Error(message || code);
       if (respData) {
         this.key_user_info.userIcon = respData;
-        localStorage.setItem('key_user_info', this.key_user_info);
+        localStorage.setItem('key_user_info', JSON.stringify(this.key_user_info));
         this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em', time: '100' });
         setTimeout(() => { this.$router.replace('/'); }, 200);
       }
