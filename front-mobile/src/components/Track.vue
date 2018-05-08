@@ -62,7 +62,7 @@ export default {
   data() {
     return {
       center: { lng: 116.404, lat: 39.915 },
-      zoom: 15,
+      zoom: 18,
       show: false,
       popShow: false,
       val: moment().format('YYYY-MM-DD h:mm'),

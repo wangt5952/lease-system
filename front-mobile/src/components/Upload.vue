@@ -112,8 +112,8 @@ export default {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       // 把画布原来的 宽高 缩小6倍(宽 高大小根据实际情况而定)
-      const width = sourceCanvas.width / 6;
-      const height = sourceCanvas.height / 6;
+      const width = sourceCanvas.width / 8;
+      const height = sourceCanvas.height / 8;
 
       canvas.width = width;
       canvas.height = height;
