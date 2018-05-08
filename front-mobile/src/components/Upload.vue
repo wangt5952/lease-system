@@ -71,18 +71,16 @@ export default {
       window.history.go(-1);
     },
     getObjectURL(file) {
-      // console.log(file);
       let url = null;
-      if (window.createObjectURL !== undefined) { // basic
+      if (window.createObjectURL !== undefined) {
         url = window.createObjectURL(file);
-         url = window.URL.createObjectURL(file);
-      } else if (window.webkitURL !== undefined) { // webkit or chrom
+        url = window.URL.createObjectURL(file);
+      } else if (window.webkitURL !== undefined) {
         url = window.webkitURL.createObjectURL(file);
       }
       return url;
     },
     change(e) {
-      // console.log(this.cropper);
       // 图片大小不能超过5M (1024字节=1kb,1024KB=1MB,1024MB=1GB,1024GB=1TB)
       if (e.target.files[0].size > 5 * 1024 * 1024) {
         this.$vux.toast.show({ text: '图片不能超过5M', type: 'warn', width: '10em' });
@@ -122,7 +120,6 @@ export default {
 
       canvas.width = width;
       canvas.height = height;
-      console.log(width,height);
 
       context.imageSmoothingEnabled = true;
       context.drawImage(sourceCanvas, 0, 0, width, height);
@@ -130,7 +127,6 @@ export default {
       context.beginPath();
       context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
       context.fill();
-      console.log(context);
       return canvas;
     },
 

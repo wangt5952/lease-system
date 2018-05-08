@@ -7,7 +7,7 @@ export default new Router({
   mode: 'history',
   routes: [
     { path: '/login', component: () => import('@/components/Login') },
-    { path: '/join', component: () => import('@/components/Join'), },
+    { path: '/join', component: () => import('@/components/Join') },
     { path: '/reset', component: () => import('@/components/Reset') },
     { path: '/', component: () => import('@/components/MainLayout') },
     { path: '/info/:id', component: () => import('@/components/Info') },
