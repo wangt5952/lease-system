@@ -48,7 +48,7 @@ export default {
     return {
       headerImage: '',
       picValue: '',
-      cropper: '',
+      cropper: {},
       croppable: false,
       panel: false,
       url: '',
@@ -75,14 +75,14 @@ export default {
       let url = null;
       if (window.createObjectURL !== undefined) { // basic
         url = window.createObjectURL(file);
-      } else if (window.URL !== undefined) { // mozilla(firefox)
-        url = window.URL.createObjectURL(file);
-      } else if (window.webkitURL !== undefined) { // webkit or chrome
+         url = window.URL.createObjectURL(file);
+      } else if (window.webkitURL !== undefined) { // webkit or chrom
         url = window.webkitURL.createObjectURL(file);
       }
       return url;
     },
     change(e) {
+      // console.log(this.cropper);
       // 图片大小不能超过500KB
       // if (e.target.files[0].size > 500 * 1000) {
       //   this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
@@ -102,9 +102,7 @@ export default {
     },
     crop() {
       this.panel = false;
-      if (!this.croppable) {
-        return;
-      }
+      if (!this.croppable) return;
       // Crop
       const croppedCanvas = this.cropper.getCroppedCanvas();
 
@@ -113,14 +111,17 @@ export default {
 
       this.headerImage = roundedCanvas.toDataURL();
     },
+    // 画布
     getRoundedCanvas(sourceCanvas) {
+      // console.log(sourceCanvas);
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      const width = sourceCanvas.width/2;
-      const height = sourceCanvas.height/2;
+      const width = sourceCanvas.width / 6;
 
+      const height = sourceCanvas.height / 6;
       canvas.width = width;
       canvas.height = height;
+      // console.log(width,height);
 
       context.imageSmoothingEnabled = true;
       context.drawImage(sourceCanvas, 0, 0, width, height);
@@ -128,6 +129,7 @@ export default {
       context.beginPath();
       context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
       context.fill();
+      // console.log(context);
       return canvas;
     },
 
