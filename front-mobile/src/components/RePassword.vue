@@ -6,9 +6,9 @@
     </div>
 
     <group>
-      <x-input title="旧密码" placeholder="请输入原始密码" required v-model="oldVal"></x-input>
-      <x-input title="新密码" placeholder="请输入新密码" required v-model="newVal"></x-input>
-      <x-input title="确认新密码" placeholder="请再次输入新密码" required v-model="confirm"></x-input>
+      <x-input title="旧密码" placeholder="请输入原始密码" :min="6" :max="10" required v-model="oldVal"></x-input>
+      <x-input title="新密码" placeholder="请输入新密码" :min="6" :max="10" required v-model="newVal"></x-input>
+      <x-input title="确认新密码" placeholder="请再次输入新密码" :min="6" :max="10" required v-model="confirm"></x-input>
     </group>
 
     <x-button @click.native="handler" type="primary">提交</x-button>
@@ -50,6 +50,7 @@ export default {
         if (this.newVal !== this.confirm) {
           this.$vux.toast.show({ text: '新密码两次输入不一致', type: 'warn', width: '10em' });
         }
+        if (!/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/.test(this.newVal)) throw new Error('请输入6-10位字母数字混合的密码');
         const authTime = moment().unix() * 1000;
         const { loginName } = this.key_user_info;
         const form = {

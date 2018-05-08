@@ -34,8 +34,9 @@
           <x-button @click.native="handler" type="primary">确认</x-button>
         </mt-popup>
 
-        <baidu-map :center="center" :zoom="zoom" :dragging="true" :pinch-to-zoom="true" class="bm-view">
+        <baidu-map @ready="ready" :center="center" :zoom="zoom" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-polyline :path="polylinePath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
+          <bm-marker :position="center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE"></bm-marker>
         </baidu-map>
       </view-box>
   </div>
@@ -96,9 +97,25 @@ export default {
         this.popShow = true;
       }
     },
+    async ready() {
+      const r = await this.getCurrentPosition();
+      this.center = r.point;
+    },
+    getCurrentPosition() {
+      this.$vux.loading.show({ text: 'Loading' });
+      const thisOne = this;
+      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
+        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
+          setTimeout(() => { thisOne.$vux.loading.hide(); }, 1000);
+          resolve(r);
+        } else {
+          reject(this.getStatus());
+        }
+      }, { enableHighAccuracy: true }));
+    },
     async handler() {
       if (this.localID === '') {
-        this.$vux.toast.show({ text: '请于实名认证到企业申领车辆后使用该功能', type: 'warn', width: '10em' });
+        this.$vux.toast.show({ text: '实名认证并从企业申领车辆后才能使用本功能', type: 'warn', width: '10em' });
       } else {
         const start = `${this.val1}:00`;
         const end = `${this.val2}:00`;

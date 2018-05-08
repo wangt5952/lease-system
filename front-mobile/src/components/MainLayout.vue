@@ -50,7 +50,7 @@
 
         <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" :showZoomInfo="true"></bm-navigation>
-          <bm-marker v-if="Center" :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{url: '/static/images/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} }}"></bm-marker>
+          <bm-marker :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="this.icon"></bm-marker>
         </baidu-map>
         <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
@@ -98,17 +98,19 @@ export default {
       showPlacement: 'left',
       showPlacementValue: 'left',
       mapCenter: '北京',
-      Center: null,
+      Center: { lng: 0, lat: 0, },
       zoomNum: 16,
       vehicleId: [],
       portrait: '',
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',
+      icon: {url: '/static/images/Red_Point.png', size: {width: 19, height: 25}, opts: {imageSize: {width: 19, height: 25} }},
     };
   },
   methods: {
     async handler() {
       const r = await this.getCurrentPosition();
       this.mapCenter = r.point;
+      this.Center = r.point;
     },
     getCurrentPosition() {
       this.$vux.loading.show({ text: 'Loading' });
@@ -124,7 +126,7 @@ export default {
     },
     async location() {
       if (this.vehicleId.length === 0) {
-        this.$vux.toast.show({ text: '请于实名认证到企业申领车辆后使用该功能', type: 'warn', width: '10em' });
+        this.$vux.toast.show({ text: '实名认证并从企业申领车辆后才能使用本功能', type: 'warn', width: '10em' });
       } else {
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
         if (code !== '200') throw new Error(message || code);
@@ -132,6 +134,7 @@ export default {
         this.Center = {
           lng: v.LON, lat: v.LAT,
         };
+        this.icon = {url: '/static/images/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} }};
         this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
         this.zoomNum = 18;
       }
