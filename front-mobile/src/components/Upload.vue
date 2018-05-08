@@ -86,13 +86,11 @@ export default {
         this.$vux.toast.show({ text: '图片不能超过5M', type: 'warn', width: '10em' });
         return;
       }
-      // console.log(e);
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
       this.panel = true;
       this.picValue = files[0];
       this.url = this.getObjectURL(this.picValue);
-      // console.log(this.url);
       if (this.cropper) {
         this.cropper.replace(this.url);
       }
