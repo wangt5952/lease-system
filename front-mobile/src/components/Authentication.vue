@@ -163,7 +163,7 @@ export default {
     },
     async handler() {
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
-        { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.userName })).body;
+        { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {

@@ -19,20 +19,22 @@
           </div>
         </div>
 
-        <group>
-          <cell title="我的车辆" link="/mycar">
-            <i slot="icon" class="iconfont icon-chelun"></i>
-          </cell>
-          <cell title="个人资料" link="/profile">
-            <i slot="icon" class="iconfont icon-weibiaoti1"></i>
-          </cell>
-          <cell title="修改密码" link="/repassword">
-            <i slot="icon" class="iconfont icon-icon-"></i>
-          </cell>
-          <cell title="登出" @click.native="loginOut" is-link>
-            <i slot="icon" class="iconfont icon-tuichu"></i>
-          </cell>
-        </group>
+        <div class="layout">
+          <group>
+            <cell title="我的车辆" link="/mycar">
+              <i slot="icon" class="iconfont icon-chelun"></i>
+            </cell>
+            <cell title="个人资料" link="/profile">
+              <i slot="icon" class="iconfont icon-weibiaoti1"></i>
+            </cell>
+            <cell title="修改密码" link="/repassword">
+              <i slot="icon" class="iconfont icon-icon-"></i>
+            </cell>
+            <cell title="登出" @click.native="loginOut" is-link>
+              <i slot="icon" class="iconfont icon-tuichu"></i>
+            </cell>
+          </group>
+        </div>
       </div>
 
       <view-box ref="viewBox">
@@ -109,9 +111,14 @@ export default {
     },
     getCurrentPosition() {
       this.$vux.loading.show({ text: 'Loading' });
-      setTimeout(() => { this.$vux.loading.hide(); }, 2000);
+      const thisOne = this;
       return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
-        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) resolve(r); else reject(this.getStatus());
+        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
+          setTimeout(() => { thisOne.$vux.loading.hide(); }, 1000);
+          resolve(r);
+        } else {
+          reject(this.getStatus());
+        }
       }, { enableHighAccuracy: true }));
     },
     async location() {
@@ -218,23 +225,23 @@ export default {
   border-radius: 100%;
 }
 
-.weui-cells {
+.layout .weui-cells {
   margin:0!important;
 }
 
-.weui-cells .weui-cell {
+.layout .weui-cells .weui-cell {
   height:50px;
 }
 
-.vux-label {
+.layout .vux-label {
   font-size: 15pt;
 }
 
-.weui-cell__hd {
+.layout .weui-cell__hd {
   margin-right: 10px;
 }
 
-.weui-cell__hd .iconfont {
+.layout .weui-cell__hd .iconfont {
   font-size: 25px;
 }
 

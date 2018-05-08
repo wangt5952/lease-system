@@ -83,11 +83,11 @@ export default {
     },
     change(e) {
       // console.log(this.cropper);
-      // 图片大小不能超过500KB
-      // if (e.target.files[0].size > 500 * 1000) {
-      //   this.$vux.toast.show({ text: '图片不能超过500KB', type: 'warn', width: '10em' });
-      //   return;
-      // }
+      // 图片大小不能超过5M (1024字节=1kb,1024KB=1MB,1024MB=1GB,1024GB=1TB)
+      if (e.target.files[0].size > 5 * 1024 * 1024) {
+        this.$vux.toast.show({ text: '图片不能超过5M', type: 'warn', width: '10em' });
+        return;
+      }
       // console.log(e);
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
@@ -113,15 +113,16 @@ export default {
     },
     // 画布
     getRoundedCanvas(sourceCanvas) {
-      // console.log(sourceCanvas);
+      console.log(sourceCanvas);
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
+      // 把画布原来的 宽高 缩小6倍(宽 高大小根据实际情况而定)
       const width = sourceCanvas.width / 6;
-
       const height = sourceCanvas.height / 6;
+
       canvas.width = width;
       canvas.height = height;
-      // console.log(width,height);
+      console.log(width,height);
 
       context.imageSmoothingEnabled = true;
       context.drawImage(sourceCanvas, 0, 0, width, height);
@@ -129,7 +130,7 @@ export default {
       context.beginPath();
       context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
       context.fill();
-      // console.log(context);
+      console.log(context);
       return canvas;
     },
 
