@@ -44,7 +44,7 @@ const store = new Vuex.Store({
     Vue.http.headers.common['header-login-token'] = key_login_token;
     return {
       key_login_token,
-      key_user_info: JSON.parse(localStorage.getItem('key_user_info') || '{}'),
+      key_user_info: localStorage.getItem('key_user_info') || '{}',
       relogin: false,
     };
   },

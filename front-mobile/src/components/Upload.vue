@@ -109,7 +109,6 @@ export default {
     },
     // 画布
     getRoundedCanvas(sourceCanvas) {
-      console.log(sourceCanvas);
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       // 把画布原来的 宽高 缩小6倍(宽 高大小根据实际情况而定)
@@ -134,7 +133,8 @@ export default {
         { id: this.key_user_info.id, userIcon: this.path, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') throw new Error(message || code);
       if (respData) {
-        localStorage.setItem('portrait', respData);
+        this.key_user_info.userIcon = respData;
+        localStorage.setItem('key_user_info', this.key_user_info);
         this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em', time: '100' });
         setTimeout(() => { this.$router.replace('/'); }, 200);
       }
