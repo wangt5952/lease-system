@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     back() {
-      window.history.go(-1);
+      this.$router.replace('/');
     },
   },
   async mounted() {

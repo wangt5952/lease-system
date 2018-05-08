@@ -47,7 +47,7 @@ export default {
     },
     async handler() {
       try {
-        if (this.newVal === this.confirm) {
+        if (this.newVal !== this.confirm) {
           this.$vux.toast.show({ text: '新密码两次输入不一致', type: 'warn', width: '10em' });
         }
         const authTime = moment().unix() * 1000;
@@ -106,6 +106,15 @@ export default {
     width:90%;
     margin:0 auto;
   }
+  .weui-cell {
+    height:50px;
+  }
+  >>>.weui-cells {
+    margin:0;
+  }
+  >>>.vux-label {
+      font-size: 15pt;
+    }
   .weui-btn{
     width:80%;
     margin-top:20px;
