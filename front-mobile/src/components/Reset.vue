@@ -11,24 +11,24 @@
     <div class="form" style="margin:40px 30px;font-size:0.4rem;">
       <x-input placeholder="请输入帐号" v-model="form.mobile" style="background:#fff;">
         <template slot="label">
-          <i class="lt lt-my"/>
+          <i slot="icon" class="iconfont icon-shoujihao"></i>
         </template>
       </x-input>
       <x-input placeholder="图形验证码" class="tu" v-model="form.captcha" style="background:#fff;">
         <template slot="label">
-          <i class="lt lt-safe"/>
+          <i slot="icon" class="iconfont icon-yanzhengma2"></i>
         </template>
         <img style="width:3rem;margin:auto 0;position: relative; top:0.1rem;right:0.3rem;" @click="reloadCaptcha" slot="right" :src="`data:image/png;base64,${key_captcha_base64}`" />
       </x-input>
       <x-input placeholder="短信验证码" class="inp-small" v-model="form.smsVCode" style="background:#fff;">
         <template slot="label">
-          <i class="lt lt-safe"/>
+          <i slot="icon" class="iconfont icon-yanzhengma2"></i>
         </template>
-        <x-button slot="right" class="btn-small" type="primary" @click.native="handleCode">获取验证码</x-button>
+        <x-button :disabled="codeBtnDisabled>0" slot="right" class="btn-small" type="primary" @click.native="handleCode">{{ codeBtnDisabled ? `${codeBtnDisabled} 秒后重新获取` : '获取验证码'}}</x-button>
       </x-input>
       <x-input placeholder="请输入密码" type="password" v-model="form.password" style="background:#fff;">
         <template slot="label">
-          <i class="lt lt-lock"/>
+          <i slot="icon" class="iconfont icon-icon-"></i>
         </template>
       </x-input>
 
@@ -48,6 +48,21 @@ export default {
     };
   },
   methods: {
+    secondTick() {
+      if (this.codeBtnDisabled) {
+        this.codeBtnDisabled = this.codeBtnDisabled - 1;
+      }
+      if (!this.codeBtnDisabled) this.stopSecondTick();
+    },
+    startSecondTick() {
+      if (!this.secondTickHandle) this.secondTickHandle = setInterval(() => this.secondTick(), 1000);
+    },
+    stopSecondTick() {
+      if (this.secondTickHandle) {
+        clearInterval(this.secondTickHandle);
+        this.secondTickHandle = null;
+      }
+    },
     async handleSubmit() {
       const { password, smsToken, smsVCode, mobile } = this.form;
       const form = {
@@ -61,7 +76,7 @@ export default {
         if (!form.newPassword) throw new Error('请输入新密码');
         const { code, message } = (await this.$http.post('/api/mobile/v1/auth/resetpassword', form)).body;
         if (code !== '200') throw new Error(message || code);
-        this.$vux.toast.show({ text: '注册成功', type: 'success', width: '10em' });
+        this.$vux.toast.show({ text: '重置密码成功', type: 'success', width: '10em' });
         this.$router.push('/login');
       } catch (e) {
         const message = e.statusText || e.message;
@@ -74,13 +89,19 @@ export default {
         mobile, captchaToken, captcha, needCaptchaToken: 'true',
       };
       try {
+        if (!form.mobile) throw new Error('请输入手机号');
+        if (!/^\d{11}$/.test(form.mobile)) throw new Error('手机格式有误');
+        if (!form.captcha) throw new Error('请输入图形验证码');
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/sendsms', form)).body;
         if (code !== '200') throw new Error(message || code);
+        this.codeBtnDisabled = 30;
+        this.startSecondTick();
         const { key_sms_vcode_token } = respData;
         this.form.smsToken = key_sms_vcode_token;
+        this.$vux.toast.text('短信验证码已发送');
       } catch (e) {
         const message = e.statusText || e.message;
-        this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
+        this.$vux.toast.text(message);
       }
     },
     async reloadCaptcha() {

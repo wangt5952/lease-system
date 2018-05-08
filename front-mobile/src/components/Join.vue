@@ -86,7 +86,6 @@ export default {
 
     async handleSubmit() {
       const { mobile, password, smsToken, smsVCode, orgName } = this.form;
-      const orgId = _.find(this.dataList, () => ({ orgName: orgName[0] }));
       const form = {
         loginName: '',
         userMobile: mobile,
@@ -95,7 +94,7 @@ export default {
         updateUser: '',
         smsToken,
         smsVCode,
-        orgId: orgId.id,
+        orgId: '',
       };
 
       try {
@@ -103,9 +102,10 @@ export default {
         if (!form.smsToken) throw new Error('请先获取短信码');
         if (!form.smsVCode) throw new Error('请输入短信码');
         if (!form.password) throw new Error('请输入密码');
-        if (!form.orgId) throw new Error('请选择关联企业');
+        if (!orgName) throw new Error('请选择关联企业');
         if (!/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/.test(form.password)) throw new Error('请输入6-10位字母数字混合的密码');
         form.password = md5(form.password).toUpperCase();
+        form.orgId = _.find(this.dataList, { orgName: orgName[0] }).id;
         const { code, message } = (await this.$http.post('/api/mobile/v1/auth/register', form)).body;
         if (code !== '200') throw new Error(message || code);
 

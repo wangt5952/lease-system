@@ -99,7 +99,7 @@ export default {
       showPlacementValue: 'left',
       mapCenter: '北京',
       Center: null,
-      zoomNum: 10,
+      zoomNum: 16,
       vehicleId: [],
       portrait: '',
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',

@@ -60,7 +60,7 @@ export default {
 
         const { code, message } = (await this.$http.post('/api/mobile/v1/device/modifypassword', form)).body;
         if (code !== '200') throw new Error(message);
-        this.$vux.toast.show({ text: '修改密码成功！', type: 'success', width: '10em' });
+        this.$vux.toast.show({ text: '修改密码成功', type: 'success', width: '10em' });
         await this.$store.commit('logout');
         setTimeout(() => { this.$router.replace('/login'); }, 200);
       } catch (e) {
