@@ -226,9 +226,12 @@
 
     <!-- 照片表单 -->
     <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
-      <!-- 身份证正面 -->
-      <img :src="userPidPath + cardPhotoFront" alt="">
-      <!-- 身份证反面 -->
+      <div class="pidPhoto">
+        <!-- 身份证正面 -->
+        <img :src="userPidPath + cardPhotoFront" alt="">
+        <!-- 身份证反面 -->
+        <img :src="userPidPath + cardPhotoBack" alt="">
+      </div>
       <!-- <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/> -->
       <!-- 双手举起身份证 -->
       <!-- <img :src="`data:image/jpg;base64,${cardPhotoGroup}`"/> -->
@@ -768,6 +771,11 @@ export default {
 </script>
 
 <style scoped>
+.pidPhoto {
+  display: flex;
+  flex-direction: row;
+}
+/* 企业图片 */
 .companyLogo {
   width: 30px;
   height: 30px;

@@ -26,11 +26,13 @@ Vue.config.productionTip = false;
 const store = new Vuex.Store({
   state() {
     const key_login_token = localStorage.getItem('key_login_token');
-    Vue.http.headers.common['header-login-token'] = key_login_token;
+    const key_user_info = localStorage.getItem('key_user_info');
+    
+    if(key_login_token) Vue.http.headers.common['header-login-token'] = key_login_token;
     return {
       key_login_token,
-      key_res_info: JSON.parse(localStorage.getItem('key_res_info') || '[]'),
-      key_user_info: JSON.parse(localStorage.getItem('key_user_info') || '{}'),
+      key_res_info: JSON.parse(localStorage.getItem('key_res_info')) || [],
+      key_user_info: JSON.parse(localStorage.getItem('key_user_info')) || {},
       relogin: false,
       orgPhotoPath: 'http://192.168.1.123:8090/leaseupload/otherimg/', // 企业照片路径
       userIconPath: 'http://192.168.1.123:8090/leaseupload/usericon/', // 用户图标路径
@@ -41,15 +43,15 @@ const store = new Vuex.Store({
     set(state, { key, value }) {
       state[key] = value;
     },
-    login(state, { key_login_token, key_res_info, key_user_info }) {
+    login(state, info) {
       state.relogin = false;
-      localStorage.setItem('key_login_token', key_login_token);
-      localStorage.setItem('key_res_info', JSON.stringify(key_res_info));
-      localStorage.setItem('key_user_info', JSON.stringify(key_user_info));
-      Vue.http.headers.common['header-login-token'] = key_login_token;
-      state.key_login_token = key_login_token;
-      state.key_res_info = key_res_info;
-      state.key_user_info = key_user_info;
+      localStorage.setItem('key_login_token', info.key_login_token);
+      localStorage.setItem('key_res_info', JSON.stringify(info.key_res_info));
+      localStorage.setItem('key_user_info', JSON.stringify(info.key_user_info));
+      Vue.http.headers.common['header-login-token'] = info.key_login_token;
+      state.key_login_token = info.key_login_token;
+      state.key_res_info = info.key_res_info;
+      state.key_user_info = info.key_user_info;
     },
     // 重新获取用户信息
     reload(state, { key_user_info }) {

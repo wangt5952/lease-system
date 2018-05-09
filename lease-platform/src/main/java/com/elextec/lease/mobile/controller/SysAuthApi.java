@@ -19,7 +19,6 @@ import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
-import com.elextec.persist.model.mybatis.BizOrganization;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
@@ -659,7 +658,7 @@ public class SysAuthApi extends BaseController {
      * </pre>
      */
     @RequestMapping(path = {"/uplodeusericon"})
-    public MessageResponse uplodeUserIcon(@RequestBody String userIdAndIconBase64Data){
+    public MessageResponse uplodeUserIcon(@RequestBody String userIdAndIconBase64Data,HttpServletRequest request){
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(userIdAndIconBase64Data)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -703,6 +702,13 @@ public class SysAuthApi extends BaseController {
                         if(WzStringUtil.isNotBlank(oldIconName)){
                             WzFileUtil.deleteFile(uploadUserIconRoot,oldIconName);
                         }
+                        String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+                        Map<String,Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
+                        SysUserExt sysUserExt = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+                        sysUserExt.setUserIcon(requestUrl);
+                        Map<String,Object> map = new HashMap<String,Object>();
+                        map.put(WzConstants.KEY_USER_INFO,sysUserExt);
+                        redisClient.valueOperations().set(WzConstants.KEY_USER_INFO,map);
                         //保存成功后将全路径返回给移动端
                         return new MessageResponse(RunningResult.SUCCESS,requestUrl);
                     }else{

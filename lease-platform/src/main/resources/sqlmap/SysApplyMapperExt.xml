@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.elextec.persist.dao.mybatis.SysApplyMapperExt">
+    <resultMap extends="BaseResultMap" id="SysApplyExtResultMap" type="com.elextec.persist.model.mybatis.ext.SysApplyExt">
+        <result column="apply_org_name" jdbcType="VARCHAR" property="applyOrgName" />
+        <result column="apply_user_name" jdbcType="VARCHAR" property="applyUserName" />
+        <result column="examine_user_name" jdbcType="VARCHAR" property="examineUserName" />
+    </resultMap>
+    <select id="selectExtByParam" parameterType="com.elextec.lease.manager.request.SysApplyParam" resultMap="SysApplyExtResultMap">
+        SELECT distinct
+        a.id id,
+        a.apply_title apply_title,
+        a.apply_content apply_content,
+        a.apply_status apply_status,
+        a.apply_type apply_type,
+        a.apply_org_id apply_org_id,
+        a.apply_user_id apply_user_id,
+        u1.user_name apply_user_name,
+        o1.org_name apply_org_name,
+        a.examine_content examine_content,
+        u2.user_name examine_user_name
+        FROM sys_apply a
+        LEFT JOIN sys_user u1 ON a.apply_user_id = u1.id
+        LEFT JOIN sys_user u2 ON a.examine_user_id = u2.id
+        LEFT JOIN biz_organization o1 ON a.apply_org_id = o1.id
+        LEFT JOIN biz_organization o2 ON a.examine_org_id = o2.id
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.apply_title like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.apply_content like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or u1.user_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or u2.user_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.examine_content like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="applyType != null and applyType != ''" >
+                and a.apply_type = #{applyType,jdbcType=VARCHAR}
+            </if>
+            <if test="userId != null and userId != ''" >
+                and a.apply_user_id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and a.examine_org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
+            <if test="applyStatus != null and applyStatus != ''">
+                and a.apply_status = #{applyStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by a.update_time desc,a.create_time desc,a.apply_status
+        limit #{pageBegin} , #{pageSize}
+    </select>
+
+    <select id="countExtByParam" parameterType="com.elextec.lease.manager.request.SysApplyParam" resultType="java.lang.Integer">
+        SELECT
+        count(distinct a.id)
+        FROM sys_apply a
+        LEFT JOIN sys_user u1 ON a.apply_user_id = u1.id
+        LEFT JOIN sys_user u2 ON a.examine_user_id = u2.id
+        LEFT JOIN biz_organization o1 ON a.apply_org_id = o1.id
+        LEFT JOIN biz_organization o2 ON a.examine_org_id = o2.id
+        <where>
+            1=1
+            <if test="keyStr != null and keyStr != ''" >
+                and (a.apply_title like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.apply_content like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or u1.user_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or u2.user_name like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%')
+                or a.examine_content like concat('%', #{keyStr,jdbcType=VARCHAR} ,'%'))
+            </if>
+            <if test="applyType != null and applyType != ''" >
+                and a.apply_type = #{applyType,jdbcType=VARCHAR}
+            </if>
+            <if test="userId != null and userId != ''" >
+                and a.apply_user_id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="orgId != null and orgId != ''" >
+                and a.examine_org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
+            <if test="applyStatus != null and applyStatus != ''">
+                and a.apply_status = #{applyStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectExtByExample" parameterType="com.elextec.persist.model.mybatis.SysApplyExample" resultMap="SysApplyExtResultMap">
+        <include refid="Pageable_Prefix" />
+        SELECT
+        <if test="distinct">
+            DISTINCT
+        </if>
+        a.id id,
+        a.apply_title apply_title,
+        a.apply_content apply_content,
+        a.apply_status apply_status,
+        a.apply_type apply_type,
+        a.apply_org_id apply_org_id,
+        a.apply_user_id apply_user_id,
+        u1.user_name apply_user_name,
+        o1.org_name apply_org_name,
+        a.examine_content examine_content,
+        u2.user_name examine_user_name
+        FROM sys_apply a
+        LEFT JOIN sys_user u1 ON a.apply_user_id = u1.id
+        LEFT JOIN sys_user u2 ON a.examine_user_id = u2.id
+        LEFT JOIN biz_organization o1 ON a.apply_org_id = o1.id
+        LEFT JOIN biz_organization o2 ON a.examine_org_id = o2.id
+        <if test="_parameter != null">
+            <include refid="Sys_Apply_Ext_Example_Where_Clause_Ext" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="Pageable_Suffix" />
+    </select>
+    <sql id="Sys_Apply_Ext_Example_Where_Clause_Ext">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and a.${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and a.${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and a.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and a.${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+</mapper>
