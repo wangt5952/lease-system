@@ -34,6 +34,7 @@ const store = new Vuex.Store({
       relogin: false,
       orgPhotoPath: 'http://192.168.1.123:8090/leaseupload/otherimg/', // 企业照片路径
       userIconPath: 'http://192.168.1.123:8090/leaseupload/usericon/', // 用户图标路径
+      userPidPath: 'http://192.168.1.123:8090/leaseupload/userrealname/', // 用户身份证图片
     };
   },
   mutations: {
@@ -48,6 +49,11 @@ const store = new Vuex.Store({
       Vue.http.headers.common['header-login-token'] = key_login_token;
       state.key_login_token = key_login_token;
       state.key_res_info = key_res_info;
+      state.key_user_info = key_user_info;
+    },
+    // 重新获取用户信息
+    reload(state, { key_user_info }) {
+      localStorage.setItem('key_user_info', JSON.stringify(key_user_info));
       state.key_user_info = key_user_info;
     },
     logout(state) {
@@ -68,7 +74,9 @@ const store = new Vuex.Store({
   },
 });
 
+// 白名单
 const whiteList = ['/login', '/resetPassword'];
+// 全局导航守卫
 router.beforeEach(async (to, from, next) => {
   const { key_login_token } = store.state;
   if (!key_login_token && whiteList.indexOf(to.path) === -1) return next({ path: '/login' });

@@ -43,7 +43,7 @@
         </el-table-column>
       </template>
     </el-table>
-    <!-- 分页 -->
+    <!-- 分页1 -->
     <el-pagination v-if="total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
@@ -115,13 +115,11 @@ import {
 
 export default {
   data() {
+    // 验证手机格式
     const checkMfrsPhone = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('电话不能为空'));
-      }
       setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('电话不能输入汉字'));
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('请输入正确的电话格式'));
         } else {
           callback();
         }
@@ -294,7 +292,10 @@ export default {
 >>> .el-textarea__inner {
   height: 90px;
 }
-.el-table >>> .cell {
+/* .el-table >>> .cell {
+  width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+} */
+>>> td.el-table_1_column_3 .cell {
   width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 >>> .mrfsHeight {

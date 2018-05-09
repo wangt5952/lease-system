@@ -12,7 +12,6 @@
       </div>
 
       <button type="button" id="button" @click="crop">确定</button>
-
     </div>
 
     <div style="padding:20px;">
@@ -25,7 +24,7 @@
         </div>
     </div>
 
-    <x-button type="primary" @click.native="handler">提交</x-button>
+    <x-button type="primary" @click.native="handler" class="tj">提交</x-button>
   </div>
 </template>
 
@@ -42,7 +41,6 @@ export default {
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
-
       relogin: state => state.relogin,
     }),
   },
@@ -50,7 +48,7 @@ export default {
     return {
       headerImage: '',
       picValue: '',
-      cropper: '',
+      cropper: {},
       croppable: false,
       panel: false,
       url: '',
@@ -74,16 +72,20 @@ export default {
     },
     getObjectURL(file) {
       let url = null;
-      if (window.createObjectURL !== undefined) { // basic
+      if (window.createObjectURL !== undefined) {
         url = window.createObjectURL(file);
-      } else if (window.URL !== undefined) { // mozilla(firefox)
         url = window.URL.createObjectURL(file);
-      } else if (window.webkitURL !== undefined) { // webkit or chrome
+      } else if (window.webkitURL !== undefined) {
         url = window.webkitURL.createObjectURL(file);
       }
       return url;
     },
     change(e) {
+      // 图片大小不能超过5M (1024字节=1kb,1024KB=1MB,1024MB=1GB,1024GB=1TB)
+      if (e.target.files[0].size > 5 * 1024 * 1024) {
+        this.$vux.toast.show({ text: '图片不能超过5M', type: 'warn', width: '10em' });
+        return;
+      }
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
       this.panel = true;
@@ -96,10 +98,7 @@ export default {
     },
     crop() {
       this.panel = false;
-
-      if (!this.croppable) {
-        return;
-      }
+      if (!this.croppable) return;
       // Crop
       const croppedCanvas = this.cropper.getCroppedCanvas();
 
@@ -108,11 +107,13 @@ export default {
 
       this.headerImage = roundedCanvas.toDataURL();
     },
+    // 画布
     getRoundedCanvas(sourceCanvas) {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      const width = sourceCanvas.width;
-      const height = sourceCanvas.height;
+      // 把画布原来的 宽高 缩小6倍(宽 高大小根据实际情况而定)
+      const width = sourceCanvas.width / 8;
+      const height = sourceCanvas.height / 8;
 
       canvas.width = width;
       canvas.height = height;
@@ -123,17 +124,18 @@ export default {
       context.beginPath();
       context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
       context.fill();
-
       return canvas;
     },
+
     async handler() {
       this.path = _.split(this.headerImage, ',')[1];
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/uplodeusericon',
-        { id: this.key_user_info.id, userIcon: this.path, updateUser: this.key_user_info.userName })).body;
+        { id: this.key_user_info.id, userIcon: this.path, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') throw new Error(message || code);
       if (respData) {
-        localStorage.setItem('portrait', respData);
-        this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em' });
+        this.key_user_info.userIcon = respData;
+        localStorage.setItem('key_user_info', JSON.stringify(this.key_user_info));
+        this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em', time: '100' });
         setTimeout(() => { this.$router.replace('/'); }, 200);
       }
     },
@@ -574,7 +576,7 @@ export default {
   opacity: 0;
   cursor: pointer;
 }
-.weui-btn {
+.tj {
   width:88%!important;
 }
 </style>

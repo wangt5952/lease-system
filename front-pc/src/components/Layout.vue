@@ -2,9 +2,12 @@
   <div style="display:flex;flex-direction:column;height:100%;">
     <div style="background:#05002a;height:64px;display:flex;align-items:center;padding:0 10px;">
       <div style="flex:1;"></div>
+      <div style="margin-right: 10px;">
+        <img class="userHeadPortraitImg" :src="userIconPath + key_user_info.userIcon" alt="">
+      </div>
       <el-dropdown @command="command => this[command]()">
         <span class="el-dropdown-link" style="cursor:pointer;color:#fff;">
-          {{key_user_info.nickName}} <i class="el-icon-arrow-down el-icon--right"></i>
+          {{ key_user_info.nickName }} <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="showPasswordForm">密码修改</el-dropdown-item>
@@ -150,7 +153,6 @@
         <el-button type="primary" @click="saveEnterpiserForm">保存</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
@@ -245,6 +247,7 @@ export default {
       key_user_info: state => state.key_user_info,
       key_res_info: state => state.key_res_info,
       relogin: state => state.relogin,
+      userIconPath: state => state.userIconPath,
     }),
 
     menuTree() {
@@ -292,6 +295,10 @@ export default {
       try {
         const { code, message } = (await this.$http.post('/api/manager/user/modifyInformation', this.form)).body;
         if (code !== '200') throw new Error(message);
+        const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getbypk', [this.form.id])).body;
+        if (userCode !== '200') throw new Error(userMessage);
+        const { key_user_info } = userRespData;
+        await this.$store.commit('reload', { key_user_info });
         this.$message.success('保存成功');
       } catch (e) {
         if (!e) return;
@@ -401,6 +408,10 @@ export default {
 </script>
 
 <style scoped>
+.userHeadPortraitImg {
+  width: 50px;
+  height: 50px;
+}
 .lt-arrow-double-left {
   position: relative !important;
   left: 85%;

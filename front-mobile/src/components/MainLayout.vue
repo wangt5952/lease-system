@@ -19,20 +19,22 @@
           </div>
         </div>
 
-        <group>
-          <cell title="我的车辆" link="/mycar">
-            <i slot="icon" class="iconfont icon-chelun"></i>
-          </cell>
-          <cell title="个人资料" link="/profile">
-            <i slot="icon" class="iconfont icon-weibiaoti1"></i>
-          </cell>
-          <cell title="修改密码" link="/repassword">
-            <i slot="icon" class="iconfont icon-icon-"></i>
-          </cell>
-          <cell title="登出" @click.native="loginOut" is-link>
-            <i slot="icon" class="iconfont icon-tuichu"></i>
-          </cell>
-        </group>
+        <div class="layout">
+          <group>
+            <cell title="我的车辆" link="/mycar">
+              <i slot="icon" class="iconfont icon-chelun"></i>
+            </cell>
+            <cell title="个人资料" link="/profile">
+              <i slot="icon" class="iconfont icon-weibiaoti1"></i>
+            </cell>
+            <cell title="修改密码" link="/repassword">
+              <i slot="icon" class="iconfont icon-icon-"></i>
+            </cell>
+            <cell title="登出" @click.native="loginOut" is-link>
+              <i slot="icon" class="iconfont icon-tuichu"></i>
+            </cell>
+          </group>
+        </div>
       </div>
 
       <view-box ref="viewBox">
@@ -48,7 +50,7 @@
 
         <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" :showZoomInfo="true"></bm-navigation>
-          <bm-marker v-if="Center" :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{url: '/static/images/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} }}"></bm-marker>
+          <bm-marker :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="this.icon"></bm-marker>
         </baidu-map>
         <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
@@ -62,7 +64,7 @@
 </template>
 
 <script>
-import { Group, Cell, Drawer, ViewBox, XHeader } from 'vux';
+import { Group, Cell, Drawer, ViewBox, XHeader, Loading } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -73,6 +75,7 @@ export default {
     Drawer,
     ViewBox,
     XHeader,
+    Loading,
   },
   computed: {
     leftOptions() {
@@ -95,25 +98,46 @@ export default {
       showPlacement: 'left',
       showPlacementValue: 'left',
       mapCenter: '北京',
-      Center: null,
-      zoomNum: 10,
+      Center: { lng: 0, lat: 0 },
+      zoomNum: 16,
       vehicleId: [],
       portrait: '',
+      website: 'http://106.14.172.38:8990/leaseupload/usericon/',
+      icon: { url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } },
     };
   },
   methods: {
     async handler() {
       const r = await this.getCurrentPosition();
       this.mapCenter = r.point;
+      this.Center = r.point;
     },
     getCurrentPosition() {
+      this.$vux.loading.show({ text: 'Loading' });
+      const thisOne = this;
       return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
-        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) resolve(r); else reject(this.getStatus());
+        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
+          setTimeout(() => { thisOne.$vux.loading.hide(); }, 1000);
+          resolve(r);
+        } else {
+          reject(this.getStatus());
+        }
       }, { enableHighAccuracy: true }));
     },
-    location() {
-      this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
-      this.zoomNum = 18;
+    async location() {
+      if (this.vehicleId.length === 0) {
+        this.$vux.toast.show({ text: '实名认证并从企业申领车辆后才能使用本功能', type: 'warn', width: '10em' });
+      } else {
+        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
+        if (code !== '200') throw new Error(message || code);
+        const v = _.find(respData, o => o.LON && o.LAT);
+        this.Center = {
+          lng: v.LON, lat: v.LAT,
+        };
+        this.icon = { url: '/static/images/vehicle-cur.svg', size: { width: 48, height: 48 }, opts: { imageSize: { width: 48, height: 48 } } };
+        this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
+        this.zoomNum = 18;
+      }
     },
     async loginOut() {
       await this.$store.commit('logout');
@@ -121,14 +145,9 @@ export default {
     },
   },
   async mounted() {
-    this.vehicleId.push(localStorage.getItem('vehicleId'));
-    this.portrait = this.portrait === '' ? '/static/images/users/1.jpg' : localStorage.getItem('portrait');
-    const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
-    if (code !== '200') throw new Error(message || code);
-    const v = _.find(respData, o => o.LON && o.LAT);
-    this.Center = {
-      lng: v.LON, lat: v.LAT,
-    };
+    if (!this.key_user_info.userIcon) this.portrait = '/static/images/users/1.jpg';
+    else this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
+    if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
   },
 };
 </script>
@@ -211,23 +230,23 @@ export default {
   border-radius: 100%;
 }
 
-.weui-cells {
+.layout .weui-cells {
   margin:0!important;
 }
 
-.weui-cells .weui-cell {
+.layout .weui-cells .weui-cell {
   height:50px;
 }
 
-.vux-label {
+.layout .vux-label {
   font-size: 15pt;
 }
 
-.weui-cell__hd {
+.layout .weui-cell__hd {
   margin-right: 10px;
 }
 
-.weui-cell__hd .iconfont {
+.layout .weui-cell__hd .iconfont {
   font-size: 25px;
 }
 

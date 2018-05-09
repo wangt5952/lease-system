@@ -130,7 +130,7 @@ export default {
   },
   methods: {
     back() {
-      window.history.go(-1);
+      this.$router.replace('/');
     },
     select(index) {
       if (index === 1) {
@@ -141,35 +141,34 @@ export default {
         this.show2 = true;
       }
     },
-    change(index,e) {
+    change(index, e) {
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
-      const _this = this;
+      const thisOne = this;
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
       reader.onload = function get() {
         if (index === 1) {
-          _this.data = this.result;
-          _this.path = _.split(this.result, ',')[1];
+          thisOne.data = this.result;
+          thisOne.path = _.split(this.result, ',')[1];
         } else if (index === 2) {
-          _this.data1 = this.result;
-          _this.path1 = _.split(this.result, ',')[1];
+          thisOne.data1 = this.result;
+          thisOne.path1 = _.split(this.result, ',')[1];
         } else if (index === 3) {
-          _this.data2 = this.result;
-          _this.path2 = _.split(this.result, ',')[1];
+          thisOne.data2 = this.result;
+          thisOne.path2 = _.split(this.result, ',')[1];
         }
-        _this.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
+        thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
       };
     },
     async handler() {
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
-        { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser:this.key_user_info.userName })).body;
+        { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
-      }else {
+      } else {
         this.$vux.toast.show({ text: respData, type: 'success', width: '10em' });
       }
-
     },
   },
   async mounted() {

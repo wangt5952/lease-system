@@ -11,13 +11,13 @@
           <i slot="icon" class="iconfont icon-shenfenzheng"></i>
         </div>
       </cell>
-      <cell title="用户类型" :value="u_type.value"></cell>
-      <cell title="用户" :value="key_user_info.userName"></cell>
-      <cell title="昵称" :value="key_user_info.nickName" link="/nickName"></cell>
-      <cell title="身份证号" :value="key_user_info.userPid"></cell>
-      <cell title="手机号" :value="key_user_info.userMobile"></cell>
-      <cell title="所属企业" :value="key_user_info.orgName"></cell>
-      <cell title="用户状态" :value="u_status.value"></cell>
+      <cell title="用户类型" :value="this.u_type.value"></cell>
+      <cell title="用户" :value="this.key_user_info.loginName"></cell>
+      <cell title="昵称" :value="this.key_user_info.nickName" link="/nickName"></cell>
+      <cell title="身份证号" :value="this.key_user_info.userPid"></cell>
+      <cell title="手机号" :value="this.key_user_info.userMobile"></cell>
+      <cell title="所属企业" :value="this.key_user_info.orgName"></cell>
+      <cell title="用户状态" :value="this.u_status.value"></cell>
     </group>
 
   </div>
@@ -76,8 +76,8 @@ export default {
     },
   },
   async mounted() {
-    this.u_type = _.find(user_type, o => { return o.key === this.key_user_info.userType; });
-    this.u_status = _.find(user_status, o => { return o.key === this.key_user_info.userStatus; });
+    this.u_type = _.find(user_type, { key: this.key_user_info.userType });
+    this.u_status = _.find(user_status, { key: this.key_user_info.userStatus });
   },
 };
 </script>

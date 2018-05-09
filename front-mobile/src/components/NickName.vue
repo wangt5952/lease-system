@@ -43,12 +43,14 @@ export default {
         { id: this.key_user_info.id,
           loginName: this.key_user_info.loginName,
           nickName: this.val,
-          userName: this.key_user_info.userName,
+          userName: this.key_user_info.loginName,
           userPid: this.key_user_info.userPid,
-          updateUser: this.key_user_info.userName })).body;
+          updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
         throw new Error(message || code);
       } else {
+        this.key_user_info.nickName = this.val;
+        localStorage.setItem('key_user_info', JSON.stringify(this.key_user_info));
         this.$vux.toast.show({ text: '修改成功', type: 'success', width: '10em' });
         setTimeout(() => { window.history.go(-1); }, 100);
       }

@@ -251,4 +251,8 @@ public class BizOrganizationServiceImpl implements BizOrganizationService {
         return bizOrganizationMapperExt.selectByPrimaryKey(id);
     }
 
+    public List<BizOrganization> orgList() {
+        return bizOrganizationMapperExt.orgList();
+    }
+
 }

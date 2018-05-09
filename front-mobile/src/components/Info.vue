@@ -44,14 +44,14 @@ import _ from 'lodash';
 
 const vehicle_status = [
   {
-    key: 'NORMAL',
-    value: '正常',
+    key: 'INVALID',
+    value: '作废',
   }, {
     key: 'FREEZE',
     value: '冻结/维保',
   }, {
-    key: 'INVALID',
-    value: '作废',
+    key: 'NORMAL',
+    value: '正常',
   },
 ];
 const battery_status = [
@@ -99,12 +99,12 @@ export default {
     },
   },
   async mounted() {
-    const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', { id: this.$route.params.id, flag: 'true' })).body;
+    const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getbypk', { id: this.$route.params.id, flag: 'true' })).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
     this.batteryList = respData.bizBatteries;
-    this.v_status = _.find(vehicle_status, o => { o.key === this.list.vehicleStatus; });
-    this.b_status = _.find(battery_status, o => { o.key === this.batteryList[0].batteryStatus; });
+    this.v_status = _.find(vehicle_status, { key: this.list.vehicleStatus });
+    this.b_status = _.find(battery_status, { key: this.batteryList[0].batteryStatus });
   },
 };
 </script>

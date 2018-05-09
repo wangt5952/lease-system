@@ -1,5 +1,6 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
+    <!--  -->
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-org-addone') >= 0">
         <div style="margin-right:10px;">
@@ -205,6 +206,17 @@ export default {
       }, 500);
       return false;
     };
+    // 验证手机格式
+    const checkPhone = (rule, value, callback) => {
+      setTimeout(() => {
+        if (/^$|^\d+$/.test(value)) {
+          callback();
+        } else {
+          callback(new Error('请输入正确手机格式'));
+        }
+      }, 500);
+      return false;
+    };
     return {
       disabledFormId: false,
       vehicleNumTotal: undefined,
@@ -261,7 +273,8 @@ export default {
           { validator: checkOrgId, trigger: 'blur' },
         ],
         orgPhone: [
-          { validator: checkSinogram, trigger: 'blur' },
+          { required: true, message: '请填写手机号码' },
+          { validator: checkPhone, trigger: 'blur' },
         ],
         orgBusinessLicences: [
           { validator: checkSinogram, trigger: 'blur' },
@@ -295,6 +308,7 @@ export default {
       this.dialogVisible = true;
     },
     // changeFile(file, fileList) {
+    // 以HTML5 方式把图片转换成Base64
     changeFile(file) {
       const This = this;
       // this.imageUrl = URL.createObjectURL(file.raw);
@@ -309,6 +323,7 @@ export default {
       this.pageSize = pageSize;
       await this.reload();
     },
+    // 加载
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/org/list', {
@@ -470,6 +485,9 @@ export default {
 </script>
 
 <style scoped>
+>>> td.el-table_1_column_12 .cell {
+  width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .edit-form >>> .el-form-item {
   height: 73px;
 }
