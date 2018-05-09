@@ -36,7 +36,7 @@
 
         <baidu-map @ready="rdy" :center="center" :zoom="zoom" :dragging="true" :pinch-to-zoom="true" class="bmap">
           <bm-polyline :path="polylinePath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
-          <bm-marker :position="center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{ url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } }"></bm-marker>
+          <bm-marker :position="center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{ url: '/static/images/red_point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } }"></bm-marker>
         </baidu-map>
       </view-box>
   </div>

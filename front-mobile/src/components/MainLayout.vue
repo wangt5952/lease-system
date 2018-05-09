@@ -103,7 +103,7 @@ export default {
       vehicleId: [],
       portrait: '',
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',
-      icon: { url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } },
+      icon: { url: '/static/images/red_point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } },
     };
   },
   methods: {
