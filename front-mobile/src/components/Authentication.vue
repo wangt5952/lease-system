@@ -27,7 +27,7 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data" style="width:100%;" class="tu">
+            <img :src="this.data" style="width:100%;">
             <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
@@ -53,7 +53,7 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data1" style="width:100%;" class="tu">
+            <img :src="this.data1" style="width:100%;"/>
             <input type="file" class="file" accept="image/*" @change="change(2,$event)" multiple>
         </div>
       </template>
@@ -232,7 +232,7 @@ export default {
     padding-bottom: 40%;
     margin: 10px 10px;
     border: 1px dashed #666;
-    position: absolute;
+    position: relative;
   }
   .up:hover {
     cursor: pointer;
