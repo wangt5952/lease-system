@@ -97,9 +97,9 @@ export default {
       showModeValue: 'push',
       showPlacement: 'left',
       showPlacementValue: 'left',
-      mapCenter: '北京',
+      mapCenter: { lng: 116.404, lat: 39.915 },
       Center: { lng: 0, lat: 0 },
-      zoomNum: 16,
+      zoomNum: 18,
       vehicleId: [],
       portrait: '',
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',
@@ -109,8 +109,10 @@ export default {
   methods: {
     async handler() {
       const r = await this.getCurrentPosition();
-      this.mapCenter = r.point;
-      this.Center = r.point;
+      this.mapCenter.lng = r.point.lng;
+      this.mapCenter.lat = r.point.lat;
+      this.Center.lng = r.point.lng;
+      this.Center.lat = r.point.lat;
     },
     getCurrentPosition() {
       this.$vux.loading.show({ text: 'Loading' });

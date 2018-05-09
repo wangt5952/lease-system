@@ -34,9 +34,9 @@
           <x-button @click.native="handler" type="primary">确认</x-button>
         </mt-popup>
 
-        <baidu-map @ready="ready" :center="center" :zoom="zoom" :dragging="true" :pinch-to-zoom="true" class="bm-view">
+        <baidu-map @ready="rdy" :center="center" :zoom="zoom" :dragging="true" :pinch-to-zoom="true" class="bmap">
           <bm-polyline :path="polylinePath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
-          <bm-marker :position="center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE"></bm-marker>
+          <bm-marker :position="center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="{ url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } }"></bm-marker>
         </baidu-map>
       </view-box>
   </div>
@@ -97,9 +97,10 @@ export default {
         this.popShow = true;
       }
     },
-    async ready() {
+    async rdy() {
       const r = await this.getCurrentPosition();
-      this.center = r.point;
+      this.center.lng = r.point.lng;
+      this.center.lat = r.point.lat;
     },
     getCurrentPosition() {
       this.$vux.loading.show({ text: 'Loading' });
@@ -167,7 +168,7 @@ export default {
   left:40%;
   top:25px;
 }
-.bm-view {
+.bmap {
   width:100%;
   height:800px;
 }

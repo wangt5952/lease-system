@@ -21,13 +21,13 @@
         <div v-transfer-dom>
           <x-dialog v-model="show" hide-on-blur>
             <div class="img-box">
-              <img :src="this.data" style="max-width:100%;height:250px;margin:25px auto">
+              <img src="/static/images/source_frontCard.jpg" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="up" type="button">
-            <img src="/static/images/add.png" style="width:100%;">
+            <img :src="this.data" style="width:100%;" class="tu">
             <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
@@ -47,13 +47,13 @@
         <div v-transfer-dom>
           <x-dialog v-model="show1" hide-on-blur>
             <div class="img-box">
-              <img :src="this.data1" style="max-width:100%;height:250px;margin:25px auto">
+              <img src="/static/images/source_backCard.jpg" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="up" type="button">
-            <img src="/static/images/add.png" style="width:100%;">
+            <img :src="this.data1" style="width:100%;" class="tu">
             <input type="file" class="file" accept="image/*" @change="change(2,$event)" multiple>
         </div>
       </template>
@@ -73,13 +73,13 @@
         <div v-transfer-dom>
           <x-dialog v-model="show2" hide-on-blur>
             <div class="img-box">
-              <img :src="this.data2" style="max-width:100%;height:250px;margin:25px auto">
+              <img src="/static/images/sc_card.jpg" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="sc_up" type="button">
-            <img src="/static/images/add1.png" style="width:100%;height:100%;">
+            <img :src="this.data2" style="width:100%;height:100%;">
             <input type="file" class="file" accept="image/*" @change="change(3,$event)" multiple>
         </div>
 
@@ -172,9 +172,9 @@ export default {
     },
   },
   async mounted() {
-    this.data = this.data === '' ? '/static/images/source_frontCard.jpg' : this.data;
-    this.data1 = this.data1 === '' ? '/static/images/source_backCard.jpg' : this.data1;
-    this.data2 = this.data2 === '' ? '/static/images/sc_card.jpg' : this.data2;
+    this.data = this.data === '' ? '/static/images/add.png' : this.data;
+    this.data1 = this.data1 === '' ? '/static/images/add.png' : this.data1;
+    this.data2 = this.data2 === '' ? '/static/images/add1.png' : this.data2;
   },
 };
 </script>
@@ -230,9 +230,9 @@ export default {
     height:0;
     display: inline-block;
     padding-bottom: 40%;
-    margin-left: 10px;
+    margin: 10px 10px;
     border: 1px dashed #666;
-    position: relative;
+    position: absolute;
   }
   .up:hover {
     cursor: pointer;
