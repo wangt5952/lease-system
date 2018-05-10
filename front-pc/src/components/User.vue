@@ -413,6 +413,8 @@ export default {
         this.cardPhotoFront = data.userIcFront;
         // this.cardPhotoBack = data.userIcBack;
         this.cardPhotoGroup = data.userIcGroup;
+        console.log(this.userPidPath+this.cardPhotoFront);
+        console.log(this.userPidPath+this.cardPhotoGroup);
         if (code !== '200') throw new Error(message);
       } catch (e) {
         if (!e) return;
@@ -774,6 +776,9 @@ export default {
 .pidPhoto {
   display: flex;
   flex-direction: row;
+}
+.pidPhoto > img {
+  margin: 10px;
 }
 /* 企业图片 */
 .companyLogo {
