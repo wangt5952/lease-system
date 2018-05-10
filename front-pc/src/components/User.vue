@@ -236,6 +236,7 @@
       <!-- 双手举起身份证 -->
       <!-- <img :src="`data:image/jpg;base64,${cardPhotoGroup}`"/> -->
       <span slot="footer" class="dialog-footer" >
+        <el-button @click="photoFormVisible = false">关闭</el-button>
         <el-button type="info" @click="overrule">驳回</el-button>
         <el-button :disabled="loading" type="primary" @click="identification">通过</el-button>
       </span>
@@ -410,6 +411,10 @@ export default {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
         const data = respData.key_user_info;
+        if(data.userIcFront === '' || data.userIcBack === '' || data.userIcGroup === '') {
+          throw new Error('该用户身份照不齐全');
+          return;
+        }
         this.cardPhotoFront = data.userIcFront;
         // this.cardPhotoBack = data.userIcBack;
         this.cardPhotoGroup = data.userIcGroup;
