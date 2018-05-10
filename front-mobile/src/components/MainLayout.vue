@@ -14,7 +14,7 @@
           </span>
           <div class="info">
             <p class="name">{{key_user_info.nickName}}</p>
-            <a href="/authentication"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
+            <a href="/authentication_step1"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
           </div>
         </div>
 
@@ -49,7 +49,7 @@
 
         <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" :showZoomInfo="true"></bm-navigation>
-          <bm-marker :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" @click="vehicleBatterInfo(vehicleID)" :icon="this.icon"></bm-marker>
+          <bm-marker :position="Center" :dragging="false" animation="BMAP_ANIMATION_BOUNCE" @click="vehicleBatterInfo(vehicleID)" :icon="this.icon"></bm-marker>
         </baidu-map>
         <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
@@ -118,7 +118,6 @@ export default {
     };
   },
   methods: {
-    // 获取车辆电池信息a
     async vehicleBatterInfo(vehicleID) {
       this.batterFrom = true;
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getpowerbyvehiclepk', [vehicleID])).body;
@@ -151,7 +150,7 @@ export default {
         this.$vux.toast.show({ text: '实名认证并从企业申领车辆后才能使用本功能', type: 'warn', width: '10em' });
       } else {
         const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
-        if (code !== '200') throw new Error(message || code);
+        if (code !== '200') this.$vux.toast.show({ text: '未查询到本车辆的定位信息', type: 'cancel', width: '10em' });
         const v = _.find(respData, o => o.LON && o.LAT);
         this.Center = {
           lng: v.LON, lat: v.LAT,

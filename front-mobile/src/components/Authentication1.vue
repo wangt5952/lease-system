@@ -98,6 +98,9 @@ export default {
   >>>.vux-label {
     font-size: 15pt;
   }
+  >>>.vux-step {
+    position: relative;
+  }
   >>>.vux-step-item {
     width:100%;
   }
@@ -107,7 +110,7 @@ export default {
     margin: 2px 10px;
   }
   .line {
-    width: 100%;
+    width: 30%;
     height:1px;
     clear:both;
     border-top:1px solid #888;
