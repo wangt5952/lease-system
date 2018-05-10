@@ -315,7 +315,7 @@ export default {
       const reader = new FileReader();
       reader.readAsDataURL(file.raw);
       // reader.onload = function(e) {
-      reader.onload = function () {
+      reader.onload = function get() {
         This.imageUrl = this.result;
       };
     },

@@ -26,9 +26,7 @@ Vue.config.productionTip = false;
 const store = new Vuex.Store({
   state() {
     const key_login_token = localStorage.getItem('key_login_token');
-    const key_user_info = localStorage.getItem('key_user_info');
-    
-    if(key_login_token) Vue.http.headers.common['header-login-token'] = key_login_token;
+    if (key_login_token) Vue.http.headers.common['header-login-token'] = key_login_token;
     return {
       key_login_token,
       key_res_info: JSON.parse(localStorage.getItem('key_res_info')) || [],
@@ -59,15 +57,12 @@ const store = new Vuex.Store({
       state.key_user_info = key_user_info;
     },
     logout(state) {
-      const key_login_token = '';
-      const key_res_info = [];
-      const key_user_info = [];
-      localStorage.setItem('key_login_token', key_login_token);
-      localStorage.setItem('key_res_info', JSON.stringify(key_res_info));
-      localStorage.setItem('key_user_info', JSON.stringify(key_user_info));
-      state.key_login_token = key_login_token;
-      state.key_res_info = key_res_info;
-      state.key_user_info = key_user_info;
+      localStorage.removeItem('key_login_token');
+      localStorage.removeItem('key_res_info');
+      localStorage.removeItem('key_user_info');
+      state.key_login_token = '';
+      state.key_res_info = [];
+      state.key_user_info = {};
       Vue.http.headers.common['header-login-token'] = undefined;
     },
     relogin(state) {
