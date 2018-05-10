@@ -641,6 +641,7 @@ public class SysAuthApi extends BaseController {
     /**
      * 上传用户头像.
      * @param userIdAndIconBase64Data 用户ID和用户头像图片BASE64
+     * @param request 登录用户
      * <pre>
      *     {
      *         id:ID,
@@ -702,13 +703,27 @@ public class SysAuthApi extends BaseController {
                         if(WzStringUtil.isNotBlank(oldIconName)){
                             WzFileUtil.deleteFile(uploadUserIconRoot,oldIconName);
                         }
+
+                        //获取登录token
                         String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+                        //获取所有登录信息
                         Map<String,Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
+                        //获取登录用户信息
                         SysUserExt sysUserExt = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+                        //把登录用户信息字段重新复制
                         sysUserExt.setUserIcon(requestUrl);
+
+                        //把改好的对象重新放进map
                         Map<String,Object> map = new HashMap<String,Object>();
                         map.put(WzConstants.KEY_USER_INFO,sysUserExt);
-                        redisClient.valueOperations().set(WzConstants.KEY_USER_INFO,map);
+                        //设置超时时间
+                        Integer overtime = 300;
+                        if (WzStringUtil.isNumeric(loginOvertime)) {
+                            overtime = Integer.parseInt(loginOvertime);
+                        }
+                        //重新塞回缓存
+                        redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, map, overtime, TimeUnit.MINUTES);
+
                         //保存成功后将全路径返回给移动端
                         return new MessageResponse(RunningResult.SUCCESS,requestUrl);
                     }else{
