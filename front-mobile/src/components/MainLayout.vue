@@ -50,6 +50,9 @@
         <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" :showZoomInfo="true"></bm-navigation>
           <bm-marker :position="Center" :dragging="false" animation="BMAP_ANIMATION_BOUNCE" @click="vehicleBatterInfo(vehicleID)" :icon="this.icon"></bm-marker>
+          <bm-info-window :position="PopCenter" :title="infoWindow.title" :show="infoWindow.show" @close="infoWindow.show = false" :width="this.width" :height="this.height">
+            <p v-text="infoWindow.contents"></p>
+          </bm-info-window>
         </baidu-map>
         <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
@@ -59,16 +62,11 @@
       </view-box>
     </drawer>
 
-    <div class="batter_info" v-if="batterFrom" @click="batterFrom = false">
-      <group title="电池信息">
-        <cell title="剩余电量：" :value="batterList.RSOC"></cell>
-      </group>
-    </div>
   </div>
 </template>
 
 <script>
-import { Group, Cell, Drawer, ViewBox, XHeader, Loading, Popover } from 'vux';
+import { Group, Cell, Drawer, ViewBox, XHeader, Loading } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -80,7 +78,6 @@ export default {
     ViewBox,
     XHeader,
     Loading,
-    Popover,
   },
   computed: {
     leftOptions() {
@@ -98,11 +95,11 @@ export default {
   },
   data() {
     return {
-      // 电池表单
-      batterFrom: false,
-      batterList: {},
-
-      showMenu: false,
+      infoWindow: {
+        show: false,
+        contents: '',
+        title: '<span><i slot="icon" class="iconfont icon-electricquantity2dianchidianliang"></i></span>',
+      },
       drawerVisibility: false,
       showMode: 'push',
       showModeValue: 'push',
@@ -110,21 +107,22 @@ export default {
       showPlacementValue: 'left',
       mapCenter: { lng: 116.404, lat: 39.915 },
       Center: { lng: 0, lat: 0 },
+      PopCenter: { lng: 0, lat: 0 },
       zoomNum: 18,
       vehicleId: [],
       portrait: '',
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',
       icon: { url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } },
+      width: 0,
+      height: 0,
     };
   },
   methods: {
     async vehicleBatterInfo(vehicleID) {
-      this.batterFrom = true;
+      this.infoWindow.show = true;
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getpowerbyvehiclepk', [vehicleID])).body;
       if (code !== '200') this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
-      const { ...list } = respData[0];
-      list.RSOC = list.RSOC ? `${list.RSOC}%` : '';
-      this.batterList = list;
+      this.infoWindow.contents = `剩余电量：${respData[0].RSOC}%`;
     },
     async handler() {
       const r = await this.getCurrentPosition();
@@ -152,9 +150,8 @@ export default {
         const { code, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
         if (code !== '200') this.$vux.toast.show({ text: '未查询到本车辆的定位信息', type: 'cancel', width: '10em' });
         const v = _.find(respData, o => o.LON && o.LAT);
-        this.Center = {
-          lng: v.LON, lat: v.LAT,
-        };
+        this.Center = { lng: v.LON, lat: v.LAT };
+        this.PopCenter = { lng: v.LON, lat: v.LAT };
         this.icon = { url: '/static/images/vehicle-cur.svg', size: { width: 48, height: 48 }, opts: { imageSize: { width: 48, height: 48 } } };
         this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
         this.zoomNum = 18;
