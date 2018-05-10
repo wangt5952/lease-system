@@ -7,7 +7,6 @@
     :show-mode="showModeValue"
     :placement="showPlacementValue"
     >
-
       <div slot="drawer">
         <div class="head">
           <span class="bg-dr_profile">
@@ -15,7 +14,7 @@
           </span>
           <div class="info">
             <p class="name">{{key_user_info.nickName}}</p>
-            <a href="/authentication_step1"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
+            <a href="/authentication"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
           </div>
         </div>
 
@@ -50,7 +49,7 @@
 
         <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" :showZoomInfo="true"></bm-navigation>
-          <bm-marker :position="Center" :dragging="false" animation="BMAP_ANIMATION_BOUNCE" :icon="this.icon"></bm-marker>
+          <bm-marker :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" @click="vehicleBatterInfo(vehicleID)" :icon="this.icon"></bm-marker>
         </baidu-map>
         <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
@@ -60,11 +59,16 @@
       </view-box>
     </drawer>
 
+    <div class="batter_info" v-if="batterFrom" @click="batterFrom = false">
+      <group title="电池信息">
+        <cell title="剩余电量：" :value="batterList.RSOC"></cell>
+      </group>
+    </div>
   </div>
 </template>
 
 <script>
-import { Group, Cell, Drawer, ViewBox, XHeader, Loading } from 'vux';
+import { Group, Cell, Drawer, ViewBox, XHeader, Loading, Popover } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -76,6 +80,7 @@ export default {
     ViewBox,
     XHeader,
     Loading,
+    Popover,
   },
   computed: {
     leftOptions() {
@@ -87,10 +92,16 @@ export default {
       key_user_info: state => state.key_user_info,
 
       relogin: state => state.relogin,
+      // 车辆ID
+      vehicleID: state => state.vehicleID,
     }),
   },
   data() {
     return {
+      // 电池表单
+      batterFrom: false,
+      batterList: {},
+
       showMenu: false,
       drawerVisibility: false,
       showMode: 'push',
@@ -107,6 +118,15 @@ export default {
     };
   },
   methods: {
+    // 获取车辆电池信息a
+    async vehicleBatterInfo(vehicleID) {
+      this.batterFrom = true;
+      const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getpowerbyvehiclepk', [vehicleID])).body;
+      if (code !== '200') this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
+      const { ...list } = respData[0];
+      list.RSOC = list.RSOC ? `${list.RSOC}%` : '';
+      this.batterList = list;
+    },
     async handler() {
       const r = await this.getCurrentPosition();
       this.mapCenter.lng = r.point.lng;
@@ -130,8 +150,8 @@ export default {
       if (this.vehicleId.length === 0) {
         this.$vux.toast.show({ text: '实名认证并从企业申领车辆后才能使用本功能', type: 'warn', width: '10em' });
       } else {
-        const { code, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
-        if (code !== '200') this.$vux.toast.show({ text: '未查询到本车辆的定位信息', type: 'cancel', width: '10em' });
+        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
+        if (code !== '200') throw new Error(message || code);
         const v = _.find(respData, o => o.LON && o.LAT);
         this.Center = {
           lng: v.LON, lat: v.LAT,
@@ -156,6 +176,16 @@ export default {
 
 <style lang="less">
 
+.batter_info {
+  width:60%;
+  background: #000000 red;
+  position: absolute;
+  top: 7rem;
+  left:25%;
+  box-shadow: 0 2px 5px;
+  border-radius: 10px;
+  z-index: 1;
+}
 .vux-header {
   width:100%;
   height: 85px;
