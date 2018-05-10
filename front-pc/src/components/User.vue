@@ -230,7 +230,7 @@
         <!-- 身份证正面 -->
         <img :src="userPidPath + cardPhotoFront" alt="">
         <!-- 身份证反面 -->
-        <img :src="userPidPath + cardPhotoBack" alt="">
+        <img :src="userPidPath + cardPhotoGroup" alt="">
       </div>
       <!-- <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/> -->
       <!-- 双手举起身份证 -->
@@ -412,7 +412,7 @@ export default {
         const data = respData.key_user_info;
         this.cardPhotoFront = data.userIcFront;
         // this.cardPhotoBack = data.userIcBack;
-        // this.cardPhotoGroup = data.userIcGroup;
+        this.cardPhotoGroup = data.userIcGroup;
         if (code !== '200') throw new Error(message);
       } catch (e) {
         if (!e) return;
