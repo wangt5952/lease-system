@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
-import com.elextec.framework.common.request.LoginParam;
-import com.elextec.framework.common.request.RegisterParam;
-import com.elextec.framework.common.request.ResetPasswordParam;
-import com.elextec.framework.common.request.SmsParam;
+import com.elextec.framework.common.request.*;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.sms.SmsClient;
@@ -19,7 +16,9 @@ import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
+import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysUser;
+import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -547,6 +546,19 @@ public class SysAuthApi extends BaseController {
             //默认暂时未实名认证
             userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.UNAUTHORIZED);
             sysUserService.insertSysUser(userTemp);
+
+            //手机端注册，默认给该用户分配个人用户权限角色
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria sysUserExampleCriteria = sysUserExample.createCriteria();
+            sysUserExampleCriteria.andUserMobileEqualTo(resetParam.getUserMobile());
+            SysUser sysUser = sysUserService.getExtById(sysUserExample);
+
+            RefUserRolesParam refUserRolesParam = new RefUserRolesParam();
+            refUserRolesParam.setUserId(sysUser.getId());
+            refUserRolesParam.setRoleIds("1dc5e062e6964b1c857098e30d89b945");
+            refUserRolesParam.setDeleteAllFlg("false");
+            sysUserService.refSysUserAndRoles(refUserRolesParam);
+
             return new MessageResponse(RunningResult.SUCCESS);
         }
     }
@@ -802,15 +814,15 @@ public class SysAuthApi extends BaseController {
                     }
                     //将身份证正面照片保存到图片服务器中
                     String frontImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", frontImageName, WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserRealnameRoot, "", frontImageName, WzFileUtil.EXT_JPG);
 //                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     //将身份证背面照片保存到图片服务器中
                     String backImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", backImageName, WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserRealnameRoot, "", backImageName, WzFileUtil.EXT_JPG);
 //                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     //将用户手持身份证的照片保存到图片服务器中
                     String groupImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", groupImageName, WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserRealnameRoot, "", groupImageName, WzFileUtil.EXT_JPG);
 //                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     userTemp.setUserPid(resetParam.getUserPid());
                     userTemp.setUpdateUser(resetParam.getUpdateUser());
