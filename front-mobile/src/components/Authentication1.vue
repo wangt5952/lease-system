@@ -16,7 +16,6 @@
    <group>
     <x-input title="身份证号：" placeholder="请输入身份证号" :min="15" :max="18" required v-model="value"></x-input>
    </group>
-   <div class="botmline"></div>
    <x-button type="primary" @click.native="handler">下一步</x-button>
   </div>
 </template>
@@ -132,13 +131,5 @@ export default {
   .weui-btn {
     width:80%;
     margin-top:20px;
-  }
-  .botmline {
-    width: 100%;
-    height:1px;
-    clear:both;
-    border-top:1px solid #D9D9D9;
-    position: absolute;
-    top:48%;
   }
 </style>
