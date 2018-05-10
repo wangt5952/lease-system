@@ -162,6 +162,12 @@ public class SysRoleServcieImpl implements SysRoleService {
         int i = 0;
         try {
             for (; i < ids.size(); i++) {
+                //判断不允许删除的角色
+                if (ids.get(i).equals("1dc5e062e6964b1c857098e30d89b945")
+                        || ids.get(i).equals("5e321a9f578a4c52ac036836d4e90339")
+                        || ids.get(i).equals("d08e7dfd41a64b469742343b742e3df6")) {
+                    throw new BizException(RunningResult.NO_FUNCTION_PERMISSION.code(),"该角色不可删除");
+                }
                 SysRefUserRoleExample example = new SysRefUserRoleExample();
                 SysRefUserRoleExample.Criteria criteria = example.createCriteria();
                 SysRefRoleResourcesExample delExample = new SysRefRoleResourcesExample();
