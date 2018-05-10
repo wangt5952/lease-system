@@ -5,6 +5,15 @@
       <div class="tlte"><span>实名认证</span></div>
     </div>
 
+    <div>
+     <step v-model="step" background-color='#fbf9fe'>
+       <div class="line"></div>
+       <step-item title="" description="" style="display:none"></step-item>
+       <step-item title="步骤2:" description="上传身份证件图片"></step-item>
+     </step>
+   </div>
+   <x-hr></x-hr>
+
     <group>
       <cell
       title="请您上传身份证正面照片"
@@ -90,7 +99,7 @@
 </template>
 
 <script>
-import { Cell, Group, XDialog, XButton, TransferDom } from 'vux';
+import { Cell, Group, XDialog, Step, StepItem, XHr, XButton, TransferDom } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -103,6 +112,9 @@ export default {
     Cell,
     XDialog,
     XButton,
+    Step,
+    StepItem,
+    XHr,
     TransferDom,
   },
   computed: {
@@ -114,6 +126,7 @@ export default {
   },
   data() {
     return {
+      step: 0,
       showContent001: false,
       showContent002: false,
       showContent003: false,
@@ -130,7 +143,7 @@ export default {
   },
   methods: {
     back() {
-      this.$router.replace('/');
+      this.$router.replace('/authentication_step1');
     },
     select(index) {
       if (index === 1) {
@@ -163,11 +176,12 @@ export default {
     },
     async handler() {
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
-        { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
+        { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {
         this.$vux.toast.show({ text: respData, type: 'success', width: '10em' });
+        this.$router.replace('/authentication_step3');
       }
     },
   },
@@ -272,5 +286,38 @@ export default {
   .weui-btn {
     width:80%;
     margin:20px auto;
+  }
+  >>>.vux-step-item {
+    width:100%;
+  }
+  >>>.vux-step-item-head-inner {
+    border: 1px solid #09bb07!important;
+    color: #FFF!important;
+    background: #09bb07 none repeat scroll 0 0!important;
+  }
+  >>>.vux-step-item-head {
+    margin: 2px 10px;
+  }
+  .line {
+    width: 100%;
+    height:1px;
+    clear:both;
+    border-top:1px solid #888;
+    position: absolute;
+    top:14%;
+  }
+  >>>.vux-step-item-main {
+    font-weight: bold;
+    color: #666;
+    margin:0 10%;
+    width:80%;
+    height:80px;
+  }
+  >>>.vux-step-item-title {
+    font-size: 18px;
+  }
+  >>>.vux-step-item-description {
+    margin:10px 50px;
+    font-size:15px;
   }
 </style>
