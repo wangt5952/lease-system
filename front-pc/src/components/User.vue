@@ -411,7 +411,10 @@ export default {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
         const data = respData.key_user_info;
-        if(data.userIcFront === '' || data.userIcBack === '' || data.userIcGroup === '') {
+        // hasOwnProperty 查看某个元素中是否包含 某元素  返回 boolean
+        if (data.hasOwnProperty('userIcFront') === false ||
+           data.hasOwnProperty('userIcBack') === false ||
+           data.hasOwnProperty('userIcGroup') === false) {
           throw new Error('该用户身份照不齐全');
           return;
         }
@@ -421,12 +424,12 @@ export default {
         // console.log(this.userPidPath+this.cardPhotoFront);
         // console.log(this.userPidPath+this.cardPhotoGroup);
         if (code !== '200') throw new Error(message);
+        this.photoFormVisible = true;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      this.photoFormVisible = true;
     },
     // 通过
     async identification() {
