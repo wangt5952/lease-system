@@ -800,7 +800,7 @@ export default {
   height: 339px;
   width: 350px;
 }
-/* 企业图片 */
+/* 企业图片1 */
 .companyLogo {
   width: 30px;
   height: 30px;
