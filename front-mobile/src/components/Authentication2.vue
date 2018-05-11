@@ -159,25 +159,26 @@ export default {
       if (!files.length) return;
       const thisOne = this;
       const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
       reader.onload = function get() {
         const image = new Image();
+        image.src = this.result;
         image.onload = function getImg() {
           image.width = 200;
           image.height = 200;
         };
         if (index === 1) {
-          thisOne.data = this.result;
-          thisOne.path = _.split(this.result, ',')[1];
+          thisOne.data = image.src;
+          thisOne.path = _.split(image.src, ',')[1];
         } else if (index === 2) {
-          thisOne.data1 = this.result;
-          thisOne.path1 = _.split(this.result, ',')[1];
+          thisOne.data1 = image.src;
+          thisOne.path1 = _.split(image.src, ',')[1];
         } else if (index === 3) {
-          thisOne.data2 = this.result;
-          thisOne.path2 = _.split(this.result, ',')[1];
+          thisOne.data2 = image.src;
+          thisOne.path2 = _.split(image.src, ',')[1];
         }
         thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
       };
+      reader.readAsDataURL(files[0]);
     },
     async handler() {
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
