@@ -34,7 +34,7 @@ const store = new Vuex.Store({
       relogin: false,
       orgPhotoPath: 'http://192.168.1.123:8090/leaseupload/otherimg/', // 企业照片路径
       userIconPath: 'http://192.168.1.123:8090/leaseupload/usericon/', // 用户图标路径
-      userPidPath: 'http://106.14.172.38:8990/leaseupload/userrealname/', // 用户身份证图片
+      userPidPath: 'http://106.14.172.38:8990/leaseupload/userrealname/', // 用户身份证图片01
     };
   },
   mutations: {
