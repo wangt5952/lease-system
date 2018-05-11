@@ -14,7 +14,7 @@
           </span>
           <div class="info">
             <p class="name">{{key_user_info.nickName}}</p>
-            <a href="/authentication_step1"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
+            <a :href="key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'javascript:;':'/authentication_step1'" @click="getPath"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
           </div>
         </div>
 
@@ -118,6 +118,11 @@ export default {
     };
   },
   methods: {
+    getPath() {
+      if (this.key_user_info.userRealNameAuthFlag === 'AUTHORIZED') {
+        this.$vux.toast.show({ text: '您已经实名认证，请勿重复提交', type: 'cancel', width: '10em' });
+      }
+    },
     async vehicleBatterInfo(vehicleID) {
       this.infoWindow.show = true;
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getpowerbyvehiclepk', [vehicleID])).body;
