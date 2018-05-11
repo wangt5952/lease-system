@@ -157,6 +157,10 @@ export default {
     change(index, e) {
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
+      if (e.target.files[0].size > 5 * 1024 * 1024) {
+        this.$vux.toast.show({ text: '图片不能超过5M', type: 'warn', width: '10em' });
+        return;
+      }
       const thisOne = this;
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
