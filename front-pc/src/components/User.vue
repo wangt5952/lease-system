@@ -423,7 +423,7 @@ export default {
         this.cardPhotoFront = data.userIcFront;
         this.cardPhotoBack = data.userIcBack;
         this.cardPhotoGroup = data.userIcGroup;
-        // console.log(this.userPidPath+this.cardPhotoFront);
+        // console.log(this.userPidPath+this.cardPhotoFronta);
         // console.log(this.userPidPath+this.cardPhotoGroup);
         if (code !== '200') throw new Error(message);
         this.photoFormVisible = true;
