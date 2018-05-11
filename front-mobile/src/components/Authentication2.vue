@@ -36,7 +36,7 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data" style="width:100%;height:100%;">
+            <img :src="this.data" style="width:calc(100% - 50px);height:calc(100% - 50px);margin:25px 25px;">
             <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="sc_up" type="button">
-            <img :src="this.data2" style="width:100%;height:100%;">
+            <img :src="this.data2" style="width:calc(100% - 50px);height:calc(100% - 30px);margin:15px 25px;">
             <input type="file" class="file" accept="image/*" @change="change(3,$event)" multiple>
         </div>
 
