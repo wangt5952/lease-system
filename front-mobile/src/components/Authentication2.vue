@@ -36,7 +36,7 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data" style="width:100%;height:100%;">
+            <img :src="this.data" :width="this.width" :height="this.height">
             <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
@@ -62,8 +62,8 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data1" style="width:100%;height:100%;">
-            <input type="file" class="file" accept="image/*" @change="change(2,$event)" multiple>
+            <img :src="this.data1" :width="this.width" :height="this.height">
+            <input type="file" class="file" accept="image/*" @change="change(2,$event)">
         </div>
       </template>
 
@@ -88,8 +88,8 @@
         </div>
 
         <div class="sc_up" type="button">
-            <img :src="this.data2" style="width:100%;height:100%;">
-            <input type="file" class="file" accept="image/*" @change="change(3,$event)" multiple>
+            <img :src="this.data2" :width="this.width" :height="this.height">
+            <input type="file" class="file" accept="image/*" @change="change(3,$event)">
         </div>
 
       </template>
@@ -139,6 +139,8 @@ export default {
       path: '',
       path1: '',
       path2: '',
+      width: '100%',
+      height: '100%',
     };
   },
   methods: {
@@ -162,21 +164,33 @@ export default {
       reader.onload = function get() {
         const image = new Image();
         image.src = this.result;
-        image.width = 100;
-        image.height = 100;
+        const roundedCanvas = thisOne.getCanvas(image);
+        const headerImage = roundedCanvas.toDataURL();
         if (index === 1) {
           thisOne.data = image.src;
-          thisOne.path = _.split(image.src, ',')[1];
+          thisOne.path = _.split(headerImage, ',')[1];
         } else if (index === 2) {
           thisOne.data1 = image.src;
-          thisOne.path1 = _.split(image.src, ',')[1];
+          thisOne.path1 = _.split(headerImage, ',')[1];
         } else if (index === 3) {
           thisOne.data2 = image.src;
-          thisOne.path2 = _.split(image.src, ',')[1];
+          thisOne.path2 = _.split(headerImage, ',')[1];
         }
         thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
       };
       reader.readAsDataURL(files[0]);
+    },
+    getCanvas(sourceCanvas) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const width = 200;
+      const height = 200;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      context.drawImage(sourceCanvas, 0, 0, width, height);
+      return canvas;
     },
     async handler() {
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
