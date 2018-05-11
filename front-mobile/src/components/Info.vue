@@ -215,5 +215,6 @@ export default {
   }
   .weui-btn {
     width:95%;
+    margin:20px auto;
   }
 </style>

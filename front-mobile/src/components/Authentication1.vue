@@ -130,6 +130,6 @@ export default {
   }
   .weui-btn {
     width:80%;
-    margin-top:20px;
+    margin:20px auto;
   }
 </style>

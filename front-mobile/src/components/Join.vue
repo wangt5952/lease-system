@@ -228,4 +228,7 @@ export default {
 >>> .btn-normal:active {
   background: #009C75 !important;
 }
+.weui-btn {
+  margin:20px auto;
+}
 </style>
