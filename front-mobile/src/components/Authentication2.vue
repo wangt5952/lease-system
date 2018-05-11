@@ -36,7 +36,7 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data" style="width:calc(100% - 50px);height:calc(100% - 50px);margin:25px 25px;">
+            <img :src="this.data" style="width:100%;height:100%;">
             <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="sc_up" type="button">
-            <img :src="this.data2" style="width:calc(100% - 50px);height:calc(100% - 30px);margin:15px 25px;">
+            <img :src="this.data2" style="width:100%;height:100%;">
             <input type="file" class="file" accept="image/*" @change="change(3,$event)" multiple>
         </div>
 
@@ -157,10 +157,7 @@ export default {
     change(index, e) {
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
-      if (e.target.files[0].size > 5 * 1024 * 1024) {
-        this.$vux.toast.show({ text: '图片不能超过5M', type: 'warn', width: '10em' });
-        return;
-      }
+      e.target.css({ width: '200px', height: '200px' });
       const thisOne = this;
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
