@@ -162,10 +162,8 @@ export default {
       reader.onload = function get() {
         const image = new Image();
         image.src = this.result;
-        image.onload = function getImg() {
-          image.width = 200;
-          image.height = 200;
-        };
+        image.width = 200;
+        image.height = 200;
         if (index === 1) {
           thisOne.data = image.src;
           thisOne.path = _.split(image.src, ',')[1];
