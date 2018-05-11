@@ -115,14 +115,13 @@ export default {
       icon: { url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } },
       width: 0,
       height: 0,
-      path: 'javascript:;',
     };
   },
   methods: {
     getPath() {
       if (this.key_user_info.userRealNameAuthFlag === 'AUTHORIZED') {
         this.$vux.toast.show({ text: '您已经实名认证，请勿重复提交', type: 'cancel', width: '10em' });
-      } 
+      }
     },
     async vehicleBatterInfo(vehicleID) {
       this.infoWindow.show = true;
