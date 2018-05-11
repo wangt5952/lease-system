@@ -230,6 +230,8 @@
         <!-- 身份证正面 -->
         <img :src="userPidPath + cardPhotoFront" alt="">
         <!-- 身份证反面 -->
+        <img :src="userPidPath + cardPhotoBack" alt="">
+        <!-- 双手举起身份证 -->
         <img :src="userPidPath + cardPhotoGroup" alt="">
       </div>
       <!-- <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/> -->
@@ -419,9 +421,9 @@ export default {
           return;
         }
         this.cardPhotoFront = data.userIcFront;
-        // this.cardPhotoBack = data.userIcBack;
+        this.cardPhotoBack = data.userIcBack;
         this.cardPhotoGroup = data.userIcGroup;
-        // console.log(this.userPidPath+this.cardPhotoFront);
+        // console.log(this.userPidPath+this.cardPhotoFronta);
         // console.log(this.userPidPath+this.cardPhotoGroup);
         if (code !== '200') throw new Error(message);
         this.photoFormVisible = true;
