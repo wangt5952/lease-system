@@ -439,7 +439,8 @@ export default {
           userId: cardForm.id, flag: 'AUTHORIZED',
         })).body;
         if (code !== '200') throw new Error(message);
-        this.$message.success('驳回成功');
+        this.$message.success('实名认证成功');
+        await this.reload();
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -454,7 +455,8 @@ export default {
           userId: cardForm.id, flag: 'REJECTAUTHORIZED',
         })).body;
         if (code !== '200') throw new Error(message);
-        this.$message.success('实名认证成功');
+        this.$message.success('驳回成功');
+        await this.reload();
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -784,6 +786,8 @@ export default {
 .pidPhoto {
   display: flex;
   flex-direction: row;
+  height: 440px;
+  width: 300px;
 }
 .pidPhoto > img {
   margin: 10px;
