@@ -36,7 +36,7 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data" style="width:100%;">
+            <img :src="this.data" style="width:100%;height:100%;">
             <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
@@ -62,7 +62,7 @@
         </div>
 
         <div class="up" type="button">
-            <img :src="this.data1" style="width:100%;"/>
+            <img :src="this.data1" style="width:100%;height:100%;">
             <input type="file" class="file" accept="image/*" @change="change(2,$event)" multiple>
         </div>
       </template>
@@ -240,10 +240,9 @@ export default {
     border: 1px dashed #666;
   }
   .up {
-    width:40%;
-    height:0;
+    width:40vw;
+    height:40vw;
     display: inline-block;
-    padding-bottom: 40%;
     margin: 10px 10px;
     border: 1px dashed #666;
     position: relative;
