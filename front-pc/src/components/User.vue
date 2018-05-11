@@ -410,23 +410,29 @@ export default {
     // 查看营业执照或者身份证照片
     async showPhoto(row) {
       this.cardForm = row;
+      console.log(row);
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
+        if (code !== '200') throw new Error(message);
         const data = respData.key_user_info;
-        // hasOwnProperty 查看某个元素中是否包含 某元素  返回 boolean
-        if (data.hasOwnProperty('userIcFront') === false ||
-           data.hasOwnProperty('userIcBack') === false ||
-           data.hasOwnProperty('userIcGroup') === false) {
+        console.log(data);
+        // hasOwnProperty(暂时不可用) 查看某个元素中是否包含 某元素  返回 boolean
+        // typeof 判断该对象里 有没有该字段
+        // 判断 用户是否上传的身份证 
+        if (typeof(data.userIcFront) === false ||
+           typeof(data.userIcBack) === false ||
+           typeof(data.userIcGroup) === false ||
+           data.userIcFront === "" || data.userIcBack === "" || data.userIcGroup === "") {
           throw new Error('该用户身份照不齐全');
           return;
+        } else {
+          this.cardPhotoFront = data.userIcFront;
+          this.cardPhotoBack = data.userIcBack;
+          this.cardPhotoGroup = data.userIcGroup;
+          // console.log(this.userPidPath+this.cardPhotoFronta);
+          // console.log(this.userPidPath+this.cardPhotoGroup);
+          this.photoFormVisible = true;
         }
-        this.cardPhotoFront = data.userIcFront;
-        this.cardPhotoBack = data.userIcBack;
-        this.cardPhotoGroup = data.userIcGroup;
-        // console.log(this.userPidPath+this.cardPhotoFronta);
-        // console.log(this.userPidPath+this.cardPhotoGroup);
-        if (code !== '200') throw new Error(message);
-        this.photoFormVisible = true;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -788,11 +794,11 @@ export default {
 .pidPhoto {
   display: flex;
   flex-direction: row;
-  height: 440px;
-  width: 300px;
 }
 .pidPhoto > img {
   margin: 10px;
+  height: 339px;
+  width: 350px;
 }
 /* 企业图片 */
 .companyLogo {
