@@ -164,7 +164,6 @@ export default {
         image.src = this.result;
         image.width = 100;
         image.height = 100;
-        console.log(image);
         if (index === 1) {
           thisOne.data = image.src;
           thisOne.path = _.split(image.src, ',')[1];
