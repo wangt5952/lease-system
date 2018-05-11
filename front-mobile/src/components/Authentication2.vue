@@ -133,9 +133,9 @@ export default {
       show: false,
       show1: false,
       show2: false,
-      data: '',
-      data1: '',
-      data2: '',
+      data: '/static/images/add.png',
+      data1: '/static/images/add.png',
+      data2: '/static/images/add1.png',
       path: '',
       path1: '',
       path2: '',
@@ -157,11 +157,15 @@ export default {
     change(index, e) {
       const files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
-      e.target.css({ width: '200px', height: '200px' });
       const thisOne = this;
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
       reader.onload = function get() {
+        const image = new Image();
+        image.onload = function getImg() {
+          image.width = 200;
+          image.height = 200;
+        };
         if (index === 1) {
           thisOne.data = this.result;
           thisOne.path = _.split(this.result, ',')[1];
@@ -185,11 +189,6 @@ export default {
         this.$router.replace('/authentication_step3');
       }
     },
-  },
-  async mounted() {
-    this.data = this.data === '' ? '/static/images/add.png' : this.data;
-    this.data1 = this.data1 === '' ? '/static/images/add.png' : this.data1;
-    this.data2 = this.data2 === '' ? '/static/images/add1.png' : this.data2;
   },
 };
 </script>
