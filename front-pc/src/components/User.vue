@@ -354,7 +354,11 @@ export default {
       },
       roleList: [],
       orgList: [],
-      userIconPhoto: [],
+      userIconPhoto: [
+        { iconName: '20180514160657.png' },
+        { iconName: '20180514160703.png' },
+        { iconName: '20180514160710.png' },
+      ],
       // 照片表单
       photoFormVisible: false,
 
@@ -410,12 +414,10 @@ export default {
     // 查看营业执照或者身份证照片
     async showPhoto(row) {
       this.cardForm = row;
-      console.log(row);
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
         if (code !== '200') throw new Error(message);
         const data = respData.key_user_info;
-        console.log(data);
         // hasOwnProperty(暂时不可用) 查看某个元素中是否包含 某元素  返回 boolean
         // typeof 判断该对象里 有没有该字段
         // 判断 用户是否上传的身份证 
@@ -651,7 +653,7 @@ export default {
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
         await this.getOrgList();
-        await this.getUserIcon();
+        // await this.getUserIcon();
       } catch (e) {
         this.loading = false;
         const message = e.statusText || e.message;
@@ -765,16 +767,16 @@ export default {
         this.$message.error(message);
       }
     },
-    async getUserIcon() {
-      try {
-        const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
-        if (code === '200') this.userIconPhoto = respData;
-      } catch (e) {
-        if (!e) return;
-        const message = e.statusText || e.message;
-        this.$message.error(message);
-      }
-    },
+    // async getUserIcon() {
+    //   try {
+    //     const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
+    //     if (code === '200') this.userIconPhoto = respData;
+    //   } catch (e) {
+    //     if (!e) return;
+    //     const message = e.statusText || e.message;
+    //     this.$message.error(message);
+    //   }
+    // },
     async getRoleList() {
       const { code, respData } = (await this.$http.post('/api/manager/role/list', {
         currPage: 1, pageSize: 999,

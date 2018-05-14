@@ -385,10 +385,16 @@ export default {
         // 车辆某段时间内行驶路径
         const { time } = this.searchLocList;
         const id = item.vehicleId;
+        const param = { id };
+        if (time) {
+          param.startTime = time[0];
+          param.endTime = time[1];
+        }
         if (this.vehiclePathVisible) {
-          const { respData: timeRespData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1] })).body;
+          const { respData: timeRespData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
           // if (code !== '200') throw new Error(message);
           const locList = timeRespData;
+          if (!locList.length) throw new Error('该时间段没有行驶轨迹');
           this.mapCenter = {
             lng: locList[0].LON, lat: locList[0].LAT,
           };
@@ -422,6 +428,9 @@ export default {
     async reloadVehicleList() {
       // 初始化坐标点
       this.mapCenter = '南京';
+      // this.zoomNum = 15;
+      // const los = await this.getAddressByLocation(118.778074, 32.057236);
+      // console.log(los);
       // 南京市中心
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -491,6 +500,7 @@ export default {
         const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
         // if (code !== '200') throw new Error(message);
         const locList = respData;
+        console.log(locList.length);
         if (!locList.length) throw new Error('该时间段没有行驶轨迹');
         this.mapCenter = {
           lng: locList[0].LON, lat: locList[0].LAT,
@@ -514,6 +524,9 @@ export default {
     getLocation(lng, lat) {
       return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
     },
+    // getAddressByLocation(lng, lat){
+    //   return new Promise((resolve, reject) => (new BMap.Geocoder()).getPoint(new BMap.Point(lng, lat), res => resolve(res)));
+    // }
     // 浏览器定位
     // getLocations() {
     //   return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition((r) => {
