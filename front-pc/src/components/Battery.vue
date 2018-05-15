@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" style="padding:10px;">
     <div style="display:flex;">
-      <!-- PLATFORM:平台, ENTERPRISE:企业1 -->
+      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-battery-addone') >= 0">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加电池</el-button>
@@ -122,22 +122,16 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import * as validate from '../util/validate.js';
+
+const checkBattreryId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
 
 export default {
   data() {
-    const checkBattreryId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
       loading: false,
       list: [],
@@ -180,8 +174,7 @@ export default {
       mfrsList: [],
       rules1: {
         batteryCode: [
-          { required: true, message: '请填写编码' },
-          { validator: checkBattreryId, trigger: 'blur' },
+          { required: true, validator: checkBattreryId },
         ],
       },
     };
@@ -201,11 +194,6 @@ export default {
     },
   },
   methods: {
-
-    // getParams() {
-    //   let routerParams = this.$route.params.aaaa;
-    //   this.id = routerParams;
-    // },
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();
@@ -243,7 +231,7 @@ export default {
         this.$message.error(message);
       }
     },
-    showForm(form = { }) {
+    showForm(form = {}) {
       this.form = _.pick(form, [
         'id',
         'batteryCode',
@@ -284,7 +272,7 @@ export default {
           if (form.parent === '') form.parent = null;
           form.create_user = loginName;
           form.update_user = loginName;
-          const { code, message } = (await this.$http.post('/api/manager/battery/add', [form])).body;
+          const { code, message } = (await this.$http.post('/api/manager/battery/addone', form)).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }

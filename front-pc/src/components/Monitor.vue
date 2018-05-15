@@ -213,8 +213,7 @@ export default {
   },
   computed: {
     selectedItem() {
-      const vehicleListInfo = (_.find(this.radiusVehicleList, { vehicleId: this.selectedId }) || {});
-      return vehicleListInfo;
+      return _.find(this.radiusVehicleList, { vehicleId: this.selectedId }) || {};
     },
   },
   watch: {
