@@ -25,7 +25,11 @@
     <el-table :data="list" class="mrfsHeight">
       <el-table-column prop="mfrsName" label="制造商名称"></el-table-column>
       <el-table-column prop="mfrsTypeText" label="类型" width="80"></el-table-column>
-      <el-table-column prop="mfrsIntroduce" label="介绍"></el-table-column>
+      <el-table-column label="介绍">
+        <template class="qqqq" slot-scope="scope">
+          {{ scope.row.mfrsIntroduce }}
+        </template>
+      </el-table-column>
       <el-table-column prop="mfrsAddress" label="地址"></el-table-column>
       <el-table-column prop="mfrsContacts" label="联系人" width="100"></el-table-column>
       <el-table-column prop="mfrsPhone" label="联系电话" width="150"></el-table-column>
@@ -325,11 +329,18 @@ export default {
 >>> .el-textarea__inner {
   height: 60px;
 }
-/* .el-table >>> .cell {
-  width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+/* .mrfsHeight >>> td.el-table_1_column_3 .cell {
+  width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis !important;
 } */
->>> td.el-table_1_column_3 .cell {
-  width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+>>> .el-table .cell {
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 23px;
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis !important;
 }
 >>> .mrfsHeight {
   position: relative;

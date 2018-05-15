@@ -500,7 +500,6 @@ export default {
         const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
         // if (code !== '200') throw new Error(message);
         const locList = respData;
-        console.log(locList.length);
         if (!locList.length) throw new Error('该时间段没有行驶轨迹');
         this.mapCenter = {
           lng: locList[0].LON, lat: locList[0].LAT,

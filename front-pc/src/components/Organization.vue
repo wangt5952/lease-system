@@ -114,23 +114,25 @@
         </el-row>
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item label="营业执照">
-              <!-- <input id="uploadFile" type="file" accept="image/*" @change="selectedFile"> -->
-              <!-- <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input> -->
-              <el-upload
-                class="avatar-uploader"
-                action=""
-                list-type="picture-card"
-                :show-file-list="false"
-                :auto-upload="false"
-                :on-change="changeFile">
-                <img id="giftImg" v-if="imageUrl" :src="imageUrl" class="avatar">
-                <el-button v-else slot="trigger" size="small" type="primary">选取文件</el-button>
-              </el-upload>
-              <div>
-                <el-button size="small" type="primary" @click="searchPhoto">点击查看</el-button>
-              </div>
-            </el-form-item>
+            <div class="photo">
+              <el-form-item label="营业执照">
+                <!-- <input id="uploadFile" type="file" accept="image/*" @change="selectedFile"> -->
+                <!-- <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input> -->
+                <el-upload
+                  class="avatar-uploader"
+                  action=""
+                  list-type="picture-card"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                  :on-change="changeFile">
+                  <img id="giftImg" v-if="imageUrl" :src="imageUrl" class="avatar">
+                  <el-button v-else slot="trigger" size="small" type="primary">选取文件</el-button>
+                </el-upload>
+                <div style="width:80px;height:30px;left:250px">
+                  <el-button size="small" type="primary" @click="searchPhoto">点击查看</el-button>
+                </div>
+              </el-form-item>
+            </div>
           </el-col>
         </el-row>
       </el-form>
@@ -164,7 +166,14 @@
 <script>
 import _ from 'lodash';
 import { mapState } from 'vuex';
+import { isvalidPhone } from '../util/validate';
 
+// 手机验证全局变量
+const checkPhone = (rule, value, callback) => {
+  if (!value) callback(new Error('请输入手机号码'));
+  else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
+  else callback();
+};
 export default {
   data() {
     // 表单效验
@@ -202,17 +211,6 @@ export default {
           callback(new Error('输入内容不能含有汉字'));
         } else {
           callback();
-        }
-      }, 500);
-      return false;
-    };
-    // 验证手机格式
-    const checkPhone = (rule, value, callback) => {
-      setTimeout(() => {
-        if (/^$|^\d+$/.test(value)) {
-          callback();
-        } else {
-          callback(new Error('请输入正确手机格式'));
         }
       }, 500);
       return false;
@@ -273,8 +271,7 @@ export default {
           { validator: checkOrgId, trigger: 'blur' },
         ],
         orgPhone: [
-          { required: true, message: '请填写手机号码' },
-          { validator: checkPhone, trigger: 'blur' },
+          { required: true, validator: checkPhone, trigger: 'blur' },
         ],
         orgBusinessLicences: [
           { validator: checkSinogram, trigger: 'blur' },
@@ -389,10 +386,10 @@ export default {
     closeForm() {
       this.formVisible = false;
       const This = this;
-      this.form = {};
+      // this.form = {};
       setTimeout(() => {
         This.imageUrl = '';
-      }, 100);
+      }, 0.1 * 1000);
     },
     // 跳转到给企业分配车辆页面
     async allotVehicle(row) {
@@ -485,9 +482,21 @@ export default {
 </script>
 
 <style scoped>
->>> td.el-table_1_column_12 .cell {
-  width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.photo >>> .el-form-item__content {
+  display: flex;
+  flex-direction: column;
 }
+>>> .el-table .cell {
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 23px;
+  width: 135px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis !important;
+}
+
 .edit-form >>> .el-form-item {
   height: 73px;
 }
