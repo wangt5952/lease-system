@@ -186,8 +186,8 @@ export default {
     getCanvas(sourceCanvas) {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      const width = 400;
-      const height = 400;
+      const width = 350;
+      const height = 350;
 
       canvas.width = width;
       canvas.height = height;
@@ -196,7 +196,6 @@ export default {
       return canvas;
     },
     async handler() {
-      console.log(this.path);
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
         { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
