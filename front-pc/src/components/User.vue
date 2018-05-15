@@ -101,7 +101,7 @@
             <el-form-item label="企业图标">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
               <el-select v-model="form.userIcon" placeholder="请选择企业Logo" style="width:100%;">
-                <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #F1F1F1" :key="`${i}`" :label="o.iconName" :value="o.iconName">
                   <img class="companyLogo" :src="userIconPath + o.iconName" alt="">
                 </el-option>
               </el-select>
@@ -355,9 +355,9 @@ export default {
       roleList: [],
       orgList: [],
       userIconPhoto: [
-        { iconName: '20180514160657.png' },
-        { iconName: '20180514160703.png' },
-        { iconName: '20180514160710.png' },
+        { iconName: '20180514171821.png' },
+        { iconName: '20180514172108.png' },
+        { iconName: '20180514172120.png' },
       ],
       // 照片表单
       photoFormVisible: false,
@@ -636,6 +636,7 @@ export default {
     },
     // 加载
     async reload() {
+      console.log(`${this.userIconPath}20180514160657.png`);
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
           currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
@@ -785,6 +786,7 @@ export default {
     },
   },
   async mounted() {
+    
     this.loading = true;
     await this.reload();
     this.loading = false;
