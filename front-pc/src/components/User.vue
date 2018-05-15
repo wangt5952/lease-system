@@ -420,13 +420,12 @@ export default {
         const data = respData.key_user_info;
         // hasOwnProperty(暂时不可用) 查看某个元素中是否包含 某元素  返回 boolean
         // typeof 判断该对象里 有没有该字段
-        // 判断 用户是否上传的身份证 
-        if (typeof(data.userIcFront) === false ||
-           typeof(data.userIcBack) === false ||
-           typeof(data.userIcGroup) === false ||
-           data.userIcFront === "" || data.userIcBack === "" || data.userIcGroup === "") {
+        // 判断 用户是否上传的身份证
+        if (!(typeof (data.userIcFront)) ||
+           !(typeof (data.userIcBack)) ||
+           !(typeof (data.userIcGroup)) ||
+           data.userIcFront === '' || data.userIcBack === '' || data.userIcGroup === '') {
           throw new Error('该用户身份照不齐全');
-          return;
         } else {
           this.cardPhotoFront = data.userIcFront;
           this.cardPhotoBack = data.userIcBack;
@@ -636,7 +635,6 @@ export default {
     },
     // 加载
     async reload() {
-      console.log(`${this.userIconPath}20180514160657.png`);
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/list', {
           currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
@@ -786,7 +784,6 @@ export default {
     },
   },
   async mounted() {
-    
     this.loading = true;
     await this.reload();
     this.loading = false;

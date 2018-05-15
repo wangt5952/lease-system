@@ -127,11 +127,11 @@ const checkPhone = (rule, value, callback) => {
   if (!value) callback(new Error('请输入手机号码'));
   else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
   else callback();
-}
-const checkStrLen = (rule, value, callback) => {
-  // if (value.length > 80) callback(new Error('字符不能超过80'));
-  // else callback();
-}
+};
+// const checkStrLen = (rule, value, callback) => {
+//   // if (value.length > 80) callback(new Error('字符不能超过80'));
+//   // else callback();
+// };
 export default {
   data() {
     return {
@@ -204,7 +204,7 @@ export default {
     },
     'form.mfrsIntroduce'(v) {
       let len = 0;
-      if(v) {
+      if (v) {
         len = v.length;
       } else {
         len = 0;
@@ -288,7 +288,7 @@ export default {
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;
           form.update_user = loginName;
-          
+
           const { code, message } = (await this.$http.post('/api/manager/mfrs/modify', form)).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('编辑成功');
