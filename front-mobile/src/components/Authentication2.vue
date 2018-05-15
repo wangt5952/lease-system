@@ -141,6 +141,7 @@ export default {
       path2: '',
       width: '100%',
       height: '100%',
+      headerImage: '',
     };
   },
   methods: {
@@ -164,27 +165,29 @@ export default {
       reader.onload = function get() {
         const image = new Image();
         image.src = this.result;
-        const roundedCanvas = thisOne.getCanvas(image);
-        const headerImage = roundedCanvas.toDataURL();
-        if (index === 1) {
-          thisOne.data = image.src;
-          thisOne.path = _.split(headerImage, ',')[1];
-        } else if (index === 2) {
-          thisOne.data1 = image.src;
-          thisOne.path1 = _.split(headerImage, ',')[1];
-        } else if (index === 3) {
-          thisOne.data2 = image.src;
-          thisOne.path2 = _.split(headerImage, ',')[1];
-        }
-        thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
+        image.onload = function getImg() {
+          thisOne.headerImage = thisOne.getCanvas(image).toDataURL();
+
+          if (index === 1) {
+            thisOne.data = image.src;
+            thisOne.path = _.split(thisOne.headerImage, ',')[1];
+          } else if (index === 2) {
+            thisOne.data1 = image.src;
+            thisOne.path1 = _.split(thisOne.headerImage, ',')[1];
+          } else if (index === 3) {
+            thisOne.data2 = image.src;
+            thisOne.path2 = _.split(thisOne.headerImage, ',')[1];
+          }
+          thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
+        };
       };
       reader.readAsDataURL(files[0]);
     },
     getCanvas(sourceCanvas) {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      const width = 200;
-      const height = 200;
+      const width = 1024;
+      const height = 1024;
 
       canvas.width = width;
       canvas.height = height;
@@ -193,6 +196,7 @@ export default {
       return canvas;
     },
     async handler() {
+      console.log(this.path);
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
         { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
