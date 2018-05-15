@@ -459,7 +459,7 @@ export default {
       bindPartsForm: {},
       unBindPartsForm: {},
       // 配件
-      parts : {
+      parts: {
         pageSizes: [10, 20, 50, 100],
         currentPage: 1,
         pageSize: 5,
@@ -500,7 +500,6 @@ export default {
       bindForm_batteryLoading: false,
       // 编辑车辆
       editForm: {},
-      
 
       statusTypeList: [
         { id: 'NORMAL', name: '正常' },

@@ -169,7 +169,7 @@ import * as validate from '../util/validate.js';
 // 验证手机格式
 const checkPhone = (rule, value, callback) => {
   if (!value) callback(new Error('请输入手机号码'));
-  else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
+  else if (!validate.isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
   else callback();
 };
 // 验证企业编号
