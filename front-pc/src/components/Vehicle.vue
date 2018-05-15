@@ -91,7 +91,7 @@
       :total="total">
     </el-pagination>
 
-    <!-- 添加车辆 -->
+    <!-- 添加车辆页面 -->
     <el-dialog title="添加车辆" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
@@ -131,7 +131,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item prop="flag" label="电池信息">
-              <el-select v-model="flag" placeholder="请选择状态" style="width:100%;" @change="onBatteryChange(flag)">
+              <el-select v-model="flag" placeholder="请选择状态" style="width:100%;" @change="changeBattery(flag)">
                 <el-option v-for="o in isBattery" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
@@ -186,7 +186,7 @@
       <template v-if="flag === '1'">
         <el-form class="edit-form" :model="bindForm" ref="bindForm">
           <el-form-item prop="id" :rules="[{required:true, message:'请选择电池'}]" label="电池">
-            <el-select style="width:100%;" v-model="bindForm.id" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :loading="bindForm_batteryLoading">
+            <el-select style="width:100%;" v-model="bindForm.id" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
               <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
                 <span style="float: left">{{ o.batteryBrand }}</span>
                 <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
@@ -241,14 +241,16 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeEditForm">取消</el-button>
+        <el-button @click="editFormVisible = false">取消</el-button>
         <el-button type="primary" @click="saveEditForm">保存</el-button>
       </span>
     </el-dialog>
+
+    <!-- 绑定电池页面 -->
     <el-dialog title="绑定电池" :visible.sync="bindFormVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="bindForm" ref="bindForm">
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择电池'}]" label="电池">
-          <el-select style="width:100%;" v-model="bindForm.batteryId" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :loading="bindForm_batteryLoading">
+          <el-select style="width:100%;" v-model="bindForm.batteryId" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
             <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
               <span style="float: left">{{ o.batteryBrand }}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
@@ -257,7 +259,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeBindForm">取消</el-button>
+        <el-button @click="bindFormVisible = false">取消</el-button>
         <el-button type="primary" @click="saveBindForm">{{form.id ? '保存' : '绑定'}}</el-button>
       </span>
     </el-dialog>
@@ -305,7 +307,7 @@
         :total="partsTotal">
       </el-pagination>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closePartsForm">关闭</el-button>
+        <el-button @click="allPartsFormVisible = false">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 查看当前车辆下已绑定的配件 -->
@@ -328,7 +330,7 @@
         </template>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="holdSavePartsForm">关闭</el-button>
+        <el-button @click="bindPartsFormVisible = false">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 企业批量归还车辆 -->
@@ -562,6 +564,13 @@ export default {
     },
   },
   methods: {
+    // 车辆列表里的 电池信息下拉框('0': 新电池 '1': 旧电池 '2': 无电池 )
+    async changeBattery(flag) {
+      // 旧电池  调取接口数据
+      if (flag === '1') {
+        await this.remoteBattery('');
+      }
+    },
     // 电池信息
     saveBatteryForm() {
       this.bindBatteryFormVisible = false;
@@ -627,15 +636,6 @@ export default {
     },
 
     // 配件———————————————————————————————————————————————————————————————————————————————————————————————————————
-    // 关闭配件列表
-    async holdClosePartsForm() {
-      // await this.partsReload();
-      this.bindPartsFormVisible = false;
-    },
-    // 保存配件列表
-    async holdSavePartsForm() {
-      this.bindPartsFormVisible = false;
-    },
     // 分页下拉
     async partsHandleSizeChange(partsPageSize) {
       this.partsPageSize = partsPageSize;
@@ -711,10 +711,6 @@ export default {
         this.$message.error(message);
       }
     },
-    // 关闭配件页面
-    closePartsForm() {
-      this.allPartsFormVisible = false;
-    },
     // 保存配件页面
     async savePartsForm() {
       this.$message.success('保存成功');
@@ -776,7 +772,8 @@ export default {
         this.$message.error(message);
       }
     },
-    showForm(form = { }) {
+    async showForm(form = { }) {
+      await this.getMfrs();
       const $form = this.$refs.form;
       if ($form) $form.resetFields();
       this.form = _.pick(form, [
@@ -796,9 +793,18 @@ export default {
       }
       this.formVisible = true;
     },
+    // 关闭车辆添加页面
     closeForm() {
+      // this.batteryForm = {},
+      // this.form = {},
+      // this.bindForm = {},
+      const $batteryForm = this.$refs.batteryForm;
+      if ($batteryForm) $batteryForm.resetFields();
+      const $bindForm = this.$refs.bindForm;
+      if ($bindForm) $bindForm.resetFields();
       this.formVisible = false;
     },
+    // 添加车辆页面 '0': 新电池, '1': 旧电池 , '2': 无电池
     async saveForm() {
       const { loginName } = this.key_user_info;
       try {
@@ -880,9 +886,6 @@ export default {
       }
       this.editFormVisible = true;
     },
-    closeEditForm() {
-      this.editFormVisible = false;
-    },
     async saveEditForm() {
       const { loginName } = this.key_user_info;
       try {
@@ -898,41 +901,32 @@ export default {
           this.$message.success('编辑成功');
         }
         await this.reload();
-        this.closeEditForm();
+        this.editFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
-    showBindForm({ id }) {
-      const $form = this.$refs.bindForm;
-      if ($form) $form.resetFields();
+    async showBindForm({ id }) {
+      await this.remoteBattery('');
       this.bindForm = { vehicleId: id };
       this.bindFormVisible = true;
     },
-    closeBindForm() {
-      this.bindFormVisible = false;
-    },
+    // 单独绑定电池页面
     async saveBindForm() {
       try {
-        const $form = this.$refs.bindForm;
-        await $form.validate();
         const { ...form } = this.bindForm;
         const { code, message } = (await this.$http.post('/api/manager/vehicle/batterybind', form)).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('绑定成功');
         await this.reload();
-        this.closeBindForm();
+        this.bindFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    },
-    // 显示配件窗口
-    closeBindPartsForm() {
-      this.allPartsFormVisible = false;
     },
     async handleUnbind({ id, batteryId }) {
       try {
@@ -946,6 +940,7 @@ export default {
         this.$message.error(message);
       }
     },
+    // 获取正常未绑定的电池集合
     async remoteBattery(keyStr) {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/battery/list', {
@@ -955,27 +950,32 @@ export default {
         const { rows } = respData;
         this.bindForm_batteryList = _.map(rows, o => ({
           ...o,
-          batteryStatusText: (_.find(this.statusList, { id: o.batteryStatus }) || { name: o.batteryStatus }).name,
         }));
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
+    // 获取制造商集合
+    async getMfrs() {
+      // 平台用户权限
+      if (this.key_user_info.userType === 'PLATFORM') {
+        try {
+          const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+            currPage: 1, pageSize: 999,
+          })).body;
+          if (code !== '200') throw new Error(message);
+          this.mfrsList = respData.rows;
+        } catch (e) {
+          const message = e.statusText || e.message;
+          this.$message.error(message);
+        }
+      } else {
+        this.mfrsList = [];
+      }
+    },
   },
   async mounted() {
-    if (this.key_user_info.userType === 'PLATFORM') {
-      try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
-          currPage: 1, pageSize: 999,
-        })).body;
-        if (code !== '200') throw new Error(message);
-        this.mfrsList = respData.rows;
-      } catch (e) {
-        const message = e.statusText || e.message;
-        this.$message.error(message);
-      }
-    }
     this.loading = true;
     await this.reload();
     await this.partsReload();

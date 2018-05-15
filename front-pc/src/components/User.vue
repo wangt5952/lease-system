@@ -101,7 +101,7 @@
             <el-form-item label="企业图标">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
               <el-select v-model="form.userIcon" placeholder="请选择企业Logo" style="width:100%;">
-                <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #F1F1F1" :key="`${i}`" :label="o.iconName" :value="o.iconName">
                   <img class="companyLogo" :src="userIconPath + o.iconName" alt="">
                 </el-option>
               </el-select>
@@ -354,7 +354,11 @@ export default {
       },
       roleList: [],
       orgList: [],
-      userIconPhoto: [],
+      userIconPhoto: [
+        { iconName: '20180514171821.png' },
+        { iconName: '20180514172108.png' },
+        { iconName: '20180514172120.png' },
+      ],
       // 照片表单
       photoFormVisible: false,
 
@@ -410,21 +414,18 @@ export default {
     // 查看营业执照或者身份证照片
     async showPhoto(row) {
       this.cardForm = row;
-      console.log(row);
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
         if (code !== '200') throw new Error(message);
         const data = respData.key_user_info;
-        console.log(data);
         // hasOwnProperty(暂时不可用) 查看某个元素中是否包含 某元素  返回 boolean
         // typeof 判断该对象里 有没有该字段
-        // 判断 用户是否上传的身份证 
-        if (typeof(data.userIcFront) === false ||
-           typeof(data.userIcBack) === false ||
-           typeof(data.userIcGroup) === false ||
-           data.userIcFront === "" || data.userIcBack === "" || data.userIcGroup === "") {
+        // 判断 用户是否上传的身份证
+        if (!(typeof (data.userIcFront)) ||
+           !(typeof (data.userIcBack)) ||
+           !(typeof (data.userIcGroup)) ||
+           data.userIcFront === '' || data.userIcBack === '' || data.userIcGroup === '') {
           throw new Error('该用户身份照不齐全');
-          return;
         } else {
           this.cardPhotoFront = data.userIcFront;
           this.cardPhotoBack = data.userIcBack;
@@ -651,7 +652,7 @@ export default {
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
         await this.getOrgList();
-        await this.getUserIcon();
+        // await this.getUserIcon();
       } catch (e) {
         this.loading = false;
         const message = e.statusText || e.message;
@@ -765,16 +766,16 @@ export default {
         this.$message.error(message);
       }
     },
-    async getUserIcon() {
-      try {
-        const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
-        if (code === '200') this.userIconPhoto = respData;
-      } catch (e) {
-        if (!e) return;
-        const message = e.statusText || e.message;
-        this.$message.error(message);
-      }
-    },
+    // async getUserIcon() {
+    //   try {
+    //     const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
+    //     if (code === '200') this.userIconPhoto = respData;
+    //   } catch (e) {
+    //     if (!e) return;
+    //     const message = e.statusText || e.message;
+    //     this.$message.error(message);
+    //   }
+    // },
     async getRoleList() {
       const { code, respData } = (await this.$http.post('/api/manager/role/list', {
         currPage: 1, pageSize: 999,

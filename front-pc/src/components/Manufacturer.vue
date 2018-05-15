@@ -54,7 +54,7 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false">
+    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false" :before-close="closeForm">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -81,7 +81,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item prop="mfrsPhone" label="联系电话">
-              <el-input v-model="form.mfrsPhone" auto-complete="off"></el-input>
+              <el-input v-model.number="form.mfrsPhone"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -92,8 +92,16 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="介绍">
+            <el-form-item prop="introduce" label="介绍">
               <el-input type="textarea" v-model="form.mfrsIntroduce" auto-complete="off"></el-input>
+              <!-- <textarea
+                maxlength="200"
+                @input="descInput"
+                v-model="form.mfrsIntroduce"
+              /> -->
+            <span :style="residueStrNumber > 0 ? {'color': 'green'}:{'color': 'red'}">
+              剩余字数: {{ residueStrNumber }}
+            </span>
             </el-form-item>
           </el-col>
         </el-row>
@@ -112,20 +120,20 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import { isvalidPhone } from '../util/validate';
 
+// 手机验证全局变量
+const checkPhone = (rule, value, callback) => {
+  if (!value) callback(new Error('请输入手机号码'));
+  else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
+  else callback();
+};
+// const checkStrLen = (rule, value, callback) => {
+//   // if (value.length > 80) callback(new Error('字符不能超过80'));
+//   // else callback();
+// };
 export default {
   data() {
-    // 验证手机格式
-    const checkMfrsPhone = (rule, value, callback) => {
-      setTimeout(() => {
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('请输入正确的电话格式'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
       loading: false,
       list: [],
@@ -166,11 +174,18 @@ export default {
         // { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
+      // 介绍剩余字数
+      residueStrNumber: 80,
       rules1: {
+        // 验证手机号码
         mfrsPhone: [
-          { required: true, message: '请填写电话号码' },
-          { validator: checkMfrsPhone, trigger: 'blur' },
+          { required: true, validator: checkPhone, trigger: 'blur' },
         ],
+        // 验证字符长度
+        // introduce : [
+        //   // { min: 1, max: 80, message: '长度不能超过 80 个字符', trigger: 'blur' },
+        //   { required: true, validator: checkStrLen },
+        // ],
       },
     };
   },
@@ -186,6 +201,15 @@ export default {
         await this.reload();
       },
       deep: true,
+    },
+    'form.mfrsIntroduce'(v) {
+      let len = 0;
+      if (v) {
+        len = v.length;
+      } else {
+        len = 0;
+      }
+      this.residueStrNumber = 80 - len >= 0 ? 80 - len : 0;
     },
   },
   methods: {
@@ -241,21 +265,30 @@ export default {
         'mfrsStatus',
       ]);
       this.formVisible = true;
+      if (!form.id) {
+        const $form = this.$refs.form;
+        if ($form) $form.resetFields();
+      } else {
+        // 判断剩余字节长度
+        this.residueStrNumber = 80 - form.mfrsIntroduce.length >= 0 ? 80 - form.mfrsIntroduce.length : 0;
+      }
     },
     closeForm() {
-      this.form = {};
       this.formVisible = false;
+      setTimeout(() => {
+        this.residueStrNumber = 80;
+      }, 0.2 * 1000);
     },
     async saveForm() {
       const { loginName } = this.key_user_info;
+      const $form = this.$refs.form;
+      await $form.validate();
       try {
-        const $form = this.$refs.form;
-        await $form.validate();
-
         if (this.form.id) {
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;
           form.update_user = loginName;
+
           const { code, message } = (await this.$http.post('/api/manager/mfrs/modify', form)).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('编辑成功');
@@ -290,7 +323,7 @@ export default {
   height: 73px;
 }
 >>> .el-textarea__inner {
-  height: 90px;
+  height: 60px;
 }
 /* .el-table >>> .cell {
   width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;

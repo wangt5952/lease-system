@@ -264,7 +264,7 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             brCriteria.andBatteryCodeEqualTo(vehicleInfo.getBatteryInfo().getBatteryCode());
             int brCnt = bizBatteryMapperExt.countByExample(brExample);
             if (0 < brCnt) {
-                throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + vehicleInfo.getBizVehicleInfo().getVehicleCode() + ")已存在");
+                throw new BizException(RunningResult.MULTIPLE_RECORD.code(), "电池编号(" + vehicleInfo.getBatteryInfo().getBatteryCode() + ")已存在");
             }
             //校验电池制造商是否存在（状态为正常）
             if(WzStringUtil.isNotBlank(vehicleInfo.getBatteryInfo().getMfrsId())){
