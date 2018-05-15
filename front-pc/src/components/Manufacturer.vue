@@ -127,11 +127,6 @@ const checkPhone = (rule, value, callback) => {
   else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
   else callback();
 };
-const checkStrLen = (rule, value, callback) => {
-  console.log(value);
-  // if (value.length > 80) callback(new Error('字符不能超过80'));
-  // else callback();
-};
 export default {
   data() {
     return {
@@ -182,7 +177,7 @@ export default {
           { required: true, validator: checkPhone, trigger: 'blur' },
         ],
         // 验证字符长度(非必填 如果填写不能超过80个字符)
-        mfrsIntroduce : [
+        mfrsIntroduce: [
           { min: 0, max: 80, message: '长度不能超过 80 个字符' },
         ],
       },
