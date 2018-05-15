@@ -216,7 +216,6 @@ export default {
   font-size: 0.4rem;
   border-radius: 30px;
   margin-left: 5px;
-  margin-top:0;
 }
 >>> .btn-small:active {
   background: #009C75 !important;
@@ -225,7 +224,6 @@ export default {
 >>> .btn-normal {
   background: #008E56;
   border-radius: 30px;
-  margin:20px auto;
 }
 >>> .btn-normal:active {
   background: #009C75 !important;
