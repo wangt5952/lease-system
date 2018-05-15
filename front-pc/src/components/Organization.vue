@@ -128,7 +128,7 @@
                   <img id="giftImg" v-if="imageUrl" :src="imageUrl" class="avatar">
                   <el-button v-else slot="trigger" size="small" type="primary">选取文件</el-button>
                 </el-upload>
-                <div style="width:80px;height:30px;left:250px">
+                <div class="searchInfo">
                   <el-button size="small" type="primary" @click="searchPhoto">点击查看</el-button>
                 </div>
               </el-form-item>
@@ -484,7 +484,14 @@ export default {
 <style scoped>
 .photo >>> .el-form-item__content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-end;
+  
+}
+.searchInfo {
+  position: relative;
+  left: 5px;
+  bottom: 10px;
 }
 >>> .el-table .cell {
   box-sizing: border-box;
