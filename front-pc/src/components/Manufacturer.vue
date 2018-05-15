@@ -96,16 +96,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item prop="introduce" label="介绍">
+            <el-form-item prop="mfrsIntroduce" label="介绍">
               <el-input type="textarea" v-model="form.mfrsIntroduce" auto-complete="off"></el-input>
-              <!-- <textarea
-                maxlength="200"
-                @input="descInput"
-                v-model="form.mfrsIntroduce"
-              /> -->
-            <span :style="residueStrNumber > 0 ? {'color': 'green'}:{'color': 'red'}">
-              剩余字数: {{ residueStrNumber }}
-            </span>
+              <span :style="residueStrNumber > 0 ? {'color': 'green'}:{'color': 'red'}">
+                剩余字数: {{ residueStrNumber }}
+              </span>
             </el-form-item>
           </el-col>
         </el-row>
@@ -132,10 +127,11 @@ const checkPhone = (rule, value, callback) => {
   else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
   else callback();
 };
-// const checkStrLen = (rule, value, callback) => {
-//   // if (value.length > 80) callback(new Error('字符不能超过80'));
-//   // else callback();
-// };
+const checkStrLen = (rule, value, callback) => {
+  console.log(value);
+  // if (value.length > 80) callback(new Error('字符不能超过80'));
+  // else callback();
+};
 export default {
   data() {
     return {
@@ -185,11 +181,10 @@ export default {
         mfrsPhone: [
           { required: true, validator: checkPhone, trigger: 'blur' },
         ],
-        // 验证字符长度
-        // introduce : [
-        //   // { min: 1, max: 80, message: '长度不能超过 80 个字符', trigger: 'blur' },
-        //   { required: true, validator: checkStrLen },
-        // ],
+        // 验证字符长度(非必填 如果填写不能超过80个字符)
+        mfrsIntroduce : [
+          { min: 0, max: 80, message: '长度不能超过 80 个字符' },
+        ],
       },
     };
   },
@@ -208,11 +203,8 @@ export default {
     },
     'form.mfrsIntroduce'(v) {
       let len = 0;
-      if (v) {
-        len = v.length;
-      } else {
-        len = 0;
-      }
+      if (v) len = v.length;
+      else len = 0;
       this.residueStrNumber = 80 - len >= 0 ? 80 - len : 0;
     },
   },
