@@ -6,25 +6,25 @@
           <!-- <div style="font-size:12px;">车辆实时情况</div> -->
           <el-input v-model="search.keyword" style="margin-top:5px;" size="mini" suffix-icon="el-icon-search" placeholder="请输入要查看的地址"></el-input>
         </div>
-        <div @click="showVehicleDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="vehicleDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{vehicleInfo.vehicleCode}}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码</div>
         </div>
-        <div @click="showVehiclePath" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="vehiclePathVisible = !vehiclePathVisible" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;">{{ address }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆当前位置</div>
         </div>
-        <div @click="showBatteryDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="batteryDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ selectedItem.RSOC ? selectedItem.RSOC+"%" : selectedItem.RSOC }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
-        <div @click="showUserDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="userDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ userInfo.userName }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">使用人</div>
         </div>
       </div>
 
-      <baidu-map class="allmap" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+      <baidu-map  @ready="handler" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
         <!-- 圆形图 -->
         <bm-circle :center="circlePath.center" :radius="circlePath.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="1" @lineupdate="updateCirclePath" :fill-opacity="0.1"></bm-circle>
         <!-- 比列尺 -->
@@ -222,6 +222,12 @@ export default {
     },
   },
   methods: {
+    async handler() {
+      const r = await this.getCurrentPosition();
+      this.mapCenter = {
+        lng: r.point.lng, lat: r.point.lat,
+      };
+    },
     // 单击车辆图标
     vehiclePicture() {
     },
@@ -335,15 +341,6 @@ export default {
         }
       }
     },
-    showVehicleDialog() {
-      this.vehicleDialogVisible = true;
-    },
-    showBatteryDialog() {
-      this.batteryDialogVisible = true;
-    },
-    showUserDialog() {
-      this.userDialogVisible = true;
-    },
     showVehiclePath() {
       this.vehiclePathVisible = !this.vehiclePathVisible;
     },
@@ -425,19 +422,17 @@ export default {
 
     // 获取所有车辆信息
     async reloadVehicleList() {
-      // 初始化坐标点
-      this.mapCenter = '南京';
-      // this.zoomNum = 15;
-      // const los = await this.getAddressByLocation(118.778074, 32.057236);
-      // console.log(los);
-      // 南京市中心
+      // 获取当前城市的浏览器定位
+      const r = await this.getCurrentPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: 118.77807441, lat: 32.0572355, radius: 1000,
+          lng: r.point.lng, lat: r.point.lat, radius: 1000,
         })).body;
         if (code === '200') {
           this.radiusVehicleList = respData;
+          // 获取当前范围内第一辆车的信息
           await this.getVehicleInfo();
+          // 获取当前范围内第一辆车的用户信息
           await this.getUserInfo();
           if (this.radiusVehicleList && this.radiusVehicleList.length && !_.find(this.radiusVehicleList, { vehicleId: this.selectedId })) {
             this.selectedId = this.radiusVehicleList[0].vehicleId;
@@ -526,12 +521,15 @@ export default {
     //   return new Promise((resolve, reject) => (new BMap.Geocoder()).getPoint(new BMap.Point(lng, lat), res => resolve(res)));
     // }
     // 浏览器定位
-    // getLocations() {
-    //   return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition((r) => {
-    //     this.mapCenter = r.point;
-    //     alert(`您的位置：${r.point.lng} ,${r.point.lat}`);
-    //   }, { enableHighAccuracy: true }));
-    // },
+    getCurrentPosition() {
+      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
+        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
+          resolve(r);
+        } else {
+          reject(this.getStatus());
+        }
+      }, { enableHighAccuracy: true }));
+    },
   },
   async mounted() {
     await this.reloadVehicleList();
