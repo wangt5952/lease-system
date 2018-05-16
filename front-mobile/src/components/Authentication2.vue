@@ -186,8 +186,8 @@ export default {
     getCanvas(sourceCanvas) {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      const width = 400;
-      const height = 400;
+      const width = 300;
+      const height = 300;
 
       canvas.width = width;
       canvas.height = height;
