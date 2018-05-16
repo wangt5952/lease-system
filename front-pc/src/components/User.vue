@@ -450,7 +450,7 @@ export default {
         if (code !== '200') throw new Error(message);
         this.$message.success('实名认证成功');
         await this.reload();
-        this.photoFormVisible = fasle;
+        this.photoFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -467,7 +467,7 @@ export default {
         if (code !== '200') throw new Error(message);
         this.$message.success('驳回成功');
         await this.reload();
-        this.photoFormVisible = fasle;
+        this.photoFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;

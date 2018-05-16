@@ -228,7 +228,7 @@ export default {
     async searchStreet(value) {
       try {
         const point = await this.getAddressByLocation(value);
-        if (!point)  throw new Error('请输入正确地址');
+        if (!point) throw new Error('请输入正确地址');
         this.mapCenter = {
           lng: point.lng, lat: point.lat,
         };
@@ -239,6 +239,7 @@ export default {
           this.radiusVehicleList = respData;
         } else {
           this.radiusVehicleList = [];
+          throw new Error(message);
         }
       } catch (e) {
         const message = e.statusText || e.message;
