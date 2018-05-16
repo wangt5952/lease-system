@@ -127,7 +127,7 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
-import * as validate from '../util/validate.js';
+import * as validate from '@/util/validate';
 
 const checkPartsId = (rule, value, callback) => {
   if (!value) callback(new Error('编号不能为空'));

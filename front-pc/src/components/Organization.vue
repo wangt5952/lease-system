@@ -164,7 +164,7 @@
 <script>
 import _ from 'lodash';
 import { mapState } from 'vuex';
-import * as validate from '../util/validate.js';
+import * as validate from '@/util/validate';
 
 // 验证手机格式
 const checkPhone = (rule, value, callback) => {
