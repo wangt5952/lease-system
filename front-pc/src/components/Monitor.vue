@@ -4,7 +4,8 @@
       <div style="display:flex;height:100px;background:#070f3e;color:#fff;">
         <div style="flex:1;padding:10px;padding-top:25px;">
           <!-- <div style="font-size:12px;">车辆实时情况</div> -->
-          <el-input v-model="search.keyword" style="margin-top:5px;" size="mini" suffix-icon="el-icon-search" placeholder="请输入要查看的地址"></el-input>
+          <el-input v-model="search.keyword" style="margin-top:5px;width:75%" size="mini" suffix-icon="el-icon-edit" placeholder="请输入要查看的地址" clearable></el-input>
+          <el-button size="mini" @click="searchStreet(search.keyword)">查看路况</el-button>
         </div>
         <div @click="vehicleDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{vehicleInfo.vehicleCode}}</div>
@@ -216,17 +217,33 @@ export default {
       return _.find(this.radiusVehicleList, { vehicleId: this.selectedId }) || {};
     },
   },
-  watch: {
-    'search.keyword'(v) {
-      this.mapCenter = v;
-    },
-  },
   methods: {
     async handler() {
       const r = await this.getCurrentPosition();
       this.mapCenter = {
         lng: r.point.lng, lat: r.point.lat,
       };
+    },
+    // 查看路况
+    async searchStreet(value) {
+      try {
+        const point = await this.getAddressByLocation(value);
+        if (!point)  throw new Error('请输入正确地址');
+        this.mapCenter = {
+          lng: point.lng, lat: point.lat,
+        };
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: point.lng, lat: point.lat, radius: 2000,
+        })).body;
+        if (code === '200') {
+          this.radiusVehicleList = respData;
+        } else {
+          this.radiusVehicleList = [];
+        }
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     // 单击车辆图标
     vehiclePicture() {
@@ -352,7 +369,6 @@ export default {
         lng: item.LON, lat: item.LAT,
       };
       this.selectedId = item.vehicleId;
-
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
         // 车辆、电池信息
@@ -419,10 +435,9 @@ export default {
       const loc = await this.getLocation(item.LON, item.LAT);
       this.address = loc.address;
     },
-
     // 获取所有车辆信息
     async reloadVehicleList() {
-      // 获取当前城市的浏览器定位
+      // 获取当前城市的浏览器定位  (根据经纬度获取范围车辆)
       const r = await this.getCurrentPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -513,13 +528,18 @@ export default {
         this.$message.error(message);
       }
     },
-    // 逆地址解析
+    // 逆地址解析(根据经纬度获取详细地址)
     getLocation(lng, lat) {
       return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
     },
-    // getAddressByLocation(lng, lat){
-    //   return new Promise((resolve, reject) => (new BMap.Geocoder()).getPoint(new BMap.Point(lng, lat), res => resolve(res)));
-    // }
+    // 根据地址获取经纬度
+    getAddressByLocation(address) {
+      return new Promise((resolve, reject) => (new global.BMap.Geocoder()).getPoint(address, (res) => {
+        // 给一个初始化坐标
+        new BMap.Point(118.805297, 32.052656);
+        resolve(res);
+      }, address));
+    },
     // 浏览器定位
     getCurrentPosition() {
       return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
