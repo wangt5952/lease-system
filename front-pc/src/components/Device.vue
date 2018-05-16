@@ -92,35 +92,22 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import * as validate from '../util/validate.js';
+
+const checkDeviceId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
+
+const checkTime = (rule, value, callback) => {
+  if (!value) callback(new Error('请求间隔时间不能为空'));
+  else if (!validate.isvalidSignlessInteger(value)) callback(new Error('请输入非负正整数'));
+  else callback();
+};
 
 export default {
   data() {
-    const checkTime = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('请求间隔时间不能为空'));
-      }
-      setTimeout(() => {
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('请输入非负正整数'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
-    const checkDeviceId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
       loading: false,
       formVisible: false,
@@ -152,14 +139,13 @@ export default {
       // 表单效验
       rules2: {
         deviceId: [
-          { required: true, message: '请输入编号' },
-          { validator: checkDeviceId, trigger: 'blur' },
+          { required: true, validator: checkDeviceId },
         ],
         deviceType: [
           { required: true, message: '请输入设备类别' },
         ],
         perSet: [
-          { validator: checkTime, trigger: 'blur' },
+          { required: true, validator: checkTime },
         ],
         reset: [
           { required: true, message: '请选择硬件复位标志' },

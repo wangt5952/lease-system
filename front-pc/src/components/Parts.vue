@@ -127,22 +127,15 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import * as validate from '../util/validate.js';
 
+const checkPartsId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
 export default {
   data() {
-    const checkPartsId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
       loading: false,
       list: [],
@@ -196,8 +189,7 @@ export default {
       mfrsList: [],
       rules1: {
         partsCode: [
-          { required: true, message: '请填写编码' },
-          { validator: checkPartsId, trigger: 'blur' },
+          { required: true, validator: checkPartsId },
         ],
       },
     };
@@ -281,7 +273,7 @@ export default {
       }
     },
     closeForm() {
-      this.form = {};
+      // this.form = {};
       this.formVisible = false;
     },
     async saveForm() {

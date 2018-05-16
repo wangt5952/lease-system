@@ -116,8 +116,6 @@
           <el-col :span="8">
             <div class="photo">
               <el-form-item label="营业执照">
-                <!-- <input id="uploadFile" type="file" accept="image/*" @change="selectedFile"> -->
-                <!-- <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input> -->
                 <el-upload
                   class="avatar-uploader"
                   action=""
@@ -166,14 +164,27 @@
 <script>
 import _ from 'lodash';
 import { mapState } from 'vuex';
-import { isvalidPhone } from '../util/validate';
+import * as validate from '../util/validate.js';
 
-// 手机验证全局变量
+// 验证手机格式
 const checkPhone = (rule, value, callback) => {
   if (!value) callback(new Error('请输入手机号码'));
-  else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
+  else if (!validate.isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
   else callback();
 };
+// 验证企业编号
+const checkOrgId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
+// 验证营业执照
+const checkSinogram = (rule, value, callback) => {
+  if (!value) callback(new Error('营业执照不能为空'));
+  if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
+
 export default {
   data() {
     // 表单效验
@@ -190,30 +201,6 @@ export default {
       }, 500);
       return false;
       // callback();
-    };
-    const checkOrgId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
-    // 汉字验证
-    const checkSinogram = (rule, value, callback) => {
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('输入内容不能含有汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
     };
     return {
       disabledFormId: false,
@@ -267,14 +254,13 @@ export default {
       ],
       rules1: {
         orgCode: [
-          { required: true, message: '请填写编码' },
-          { validator: checkOrgId, trigger: 'blur' },
+          { required: true, validator: checkOrgId },
         ],
         orgPhone: [
           { required: true, validator: checkPhone, trigger: 'blur' },
         ],
         orgBusinessLicences: [
-          { validator: checkSinogram, trigger: 'blur' },
+          { required: true, validator: checkSinogram },
         ],
       },
       rules2: {
@@ -373,9 +359,6 @@ export default {
       this.formVisible = true;
       if (form.id) {
         this.disabledFormId = true;
-        // form.orgBusinessLicenceFront = this.orgPhotoPath + form.orgBusinessLicenceFront;
-        // this.imageUrl = form.orgBusinessLicenceFront;
-        // form.orgBusinessLicenceFront = this.orgPhotoPath + form.orgBusinessLicenceFront;
         this.imageUrl = this.orgPhotoPath + form.orgBusinessLicenceFront;
       } else {
         const $form = this.$refs.form;
@@ -486,12 +469,10 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  
 }
 .searchInfo {
   position: relative;
   left: 5px;
-  bottom: 10px;
 }
 >>> .el-table .cell {
   box-sizing: border-box;
