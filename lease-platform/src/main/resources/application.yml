@@ -9,8 +9,13 @@ spring:
       exclude: src/main/resources/static/**,src/main/resources/templates/**
   http:
     multipart:
+      #默认支持文件上传
+      enabled: true
+      #单个文件最大限制
       max-file-size: 10Mb
-      max-request-size: 10Mb
+      #总文件最大限制
+      max-request-size: 30Mb
+
 logging:
   config: classpath:logback.xml
 localsetting:
