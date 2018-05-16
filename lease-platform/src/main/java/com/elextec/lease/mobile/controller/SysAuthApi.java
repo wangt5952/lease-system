@@ -815,15 +815,15 @@ public class SysAuthApi extends BaseController {
                     //将身份证正面照片保存到图片服务器中
                     String frontImageName = WzUniqueValUtil.makeUniqueTimes();
                     WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserRealnameRoot, "", frontImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    //String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     //将身份证背面照片保存到图片服务器中
                     String backImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserRealnameRoot, "", backImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcBack().replace(" ","+"), uploadUserRealnameRoot, "", backImageName, WzFileUtil.EXT_JPG);
+                    //String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     //将用户手持身份证的照片保存到图片服务器中
                     String groupImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserRealnameRoot, "", groupImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcGroup().replace(" ","+"), uploadUserRealnameRoot, "", groupImageName, WzFileUtil.EXT_JPG);
+                    //String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     userTemp.setUserPid(resetParam.getUserPid());
                     userTemp.setUpdateUser(resetParam.getUpdateUser());
                     //数据库只保存文件名

@@ -122,7 +122,7 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
-import * as validate from '../util/validate.js';
+import * as validate from '@/util/validate';
 
 const checkBattreryId = (rule, value, callback) => {
   if (!value) callback(new Error('编号不能为空'));
