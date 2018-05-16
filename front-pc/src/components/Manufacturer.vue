@@ -345,7 +345,7 @@ export default {
   width: 100%;
   max-width: 100%;
   color: #606266;
-  height: 90%;
+  height: 85%;
   max-height: 90%;
 }
 </style>
