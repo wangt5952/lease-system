@@ -31,15 +31,15 @@
         <cell title="" value="" class="kong"></cell>
       </group>
     </div>
-    <box class="parts" gap="10px 10px">
+    <div class="parts">
         <x-button class="parts" @click.native="skip('/parts')">查看车辆配件信息</x-button>
         <x-button type="primary" @click.native="deft">设为默认车辆</x-button>
-    </box>
+    </div>
   </div>
 </template>
 
 <script>
-import { Cell, Group, XButton, Box } from 'vux';
+import { Cell, Group, XButton } from 'vux';
 import _ from 'lodash';
 
 const vehicle_status = [
@@ -71,7 +71,6 @@ export default {
     Group,
     Cell,
     XButton,
-    Box,
   },
   data() {
     return {
@@ -214,7 +213,7 @@ export default {
     margin-top:1150px;
   }
   .weui-btn {
-    width:95%;
+    width:90%;
     margin:20px auto;
   }
 </style>
