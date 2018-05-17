@@ -329,6 +329,10 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis !important;
 }
+>>> .el-table__body-wrapper {
+    overflow-x: hidden;
+    position: relative;
+}
 >>> .mrfsHeight {
   position: relative;
   overflow-x: hidden;
@@ -342,6 +346,6 @@ export default {
   max-width: 100%;
   color: #606266;
   height: 85%;
-  max-height: 85%;
+  max-height: 90%;
 }
 </style>
