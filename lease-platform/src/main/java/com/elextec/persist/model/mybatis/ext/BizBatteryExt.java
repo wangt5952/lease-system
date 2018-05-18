@@ -22,6 +22,16 @@ public class BizBatteryExt extends BizBattery {
     //解绑时间
     private Date unbindTime;
 
+    private String deviceId;
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
     public Date getBindTime() {
         return bindTime;
     }
