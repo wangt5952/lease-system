@@ -112,10 +112,9 @@ export default {
     ...mapState({
       key_user_info: state => state.key_user_info,
     }),
-
+    // 递归循环调用自身
     resTree() {
       const { resList: list } = this;
-
       const buildChildren = (parent) => {
         const childrenList = parent ? _.filter(list, { parent }) : _.filter(list, o => !o.parent);
         if (!childrenList.length) return null;
@@ -218,7 +217,7 @@ export default {
         this.$message.error(message);
       }
     },
-
+    // 分配资源按钮
     async showAssignResForm({ id, roleName }) {
       this.assignResFormVisible = true;
       this.assignResForm.id = id;
@@ -237,6 +236,7 @@ export default {
     closeAssignResForm() {
       this.assignResFormVisible = false;
     },
+    // 保存所分配分配资源
     async saveAssignResForm() {
       try {
         const { id } = this.assignResForm;
@@ -257,13 +257,23 @@ export default {
         this.$message.error(message);
       }
     },
+    // 获取所有权限
+    async getResList() {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/res/list', {
+          currPage: 1, pageSize: 999,
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.resList = respData.rows;
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
   },
   async mounted() {
-    const { code, respData } = (await this.$http.post('/api/manager/res/list', {
-      currPage: 1, pageSize: 999,
-    })).body;
-    if (code === '200') this.resList = respData.rows;
     this.loading = true;
+    await this.getResList();
     await this.reload();
     this.loading = false;
   },

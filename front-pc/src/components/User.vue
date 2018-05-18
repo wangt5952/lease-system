@@ -653,8 +653,7 @@ export default {
           userTypeText: (_.find(this.typeList2, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
-        await this.getOrgList();
-        // await this.getUserIcon();
+        // await this.getOrgList();
       } catch (e) {
         this.loading = false;
         const message = e.statusText || e.message;
@@ -673,7 +672,8 @@ export default {
         this.$message.error(message);
       }
     },
-    showForm(form = { }) {
+    async showForm(form = { }) {
+      await this.getOrgList();
       this.form = _.pick(form, [
         'id',
         'loginName',
@@ -768,16 +768,6 @@ export default {
         this.$message.error(message);
       }
     },
-    // async getUserIcon() {
-    //   try {
-    //     const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
-    //     if (code === '200') this.userIconPhoto = respData;
-    //   } catch (e) {
-    //     if (!e) return;
-    //     const message = e.statusText || e.message;
-    //     this.$message.error(message);
-    //   }
-    // },
     async getRoleList() {
       const { code, respData } = (await this.$http.post('/api/manager/role/list', {
         currPage: 1, pageSize: 999,

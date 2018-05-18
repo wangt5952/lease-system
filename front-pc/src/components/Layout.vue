@@ -238,7 +238,6 @@ export default {
       enterpriseVisible: false,
       disabledForm: false,
       form: {},
-      orgList: [],
 
     };
   },
@@ -306,12 +305,6 @@ export default {
         this.$message.error(message);
       }
       this.enterpriseVisible = false;
-    },
-    async getOrgList() {
-      const { code, respData } = (await this.$http.post('/api/manager/org/list', {
-        currPage: 1, pageSize: 999,
-      })).body;
-      if (code === '200') this.orgList = respData.rows;
     },
     // 取消
     closeForm() {
@@ -398,11 +391,6 @@ export default {
       }
       // this.$router.push('/');
     },
-  },
-  async mounted() {
-    this.loading = true;
-    await this.getOrgList();
-    this.loading = false;
   },
 };
 </script>

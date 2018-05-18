@@ -209,9 +209,6 @@ export default {
     },
   },
   methods: {
-    // next(row) {
-    //   this.$router.push({ path: 'battery', query: { aaaa: '12312' }})
-    // },
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();
@@ -251,7 +248,8 @@ export default {
       }
     },
 
-    showForm(form = {}) {
+    async showForm(form = {}) {
+      await this.getMfrsList();
       this.form = _.pick(form, [
         'id',
         'partsCode',
@@ -306,12 +304,20 @@ export default {
         this.$message.error(message);
       }
     },
+    async getMfrsList() {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+          currPage: 1, pageSize: 999,
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.mfrsList = respData.rows;
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
   },
   async mounted() {
-    const { code, respData } = (await this.$http.post('/api/manager/mfrs/list', {
-      currPage: 1, pageSize: 999,
-    })).body;
-    if (code === '200') this.mfrsList = respData.rows;
     this.loading = true;
     await this.reload();
     this.loading = false;

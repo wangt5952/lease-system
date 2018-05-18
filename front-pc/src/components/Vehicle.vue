@@ -965,7 +965,7 @@ export default {
   async mounted() {
     this.loading = true;
     await this.reload();
-    await this.partsReload();
+    // await this.partsReload();
     this.loading = false;
   },
 };
