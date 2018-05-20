@@ -32,7 +32,8 @@ const store = new Vuex.Store({
       key_res_info: JSON.parse(localStorage.getItem('key_res_info')) || [],
       key_user_info: JSON.parse(localStorage.getItem('key_user_info')) || {},
       relogin: false,
-
+      smsToken: '',
+      smsVCode: '',
       orgPhotoPath: 'http://106.14.172.38:8990/leaseupload/otherimg/', // 企业照片路径
       userIconPath: 'http://106.14.172.38:8990/leaseupload/usericon/pc/', // 用户图标路径
       userPidPath: 'http://106.14.172.38:8990/leaseupload/userrealname/', // 用户身份证图片
@@ -70,11 +71,17 @@ const store = new Vuex.Store({
     relogin(state) {
       state.relogin = true;
     },
+    setSmsToken(state, smsToken) {
+      state.smsToken = smsToken;
+    },
+    setSmsVCode(state, smsVCode) {
+      state.smsVCode = smsVCode;
+    },
   },
 });
 
 // 白名单
-const whiteList = ['/login', '/resetPassword'];
+const whiteList = ['/login', '/resetPassword1', '/resetPassword2'];
 // 全局导航守卫
 router.beforeEach(async (to, from, next) => {
   const { key_login_token } = store.state;
