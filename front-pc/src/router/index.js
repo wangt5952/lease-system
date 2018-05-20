@@ -7,8 +7,8 @@ export default new Router({
   mode: 'history',
   routes: [
     { path: '/login', component: () => import('@/components/Login') },
-    { path: '/resetPassword1', component: () => import('@/components/ResetPassword1') },
-    { path: '/resetPassword2', component: () => import('@/components/ResetPassword2') },
+    { path: '/resetPasswordOne', component: () => import('@/components/ResetPasswordOne') },
+    { path: '/resetPasswordTwo', component: () => import('@/components/ResetPasswordTwo') },
     { path: '/',
       component: () => import('@/components/Layout'),
       children: [

@@ -18,7 +18,7 @@
             </el-form-item>
             <div style="cursor:pointer;background:#fff;border:2px solid #000;margin:40px 20px;text-align:center;padding:10px;border-radius:3px;" @click="handleSubmit" >登录</div>
             <div style="margin-left:300px;margin-top:-25px">
-              <router-link to="resetPassword1" style="text-decoration:none; color: #454545;">忘记密码</router-link>
+              <router-link to="resetPasswordOne" style="text-decoration:none; color: #454545;">忘记密码</router-link>
             </div>
           </el-form>
         </div>

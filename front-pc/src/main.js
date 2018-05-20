@@ -81,7 +81,7 @@ const store = new Vuex.Store({
 });
 
 // 白名单
-const whiteList = ['/login', '/resetPassword1', '/resetPassword2'];
+const whiteList = ['/login', '/resetPasswordOne', '/resetPasswordTwo'];
 // 全局导航守卫
 router.beforeEach(async (to, from, next) => {
   const { key_login_token } = store.state;
