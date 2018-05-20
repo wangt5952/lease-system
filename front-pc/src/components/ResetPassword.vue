@@ -11,7 +11,7 @@
             <router-link to="login">登录</router-link>
           </el-button>
         </div>
-        <div class="registerButton"><a href="javascript:void(0)">注册</a></div>
+        <!-- <div class="registerButton"><a href="javascript:">注册</a></div> -->
       </div>
     </div>
     <!-- 主体 -->
@@ -30,23 +30,27 @@
             </div>
             <div style="width:200px;height:20px;margin:0px 450px 10px 430px;font-weight:bold">请填写您需要找回的账号:</div>
 
-            <el-form>
+            <el-form :model="sMs" ref="sMs" :rules="rules1">
               <div style="width:410px;height:50px;margin:10px 430px 10px 430px">
-                <el-form-item>
+                <el-form-item prop="mobile">
                   <el-input v-model.number="sMs.mobile" style="width: 300px; height: 35px;" placeholder="请输入您的手机号" clearable></el-input>
-                  <el-button style="width: 90px; height: 35px;" @click="validateMobileNumber" type="primary" :disabled="state">获取验证码</el-button>
-                </el-form-item>
-              </div>
-              <div style="width:300px;height:50px;margin:10px 430px 10px 430px">
-                <el-form-item>
-                  <el-input v-model="form.smsVCode" placeholder="请输入短信验证码" clearable></el-input>
+                  <el-button style="width: 90px; height: 35px;" @click="validateMobileNumber" :type="buttontype" :disabled="state">
+                    {{ buttontype === 'primary' ? '获取验证码': `(  ${time} s )`}}
+                  </el-button>
                 </el-form-item>
               </div>
             </el-form>
-              <div class="nextButton" style="width: 100px; height: 35px;margin:10px 430px 10px 430px">
-                <el-button style="width: 100px; height: 35px;"
-                    type="primary" @click="nextQuery">下一步</el-button>
+            <el-form :model="token" ref="token" :rules="rules2">
+              <div style="width:300px;height:50px;margin:10px 430px 10px 430px">
+                <el-form-item prop="smsVCode">
+                  <el-input v-model="token.smsVCode" placeholder="请输入短信验证码" clearable></el-input>
+                </el-form-item>
               </div>
+            </el-form>
+            <div class="nextButton" style="width: 100px; height: 35px;margin:10px 430px 10px 430px">
+              <el-button style="width: 100px; height: 35px;"
+                  type="primary" @click="nextQuery">下一步</el-button>
+            </div>
           </div>
         </div>
         <div class="resPw-body-right"></div>
@@ -78,9 +82,10 @@
                 </el-form-item>
               </div>
             </el-form>
-            <div class="nextButton" style="width: 300px; height: 35px;margin:10px 430px 10px 430px;">
+            <div class="nextButton" style="width: 400px; height: 35px;margin:10px 430px 10px 430px;">
               <el-button style="width: 100px; height: 35px;" type="primary" @click="confirm">完成</el-button>
-              <el-button style="width: 100px; height: 35px;margin-left:95px" type="info" @click="cancel">取消</el-button>
+              <el-button style="width: 100px; height: 35px;margin-left:1px" type="info" @click="cancel">取消</el-button>
+              <el-button style="width: 100px; height: 35px;margin-left:10px" @click="cancel">上一步</el-button>
             </div>
           </div>
         </div>
@@ -91,14 +96,14 @@
     <!-- 脚部 -->
     <div class="resPw-foot">
       <div style="padding-left:300px; margin:20px 0px 40px 110px;width:900px;height:60px;border-bottom:solid 1.5px #BFBFBF;">
-        <a href="javascript:void(0)">关于我们  &nbsp;|</a>
-        <a href="javascript:void(0)">联系方式  &nbsp;|</a>
-        <a href="javascript:void(0)">对外合作  &nbsp;|</a>
-        <a href="javascript:void(0)">服务条款  &nbsp;|</a>
-        <a href="javascript:void(0)">隐私政策  &nbsp;|</a>
-        <a href="javascript:void(0)">版权声明  &nbsp;|</a>
-        <a href="javascript:void(0)">招贤纳士  &nbsp;|</a>
-        <a href="javascript:void(0)">问题建议  &nbsp;</a>
+        <a href="javascript:">关于我们  &nbsp;|</a>
+        <a href="javascript:">联系方式  &nbsp;|</a>
+        <a href="javascript:">对外合作  &nbsp;|</a>
+        <a href="javascript:">服务条款  &nbsp;|</a>
+        <a href="javascript:">隐私政策  &nbsp;|</a>
+        <a href="javascript:">版权声明  &nbsp;|</a>
+        <a href="javascript:">招贤纳士  &nbsp;|</a>
+        <a href="javascript:">问题建议  &nbsp;</a>
       </div>
       <div style="padding:0px 300px;width:300px;height:20px;position:absolute;left:270px;bottom:40px">
         Copyright© &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;* &nbsp;
@@ -108,7 +113,20 @@
 </template>
 <script>
 import md5 from 'js-md5';
+import * as validate from '@/util/validate';
 
+// 验证码
+const token = (rule, value, callback) => {
+  if (!value) callback(new Error('短信验证码不能为空'));
+  else callback();
+};
+
+// 验证手机格式
+const checkPhone = (rule, value, callback) => {
+  if (!value) callback(new Error('请输入手机号码'));
+  else if (!validate.isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
+  else callback();
+};
 export default {
   data() {
     return {
@@ -118,41 +136,73 @@ export default {
       form: {
         smsToken: '',
       },
+      token: {},
       confirmNewPassword: '',
       stepNo1: true,
       stepNo2: false,
       // 验证码按钮状态
       state: false,
+      // 验证码按钮样式
+      buttontype: 'primary',
+      time: 60,
+      rules1: {
+        mobile: [
+          { required: true, validator: checkPhone, trigger: 'blur' },
+        ],
+      },
+      rules2: {
+        smsVCode: [
+          { required: true, validator: token, trigger: 'blur' },
+        ],
+      },
     };
   },
   methods: {
     // 验证手机号码
     async validateMobileNumber() {
-      this.state = true;
-      const { ...sMs } = this.sMs;
+      const $sMs = this.$refs.sMs;
+      await $sMs.validate();
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/auth/sendsms', sMs)).body;
+        const { code, message, respData } = (await this.$http.post('/api/manager/auth/sendsms', {
+          mobile: this.sMs.mobile,
+        })).body;
         if (code !== '200') throw new Error(message || code);
         this.$message.success({ message: '验证码发送中,请稍等片刻...' });
+        this.state = true;
         const { key_sms_vcode_token } = respData;
         this.form.smsToken = key_sms_vcode_token;
-        // console.log(this.form.smsToken);
+        this.buttontype = 'info';
+
+        let time = 60;
+        const timeOut = setInterval(() => {
+          this.buttontype = 'info';
+          this.time = time--;
+          if (time === 0) {
+            clearInterval(timeOut);
+            this.buttontype = 'primary';
+            this.state = false;
+          }
+        }, 1 * 1000);
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      setTimeout(() => {
-        this.state = false;
-      }, 120 * 1000);
     },
     // 下一步按钮
-    nextQuery() {
-      this.stepNo1 = false;
-      this.stepNo2 = true;
+    async nextQuery() {
+      const $sMs = this.$refs.sMs;
+      const $token = this.$refs.token;
+      await $sMs.validate();
+      await $token.validate();
+      if ($sMs && $token) {
+        this.stepNo1 = false;
+        this.stepNo2 = true;
+      }
     },
     // 完成按钮
     async confirm() {
-      const { smsVCode, smsToken, newPassword } = this.form;
+      const { smsToken, newPassword } = this.form;
+      const { smsVCode } = this.token;
       if (newPassword === this.confirmNewPassword) {
         const form = { newPassword: md5(newPassword).toUpperCase(), smsVCode, smsToken };
         try {
