@@ -228,20 +228,36 @@
     <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <div class="pidPhoto">
         <!-- 身份证正面 -->
-        <img :src="userPidPath + cardPhotoFront" alt="">
+        <div class="imgClass">
+          <img :src="userPidPath + cardPhotoFront" alt="">
+          <!-- <div class="imgButton">
+            <el-button type="primary" @click="searchPid(pid,'cardPhotoFront')">放大观看</el-button>
+          </div> -->
+        </div>
         <!-- 身份证反面 -->
-        <img :src="userPidPath + cardPhotoBack" alt="">
+        <div class="imgClass">
+          <img :src="userPidPath + cardPhotoBack" alt="">
+          <!-- <div class="imgButton">
+            <el-button type="primary" @click="searchPid(pid,'cardPhotoBack')">放大观看</el-button>
+          </div> -->
+        </div>
         <!-- 双手举起身份证 -->
-        <img :src="userPidPath + cardPhotoGroup" alt="">
+        <div class="imgClass">
+          <img :src="userPidPath + cardPhotoGroup" alt="">
+          <!-- <div class="imgButton">
+            <el-button type="primary" @click="searchPid(pid,'cardPhotoGroup')">放大观看</el-button>
+          </div> -->
+        </div>
       </div>
-      <!-- <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/> -->
-      <!-- 双手举起身份证 -->
-      <!-- <img :src="`data:image/jpg;base64,${cardPhotoGroup}`"/> -->
       <span slot="footer" class="dialog-footer" >
         <el-button @click="photoFormVisible = false">关闭</el-button>
         <el-button type="info" @click="overrule">驳回</el-button>
         <el-button :disabled="loading" type="primary" @click="identification">通过</el-button>
       </span>
+    </el-dialog>
+    <!-- 放大后的表单 -->
+    <el-dialog :title="pidInfo" :visible.sync="photoInfoVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%" center>
+      <img :src="userPidPath + cardPhoto" alt="">
     </el-dialog>
   </div>
 </template>
@@ -361,6 +377,10 @@ export default {
       ],
       // 照片表单
       photoFormVisible: false,
+      pid: '',
+      photoInfoVisible: false,
+      cardPhoto: '',
+      pidInfo: '',
 
       // 表单效验
       rules2: {
@@ -427,6 +447,7 @@ export default {
            data.userIcFront === '' || data.userIcBack === '' || data.userIcGroup === '') {
           throw new Error('该用户身份照不齐全');
         } else {
+          this.pid = row.id;
           this.cardPhotoFront = data.userIcFront;
           this.cardPhotoBack = data.userIcBack;
           this.cardPhotoGroup = data.userIcGroup;
@@ -434,6 +455,29 @@ export default {
           // console.log(this.userPidPath+this.cardPhotoGroup);
           this.photoFormVisible = true;
         }
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    // 查看放大的身份证
+    async searchPid(pid, value) {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [pid])).body;
+        if (code !== '200') throw new Error(message);
+        const data = respData.key_user_info;
+        if (value === 'cardPhotoFront') {
+          this.pidInfo = '正面照';
+          this.cardPhoto = data.userIcFront;
+        } else if (value === 'cardPhotoBack') {
+          this.pidInfo = '背面照';
+          this.cardPhoto = data.userIcBack;
+        } else {
+          this.pidInfo = '举起双手合照';
+          this.cardPhoto = data.userIcGroup;
+        }
+        this.photoInfoVisible = true;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -788,10 +832,13 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.pidPhoto > img {
+.pidPhoto > .imgClass {
   margin: 10px;
   height: 339px;
   width: 350px;
+}
+.imgButton {
+  margin-left: 30%;
 }
 /* 企业图片1 */
 .companyLogo {

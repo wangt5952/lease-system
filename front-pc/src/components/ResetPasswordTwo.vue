@@ -73,7 +73,7 @@ export default {
           const { code, message } = (await this.$http.post('/api/manager/auth/resetpassword', form)).body;
           if (code !== '200') throw new Error(message || code);
           this.$message.success({
-            message: '重置密码成功！2秒后跳转登录页面',
+            message: '重置密码成功！2秒后跳转登录页面...',
           });
           setTimeout(() => {
             this.$router.push('/login');
@@ -83,7 +83,7 @@ export default {
           this.$message.error(message);
         }
       } else {
-        this.$message.error('两次密码输入不配备,请重新输入');
+        this.$message.error('两次密码输入不匹配,请重新输入');
         this.cancel();
       }
     },
@@ -93,7 +93,7 @@ export default {
       this.confirmNewPassword = '';
     },
     queryBack() {
-      this.$router.push('resetPasswordOne');
+      this.$router.push('/resetPasswordOne');
     },
   },
 };

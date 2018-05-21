@@ -32,8 +32,17 @@ const store = new Vuex.Store({
       key_res_info: JSON.parse(localStorage.getItem('key_res_info')) || [],
       key_user_info: JSON.parse(localStorage.getItem('key_user_info')) || {},
       relogin: false,
+      // 验证码token
       smsToken: '',
+      // 验证码
       smsVCode: '',
+      // 验证码按钮的全局状态
+      tokenButtonState: false,
+      // 验证码按钮的全局样式
+      tokenButtonType: 'primary',
+      // 全局时间
+      time: localStorage.getItem('time'),
+
       orgPhotoPath: 'http://106.14.172.38:8990/leaseupload/otherimg/', // 企业照片路径
       userIconPath: 'http://106.14.172.38:8990/leaseupload/usericon/pc/', // 用户图标路径
       userPidPath: 'http://106.14.172.38:8990/leaseupload/userrealname/', // 用户身份证图片
@@ -68,15 +77,53 @@ const store = new Vuex.Store({
       state.key_user_info = {};
       Vue.http.headers.common['header-login-token'] = undefined;
     },
+    // 重新登录
     relogin(state) {
       state.relogin = true;
     },
+    // 验证码token
     setSmsToken(state, smsToken) {
       state.smsToken = smsToken;
     },
+    // 验证码
     setSmsVCode(state, smsVCode) {
       state.smsVCode = smsVCode;
     },
+    // 验证码按钮状态(true, false) 正确规范
+    // ['setTokenButtonState'](state, buttonState) {
+    //   state.tokenButtonState = buttonState;
+    // },
+    setTokenButtonState(state, buttonState) {
+      state.tokenButtonState = buttonState;
+    },
+    // 验证码按钮样式('primary', 'info')
+    setTokenButtonType(state, buttonType) {
+      state.tokenButtonType = buttonType;
+    },
+    // 倒计时
+    setTime(state, time) {
+      state.time = time;
+      localStorage.setItem('time', time);
+    },
+  },
+  actions: {
+    tokenButtonStyle({ commit, getters }, time) {
+      commit('setTokenButtonState', true);
+      let times = time;
+      const timeOut = setInterval(() => {
+        commit('setTokenButtonType', 'info');
+        times -= 1;
+        commit('setTime', times);
+        if (getters.time === 0) {
+          clearInterval(timeOut);
+          commit('setTokenButtonType', 'primary');
+          commit('setTokenButtonState', false);
+        }
+      }, 1 * 1000);
+    },
+  },
+  getters: {
+    time: state => state.time,
   },
 });
 

@@ -18,8 +18,8 @@
             <div style="width:410px;height:50px;margin:10px 430px 10px 38%">
               <el-form-item prop="mobile">
                 <el-input v-model.number="sMs.mobile" style="width: 300px; height: 35px;" placeholder="请输入您的手机号" clearable></el-input>
-                <el-button style="width: 90px; height: 35px;" @click="validateMobileNumber" :type="buttontype" :disabled="state">
-                  {{ buttontype === 'primary' ? '获取验证码': `(  ${time} s )`}}
+                <el-button style="width: 90px; height: 35px;" @click="validateMobileNumber" :type="buttonType" :disabled="state">
+                  {{ buttonType === 'primary' ? '获取验证码': `(  ${time} s )`}}
                 </el-button>
               </el-form-item>
             </div>
@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
 import * as validate from '@/util/validate';
 import ResetPwdHeader from './resetPassword/ResetPwdHeader';
 import ResetPwdFoot from './resetPassword/ResetPwdFoot';
@@ -74,10 +75,11 @@ export default {
       },
       token: {},
       // 验证码按钮状态
-      state: false,
+      // state: this.$store.state.tokenButtonState,
       // 验证码按钮样式
-      buttontype: 'primary',
-      time: 60,
+      // buttonType: this.$store.state.tokenButtonType,
+      // time: this.$store.state.time,
+
       rules1: {
         mobile: [
           { required: true, validator: checkPhone, trigger: 'blur' },
@@ -90,9 +92,25 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapState({
+      state: state => state.tokenButtonState,
+      buttonType: state => state.tokenButtonType,
+      time: state => state.time,
+    }),
+  },
+  watch: {
+
+  },
   methods: {
+    // vuex 中的actions(扩展对象 类似于...mapState)
+    ...mapActions({
+      tokenButtonStyle: 'tokenButtonStyle',
+    }),
     // 验证手机号码
     async validateMobileNumber() {
+      // 直接调用 vuex 中 actions 的 tokenButtonStyle 方法, 并且提供参数
+      // this.$store.dispatch('tokenButtonStyle', 10);
       const $sMs = this.$refs.sMs;
       await $sMs.validate();
       try {
@@ -101,22 +119,9 @@ export default {
         })).body;
         if (code !== '200') throw new Error(message || code);
         this.$message.success({ message: '验证码发送中,请稍等片刻...' });
-        this.state = true;
         await this.$store.commit('setSmsToken', respData.key_sms_vcode_token);
-        this.buttontype = 'info';
-
-        let time = 60;
-        const timeOut = setInterval(() => {
-          this.buttontype = 'info';
-          // this.time = time--;
-          time -= 1;
-          this.time = time;
-          if (time === 0) {
-            clearInterval(timeOut);
-            this.buttontype = 'primary';
-            this.state = false;
-          }
-        }, 1 * 1000);
+        // 通过 ...mapActions 调用 tokenButtonStyle 方法
+        this.tokenButtonStyle(60);
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
@@ -133,6 +138,13 @@ export default {
         this.$router.push('/resetPasswordTwo');
       }
     },
+  },
+  mounted() {
+    if (this.time < 60 && this.time > 0) {
+      this.$store.commit('setTokenButtonType', 'info');
+      this.$store.commit('setTokenButtonState', true);
+      this.$store.dispatch('tokenButtonStyle', this.time);
+    }
   },
 };
 </script>
