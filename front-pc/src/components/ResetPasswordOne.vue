@@ -1,6 +1,6 @@
 <template>
   <div class="resPw">
-    <reset-pwd-header></reset-pwd-header>
+    <reset-pwd-header :center="title"></reset-pwd-header>
     <div class="resPw-body">
       <div class="resPw-body-left"></div>
       <div class="resPw-body-center">
@@ -74,11 +74,8 @@ export default {
         smsToken: '',
       },
       token: {},
-      // 验证码按钮状态
-      // state: this.$store.state.tokenButtonState,
-      // 验证码按钮样式
-      // buttonType: this.$store.state.tokenButtonType,
-      // time: this.$store.state.time,
+      // 测试组件
+      title: '',
 
       rules1: {
         mobile: [
@@ -110,7 +107,7 @@ export default {
     // 验证手机号码
     async validateMobileNumber() {
       // 直接调用 vuex 中 actions 的 tokenButtonStyle 方法, 并且提供参数
-      // this.$store.dispatch('tokenButtonStyle', 10);
+      // this.$store.dispatch('tokenButtonStyle', 60);
       const $sMs = this.$refs.sMs;
       await $sMs.validate();
       try {

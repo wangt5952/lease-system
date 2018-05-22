@@ -18,6 +18,11 @@
 </template>
 <script>
 export default {
+  props: {
+    center: {
+      type: String,
+    },
+  },
   data() {
     return {
 

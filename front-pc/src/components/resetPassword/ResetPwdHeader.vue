@@ -2,7 +2,7 @@
     <!-- 头部 -->
   <div class="resPw-header">
     <div class="header-font">
-    <div style="font-size:35px;color:#4377B8;">logo</div>
+    <div style="font-size:35px;color:#4377B8;">logo{{ center }}</div>
     &nbsp;
     <div style="margin-top:4px;font-size:23px;color:#F2F2F2;width:150px;height:50px">小哥乐途</div>
     <div class="longinButton">
@@ -16,6 +16,11 @@
 <script>
 
 export default {
+  props: {
+    center: {
+      type: String,
+    },
+  },
   data() {
     return {
 
