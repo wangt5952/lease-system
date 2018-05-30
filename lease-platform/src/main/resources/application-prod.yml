@@ -3,6 +3,14 @@ server:
   tomcat:
     uri-encoding: utf-8
 spring:
+#activemq
+  activemq:
+    broker-url: tcp://106.14.172.38:61616
+    user: admin
+    password: admin
+    in-memory: true
+    # 如果此处设置为true，需要加activemq-pool的依赖包，否则会自动配置失败，报JmsMessagingTemplate注入失败
+    pool.enabled: false
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://106.14.172.38:3996/lease_sys?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true

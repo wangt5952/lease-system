@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   mvc:
     media-types.*: text/html;application/json
   devtools:
@@ -15,7 +15,6 @@ spring:
       max-file-size: 10Mb
       #总文件最大限制
       max-request-size: 30Mb
-
 logging:
   config: classpath:logback.xml
 localsetting:
