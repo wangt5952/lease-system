@@ -24,7 +24,7 @@ export default {
     // },
   },
   computed: {
-    // normalizedSize() {
+    // normalizedSize() {.
     //   return this.center.trim().toLowerCase();
     // },
   },

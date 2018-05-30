@@ -88,7 +88,7 @@ const store = new Vuex.Store({
     setSmsVCode(state, smsVCode) {
       state.smsVCode = smsVCode;
     },
-    // 验证码按钮状态(true, false) 正确规范
+    // 验证码按钮状态(true, false) 正确规范.
     // ['setTokenButtonState'](state, buttonState) {
     //   state.tokenButtonState = buttonState;
     // },

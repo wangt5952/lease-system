@@ -419,7 +419,7 @@ export default {
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
-      // 获取当前城市的浏览器定位  (根据经纬度获取范围车辆)
+      // 获取当前城市的浏览器定位  (根据经纬度获取范围车辆).
       const r = await this.getCurrentPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {

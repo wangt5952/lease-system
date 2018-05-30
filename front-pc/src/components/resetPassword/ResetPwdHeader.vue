@@ -17,7 +17,7 @@
 
 export default {
   props: {
-  // 定义一个center组件 类型是String
+  // 定义一个center组件 类型是String.
     // center: {
     //   type: String,
     // },

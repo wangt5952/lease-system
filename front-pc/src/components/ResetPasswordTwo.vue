@@ -87,7 +87,7 @@ export default {
         this.cancel();
       }
     },
-    // 取消按钮
+    // 取消按钮.
     cancel() {
       this.form.newPassword = '';
       this.confirmNewPassword = '';
