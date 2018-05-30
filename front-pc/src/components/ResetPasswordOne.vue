@@ -1,6 +1,6 @@
 <template>
   <div class="resPw">
-    <reset-pwd-header :center="title"></reset-pwd-header>
+    <reset-pwd-header></reset-pwd-header>
     <div class="resPw-body">
       <div class="resPw-body-left"></div>
       <div class="resPw-body-center">
@@ -74,8 +74,6 @@ export default {
         smsToken: '',
       },
       token: {},
-      // 测试组件
-      title: '',
 
       rules1: {
         mobile: [
@@ -136,10 +134,15 @@ export default {
       }
     },
   },
-  mounted() {
+  // created:在模板渲染成html前调用，即通常初始化某些属性值，然后再渲染成视图。
+  // mounted:在模板渲染成html后调用，通常是初始化页面完成后，再对html的dom节点进行一些需要的操作。
+  created() {
     if (this.time < 60 && this.time > 0) {
+      // 初始化按钮类型为 info
       this.$store.commit('setTokenButtonType', 'info');
+      // 初始化按钮状态 true为禁用 fasle为不禁用
       this.$store.commit('setTokenButtonState', true);
+      // 调用vuex后台 actions 中tokenButtonStyle 方法
       this.$store.dispatch('tokenButtonStyle', this.time);
     }
   },

@@ -19,9 +19,14 @@
 <script>
 export default {
   props: {
-    center: {
-      type: String,
-    },
+    // center: {
+    //   type: String,
+    // },
+  },
+  computed: {
+    // normalizedSize() {
+    //   return this.center.trim().toLowerCase();
+    // },
   },
   data() {
     return {
