@@ -26,8 +26,6 @@
       </div>
 
       <baidu-map  @ready="handler" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
-        <!-- 圆形图 -->
-        <bm-circle :center="circlePath.center" :radius="circlePath.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="1" @lineupdate="updateCirclePath" :fill-opacity="0.1"></bm-circle>
         <!-- 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
@@ -174,24 +172,10 @@
 
 <script>
 import _ from 'lodash';
-// import BMap from 'BMap';
-// const path = [
-//   { lng: 118.790852, lat: 32.057248 },
-//   { lng: 118.803069, lat: 32.055044 },
-//   { lng: 118.812267, lat: 32.063735 },
-// ];
 
 export default {
   data() {
     return {
-      // 绘制圆形图
-      circlePath: {
-        center: {
-          lng: 0,
-          lat: 0,
-        },
-        radius: 1000,
-      },
 
       address: '',
       search: {},
@@ -211,6 +195,9 @@ export default {
       // 指定范围内的车辆集合
       radiusVehicleList: [],
     };
+  },
+  async mounted() {
+    await this.reloadVehicleList();
   },
   computed: {
     selectedItem() {
@@ -251,8 +238,6 @@ export default {
     },
     // 单击右下角的定位
     async positionSuccess(e) {
-      this.circlePath.center = e.point;
-      this.circlePath.radius = 1000;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: e.point.lng, lat: e.point.lat, radius: 1000,
@@ -275,11 +260,6 @@ export default {
     },
     positionError() {
     },
-    // 圆形区域
-    updateCirclePath(e) {
-      this.circlePath.center = e.target.getCenter();
-      this.circlePath.radius = e.target.getRadius();
-    },
     // 地图更改缩放级别结束时触发触发此事件
     async syncCenterAndZoom(e) {
       // 获取地图中心点
@@ -291,14 +271,14 @@ export default {
       if (zoomNum > 10) {
         switch (zoomNum) {
           // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: this.circlePath.radius = 900; num = 900; break;
+          case 16: num = 900; break;
           // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: this.circlePath.radius = 2000; num = 2000; break;
-          case 14: this.circlePath.radius = 2000; num = 2000; break;
-          case 13: this.circlePath.radius = 4000; num = 4000; break;
-          case 12: this.circlePath.radius = 10000; num = 10000; break;
-          case 11: this.circlePath.radius = 20000; num = 20000; break;
-          default: this.circlePath.radius = 1000; num = 1000;
+          case 15: num = 2000; break;
+          case 14: num = 2000; break;
+          case 13: num = 4000; break;
+          case 12: num = 10000; break;
+          case 11: num = 20000; break;
+          default: num = 1000;
         }
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -323,21 +303,21 @@ export default {
     // 停止拖拽地图时触发此事件
     async syncCenterAndZooms(e) {
       const { lng, lat } = e.target.getCenter();
-      this.circlePath.center = e.target.getCenter();
+      // this.circlePath.center = e.target.getCenter();
       // 获取缩放等级
       const zoomNum = e.target.getZoom();
       let num = 0;
       if (zoomNum > 10) {
         switch (zoomNum) {
           // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: this.circlePath.radius = 900; num = 900; break;
+          case 16: num = 900; break;
           // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: this.circlePath.radius = 2000; num = 2000; break;
-          case 14: this.circlePath.radius = 2000; num = 2000; break;
-          case 13: this.circlePath.radius = 4000; num = 4000; break;
-          case 12: this.circlePath.radius = 10000; num = 10000; break;
-          case 11: this.circlePath.radius = 20000; num = 20000; break;
-          default: this.circlePath.radius = 1000; num = 1000;
+          case 15: num = 2000; break;
+          case 14: num = 2000; break;
+          case 13: num = 4000; break;
+          case 12: num = 10000; break;
+          case 11: num = 20000; break;
+          default: num = 1000;
         }
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -421,6 +401,7 @@ export default {
               })),
             };
           });
+          console.log(this.radiusVehicleList);
         }
       } catch (e) {
         const message = e.statusText || e.message;
@@ -438,7 +419,7 @@ export default {
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
-      // 获取当前城市的浏览器定位  (根据经纬度获取范围车辆)
+      // 获取当前城市的浏览器定位  (根据经纬度获取范围车辆).
       const r = await this.getCurrentPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -529,13 +510,13 @@ export default {
         this.$message.error(message);
       }
     },
-    // 逆地址解析(根据经纬度获取详细地址)
+    // 逆地址解析(根据经纬度获取详细地址).
     getLocation(lng, lat) {
-      return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+      return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
     },
     // 根据地址获取经纬度
     getAddressByLocation(address) {
-      return new Promise((resolve, reject) => (new global.BMap.Geocoder()).getPoint(address, (res) => {
+      return new Promise(resolve => (new global.BMap.Geocoder()).getPoint(address, (res) => {
         // 给一个初始化坐标
         new BMap.Point(118.805297, 32.052656);
         resolve(res);
@@ -551,9 +532,6 @@ export default {
         }
       }, { enableHighAccuracy: true }));
     },
-  },
-  async mounted() {
-    await this.reloadVehicleList();
   },
 };
 </script>
