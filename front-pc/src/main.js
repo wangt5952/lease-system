@@ -17,7 +17,7 @@ Vue.use(Vuex);
 Vue.use(Resource);
 Vue.use(ElementUI, { size: 'small' });
 Vue.use(BaiduMap, {
-  ak: 'NmRvD46XSX0n2jOYGNZhK2jA9Bw6yGT0',
+  ak: 'rlAvtgVvUI1oM54bjPaWtVesiFtqT3cG',
 });
 Vue.component('vue-base64-file-upload', VueBase64FileUpload);
 
