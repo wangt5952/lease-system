@@ -1,4 +1,4 @@
-package com.elextec.lease.manager.service.impl;
+﻿package com.elextec.lease.manager.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
@@ -402,6 +402,7 @@ public class BizDeviceConfServiceImpl extends BaseController implements BizDevic
                 }
             } catch (BizException ex) {
                 logger.error("接口调用出现异常", ex);
+
                 throw new BizException(RunningResult.BAD_REQUEST.code(), "接口调用异常");
             } catch (Exception ex) {
                 logger.error("接口调用出现异常", ex);
