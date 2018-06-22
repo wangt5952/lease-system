@@ -1,6 +1,7 @@
 package com.elextec.lease.mobile.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
@@ -20,6 +21,7 @@ import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
+import org.hibernate.usertype.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -877,5 +879,67 @@ public class SysAuthApi extends BaseController {
     public MessageResponse userBindOrg(){
         return new MessageResponse(RunningResult.SUCCESS,bizOrganizationService.orgList());
     }
+
+    /**
+     * 获取最新用户状态，并且更新缓存
+     * @param request
+     * @return
+     * <pre>
+     *     {
+     *          code:返回Code,
+     *          message:返回消息,
+     *          respData:[{
+     *              userRealNameAuthFlag:用户实名状态
+     *          }]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/userState",method = RequestMethod.GET)
+    public MessageResponse userState(HttpServletRequest request){
+        try{
+            //获取登录token
+            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+            //获取所有登录信息
+            Map<String,Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
+            //获取登录用户信息
+            SysUserExt userExt = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+
+            //查询最新的用户状态
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria criteria = sysUserExample.createCriteria();
+            criteria.andIdEqualTo(userExt.getId());
+            SysUserExt sysUserExt = sysUserService.getExtById(sysUserExample);
+
+            //把缓存中的登录用户信息字段重新赋值
+            userExt.setUserRealNameAuthFlag(sysUserExt.getUserRealNameAuthFlag());
+
+            //生成新的登录token
+            String loginToken = WzUniqueValUtil.makeUUID();
+            //重新组织登录信息
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put(WzConstants.KEY_LOGIN_TOKEN, loginToken);//登录token
+            map.put(WzConstants.KEY_USER_INFO,sysUserExt);//用户信息
+            map.put(WzConstants.KEY_RES_INFO,userInfo.get(WzConstants.KEY_RES_INFO));//用户资源
+            map.put(WzConstants.KEY_VEHICLE_INFO,userInfo.get(WzConstants.KEY_VEHICLE_INFO));//车辆信息
+
+            //设置超时时间
+            Integer overtime = 300;
+            //判断是否是数字
+            if (WzStringUtil.isNumeric(loginOvertime)) {
+                overtime = Integer.parseInt(loginOvertime);
+            }
+
+            //重新塞回缓存
+            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, map, overtime, TimeUnit.MINUTES);
+
+            //组织返回
+            return new MessageResponse(RunningResult.SUCCESS,map);
+        }  catch (BizException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+        }
+    }
+
 
 }
