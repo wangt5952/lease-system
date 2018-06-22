@@ -62,7 +62,10 @@
           </template>
         </el-menu>
       </div>
-      <router-view style="flex:1;" />
+      <!-- 缓存页面 keep-alive -->
+      <keep-alive>
+        <router-view style="flex:1;" />
+      </keep-alive>
     </div>
 
     <el-dialog title="密码修改" :visible.sync="passwordFormVisible" :close-on-click-modal="false">
