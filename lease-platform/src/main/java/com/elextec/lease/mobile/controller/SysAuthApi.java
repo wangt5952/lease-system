@@ -928,10 +928,8 @@ public class SysAuthApi extends BaseController {
             if (WzStringUtil.isNumeric(loginOvertime)) {
                 overtime = Integer.parseInt(loginOvertime);
             }
-
             //重新塞回缓存
             redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, map, overtime, TimeUnit.MINUTES);
-
             //组织返回
             return new MessageResponse(RunningResult.SUCCESS,map);
         }  catch (BizException ex) {
