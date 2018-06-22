@@ -10,6 +10,7 @@ export default new Router({
     { path: '/resetPasswordOne', component: () => import('@/components/ResetPasswordOne') },
     { path: '/resetPasswordTwo', component: () => import('@/components/ResetPasswordTwo') },
     { path: '/',
+      redirect: '/monitor',
       component: () => import('@/components/Layout'),
       children: [
         { path: '/organization', component: () => import('@/components/Organization') },

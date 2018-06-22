@@ -9,7 +9,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+          <el-input style="width:400px;" v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.vehicleStatus" placeholder="请选择状态" style="width:100%;">
@@ -22,6 +22,13 @@
           </el-select>
         </el-form-item>
       </el-form>
+      <!-- 平台 -->
+      <template v-if="key_user_info.userType === 'PLATFORM'">
+        <div style="margin-right:10px;">
+          <el-button icon="el-icon-tickets" type="success" size="small" @click="importExcelVisible = true">导入 Excel 表格</el-button>
+        </div>
+      </template>
+      <!-- 企业 -->
       <template v-if="key_user_info.userType === 'ENTERPRISE'">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-edit" type="primary" size="small" @click="returnVehicleForms(key_user_info)">批量归还车辆</el-button>
@@ -267,7 +274,7 @@
     <el-dialog title="配件列表" :visible.sync="allPartsFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="partsSearch.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
+          <el-input style="width:400px;" v-model="partsSearch.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="partsSearch.partsStatus" placeholder="请选择状态" style="width:100%;">
@@ -377,11 +384,27 @@
         <el-button @click="saveBatteryForm2">关闭</el-button>
       </span>
     </el-dialog>
+
+    <!-- Excel表格数据入库 -->
+    <el-dialog title="导入Excel" :visible.sync="importExcelVisible" :before-close="closeExcel" style="margin-top:-50px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
+      <div class="app-container">
+        <upload-excel-component @on-selected-file='selected'></upload-excel-component>
+        <el-table :data="tableData" border highlight-current-row style="width: 100%;margin-top:20px;height: 350px; overflow-y: auto;">
+          <el-table-column v-for='item of tableHeader' :prop="item" :label="item" :key='item'>
+          </el-table-column>
+        </el-table>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="commitExcel">提交</el-button>
+        <el-button @click="closeExcel">关闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
+import UploadExcelComponent from '@/components/UploadExcel/index'
 import {
   mapState,
 } from 'vuex';
@@ -414,8 +437,15 @@ const checkVehicleNum = (rule, value, callback) => {
   else callback();
 };
 export default {
+  components: { UploadExcelComponent },
   data() {
     return {
+      // Excel表格参数
+      tableData: [],
+      tableHeader: [],
+
+      importExcelVisible: false,
+
       loading: false,
       vehicleNumTotal: undefined,
       // 车辆
@@ -543,6 +573,24 @@ export default {
     },
   },
   methods: {
+    // 提交 入库
+    async commitExcel() {
+ 
+    },
+    // 关闭Excel窗口
+    closeExcel() {
+      this.importExcelVisible = false;
+      this.tableHeader = [];
+      this.tableData = [];
+    },
+    selected(data) {
+      let results;
+      this.tableHeader = data.header;
+      this.tableData = results = data.results;
+      console.log(results);
+      // _.pluck(results, )
+    },
+
     // 车辆列表里的 电池信息下拉框('0': 新电池 '1': 旧电池 '2': 无电池 )
     async changeBattery(flag) {
       // 旧电池  调取接口数据
@@ -962,7 +1010,7 @@ export default {
       }
     },
   },
-  async mounted() {
+  async created() {
     this.loading = true;
     await this.reload();
     // await this.partsReload();

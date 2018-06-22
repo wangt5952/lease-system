@@ -42,8 +42,6 @@
         <el-menu :router="true" :collapse="isCollapse" unique-opened>
           <div style="padding:15px" @click="shrinkChang">
             <i style="color:#ffffff;font-size:28px;" class="lt" :class="{ 'lt-arrow-double-left': !isCollapse, 'lt-arrow-double-right': isCollapse }"></i>
-            <!-- <a 1href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a> -->
-            <!-- <a href="javascript:void(0)" :icon="{ isCollapse ? lt-left-sorting:lt-arrow-double-right }"></a> -->
           </div>
           <template v-for="(o, i) in menuTree">
             <!-- 有子集 -->

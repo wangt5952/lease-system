@@ -9,7 +9,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
+          <el-input style="width:450px;" v-model="search.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.partsStatus" placeholder="请选择状态" style="width:100%;">

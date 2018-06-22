@@ -9,7 +9,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="电池编号/电池货名/电池品牌/电池型号/电池参数/生产商ID/生产商名"></el-input>
+          <el-input style="width:450px;" v-model="search.keyStr" placeholder="电池编号/电池货名/电池品牌/电池型号/电池参数/生产商ID/生产商名"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.batteryStatus" placeholder="请选择状态" style="width:100%;">

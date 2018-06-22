@@ -9,7 +9,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="组织Code/组织名称/组织介绍/组织地址/联系人/联系电话/营业执照号码"></el-input>
+          <el-input style="width:450px;" v-model="search.keyStr" placeholder="组织Code/组织名称/组织介绍/组织地址/联系人/联系电话/营业执照号码"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.orgStatus" placeholder="请选择状态" style="width:100%;">
