@@ -9,7 +9,7 @@
       <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
         <el-form :inline="true">
           <el-form-item>
-            <el-input style="width:500px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+            <el-input style="width:400px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
           </el-form-item>
           <el-form-item>
             <el-select v-model="search.userStatus" placeholder="请选择状态" style="width:100%;">
@@ -160,7 +160,7 @@
     <el-dialog title="车辆列表" :visible.sync="vehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+          <el-input style="width:400px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
       </el-form>
       <el-table :data="vehicleList" style="width: 100%">

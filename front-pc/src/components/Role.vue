@@ -6,7 +6,7 @@
       </div>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="角色名"></el-input>
+          <el-input style="width:400px;" v-model="search.keyStr" placeholder="角色名"></el-input>
         </el-form-item>
       </el-form>
     </div>

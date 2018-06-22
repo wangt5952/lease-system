@@ -4,12 +4,6 @@
       <div style="margin-right:10px;">
         <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm({resType:'CATALOG'})">添加目录</el-button>
       </div>
-
-      <!-- <el-form :inline="true">
-        <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="资源Code/资源名1"></el-input>
-        </el-form-item>
-      </el-form>    -->
     </div>
     <el-table :data="tableTree" row-key="id" style="width: 100%;margin-top:10px;">
       <el-table-column width="80">

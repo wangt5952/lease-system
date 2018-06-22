@@ -171,6 +171,7 @@
 </template>
 
 <script>
+// import moment from 'moment';
 import _ from 'lodash';
 
 export default {
@@ -487,6 +488,8 @@ export default {
         param.startTime = time[0];
         param.endTime = time[1];
       }
+      // 日期格式 转换成时间戳 moment('').format('X')
+      // console.log(moment(time[0]).format('X'));
       try {
         const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
         // if (code !== '200') throw new Error(message);
