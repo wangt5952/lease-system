@@ -57,7 +57,8 @@ export default {
     },
   },
   created() {
-    this.val = this.$route.query.nickName;
+    this.val = this.$route.params.nickName;
+    console.log(this.val);
   },
 };
 </script>
