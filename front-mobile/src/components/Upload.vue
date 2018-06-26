@@ -57,6 +57,7 @@ export default {
   },
   created() {
     this.headerImage = this.$route.query.userIcon;
+    console.log(this.headerImage);
   },
   mounted() {
     const self = this;
