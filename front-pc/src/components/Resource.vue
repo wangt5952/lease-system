@@ -5,6 +5,7 @@
         <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm({resType:'CATALOG'})">添加目录</el-button>
       </div>
     </div>
+
     <el-table :data="tableTree" row-key="id" style="width: 100%;margin-top:10px;">
       <el-table-column width="80">
         <template slot-scope="{row}">
@@ -15,13 +16,13 @@
         </template>
       </el-table-column>
       <el-table-column prop="resCode" label="编码" width="100"></el-table-column>
-      <el-table-column prop="resName" label="资源名"></el-table-column>
-      <el-table-column prop="resTypeText" label="类型"></el-table-column>
-      <el-table-column prop="resUrl" label="请求URL"></el-table-column>
-      <el-table-column prop="groupSort" label="分组排序"></el-table-column>
-      <el-table-column prop="resSort" label="组内排序"></el-table-column>
-      <el-table-column prop="showFlagText" label="显示标志"></el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column prop="resName" label="资源名" width="100"></el-table-column>
+      <el-table-column prop="resTypeText" label="类型" width="100"></el-table-column>
+      <el-table-column prop="resUrl" label="请求URL" width="100"></el-table-column>
+      <el-table-column prop="groupSort" label="分组排序" width="100"></el-table-column>
+      <el-table-column prop="resSort" label="组内排序" width="100"></el-table-column>
+      <el-table-column prop="showFlagText" label="显示标志" width="100"></el-table-column>
+      <el-table-column label="操作" width="400">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
           <el-button v-if="row.resType == 'CATALOG'" icon="el-icon-edit" size="mini" type="text" @click="showForm({resType:'MENU', parent:row.id})">添加菜单</el-button>

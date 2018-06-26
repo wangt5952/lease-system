@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px;width:99%">
     <!-- 平台 -->
     <template v-if="key_user_info.userType === 'PLATFORM'">
       <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
@@ -22,11 +22,11 @@
             </el-form>
           </div>
           <el-table :data="sysApplyList">
-            <el-table-column prop="applyTitle" label="申请标题"></el-table-column>
-            <el-table-column prop="applyTypeText" label="申请类型"></el-table-column>
-            <el-table-column prop="applyStatusText" label="申请状态"></el-table-column>
-            <el-table-column prop="applyUserName" label="申请人名称"></el-table-column>
-            <el-table-column prop="applyOrgName" label="申请企业名称"></el-table-column>
+            <el-table-column prop="applyTitle" label="申请标题" width="200"></el-table-column>
+            <el-table-column prop="applyTypeText" label="申请类型" width="200"></el-table-column>
+            <el-table-column prop="applyStatusText" label="申请状态" width="200"></el-table-column>
+            <el-table-column prop="applyUserName" label="申请人名称" width="200"></el-table-column>
+            <el-table-column prop="applyOrgName" label="申请企业名称" width="200"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="{row}">
                 <el-button icon="el-icon-edit" size="mini" type="text" @click="searchInfo(row)">查看内容</el-button>

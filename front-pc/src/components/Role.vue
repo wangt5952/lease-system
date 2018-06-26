@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading && !formVisible && !assignResFormVisible" style="padding:10px;">
+  <div v-loading="loading && !formVisible && !assignResFormVisible" style="padding:10px">
     <div style="display:flex;">
       <div style="margin-right:10px;">
         <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加角色</el-button>
@@ -12,9 +12,9 @@
     </div>
 
     <el-table :data="list" class="roleHeight">
-      <el-table-column prop="roleName" label="角色名"></el-table-column>
-      <el-table-column prop="roleIntroduce" label="说明"></el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column prop="roleName" label="角色名" width="350"></el-table-column>
+      <el-table-column prop="roleIntroduce" label="说明" width="350"></el-table-column>
+      <el-table-column label="操作" width="500">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
           <el-button icon="el-icon-edit" size="mini" type="text" @click="showAssignResForm(row)">分配资源</el-button>
@@ -296,7 +296,7 @@ export default {
   width: 100%;
   max-width: 100%;
   color: #606266;
-  height: 85%;
-  max-height: 85%;
+  height: 95%;
+  max-height: 95%;
 }
 </style>

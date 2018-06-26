@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
@@ -9,7 +9,7 @@
       <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
         <el-form :inline="true">
           <el-form-item>
-            <el-input style="width:400px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+            <el-input style="width:400px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/所属企业Code/所属企业名"></el-input>
           </el-form-item>
           <el-form-item>
             <el-select v-model="search.userStatus" placeholder="请选择状态" style="width:100%;">
@@ -25,25 +25,25 @@
       </template>
     </div>
     <el-table :data="list" class="userHeight">
-      <el-table-column prop="loginName" label="用户名"></el-table-column>
-      <el-table-column prop="userMobile" label="手机号"></el-table-column>
-      <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
-      <el-table-column prop="orgName" label="所属企业名称">
+      <el-table-column prop="loginName" label="用户名" width="100"></el-table-column>
+      <el-table-column prop="userMobile" label="手机号" width="100"></el-table-column>
+      <el-table-column prop="userTypeText" label="用户类型" width="100"></el-table-column>
+      <el-table-column prop="orgName" label="所属企业" width="100">
         <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
           {{ scope.row.orgName }}
         </template>
       </el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
-      <el-table-column prop="nickName" label="昵称"></el-table-column>
-      <el-table-column prop="userName" label="姓名"></el-table-column>
-      <el-table-column prop="userRealNameAuthFlagText" label="实名认证">
+      <el-table-column prop="userIcon" label="用户LOGO" width="150"></el-table-column>
+      <el-table-column prop="nickName" label="昵称" width="100"></el-table-column>
+      <el-table-column prop="userName" label="姓名" width="100"></el-table-column>
+      <el-table-column prop="userRealNameAuthFlagText" label="实名认证" width="100">
         <template slot-scope="{row}">
           <template v-if="row.userRealNameAuthFlag === 'AUTHORIZED'"><span style="color:#17BE45">已实名</span></template>
           <template v-else><span style="color:red">未实名</span></template>
         </template>
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <el-table-column label="操作" width="270">
+      <el-table-column label="操作" width="500">
         <template slot-scope="{row}">
           <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
             <template v-if="row.userType === 'INDIVIDUAL'">
@@ -226,6 +226,9 @@
 
     <!-- 照片表单 -->
     <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
+      <div style="margin-left:10px">
+        身份证号: <span style="margin-left:10px; color:blue">{{ userPid }}</span>
+      </div>
       <div class="pidPhoto">
         <!-- 身份证正面 -->
         <div class="imgClass">
@@ -296,6 +299,8 @@ export default {
       return false;
     };
     return {
+      userPid: null,
+
       loading: false,
       // 车辆
       vehicleList: [],
@@ -441,6 +446,7 @@ export default {
         // hasOwnProperty(暂时不可用) 查看某个元素中是否包含 某元素  返回 boolean
         // typeof 判断该对象里 有没有该字段
         // 判断 用户是否上传的身份证
+        this.userPid = data.userPid;
         if (!(typeof (data.userIcFront)) ||
            !(typeof (data.userIcBack)) ||
            !(typeof (data.userIcGroup)) ||
@@ -867,7 +873,7 @@ export default {
   /* width: 100%; */
   max-width: 100%;
   color: #606266;
-  height: 85%;
-  max-height: 85%;
+  height: 90%;
+  max-height: 90%;
 }
 </style>

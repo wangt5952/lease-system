@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-battery-addone') >= 0">
@@ -25,20 +25,20 @@
     </div>
     <!-- 电池集合 -->
     <el-table :data="list" class="batteryHeight">
-      <el-table-column prop="batteryCode" label="编号"></el-table-column>
-      <el-table-column prop="batteryName" label="电池货名"></el-table-column>
-      <el-table-column prop="batteryBrand" label="品牌"></el-table-column>
-      <el-table-column prop="batteryPn" label="型号"></el-table-column>
-      <el-table-column prop="batteryParameters" label="参数"></el-table-column>
-      <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="batteryStatusText" label="状态">
+      <el-table-column prop="batteryCode" label="编号" width="150"></el-table-column>
+      <el-table-column prop="batteryName" label="电池货名" width="100"></el-table-column>
+      <el-table-column prop="batteryBrand" label="品牌" width="100"></el-table-column>
+      <el-table-column prop="batteryPn" label="型号" width="100"></el-table-column>
+      <el-table-column prop="batteryParameters" label="参数" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="120"></el-table-column>
+      <el-table-column prop="batteryStatusText" label="状态" width="100">
         <template slot-scope="{row}">
           <template v-if="row.batteryStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else-if="row.batteryStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
           <template v-else><span style="color:red">作废</span></template>
         </template>
       </el-table-column>
-      <el-table-column label="绑定车辆">
+      <el-table-column label="绑定车辆" width="100">
         <template slot-scope="{row}">
           <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
           <template v-else><span style="color:#17BE45">已绑定</span></template>
@@ -46,7 +46,7 @@
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="key_user_info.userType === 'PLATFORM'">
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" width="300">
             <template slot-scope="{row}">
               <template v-if="res['FUNCTION'].indexOf('manager-battery-modify') >= 0">
                 <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
@@ -439,7 +439,7 @@ export default {
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  width: 100%;
+  /* width: 100%; */
   max-width: 100%;
   color: #606266;
   height: 85%;
