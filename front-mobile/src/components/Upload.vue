@@ -55,6 +55,9 @@ export default {
       path: '',
     };
   },
+  created() {
+    this.headerImage = this.$route.query.userIcon;
+  },
   mounted() {
     const self = this;
     const image = document.getElementById('image');
@@ -577,6 +580,6 @@ export default {
   cursor: pointer;
 }
 .tj {
-  width:88%!important;
+  width:89%!important;
 }
 </style>

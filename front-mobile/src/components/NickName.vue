@@ -56,6 +56,9 @@ export default {
       }
     },
   },
+  created() {
+    this.val = this.$route.query.nickName;
+  },
 };
 </script>
 
