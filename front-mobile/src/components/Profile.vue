@@ -78,7 +78,6 @@ export default {
   async mounted() {
     this.u_type = _.find(user_type, { key: this.key_user_info.userType });
     this.u_status = _.find(user_status, { key: this.key_user_info.userStatus });
-    console.log(this.key_user_info);
   },
 };
 </script>

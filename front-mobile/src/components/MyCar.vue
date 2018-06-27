@@ -52,7 +52,6 @@ export default {
     const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getVehicleByUserId', { id: this.key_user_info.id })).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
-    console.log(this.list);
   },
 };
 </script>
