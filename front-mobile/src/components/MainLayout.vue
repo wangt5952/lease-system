@@ -166,6 +166,7 @@ export default {
     },
   },
   async mounted() {
+    // 静态文件
     if (!this.key_user_info.userIcon) this.portrait = '/static/images/users/1.jpg';
     else this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
     if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));

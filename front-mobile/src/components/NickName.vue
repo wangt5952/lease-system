@@ -57,6 +57,7 @@ export default {
     },
   },
   created() {
+    // 判断字段是否存在
     if (this.key_user_info.nickName) this.val = this.$route.params.nickName;
     else this.val = '';
   },
