@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-device-addone') >= 0">
         <div style="margin-right:10px;">
@@ -14,12 +14,12 @@
     </div>
     <!-- 列表a -->
     <el-table :data="list" class="deviceHeight">
-      <el-table-column prop="deviceId" label="编号"></el-table-column>
-      <el-table-column prop="deviceTypeListText" label="设备类别"></el-table-column>
-      <el-table-column prop="perSet" label="请求间隔时间(单位:秒)"></el-table-column>
-      <el-table-column prop="resetTypeText" label="硬件复位标志"></el-table-column>
-      <el-table-column prop="requestTypeText" label="主动请求数据标志"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="deviceId" label="编号" width="150"></el-table-column>
+      <el-table-column prop="deviceTypeListText" label="设备类别" width="100"></el-table-column>
+      <el-table-column prop="perSet" label="请求间隔时间(单位:秒)" width="200"></el-table-column>
+      <el-table-column prop="resetTypeText" label="硬件复位标志" width="100"></el-table-column>
+      <el-table-column prop="requestTypeText" label="主动请求数据标志" width="200"></el-table-column>
+      <el-table-column label="操作" width="400">
         <template slot-scope="{row}">
           <template v-if="res['FUNCTION'].indexOf('manager-device-modify') >= 0">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="editButton(row)">编辑</el-button>

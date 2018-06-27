@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <!--  -->
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-org-addone') >= 0">
@@ -25,21 +25,21 @@
     </div>
 
     <el-table :data="list" class="orgHeight">
-      <el-table-column prop="orgCode" label="编码"></el-table-column>
-      <el-table-column prop="orgName" label="组织名称"></el-table-column>
-      <el-table-column prop="orgTypeText" label="类别"></el-table-column>
-      <el-table-column prop="orgIntroduce" label="介绍"></el-table-column>
-      <el-table-column prop="orgAddress" label="地址"></el-table-column>
-      <el-table-column prop="orgContacts" label="联系人"></el-table-column>
-      <el-table-column prop="orgPhone" label="联系电话"></el-table-column>
-      <el-table-column prop="orgBusinessLicences" label="营业执照号码"></el-table-column>
-      <el-table-column prop="orgStatusText" label="状态">
+      <el-table-column prop="orgCode" label="编码" width="80"></el-table-column>
+      <el-table-column prop="orgName" label="组织名称" width="100"></el-table-column>
+      <el-table-column prop="orgTypeText" label="类别" width="100"></el-table-column>
+      <el-table-column prop="orgIntroduce" label="介绍" width="100"></el-table-column>
+      <el-table-column prop="orgAddress" label="地址" width="150"></el-table-column>
+      <el-table-column prop="orgContacts" label="联系人" width="100"></el-table-column>
+      <el-table-column prop="orgPhone" label="联系电话" width="100"></el-table-column>
+      <el-table-column prop="orgBusinessLicences" label="营业执照号码" width="150"></el-table-column>
+      <el-table-column prop="orgStatusText" label="状态" width="50">
         <template slot-scope="{row}">
           <template v-if="row.orgStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else><span style="color:red">作废</span></template>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="操作" width="280">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="allotVehicle(row)">分配车辆</el-button>
           <template v-if="res['FUNCTION'].indexOf('manager-org-modify') >= 0">

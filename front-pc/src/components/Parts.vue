@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业1 -->
       <template v-if="res['FUNCTION'].indexOf('manager-parts-addone') >= 0">
@@ -25,15 +25,15 @@
     </div>
     <!-- a -->
     <el-table :data="list" class="partsHeight">
-      <el-table-column prop="partsCode" label="编码"></el-table-column>
-      <el-table-column prop="partsName" label="配件货名"></el-table-column>
-      <el-table-column prop="partsBrand" label="品牌"></el-table-column>
-      <el-table-column prop="partsPn" label="型号"></el-table-column>
-      <el-table-column prop="partsTypeText" label="类别"></el-table-column>
-      <el-table-column prop="partsParameters" label="参数"></el-table-column>
-      <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="partsStatusText" label="状态"></el-table-column>
-      <el-table-column label="绑定车辆">
+      <el-table-column prop="partsCode" label="编码" width="150"></el-table-column>
+      <el-table-column prop="partsName" label="配件货名" width="100"></el-table-column>
+      <el-table-column prop="partsBrand" label="品牌" width="100"></el-table-column>
+      <el-table-column prop="partsPn" label="型号" width="100"></el-table-column>
+      <el-table-column prop="partsTypeText" label="类别" width="100"></el-table-column>
+      <el-table-column prop="partsParameters" label="参数" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
+      <el-table-column prop="partsStatusText" label="状态" width="100"></el-table-column>
+      <el-table-column label="绑定车辆" width="100">
         <template slot-scope="{row}">
           <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
           <template v-else><span style="color:#17BE45">已绑定</span></template>
@@ -41,7 +41,7 @@
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-parts-modify') >= 0">
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作" width="200">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
             <!-- <el-button icon="el-icon-edit" size="mini" type="text" @click="next(row)">下一步</el-button> -->

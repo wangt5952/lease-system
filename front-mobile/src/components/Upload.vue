@@ -53,7 +53,16 @@ export default {
       panel: false,
       url: '',
       path: '',
+      website: 'http://106.14.172.38:8990/leaseupload/usericon/',
     };
+  },
+  created() {
+    // 判断字段是否存在
+    if (this.key_user_info.userIcon) {
+      this.headerImage = this.key_user_info.userIcon.includes(this.website) ? this.$route.query.userIcon : this.website + this.$route.query.userIcon;
+    } else {
+      this.headerImage = '/static/images/users/1.jpg';
+    }
   },
   mounted() {
     const self = this;
@@ -577,6 +586,6 @@ export default {
   cursor: pointer;
 }
 .tj {
-  width:88%!important;
+  width:89%!important;
 }
 </style>

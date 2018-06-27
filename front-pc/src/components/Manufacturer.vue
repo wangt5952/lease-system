@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-mfrs-addone') >= 0">
         <div style="margin-right:10px;">
@@ -22,17 +22,18 @@
         </el-form-item>
       </el-form>
     </div>
+
     <el-table :data="list" class="mrfsHeight">
-      <el-table-column prop="mfrsName" label="制造商名称"></el-table-column>
-      <el-table-column prop="mfrsTypeText" label="类型" width="80"></el-table-column>
-      <el-table-column label="介绍">
+      <el-table-column prop="mfrsName" label="制造商名称" width="150"></el-table-column>
+      <el-table-column prop="mfrsTypeText" label="制造商类型" width="100"></el-table-column>
+      <el-table-column label="介绍" width="200">
         <template class="qqqq" slot-scope="scope">
           {{ scope.row.mfrsIntroduce }}
         </template>
       </el-table-column>
-      <el-table-column prop="mfrsAddress" label="地址"></el-table-column>
-      <el-table-column prop="mfrsContacts" label="联系人" width="100"></el-table-column>
-      <el-table-column prop="mfrsPhone" label="联系电话" width="150"></el-table-column>
+      <el-table-column prop="mfrsAddress" label="地址" width="200"></el-table-column>
+      <el-table-column prop="mfrsContacts" label="联系人" width="80"></el-table-column>
+      <el-table-column prop="mfrsPhone" label="联系电话" width="100"></el-table-column>
       <el-table-column prop="mfrsStatusText" label="状态" width="100">
         <template slot-scope="{row}">
           <template v-if="row.mfrsStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
@@ -40,7 +41,7 @@
         </template>
       </el-table-column>
       <template v-if="res['FUNCTION'].indexOf('manager-mfrs-modify') >= 0">
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
           </template>

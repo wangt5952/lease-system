@@ -37,13 +37,13 @@
     </div>
 
     <el-table :data="vehicle.list" class="vehicleHeight">
-      <el-table-column prop="vehicleCode" label="编号"></el-table-column>
-      <el-table-column prop="vehiclePn" label="型号"></el-table-column>
-      <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
-      <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
-      <el-table-column prop="orgName" label="所属单位"></el-table-column>
-      <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="vehicleStatusText" label="状态">
+      <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
+      <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
+      <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
+      <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
+      <el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
+      <el-table-column prop="vehicleStatusText" label="状态" width="60">
         <template slot-scope="{row}">
           <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else-if="row.vehicleStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
@@ -61,13 +61,13 @@
             <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="配件" width="200">
+        <el-table-column label="配件" width="180">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="">
+        <el-table-column label="操作" width="180">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">编辑</el-button>
           </template>
@@ -399,6 +399,7 @@
         <el-button @click="closeExcel">关闭</el-button>
       </span>
     </el-dialog>
+
   </div>
 </template>
 
@@ -1025,17 +1026,18 @@ export default {
 }
 >>> .vehicleHeight {
   position: relative;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  /* overflow-x: auto; */
+  /* white-space: nowrap; */
+  overflow-y: auto;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
   width: 100%;
-  max-width: 100%;
-  color: #606266;
+  /* max-width: 100%; */
   height: 85%;
   max-height: 85%;
+  color: #606266;
 }
 </style>
