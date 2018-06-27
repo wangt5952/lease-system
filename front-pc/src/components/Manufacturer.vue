@@ -24,8 +24,8 @@
     </div>
 
     <el-table :data="list" class="mrfsHeight">
-      <el-table-column prop="mfrsName" label="制造商名称" width="200"></el-table-column>
-      <el-table-column prop="mfrsTypeText" label="类型" width="80"></el-table-column>
+      <el-table-column prop="mfrsName" label="制造商名称" width="150"></el-table-column>
+      <el-table-column prop="mfrsTypeText" label="制造商类型" width="100"></el-table-column>
       <el-table-column label="介绍" width="200">
         <template class="qqqq" slot-scope="scope">
           {{ scope.row.mfrsIntroduce }}
