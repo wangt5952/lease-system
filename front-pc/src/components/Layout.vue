@@ -38,33 +38,33 @@
     </div>
     <div style="display:flex;flex:1;">
       <!-- 左侧导航 -->
-      <div :style="isCollapse ? { 'width': '4%' } : { 'width': '15%' }">
-        <el-menu :router="true" :collapse="isCollapse" unique-opened>
-          <div style="padding:15px" @click="shrinkChang">
-            <i style="color:#ffffff;font-size:28px;" class="lt" :class="{ 'lt-arrow-double-left': !isCollapse, 'lt-arrow-double-right': isCollapse }"></i>
-            <!-- <a 1href="javascript:void(0)" style="text-decoration:none;color:#FFFFFF">{{ isCollapse ? '弹出':'收缩' }}</a> -->
-            <!-- <a href="javascript:void(0)" :icon="{ isCollapse ? lt-left-sorting:lt-arrow-double-right }"></a> -->
-          </div>
-          <template v-for="(o, i) in menuTree">
-            <!-- 有子集 -->
-            <el-submenu v-if="o.children" :key="i" :index="`${i}`">
-              <template slot="title">
-                <i :class="o.icon"></i>
-                <span slot="title">{{o.name}}</span>
-              </template>
-              <el-menu-item v-for="(p, j) in o.children" :key="j" :index="p.path">{{p.name}}</el-menu-item>
-            </el-submenu>
-            <!-- 无子集 -->
-            <el-menu-item v-else :key="i" :index="`${i}`">
-              <template slot="title">
-                <i :class="o.icon"></i>
-                <span>{{o.name}}</span>
-              </template>
-            </el-menu-item>
-          </template>
-        </el-menu>
-      </div>
-      <router-view style="flex:1;" />
+      <el-menu :router="true" :default-active="$route.path" :collapse="isCollapse" unique-opened>
+        <div style="padding:15px" @click="shrinkChang">
+          <i style="color:#ffffff;font-size:28px;" class="lt" :class="{ 'lt-arrow-double-left': !isCollapse, 'lt-arrow-double-right': isCollapse }"></i>
+        </div>
+        <template v-for="(o, i) in menuTree">
+          <!-- 有子集 -->
+          <el-submenu v-if="o.children" :key="i" :index="`${i}`">
+            <template slot="title">
+              <i :class="o.icon"></i>
+              <span slot="title">{{o.name}}</span>
+            </template>
+            <el-menu-item v-for="(p, j) in o.children" :key="j" :index="p.path">{{p.name}}</el-menu-item>
+          </el-submenu>
+          <!-- 无子集 -->
+          <el-menu-item v-else :key="i" :index="`${i}`">
+            <template slot="title">
+              <i :class="o.icon"></i>
+              <span>{{o.name}}</span>
+            </template>
+          </el-menu-item>
+        </template>
+      </el-menu>
+      <!-- <div :style="isCollapse ? { 'width': '5%' } : { 'width': '15%' }">
+      </div> -->
+
+      <!-- <router-view style="flex: 1"/> -->
+      <router-view style="width:99%"/>
     </div>
 
     <el-dialog title="密码修改" :visible.sync="passwordFormVisible" :close-on-click-modal="false">
@@ -238,7 +238,6 @@ export default {
       enterpriseVisible: false,
       disabledForm: false,
       form: {},
-      orgList: [],
 
     };
   },
@@ -306,12 +305,6 @@ export default {
         this.$message.error(message);
       }
       this.enterpriseVisible = false;
-    },
-    async getOrgList() {
-      const { code, respData } = (await this.$http.post('/api/manager/org/list', {
-        currPage: 1, pageSize: 999,
-      })).body;
-      if (code === '200') this.orgList = respData.rows;
     },
     // 取消
     closeForm() {
@@ -399,11 +392,6 @@ export default {
       // this.$router.push('/');
     },
   },
-  async mounted() {
-    this.loading = true;
-    await this.getOrgList();
-    this.loading = false;
-  },
 };
 </script>
 
@@ -418,9 +406,15 @@ export default {
   /* font-size: 40px; */
 }
 >>> .el-menu {
-  height: 100%;
+  height: 105%;
   background: #1c2166;
   border-right: 0;
+}
+.el-submenu .el-menu-item {
+  height: 50px;
+  line-height: 50px;
+  padding: 0 45px;
+  min-width: 180px;
 }
 
 >>> .el-menu .el-submenu .el-submenu__title,

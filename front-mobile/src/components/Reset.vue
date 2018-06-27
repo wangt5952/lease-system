@@ -161,6 +161,7 @@ export default {
 >>> .btn-normal {
   background: #008E56;
   border-radius: 30px;
+  margin:20px auto;
 }
 >>> .btn-normal:active {
   background: #009C75 !important;
@@ -172,4 +173,5 @@ export default {
 >>> .inp-small .weui-icon{
   position: absolute; bottom: 0.35rem;right: 3rem;
 }
+
 </style>

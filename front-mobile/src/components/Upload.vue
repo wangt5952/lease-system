@@ -53,7 +53,11 @@ export default {
       panel: false,
       url: '',
       path: '',
+      website: 'http://106.14.172.38:8990/leaseupload/usericon/',
     };
+  },
+  created() {
+    this.headerImage = this.key_user_info.userIcon.includes(this.website) ? this.$route.query.userIcon : this.website + this.$route.query.userIcon;
   },
   mounted() {
     const self = this;
@@ -112,8 +116,8 @@ export default {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       // 把画布原来的 宽高 缩小6倍(宽 高大小根据实际情况而定)
-      const width = sourceCanvas.width / 8;
-      const height = sourceCanvas.height / 8;
+      const width = 200;
+      const height = 200;
 
       canvas.width = width;
       canvas.height = height;
@@ -577,6 +581,6 @@ export default {
   cursor: pointer;
 }
 .tj {
-  width:88%!important;
+  width:89%!important;
 }
 </style>

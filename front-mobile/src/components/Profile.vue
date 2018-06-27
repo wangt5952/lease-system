@@ -6,14 +6,14 @@
     </div>
 
     <group>
-      <cell title="用户头像" link="/upload">
+      <cell title="用户头像" :link="`/upload?userIcon=${key_user_info.userIcon}`">
         <div class="icon_val">
           <i slot="icon" class="iconfont icon-shenfenzheng"></i>
         </div>
       </cell>
       <cell title="用户类型" :value="this.u_type.value"></cell>
       <cell title="用户" :value="this.key_user_info.loginName"></cell>
-      <cell title="昵称" :value="this.key_user_info.nickName" link="/nickName"></cell>
+      <cell title="昵称" :value="this.key_user_info.nickName" :link="`/nickName/${key_user_info.nickName}`"></cell>
       <cell title="身份证号" :value="this.key_user_info.userPid"></cell>
       <cell title="手机号" :value="this.key_user_info.userMobile"></cell>
       <cell title="所属企业" :value="this.key_user_info.orgName"></cell>
@@ -78,6 +78,7 @@ export default {
   async mounted() {
     this.u_type = _.find(user_type, { key: this.key_user_info.userType });
     this.u_status = _.find(user_status, { key: this.key_user_info.userStatus });
+    console.log(this.key_user_info);
   },
 };
 </script>

@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sun.misc.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
@@ -1139,8 +1138,10 @@ public class BizVehicleController extends BaseController {
             // 循环每个车辆信息并装配位置信息及电量信息
             JSONObject powerInfo = null;
             for (Map<String, Object> vh : vehicles) {
-                vh.put(DeviceApiConstants.REQ_LAT, deviceLocsCache.get(vh.get("batteryCode")).getDouble(DeviceApiConstants.REQ_LAT));
-                vh.put(DeviceApiConstants.REQ_LON, deviceLocsCache.get(vh.get("batteryCode")).getDouble(DeviceApiConstants.REQ_LON));
+                //将GPS坐标转换成百度坐标
+                double[] wgs2bd = WzGPSUtil.wgs2bd(deviceLocsCache.get(vh.get("batteryCode")).getDouble(DeviceApiConstants.REQ_LAT),deviceLocsCache.get(vh.get("batteryCode")).getDouble(DeviceApiConstants.REQ_LON));
+                vh.put(DeviceApiConstants.REQ_LAT, wgs2bd[0]);//lat
+                vh.put(DeviceApiConstants.REQ_LON, wgs2bd[1]);//lon
                 powerInfo = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVIE_POWER_MAP, vh.get("batteryCode") + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString());
                 if (null == powerInfo) {
                     vh.put(DeviceApiConstants.REQ_RSOC, "");

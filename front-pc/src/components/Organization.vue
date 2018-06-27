@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <!--  -->
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-org-addone') >= 0">
@@ -9,7 +9,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="组织Code/组织名称/组织介绍/组织地址/联系人/联系电话/营业执照号码"></el-input>
+          <el-input style="width:450px;" v-model="search.keyStr" placeholder="组织Code/组织名称/组织介绍/组织地址/联系人/联系电话/营业执照号码"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.orgStatus" placeholder="请选择状态" style="width:100%;">
@@ -25,21 +25,21 @@
     </div>
 
     <el-table :data="list" class="orgHeight">
-      <el-table-column prop="orgCode" label="编码"></el-table-column>
-      <el-table-column prop="orgName" label="组织名称"></el-table-column>
-      <el-table-column prop="orgTypeText" label="类别"></el-table-column>
-      <el-table-column prop="orgIntroduce" label="介绍"></el-table-column>
-      <el-table-column prop="orgAddress" label="地址"></el-table-column>
-      <el-table-column prop="orgContacts" label="联系人"></el-table-column>
-      <el-table-column prop="orgPhone" label="联系电话"></el-table-column>
-      <el-table-column prop="orgBusinessLicences" label="营业执照号码"></el-table-column>
-      <el-table-column prop="orgStatusText" label="状态">
+      <el-table-column prop="orgCode" label="编码" width="80"></el-table-column>
+      <el-table-column prop="orgName" label="组织名称" width="100"></el-table-column>
+      <el-table-column prop="orgTypeText" label="类别" width="100"></el-table-column>
+      <el-table-column prop="orgIntroduce" label="介绍" width="100"></el-table-column>
+      <el-table-column prop="orgAddress" label="地址" width="150"></el-table-column>
+      <el-table-column prop="orgContacts" label="联系人" width="100"></el-table-column>
+      <el-table-column prop="orgPhone" label="联系电话" width="100"></el-table-column>
+      <el-table-column prop="orgBusinessLicences" label="营业执照号码" width="150"></el-table-column>
+      <el-table-column prop="orgStatusText" label="状态" width="50">
         <template slot-scope="{row}">
           <template v-if="row.orgStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else><span style="color:red">作废</span></template>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="操作" width="280">
         <template slot-scope="{row}">
           <el-button icon="el-icon-edit" size="mini" type="text" @click="allotVehicle(row)">分配车辆</el-button>
           <template v-if="res['FUNCTION'].indexOf('manager-org-modify') >= 0">
@@ -114,23 +114,23 @@
         </el-row>
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item label="营业执照">
-              <!-- <input id="uploadFile" type="file" accept="image/*" @change="selectedFile"> -->
-              <!-- <el-input v-model="form.orgBusinessLicences" auto-complete="off"></el-input> -->
-              <el-upload
-                class="avatar-uploader"
-                action=""
-                list-type="picture-card"
-                :show-file-list="false"
-                :auto-upload="false"
-                :on-change="changeFile">
-                <img id="giftImg" v-if="imageUrl" :src="imageUrl" class="avatar">
-                <el-button v-else slot="trigger" size="small" type="primary">选取文件</el-button>
-              </el-upload>
-              <div>
-                <el-button size="small" type="primary" @click="searchPhoto">点击查看</el-button>
-              </div>
-            </el-form-item>
+            <div class="photo">
+              <el-form-item label="营业执照">
+                <el-upload
+                  class="avatar-uploader"
+                  action=""
+                  list-type="picture-card"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                  :on-change="changeFile">
+                  <img id="giftImg" v-if="imageUrl" :src="imageUrl" class="avatar">
+                  <el-button v-else slot="trigger" size="small" type="primary">选取文件</el-button>
+                </el-upload>
+                <div class="searchInfo">
+                  <el-button size="small" type="primary" @click="searchPhoto">点击查看</el-button>
+                </div>
+              </el-form-item>
+            </div>
           </el-col>
         </el-row>
       </el-form>
@@ -164,6 +164,26 @@
 <script>
 import _ from 'lodash';
 import { mapState } from 'vuex';
+import * as validate from '@/util/validate';
+
+// 验证手机格式
+const checkPhone = (rule, value, callback) => {
+  if (!value) callback(new Error('请输入手机号码'));
+  else if (!validate.isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
+  else callback();
+};
+// 验证企业编号
+const checkOrgId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
+// 验证营业执照
+const checkSinogram = (rule, value, callback) => {
+  if (!value) callback(new Error('营业执照不能为空'));
+  if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
 
 export default {
   data() {
@@ -181,41 +201,6 @@ export default {
       }, 500);
       return false;
       // callback();
-    };
-    const checkOrgId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
-    // 汉字验证
-    const checkSinogram = (rule, value, callback) => {
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('输入内容不能含有汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
-    // 验证手机格式
-    const checkPhone = (rule, value, callback) => {
-      setTimeout(() => {
-        if (/^$|^\d+$/.test(value)) {
-          callback();
-        } else {
-          callback(new Error('请输入正确手机格式'));
-        }
-      }, 500);
-      return false;
     };
     return {
       disabledFormId: false,
@@ -269,15 +254,13 @@ export default {
       ],
       rules1: {
         orgCode: [
-          { required: true, message: '请填写编码' },
-          { validator: checkOrgId, trigger: 'blur' },
+          { required: true, validator: checkOrgId },
         ],
         orgPhone: [
-          { required: true, message: '请填写手机号码' },
-          { validator: checkPhone, trigger: 'blur' },
+          { required: true, validator: checkPhone, trigger: 'blur' },
         ],
         orgBusinessLicences: [
-          { validator: checkSinogram, trigger: 'blur' },
+          { required: true, validator: checkSinogram },
         ],
       },
       rules2: {
@@ -315,7 +298,7 @@ export default {
       const reader = new FileReader();
       reader.readAsDataURL(file.raw);
       // reader.onload = function(e) {
-      reader.onload = function () {
+      reader.onload = function get() {
         This.imageUrl = this.result;
       };
     },
@@ -376,9 +359,6 @@ export default {
       this.formVisible = true;
       if (form.id) {
         this.disabledFormId = true;
-        // form.orgBusinessLicenceFront = this.orgPhotoPath + form.orgBusinessLicenceFront;
-        // this.imageUrl = form.orgBusinessLicenceFront;
-        // form.orgBusinessLicenceFront = this.orgPhotoPath + form.orgBusinessLicenceFront;
         this.imageUrl = this.orgPhotoPath + form.orgBusinessLicenceFront;
       } else {
         const $form = this.$refs.form;
@@ -389,10 +369,10 @@ export default {
     closeForm() {
       this.formVisible = false;
       const This = this;
-      this.form = {};
+      // this.form = {};
       setTimeout(() => {
         This.imageUrl = '';
-      }, 100);
+      }, 0.1 * 1000);
     },
     // 跳转到给企业分配车辆页面
     async allotVehicle(row) {
@@ -485,9 +465,26 @@ export default {
 </script>
 
 <style scoped>
->>> td.el-table_1_column_12 .cell {
-  width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.photo >>> .el-form-item__content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
 }
+.searchInfo {
+  position: relative;
+  left: 5px;
+}
+>>> .el-table .cell {
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 23px;
+  width: 135px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis !important;
+}
+
 .edit-form >>> .el-form-item {
   height: 73px;
 }

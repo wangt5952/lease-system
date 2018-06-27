@@ -5,6 +5,11 @@
       <div class="tlte"><span>我的车辆</span></div>
     </div>
 
+    <group v-if="this.list.length === 0">
+     <x-textarea title="" v-model="value"></x-textarea>
+     <x-button type="primary" @click.native="handler">实名认证</x-button>
+    </group>
+
     <group v-for="(item,index) in list" :key="item.id">
       <cell :title="`我的车辆${index+1}`"  :value="item.id == localID?'默认车辆':''" :link="`/info/${item.id}`"></cell>
     </group>
@@ -12,18 +17,21 @@
 </template>
 
 <script>
-import { Cell, Group } from 'vux';
+import { Cell, Group, XTextarea, XButton } from 'vux';
 import { mapState } from 'vuex';
 
 export default {
   components: {
     Group,
     Cell,
+    XTextarea,
+    XButton,
   },
   data() {
     return {
       list: [],
       localID: localStorage.getItem('vehicleId'),
+      value: '很遗憾您的名下没有车辆，赶快实名认证，去企业申领车辆吧！',
     };
   },
   computed: {
@@ -36,11 +44,15 @@ export default {
     back() {
       this.$router.replace('/');
     },
+    handler() {
+      this.$router.replace('/authentication_step1');
+    },
   },
   async mounted() {
     const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getVehicleByUserId', { id: this.key_user_info.id })).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
+    console.log(this.list);
   },
 };
 </script>
@@ -83,4 +95,7 @@ export default {
   >>>.vux-label {
       font-size: 15pt;
     }
+  .weui-btn {
+    width:80%;
+  }
 </style>

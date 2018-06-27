@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-mfrs-addone') >= 0">
         <div style="margin-right:10px;">
@@ -8,7 +8,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="制造商名称/制造商介绍/制造商地址/联系人/联系电话"></el-input>
+          <el-input style="width:400px;" v-model="search.keyStr" placeholder="制造商名称/制造商介绍/制造商地址/联系人/联系电话"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.mfrsStatus" placeholder="请选择状态" style="width:100%;">
@@ -22,13 +22,18 @@
         </el-form-item>
       </el-form>
     </div>
+
     <el-table :data="list" class="mrfsHeight">
-      <el-table-column prop="mfrsName" label="制造商名称"></el-table-column>
+      <el-table-column prop="mfrsName" label="制造商名称" width="200"></el-table-column>
       <el-table-column prop="mfrsTypeText" label="类型" width="80"></el-table-column>
-      <el-table-column prop="mfrsIntroduce" label="介绍"></el-table-column>
-      <el-table-column prop="mfrsAddress" label="地址"></el-table-column>
-      <el-table-column prop="mfrsContacts" label="联系人" width="100"></el-table-column>
-      <el-table-column prop="mfrsPhone" label="联系电话" width="150"></el-table-column>
+      <el-table-column label="介绍" width="200">
+        <template class="qqqq" slot-scope="scope">
+          {{ scope.row.mfrsIntroduce }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="mfrsAddress" label="地址" width="200"></el-table-column>
+      <el-table-column prop="mfrsContacts" label="联系人" width="80"></el-table-column>
+      <el-table-column prop="mfrsPhone" label="联系电话" width="100"></el-table-column>
       <el-table-column prop="mfrsStatusText" label="状态" width="100">
         <template slot-scope="{row}">
           <template v-if="row.mfrsStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
@@ -36,7 +41,7 @@
         </template>
       </el-table-column>
       <template v-if="res['FUNCTION'].indexOf('manager-mfrs-modify') >= 0">
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
           </template>
@@ -54,7 +59,7 @@
       :total="total">
     </el-pagination>
 
-    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false">
+    <el-dialog title="企业信息" :visible.sync="formVisible" :close-on-click-modal="false" :before-close="closeForm">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
           <el-col :span="8">
@@ -81,7 +86,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item prop="mfrsPhone" label="联系电话">
-              <el-input v-model="form.mfrsPhone" auto-complete="off"></el-input>
+              <el-input v-model.number="form.mfrsPhone"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -92,8 +97,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="介绍">
+            <el-form-item prop="mfrsIntroduce" label="介绍">
               <el-input type="textarea" v-model="form.mfrsIntroduce" auto-complete="off"></el-input>
+              <span :style="residueStrNumber > 0 ? {'color': 'green'}:{'color': 'red'}">
+                剩余字数: {{ residueStrNumber }}
+              </span>
             </el-form-item>
           </el-col>
         </el-row>
@@ -112,20 +120,16 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import { isvalidPhone } from '../util/validate';
 
+// 手机验证全局变量
+const checkPhone = (rule, value, callback) => {
+  if (!value) callback(new Error('请输入手机号码'));
+  else if (!isvalidPhone(value)) callback(new Error('请输入正确的11位手机号码'));
+  else callback();
+};
 export default {
   data() {
-    // 验证手机格式
-    const checkMfrsPhone = (rule, value, callback) => {
-      setTimeout(() => {
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('请输入正确的电话格式'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
       loading: false,
       list: [],
@@ -166,10 +170,16 @@ export default {
         // { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
       ],
+      // 介绍剩余字数
+      residueStrNumber: 80,
       rules1: {
+        // 验证手机号码
         mfrsPhone: [
-          { required: true, message: '请填写电话号码' },
-          { validator: checkMfrsPhone, trigger: 'blur' },
+          { required: true, validator: checkPhone, trigger: 'blur' },
+        ],
+        // 验证字符长度(非必填 如果填写不能超过80个字符)
+        mfrsIntroduce: [
+          { min: 0, max: 80, message: '长度不能超过 80 个字符' },
         ],
       },
     };
@@ -186,6 +196,12 @@ export default {
         await this.reload();
       },
       deep: true,
+    },
+    'form.mfrsIntroduce'(v) {
+      let len = 0;
+      if (v) len = v.length;
+      else len = 0;
+      this.residueStrNumber = 80 - len >= 0 ? 80 - len : 0;
     },
   },
   methods: {
@@ -241,21 +257,30 @@ export default {
         'mfrsStatus',
       ]);
       this.formVisible = true;
+      if (!form.id) {
+        const $form = this.$refs.form;
+        if ($form) $form.resetFields();
+      } else {
+        // 判断剩余字节长度
+        this.residueStrNumber = 80 - form.mfrsIntroduce.length >= 0 ? 80 - form.mfrsIntroduce.length : 0;
+      }
     },
     closeForm() {
-      this.form = {};
       this.formVisible = false;
+      setTimeout(() => {
+        this.residueStrNumber = 80;
+      }, 0.2 * 1000);
     },
     async saveForm() {
       const { loginName } = this.key_user_info;
+      const $form = this.$refs.form;
+      await $form.validate();
       try {
-        const $form = this.$refs.form;
-        await $form.validate();
-
         if (this.form.id) {
           const { ...form } = this.form;
           if (form.parent === '') form.parent = null;
           form.update_user = loginName;
+
           const { code, message } = (await this.$http.post('/api/manager/mfrs/modify', form)).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('编辑成功');
@@ -290,13 +315,24 @@ export default {
   height: 73px;
 }
 >>> .el-textarea__inner {
-  height: 90px;
+  height: 60px;
 }
-/* .el-table >>> .cell {
-  width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+/* .mrfsHeight >>> td.el-table_1_column_3 .cell {
+  width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis !important;
 } */
->>> td.el-table_1_column_3 .cell {
-  width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+>>> .el-table .cell {
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 23px;
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis !important;
+}
+>>> .el-table__body-wrapper {
+    overflow-x: hidden;
+    position: relative;
 }
 >>> .mrfsHeight {
   position: relative;
@@ -311,6 +347,6 @@ export default {
   max-width: 100%;
   color: #606266;
   height: 85%;
-  max-height: 85%;
+  max-height: 90%;
 }
 </style>

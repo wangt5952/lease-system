@@ -5,6 +5,15 @@
       <div class="tlte"><span>实名认证</span></div>
     </div>
 
+    <div>
+     <step v-model="step" background-color='#fbf9fe'>
+       <div class="line"></div>
+       <step-item title="" description="" style="display:none"></step-item>
+       <step-item title="步骤2:" description="上传身份证件图片"></step-item>
+     </step>
+   </div>
+   <x-hr></x-hr>
+
     <group>
       <cell
       title="请您上传身份证正面照片"
@@ -21,13 +30,13 @@
         <div v-transfer-dom>
           <x-dialog v-model="show" hide-on-blur>
             <div class="img-box">
-              <img :src="this.data" style="max-width:100%;height:250px;margin:25px auto">
+              <img src="/static/images/source_frontCard.jpg" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="up" type="button">
-            <img src="/static/images/add.png" style="width:100%;">
+            <img :src="this.data" :width="this.width" :height="this.height">
             <input type="file" class="file" accept="image/*" multiple @change="change(1,$event)">
         </div>
       </template>
@@ -47,14 +56,14 @@
         <div v-transfer-dom>
           <x-dialog v-model="show1" hide-on-blur>
             <div class="img-box">
-              <img :src="this.data1" style="max-width:100%;height:250px;margin:25px auto">
+              <img src="/static/images/source_backCard.jpg" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="up" type="button">
-            <img src="/static/images/add.png" style="width:100%;">
-            <input type="file" class="file" accept="image/*" @change="change(2,$event)" multiple>
+            <img :src="this.data1" :width="this.width" :height="this.height">
+            <input type="file" class="file" accept="image/*" @change="change(2,$event)">
         </div>
       </template>
 
@@ -73,14 +82,14 @@
         <div v-transfer-dom>
           <x-dialog v-model="show2" hide-on-blur>
             <div class="img-box">
-              <img :src="this.data2" style="max-width:100%;height:250px;margin:25px auto">
+              <img src="/static/images/sc_card.jpg" style="max-width:100%;height:250px;margin:25px auto">
             </div>
           </x-dialog>
         </div>
 
         <div class="sc_up" type="button">
-            <img src="/static/images/add1.png" style="width:100%;height:100%;">
-            <input type="file" class="file" accept="image/*" @change="change(3,$event)" multiple>
+            <img :src="this.data2" :width="this.width" :height="this.height">
+            <input type="file" class="file" accept="image/*" @change="change(3,$event)">
         </div>
 
       </template>
@@ -90,7 +99,7 @@
 </template>
 
 <script>
-import { Cell, Group, XDialog, XButton, TransferDom } from 'vux';
+import { Cell, Group, XDialog, Step, StepItem, XHr, XButton, TransferDom } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -103,6 +112,9 @@ export default {
     Cell,
     XDialog,
     XButton,
+    Step,
+    StepItem,
+    XHr,
     TransferDom,
   },
   computed: {
@@ -114,23 +126,27 @@ export default {
   },
   data() {
     return {
+      step: 0,
       showContent001: false,
       showContent002: false,
       showContent003: false,
       show: false,
       show1: false,
       show2: false,
-      data: '',
-      data1: '',
-      data2: '',
+      data: '/static/images/add.png',
+      data1: '/static/images/add.png',
+      data2: '/static/images/add1.png',
       path: '',
       path1: '',
       path2: '',
+      width: '100%',
+      height: '100%',
+      headerImage: '',
     };
   },
   methods: {
     back() {
-      this.$router.replace('/');
+      this.$router.replace('/authentication_step1');
     },
     select(index) {
       if (index === 1) {
@@ -146,35 +162,49 @@ export default {
       if (!files.length) return;
       const thisOne = this;
       const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
       reader.onload = function get() {
-        if (index === 1) {
-          thisOne.data = this.result;
-          thisOne.path = _.split(this.result, ',')[1];
-        } else if (index === 2) {
-          thisOne.data1 = this.result;
-          thisOne.path1 = _.split(this.result, ',')[1];
-        } else if (index === 3) {
-          thisOne.data2 = this.result;
-          thisOne.path2 = _.split(this.result, ',')[1];
-        }
-        thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
+        const image = new Image();
+        image.src = this.result;
+        image.onload = function getImg() {
+          thisOne.headerImage = thisOne.getCanvas(image).toDataURL();
+
+          if (index === 1) {
+            thisOne.data = image.src;
+            thisOne.path = _.split(thisOne.headerImage, ',')[1];
+          } else if (index === 2) {
+            thisOne.data1 = image.src;
+            thisOne.path1 = _.split(thisOne.headerImage, ',')[1];
+          } else if (index === 3) {
+            thisOne.data2 = image.src;
+            thisOne.path2 = _.split(thisOne.headerImage, ',')[1];
+          }
+          thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
+        };
       };
+      reader.readAsDataURL(files[0]);
+    },
+    getCanvas(sourceCanvas) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const width = 300;
+      const height = 300;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      context.drawImage(sourceCanvas, 0, 0, width, height);
+      return canvas;
     },
     async handler() {
       const { code, message, respData } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
-        { id: this.key_user_info.id, userPid: this.key_user_info.userPid, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
+        { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
       if (code !== '200') {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {
         this.$vux.toast.show({ text: respData, type: 'success', width: '10em' });
+        this.$router.replace('/authentication_step3');
       }
     },
-  },
-  async mounted() {
-    this.data = this.data === '' ? '/static/images/source_frontCard.jpg' : this.data;
-    this.data1 = this.data1 === '' ? '/static/images/source_backCard.jpg' : this.data1;
-    this.data2 = this.data2 === '' ? '/static/images/sc_card.jpg' : this.data2;
   },
 };
 </script>
@@ -226,11 +256,10 @@ export default {
     border: 1px dashed #666;
   }
   .up {
-    width:40%;
-    height:0;
+    width:40vw;
+    height:40vw;
     display: inline-block;
-    padding-bottom: 40%;
-    margin-left: 10px;
+    margin: 10px 10px;
     border: 1px dashed #666;
     position: relative;
   }
@@ -272,5 +301,38 @@ export default {
   .weui-btn {
     width:80%;
     margin:20px auto;
+  }
+  >>>.vux-step-item {
+    width:100%;
+  }
+  >>>.vux-step-item-head-inner {
+    border: 1px solid #09bb07!important;
+    color: #FFF!important;
+    background: #09bb07 none repeat scroll 0 0!important;
+  }
+  >>>.vux-step-item-head {
+    margin: 2px 10px;
+  }
+  .line {
+    width: 30%;
+    height:1px;
+    clear:both;
+    border-top:1px solid #888;
+    position: absolute;
+    top:14%;
+  }
+  >>>.vux-step-item-main {
+    font-weight: bold;
+    color: #666;
+    margin:0 10%;
+    width:80%;
+    height:80px;
+  }
+  >>>.vux-step-item-title {
+    font-size: 18px;
+  }
+  >>>.vux-step-item-description {
+    margin:10px 50px;
+    font-size:15px;
   }
 </style>

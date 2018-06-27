@@ -1,7 +1,7 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
-      <!-- PLATFORM:平台, ENTERPRISE:企业1 -->
+      <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-battery-addone') >= 0">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加电池</el-button>
@@ -9,7 +9,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="电池编号/电池货名/电池品牌/电池型号/电池参数/生产商ID/生产商名"></el-input>
+          <el-input style="width:450px;" v-model="search.keyStr" placeholder="电池编号/电池货名/电池品牌/电池型号/电池参数/生产商ID/生产商名"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.batteryStatus" placeholder="请选择状态" style="width:100%;">
@@ -23,33 +23,36 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- {{ id }} -->
+    <!-- 电池集合 -->
     <el-table :data="list" class="batteryHeight">
-      <el-table-column prop="batteryCode" label="编号"></el-table-column>
-      <el-table-column prop="batteryName" label="电池货名"></el-table-column>
-      <el-table-column prop="batteryBrand" label="品牌"></el-table-column>
-      <el-table-column prop="batteryPn" label="型号"></el-table-column>
-      <el-table-column prop="batteryParameters" label="参数"></el-table-column>
-      <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="batteryStatusText" label="状态">
+      <el-table-column prop="batteryCode" label="编号" width="150"></el-table-column>
+      <el-table-column prop="batteryName" label="电池货名" width="100"></el-table-column>
+      <el-table-column prop="batteryBrand" label="品牌" width="100"></el-table-column>
+      <el-table-column prop="batteryPn" label="型号" width="100"></el-table-column>
+      <el-table-column prop="batteryParameters" label="参数" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="120"></el-table-column>
+      <el-table-column prop="batteryStatusText" label="状态" width="100">
         <template slot-scope="{row}">
           <template v-if="row.batteryStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else-if="row.batteryStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
           <template v-else><span style="color:red">作废</span></template>
         </template>
       </el-table-column>
-      <el-table-column label="绑定车辆">
+      <el-table-column label="绑定车辆" width="100">
         <template slot-scope="{row}">
           <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
           <template v-else><span style="color:#17BE45">已绑定</span></template>
         </template>
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <template v-if="res['FUNCTION'].indexOf('manager-battery-modify') >= 0">
-        <el-table-column label="操作" width="100">
-          <template slot-scope="{row}">
-            <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
-          </template>
+      <template v-if="key_user_info.userType === 'PLATFORM'">
+        <el-table-column label="操作" width="300">
+            <template slot-scope="{row}">
+              <template v-if="res['FUNCTION'].indexOf('manager-battery-modify') >= 0">
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
+              </template>
+              <el-button v-if="!row.deviceId" icon="el-icon-plus" size="mini" type="text" @click="addDeviceButton(row)">添加设备</el-button>
+            </template>
         </el-table-column>
       </template>
     </el-table>
@@ -63,6 +66,48 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+
+    <el-dialog title="设备信息" :visible.sync="deviceFormVisible" :before-close="colseDeviceForm">
+      <el-form class="edit-form" :model="deviceForm" ref="deviceForm" :rules="rules2">
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item prop="deviceId" label="编号">
+              <el-input v-model="batteryForm.batteryCode" placeholder="请输入编号" auto-complete="off" :disabled="editForm"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="deviceType" label="设备类别">
+              <el-select v-model="deviceForm.deviceType" placeholder="请选择设备类别" style="width:100%;" :disabled="editForm">
+                <el-option v-for="o in deviceTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="perSet" label="请求间隔时间 (单位:秒)">
+              <el-input v-model.number="deviceForm.perSet" placeholder="请输入请求间隔时间" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="reset" label="硬件复位标志">
+              <el-select v-model="deviceForm.reset" placeholder="请选择硬件复位标志" style="width:100%;">
+                <el-option v-for="o in resetTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item prop="request" label="主动请求数据标志">
+              <el-select v-model="deviceForm.request" placeholder="请选择主动请求数据标志" style="width:100%;">
+                <el-option v-for="o in requestTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="colseDeviceForm">取消</el-button>
+        <el-button type="primary" @click="addDeviceForm">添加</el-button>
+      </span>
+    </el-dialog>
 
     <el-dialog title="电池信息" :visible.sync="formVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
@@ -122,26 +167,57 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import * as validate from '@/util/validate';
+
+const checkBattreryId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
+
+const checkTime = (rule, value, callback) => {
+  if (!value) callback(new Error('请求间隔时间不能为空'));
+  else if (!validate.isvalidSignlessInteger(value)) callback(new Error('请输入非负正整数'));
+  else callback();
+};
 
 export default {
   data() {
-    const checkBattreryId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
+      // 设备
+      deviceFormVisible: false,
+      editForm: false,
+      editButtonVisible: false,
+      addButtonVisible: false,
+      deviceForm: {},
+      batteryForm: {},
+      deviceTypeList: [
+        { id: 'BATTERY', name: '电池' },
+      ],
+      resetTypeList: [
+        { id: 0, name: '无处理' },
+        { id: 1, name: '复位重启' },
+      ],
+      requestTypeList: [
+        { id: 0, name: '无处理' },
+        { id: 1, name: '主动请求' },
+      ],
+      // 设备表单效验
+      rules2: {
+        perSet: [
+          { required: true, validator: checkTime },
+        ],
+        reset: [
+          { required: true, message: '请选择硬件复位标志' },
+        ],
+        request: [
+          { required: true, message: '请选择主动请求数据标志' },
+        ],
+      },
+
+
       loading: false,
       list: [],
-      // id: this.$route.query.aaaa,
       search: {
         batteryStatus: '',
         isBind: '',
@@ -180,8 +256,7 @@ export default {
       mfrsList: [],
       rules1: {
         batteryCode: [
-          { required: true, message: '请填写编码' },
-          { validator: checkBattreryId, trigger: 'blur' },
+          { required: true, validator: checkBattreryId },
         ],
       },
     };
@@ -201,11 +276,44 @@ export default {
     },
   },
   methods: {
+    // 添加设备按钮
+    addDeviceButton(row = {}) {
+      this.editForm = true;
+      this.deviceFormVisible = true;
+      this.batteryForm = _.pick(row, [
+        'batteryCode',
+      ]);
+      this.deviceForm.perSet = 30;
+      this.deviceForm.deviceType = '电池';
+    },
+    // 保存设备
+    async addDeviceForm() {
+      const $deviceForm = this.$refs.deviceForm;
+      await $deviceForm.validate();
 
-    // getParams() {
-    //   let routerParams = this.$route.params.aaaa;
-    //   this.id = routerParams;
-    // },
+      const { ...deviceForm } = this.deviceForm;
+      deviceForm.deviceId = this.batteryForm.batteryCode;
+      deviceForm.deviceType = 'BATTERY';
+      try {
+        const { code, message } = (await this.$http.post('/api/manager/device/addone', deviceForm)).body;
+        if (code !== '200') throw new Error(message);
+        this.$message.success('添加成功');
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      await this.reload();
+      this.deviceFormVisible = false;
+    },
+    // 关闭设备窗口
+    colseDeviceForm() {
+      const $deviceForm = this.$refs.deviceForm;
+      if ($deviceForm) $deviceForm.resetFields();
+      this.deviceFormVisible = false;
+      this.deviceForm = {};
+    },
+
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();
@@ -243,7 +351,8 @@ export default {
         this.$message.error(message);
       }
     },
-    showForm(form = { }) {
+    async showForm(form = {}) {
+      await this.getMfrsList();
       this.form = _.pick(form, [
         'id',
         'batteryCode',
@@ -284,7 +393,7 @@ export default {
           if (form.parent === '') form.parent = null;
           form.create_user = loginName;
           form.update_user = loginName;
-          const { code, message } = (await this.$http.post('/api/manager/battery/add', [form])).body;
+          const { code, message } = (await this.$http.post('/api/manager/battery/addone', form)).body;
           if (code !== '200') throw new Error(message);
           this.$message.success('添加成功');
         }
@@ -296,12 +405,20 @@ export default {
         this.$message.error(message);
       }
     },
+    async getMfrsList() {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+          currPage: 1, pageSize: 999,
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.mfrsList = respData.rows;
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
   },
   async mounted() {
-    const { code, respData } = (await this.$http.post('/api/manager/mfrs/list', {
-      currPage: 1, pageSize: 999,
-    })).body;
-    if (code === '200') this.mfrsList = respData.rows;
     this.loading = true;
     await this.reload();
     this.loading = false;
@@ -322,7 +439,7 @@ export default {
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  width: 100%;
+  /* width: 100%; */
   max-width: 100%;
   color: #606266;
   height: 85%;

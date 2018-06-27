@@ -7,7 +7,6 @@
     :show-mode="showModeValue"
     :placement="showPlacementValue"
     >
-
       <div slot="drawer">
         <div class="head">
           <span class="bg-dr_profile">
@@ -15,7 +14,7 @@
           </span>
           <div class="info">
             <p class="name">{{key_user_info.nickName}}</p>
-            <a href="/authentication"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
+            <a :href="key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'javascript:;':'/authentication_step1'" @click="getPath"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
           </div>
         </div>
 
@@ -50,7 +49,10 @@
 
         <baidu-map @ready="handler" :center="mapCenter" :zoom="zoomNum" :dragging="true" :pinch-to-zoom="true" class="bm-view">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" :showZoomInfo="true"></bm-navigation>
-          <bm-marker :position="Center" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" :icon="this.icon"></bm-marker>
+          <bm-marker :position="Center" :dragging="false" animation="BMAP_ANIMATION_BOUNCE" @click="vehicleBatterInfo(vehicleID)" :icon="this.icon"></bm-marker>
+          <bm-info-window :position="PopCenter" :title="infoWindow.title" :show="infoWindow.show" @close="infoWindow.show = false" :width="this.width" :height="this.height">
+            <p v-text="infoWindow.contents"></p>
+          </bm-info-window>
         </baidu-map>
         <a class="btn" @click="location" href="javascript:;">
           <p><i slot="icon" class="iconfont icon-motuoche"></i></p>
@@ -87,30 +89,52 @@ export default {
       key_user_info: state => state.key_user_info,
 
       relogin: state => state.relogin,
+      // 车辆ID
+      vehicleID: state => state.vehicleID,
     }),
   },
   data() {
     return {
-      showMenu: false,
+      infoWindow: {
+        show: false,
+        contents: '',
+        title: '<span><i slot="icon" class="iconfont icon-electricquantity2dianchidianliang"></i></span>',
+      },
       drawerVisibility: false,
       showMode: 'push',
       showModeValue: 'push',
       showPlacement: 'left',
       showPlacementValue: 'left',
-      mapCenter: '北京',
+      mapCenter: { lng: 116.404, lat: 39.915 },
       Center: { lng: 0, lat: 0 },
-      zoomNum: 16,
+      PopCenter: { lng: 0, lat: 0 },
+      zoomNum: 18,
       vehicleId: [],
       portrait: '',
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',
       icon: { url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } },
+      width: 0,
+      height: 0,
     };
   },
   methods: {
+    getPath() {
+      if (this.key_user_info.userRealNameAuthFlag === 'AUTHORIZED') {
+        this.$vux.toast.show({ text: '您已经实名认证，请勿重复提交', type: 'cancel', width: '10em' });
+      }
+    },
+    async vehicleBatterInfo(vehicleID) {
+      this.infoWindow.show = true;
+      const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getpowerbyvehiclepk', [vehicleID])).body;
+      if (code !== '200') this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
+      this.infoWindow.contents = `剩余电量：${respData[0].RSOC}%`;
+    },
     async handler() {
       const r = await this.getCurrentPosition();
-      this.mapCenter = r.point;
-      this.Center = r.point;
+      this.mapCenter.lng = r.point.lng;
+      this.mapCenter.lat = r.point.lat;
+      this.Center.lng = r.point.lng;
+      this.Center.lat = r.point.lat;
     },
     getCurrentPosition() {
       this.$vux.loading.show({ text: 'Loading' });
@@ -128,12 +152,11 @@ export default {
       if (this.vehicleId.length === 0) {
         this.$vux.toast.show({ text: '实名认证并从企业申领车辆后才能使用本功能', type: 'warn', width: '10em' });
       } else {
-        const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
-        if (code !== '200') throw new Error(message || code);
+        const { code, respData } = (await this.$http.post('/api/mobile/v1/device/getlocbyvehiclepk', this.vehicleId)).body;
+        if (code !== '200') this.$vux.toast.show({ text: '未查询到本车辆的定位信息', type: 'cancel', width: '10em' });
         const v = _.find(respData, o => o.LON && o.LAT);
-        this.Center = {
-          lng: v.LON, lat: v.LAT,
-        };
+        this.Center = { lng: v.LON, lat: v.LAT };
+        this.PopCenter = { lng: v.LON, lat: v.LAT };
         this.icon = { url: '/static/images/vehicle-cur.svg', size: { width: 48, height: 48 }, opts: { imageSize: { width: 48, height: 48 } } };
         this.mapCenter = { lng: this.Center.lng, lat: this.Center.lat };
         this.zoomNum = 18;
@@ -154,6 +177,16 @@ export default {
 
 <style lang="less">
 
+.batter_info {
+  width:60%;
+  background: #000000 red;
+  position: absolute;
+  top: 7rem;
+  left:25%;
+  box-shadow: 0 2px 5px;
+  border-radius: 10px;
+  z-index: 1;
+}
 .vux-header {
   width:100%;
   height: 85px;

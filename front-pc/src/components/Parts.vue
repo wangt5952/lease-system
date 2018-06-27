@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业1 -->
       <template v-if="res['FUNCTION'].indexOf('manager-parts-addone') >= 0">
@@ -9,7 +9,7 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
+          <el-input style="width:450px;" v-model="search.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.partsStatus" placeholder="请选择状态" style="width:100%;">
@@ -25,15 +25,15 @@
     </div>
     <!-- a -->
     <el-table :data="list" class="partsHeight">
-      <el-table-column prop="partsCode" label="编码"></el-table-column>
-      <el-table-column prop="partsName" label="配件货名"></el-table-column>
-      <el-table-column prop="partsBrand" label="品牌"></el-table-column>
-      <el-table-column prop="partsPn" label="型号"></el-table-column>
-      <el-table-column prop="partsTypeText" label="类别"></el-table-column>
-      <el-table-column prop="partsParameters" label="参数"></el-table-column>
-      <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="partsStatusText" label="状态"></el-table-column>
-      <el-table-column label="绑定车辆">
+      <el-table-column prop="partsCode" label="编码" width="150"></el-table-column>
+      <el-table-column prop="partsName" label="配件货名" width="100"></el-table-column>
+      <el-table-column prop="partsBrand" label="品牌" width="100"></el-table-column>
+      <el-table-column prop="partsPn" label="型号" width="100"></el-table-column>
+      <el-table-column prop="partsTypeText" label="类别" width="100"></el-table-column>
+      <el-table-column prop="partsParameters" label="参数" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
+      <el-table-column prop="partsStatusText" label="状态" width="100"></el-table-column>
+      <el-table-column label="绑定车辆" width="100">
         <template slot-scope="{row}">
           <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>
           <template v-else><span style="color:#17BE45">已绑定</span></template>
@@ -41,7 +41,7 @@
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-parts-modify') >= 0">
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作" width="200">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showForm(row)">编辑</el-button>
             <!-- <el-button icon="el-icon-edit" size="mini" type="text" @click="next(row)">下一步</el-button> -->
@@ -127,22 +127,15 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import * as validate from '@/util/validate';
 
+const checkPartsId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
 export default {
   data() {
-    const checkPartsId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
       loading: false,
       list: [],
@@ -196,8 +189,7 @@ export default {
       mfrsList: [],
       rules1: {
         partsCode: [
-          { required: true, message: '请填写编码' },
-          { validator: checkPartsId, trigger: 'blur' },
+          { required: true, validator: checkPartsId },
         ],
       },
     };
@@ -217,9 +209,6 @@ export default {
     },
   },
   methods: {
-    // next(row) {
-    //   this.$router.push({ path: 'battery', query: { aaaa: '12312' }})
-    // },
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
       await this.reload();
@@ -259,7 +248,8 @@ export default {
       }
     },
 
-    showForm(form = {}) {
+    async showForm(form = {}) {
+      await this.getMfrsList();
       this.form = _.pick(form, [
         'id',
         'partsCode',
@@ -281,7 +271,7 @@ export default {
       }
     },
     closeForm() {
-      this.form = {};
+      // this.form = {};
       this.formVisible = false;
     },
     async saveForm() {
@@ -314,12 +304,20 @@ export default {
         this.$message.error(message);
       }
     },
+    async getMfrsList() {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+          currPage: 1, pageSize: 999,
+        })).body;
+        if (code !== '200') throw new Error(message);
+        this.mfrsList = respData.rows;
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
   },
   async mounted() {
-    const { code, respData } = (await this.$http.post('/api/manager/mfrs/list', {
-      currPage: 1, pageSize: 999,
-    })).body;
-    if (code === '200') this.mfrsList = respData.rows;
     this.loading = true;
     await this.reload();
     this.loading = false;

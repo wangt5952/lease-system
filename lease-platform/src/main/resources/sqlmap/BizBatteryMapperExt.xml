@@ -6,6 +6,7 @@
         <result column="vehicle_id" jdbcType="VARCHAR" property="vehicleId" />
         <result column="bind_time" jdbcType="TIMESTAMP" property="bindTime" />
         <result column="unbind_time" jdbcType="TIMESTAMP" property="unbindTime" />
+        <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
     </resultMap>
     <select id="getBatteryInfoByVehicleId" parameterType="java.util.Map" resultMap="BizBatteryExtResultMap">
         select
@@ -43,13 +44,14 @@
         a.update_user update_user,
         a.update_time update_time,
         d.vehicle_id vehicle_id,
-        b.mfrs_name mfrs_name
-        FROM
-        biz_battery a
+        b.mfrs_name mfrs_name,
+        dc.device_id device_id
+        FROM biz_battery a
         LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id AND d.unbind_time is NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
         LEFT JOIN biz_ref_org_vehicle r ON d.vehicle_id = r.vehicle_id AND r.unbind_time IS NULL
-        LEFT JOIN biz_ref_user_vehicle r1 ON d.vehicle_id = r1.vehicle_id and r1.unbind_time is NULL
+        LEFT JOIN biz_ref_user_vehicle r1 ON d.vehicle_id = r1.vehicle_id AND r1.unbind_time is NULL
+        LEFT JOIN biz_device_conf  dc ON dc.device_id = a.battery_code AND dc.device_type ='BATTERY'
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >
@@ -84,12 +86,12 @@
     <select id="countExtByParam" parameterType="com.elextec.lease.manager.request.BizBatteryParam" resultType="java.lang.Integer">
         SELECT
         count(distinct a.id)
-        FROM
-        biz_battery a
+        FROM biz_battery a
         LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id AND d.unbind_time is NULL
         LEFT JOIN biz_manufacturer b ON a.mfrs_id = b.id
         LEFT JOIN biz_ref_org_vehicle r ON d.vehicle_id = r.vehicle_id AND r.unbind_time IS NULL
         LEFT JOIN biz_ref_user_vehicle r1 ON d.vehicle_id = r1.vehicle_id and r1.unbind_time is NULL
+        LEFT JOIN biz_device_conf  dc ON dc.device_id = a.battery_code AND dc.device_type ='BATTERY'
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >

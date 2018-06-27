@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <template v-if="res['FUNCTION'].indexOf('manager-device-addone') >= 0">
         <div style="margin-right:10px;">
@@ -8,18 +8,18 @@
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="设备编码"></el-input>
+          <el-input style="width:400px;" v-model="search.keyStr" placeholder="设备编码"></el-input>
         </el-form-item>
       </el-form>
     </div>
     <!-- 列表a -->
     <el-table :data="list" class="deviceHeight">
-      <el-table-column prop="deviceId" label="编号"></el-table-column>
-      <el-table-column prop="deviceTypeListText" label="设备类别"></el-table-column>
-      <el-table-column prop="perSet" label="请求间隔时间(单位:秒)"></el-table-column>
-      <el-table-column prop="resetTypeText" label="硬件复位标志"></el-table-column>
-      <el-table-column prop="requestTypeText" label="主动请求数据标志"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="deviceId" label="编号" width="150"></el-table-column>
+      <el-table-column prop="deviceTypeListText" label="设备类别" width="100"></el-table-column>
+      <el-table-column prop="perSet" label="请求间隔时间(单位:秒)" width="200"></el-table-column>
+      <el-table-column prop="resetTypeText" label="硬件复位标志" width="100"></el-table-column>
+      <el-table-column prop="requestTypeText" label="主动请求数据标志" width="200"></el-table-column>
+      <el-table-column label="操作" width="400">
         <template slot-scope="{row}">
           <template v-if="res['FUNCTION'].indexOf('manager-device-modify') >= 0">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="editButton(row)">编辑</el-button>
@@ -92,35 +92,22 @@ import _ from 'lodash';
 import {
   mapState,
 } from 'vuex';
+import * as validate from '@/util/validate';
+
+const checkDeviceId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
+
+const checkTime = (rule, value, callback) => {
+  if (!value) callback(new Error('请求间隔时间不能为空'));
+  else if (!validate.isvalidSignlessInteger(value)) callback(new Error('请输入非负正整数'));
+  else callback();
+};
 
 export default {
   data() {
-    const checkTime = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('请求间隔时间不能为空'));
-      }
-      setTimeout(() => {
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('请输入非负正整数'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
-    const checkDeviceId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
       loading: false,
       formVisible: false,
@@ -152,14 +139,13 @@ export default {
       // 表单效验
       rules2: {
         deviceId: [
-          { required: true, message: '请输入编号' },
-          { validator: checkDeviceId, trigger: 'blur' },
+          { required: true, validator: checkDeviceId },
         ],
         deviceType: [
           { required: true, message: '请输入设备类别' },
         ],
         perSet: [
-          { validator: checkTime, trigger: 'blur' },
+          { required: true, validator: checkTime },
         ],
         reset: [
           { required: true, message: '请选择硬件复位标志' },

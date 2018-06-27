@@ -1,14 +1,13 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px;width:99%">
     <!-- 平台 -->
-
     <template v-if="key_user_info.userType === 'PLATFORM'">
       <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane label="审核列表" name="second">
           <div>
             <el-form :inline="true">
               <el-form-item>
-                <el-input style="width:500px;" v-model="sysSearch.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
+                <el-input style="width:400px;" v-model="sysSearch.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
               </el-form-item>
               <el-form-item>
                 <el-select v-model="sysSearch.applyType" placeholder="请选择申请类别" style="width:100%;">
@@ -23,11 +22,11 @@
             </el-form>
           </div>
           <el-table :data="sysApplyList">
-            <el-table-column prop="applyTitle" label="申请标题"></el-table-column>
-            <el-table-column prop="applyTypeText" label="申请类型"></el-table-column>
-            <el-table-column prop="applyStatusText" label="申请状态"></el-table-column>
-            <el-table-column prop="applyUserName" label="申请人名称"></el-table-column>
-            <el-table-column prop="applyOrgName" label="申请企业名称"></el-table-column>
+            <el-table-column prop="applyTitle" label="申请标题" width="200"></el-table-column>
+            <el-table-column prop="applyTypeText" label="申请类型" width="200"></el-table-column>
+            <el-table-column prop="applyStatusText" label="申请状态" width="200"></el-table-column>
+            <el-table-column prop="applyUserName" label="申请人名称" width="200"></el-table-column>
+            <el-table-column prop="applyOrgName" label="申请企业名称" width="200"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="{row}">
                 <el-button icon="el-icon-edit" size="mini" type="text" @click="searchInfo(row)">查看内容</el-button>
@@ -73,7 +72,7 @@
           <div>
             <el-form :inline="true">
               <el-form-item>
-                <el-input style="width:500px;" v-model="search.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
+                <el-input style="width:400px;" v-model="search.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
               </el-form-item>
               <el-form-item>
                 <el-select v-model="search.applyType" placeholder="请选择申请类别" style="width:100%;">
@@ -137,7 +136,7 @@
               </div>
               <el-form :inline="true">
                 <el-form-item>
-                  <el-input style="width:500px;" v-model="enterpriseMySearch.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+                  <el-input style="width:400px;" v-model="enterpriseMySearch.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
                 </el-form-item>
                 <el-form-item>
                   <el-select v-model="enterpriseMySearch.applyType" placeholder="请选择申请类别" style="width:100%;">
@@ -223,7 +222,7 @@
               </div>
               <el-form :inline="true">
                 <el-form-item>
-                  <el-input style="width:500px;" v-model="individualSearch.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
+                  <el-input style="width:400px;" v-model="individualSearch.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>
                 </el-form-item>
                 <el-form-item>
                   <el-select v-model="individualSearch.applyType" placeholder="请选择申请类别" style="width:100%;">

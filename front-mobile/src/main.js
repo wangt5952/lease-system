@@ -46,6 +46,8 @@ const store = new Vuex.Store({
       key_login_token,
       key_user_info: JSON.parse(localStorage.getItem('key_user_info') || '{}'),
       relogin: false,
+      // 车辆ID
+      vehicleID: localStorage.getItem('vehicleId') || '',
     };
   },
   mutations: {
@@ -57,14 +59,22 @@ const store = new Vuex.Store({
       state.key_login_token = key_login_token;
       state.key_user_info = key_user_info;
     },
+    // 登出
     logout(state) {
-      const key_login_token = '';
-      const key_user_info = [];
-      localStorage.setItem('key_login_token', key_login_token);
-      localStorage.setItem('key_user_info', JSON.stringify(key_user_info));
-      state.key_login_token = key_login_token;
-      state.key_user_info = key_user_info;
+      // 删除本地信息
+      localStorage.removeItem('key_login_token');
+      localStorage.removeItem('key_user_info');
+      localStorage.removeItem('vehicleId');
+      // 给状态赋值
+      state.vehicleId = '';
+      state.key_login_token = '';
+      state.key_user_info = {};
       Vue.http.headers.common['header-login-token'] = undefined;
+    },
+    // 重新给车辆ID赋值
+    setVehicleId(state, id) {
+      localStorage.setItem('vehicleId', id);
+      state.vehicleId = id;
     },
     relogin(state) {
       state.relogin = true;

@@ -11,13 +11,14 @@ export default {
 </script>
 
 <style>
-@import url(//at.alicdn.com/t/font_544955_4nkz7ho6dx2h85mi.css);
+@import url(//at.alicdn.com/t/font_544955_od6cgc8iq59.css);
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   height: 100%;
+  overflow-x: hidden;
 }
 
 html, body {

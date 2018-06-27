@@ -4,24 +4,31 @@
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-vehicle-addone') >= 0">
         <div style="margin-right:10px;">
-          <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加车辆</el-button>
+          <el-button icon="el-icon-plus" type="primary" size="small" @click="addVehicleForm()">添加车辆</el-button>
         </div>
       </template>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+          <el-input style="width:400px;" v-model="search.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.vehicleStatus" placeholder="请选择状态" style="width:100%;">
-            <el-option v-for="o in searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+            <el-option v-for="o in vehicle.searchStatusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.isBind" placeholder="请选择状态" style="width:100%;">
-            <el-option v-for="o in searchIsBindList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+            <el-option v-for="o in vehicle.searchIsBindList" :key="o.id" :label="o.name" :value="o.id"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
+      <!-- 平台 -->
+      <template v-if="key_user_info.userType === 'PLATFORM'">
+        <div style="margin-right:10px;">
+          <el-button icon="el-icon-tickets" type="success" size="small" @click="importExcelVisible = true">导入 Excel 表格</el-button>
+        </div>
+      </template>
+      <!-- 企业 -->
       <template v-if="key_user_info.userType === 'ENTERPRISE'">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-edit" type="primary" size="small" @click="returnVehicleForms(key_user_info)">批量归还车辆</el-button>
@@ -29,14 +36,14 @@
       </template>
     </div>
 
-    <el-table :data="list" class="vehicleHeight">
-      <el-table-column prop="vehicleCode" label="编号"></el-table-column>
-      <el-table-column prop="vehiclePn" label="型号"></el-table-column>
-      <el-table-column prop="vehicleBrand" label="品牌"></el-table-column>
-      <el-table-column prop="vehicleMadeIn" label="车辆产地"></el-table-column>
-      <el-table-column prop="orgName" label="所属单位"></el-table-column>
-      <el-table-column prop="mfrsName" label="生产商"></el-table-column>
-      <el-table-column prop="vehicleStatusText" label="状态">
+    <el-table :data="vehicle.list" class="vehicleHeight">
+      <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
+      <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
+      <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
+      <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
+      <el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
+      <el-table-column prop="vehicleStatusText" label="状态" width="60">
         <template slot-scope="{row}">
           <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else-if="row.vehicleStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
@@ -54,13 +61,13 @@
             <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="配件" width="200">
+        <el-table-column label="配件" width="180">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="">
+        <el-table-column label="操作" width="180">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">编辑</el-button>
           </template>
@@ -81,23 +88,23 @@
       </template>
     </el-table>
 
-    <el-pagination v-if="total" style="margin-top:10px;"
+    <el-pagination v-if="vehicle.total" style="margin-top:10px;"
       @size-change="handleSizeChange"
       @current-change="reload"
-      :current-page.sync="currentPage"
-      :page-sizes="pageSizes"
-      :page-size="pageSize"
+      :current-page.sync="vehicle.currentPage"
+      :page-sizes="vehicle.pageSizes"
+      :page-size="vehicle.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="total">
+      :total="vehicle.total">
     </el-pagination>
 
-    <!-- 添加车辆 -->
-    <el-dialog title="添加车辆" :visible.sync="formVisible" :close-on-click-modal="false">
+    <!-- 添加车辆页面 -->
+    <el-dialog title="添加车辆" :visible.sync="vehicle.formVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="form" ref="form" :rules="rules1">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="vehicleCode" label="编号">
-              <el-input v-model="form.vehicleCode" auto-complete="off" :disabled="vehicleIdForm"></el-input>
+              <el-input v-model="form.vehicleCode" auto-complete="off" :disabled="vehicle.vehicleIdForm"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -125,13 +132,13 @@
           <el-col :span="8">
             <el-form-item prop="vehicleStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
               <el-select v-model="form.vehicleStatus" placeholder="请选择状态" style="width:100%;">
-                <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+                <el-option v-for="o in statusTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item prop="flag" label="电池信息">
-              <el-select v-model="flag" placeholder="请选择状态" style="width:100%;" @change="onBatteryChange(flag)">
+              <el-select v-model="flag" placeholder="请选择状态" style="width:100%;" @change="changeBattery(flag)">
                 <el-option v-for="o in isBattery" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
@@ -176,7 +183,7 @@
             <el-col :span="8">
               <el-form-item prop="batteryStatus" :rules="[{required:true, message:'请选择状态'}]" label="电池状态">
                 <el-select v-model="batteryForm.batteryStatus" placeholder="请选择状态" style="width:100%;">
-                  <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+                  <el-option v-for="o in statusTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -186,7 +193,7 @@
       <template v-if="flag === '1'">
         <el-form class="edit-form" :model="bindForm" ref="bindForm">
           <el-form-item prop="id" :rules="[{required:true, message:'请选择电池'}]" label="电池">
-            <el-select style="width:100%;" v-model="bindForm.id" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :loading="bindForm_batteryLoading">
+            <el-select style="width:100%;" v-model="bindForm.id" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
               <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
                 <span style="float: left">{{ o.batteryBrand }}</span>
                 <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
@@ -201,12 +208,12 @@
       </span>
     </el-dialog>
     <!-- 编辑车辆信息 -->
-    <el-dialog title="编辑车辆" :visible.sync="editFormVisible" :close-on-click-modal="false">
+    <el-dialog title="编辑车辆" :visible.sync="vehicle.editFormVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="editForm" ref="editForm">
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item prop="vehicleCode" :rules="[{required:true, message:'请填写编号'}]" label="编号">
-              <el-input v-model="editForm.vehicleCode" auto-complete="off" :disabled="vehicleIdForm"></el-input>
+              <el-input v-model="editForm.vehicleCode" auto-complete="off" :disabled="vehicle.vehicleIdForm"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -234,21 +241,23 @@
           <el-col :span="8">
             <el-form-item prop="vehicleStatus" :rules="[{required:true, message:'请选择状态'}]" label="状态">
               <el-select v-model="editForm.vehicleStatus" placeholder="请选择状态" style="width:100%;">
-                <el-option v-for="o in statusList" :key="o.id" :label="o.name" :value="o.id"></el-option>
+                <el-option v-for="o in statusTypeList" :key="o.id" :label="o.name" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeEditForm">取消</el-button>
+        <el-button @click="vehicle.editFormVisible = false">取消</el-button>
         <el-button type="primary" @click="saveEditForm">保存</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="绑定电池" :visible.sync="bindFormVisible" :close-on-click-modal="false">
+
+    <!-- 绑定电池页面 -->
+    <el-dialog title="绑定电池" :visible.sync="battery.bindFormVisible" :close-on-click-modal="false">
       <el-form class="edit-form" :model="bindForm" ref="bindForm">
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择电池'}]" label="电池">
-          <el-select style="width:100%;" v-model="bindForm.batteryId" filterable remote placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" @focus="remoteBattery('')" :loading="bindForm_batteryLoading">
+          <el-select style="width:100%;" v-model="bindForm.batteryId" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
             <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
               <span style="float: left">{{ o.batteryBrand }}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
@@ -257,7 +266,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeBindForm">取消</el-button>
+        <el-button @click="battery.bindFormVisible = false">取消</el-button>
         <el-button type="primary" @click="saveBindForm">{{form.id ? '保存' : '绑定'}}</el-button>
       </span>
     </el-dialog>
@@ -265,7 +274,7 @@
     <el-dialog title="配件列表" :visible.sync="allPartsFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="partsSearch.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
+          <el-input style="width:400px;" v-model="partsSearch.keyStr" placeholder="配件编码/配件货名/配件品牌/配件型号/配件参数/生产商ID/生产商名称"></el-input>
         </el-form-item>
         <el-form-item>
           <el-select v-model="partsSearch.partsStatus" placeholder="请选择状态" style="width:100%;">
@@ -295,17 +304,17 @@
           </el-table-column>
         </template>
       </el-table>
-      <el-pagination v-if="partsTotal" style="margin-top:10px;"
+      <el-pagination v-if="parts.total" style="margin-top:10px;"
         @size-change="partsHandleSizeChange"
         @current-change="partsReload"
-        :current-page.sync="partsCurrentPage"
-        :page-sizes="partsPageSizes"
-        :page-size="partsPageSize"
+        :current-page.sync="parts.currentPage"
+        :page-sizes="parts.pageSizes"
+        :page-size="parts.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="partsTotal">
+        :total="parts.total">
       </el-pagination>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closePartsForm">关闭</el-button>
+        <el-button @click="allPartsFormVisible = false">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 查看当前车辆下已绑定的配件 -->
@@ -328,7 +337,7 @@
         </template>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="holdSavePartsForm">关闭</el-button>
+        <el-button @click="bindPartsFormVisible = false">关闭</el-button>
       </span>
     </el-dialog>
     <!-- 企业批量归还车辆 -->
@@ -375,45 +384,69 @@
         <el-button @click="saveBatteryForm2">关闭</el-button>
       </span>
     </el-dialog>
+
+    <!-- Excel表格数据入库 -->
+    <el-dialog title="导入Excel" :visible.sync="importExcelVisible" :before-close="closeExcel" style="margin-top:-50px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
+      <div class="app-container">
+        <upload-excel-component @on-selected-file='selected'></upload-excel-component>
+        <el-table :data="tableData" border highlight-current-row style="width: 100%;margin-top:20px;height: 350px; overflow-y: auto;">
+          <el-table-column v-for='item of tableHeader' :prop="item" :label="item" :key='item'>
+          </el-table-column>
+        </el-table>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="commitExcel">提交</el-button>
+        <el-button @click="closeExcel">关闭</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
+import UploadExcelComponent from '@/components/UploadExcel/index'
 import {
   mapState,
 } from 'vuex';
+import * as validate from '../util/validate';
 
+const partsTypeList = [
+  { id: 'SEATS', name: '车座' },
+  { id: 'FRAME', name: '车架' },
+  { id: 'HANDLEBAR', name: '车把' },
+  { id: 'BELL', name: '车铃' },
+  { id: 'TYRE', name: '轮胎' },
+  { id: 'PEDAL', name: '脚蹬' },
+  { id: 'DASHBOARD', name: '仪表盘' },
+];
+const statusList = [
+  { id: 'NORMAL', name: '正常' },
+  { id: 'FREEZE', name: '冻结/维保' },
+  { id: 'INVALID', name: '作废' },
+];
+
+const checkVehicleId = (rule, value, callback) => {
+  if (!value) callback(new Error('编号不能为空'));
+  else if (!validate.isvalidSinogram(value)) callback(new Error('编号不能包含汉字'));
+  else callback();
+};
+
+const checkVehicleNum = (rule, value, callback) => {
+  if (!value) callback(new Error('数量不能为空'));
+  else if (!validate.isvalidSignlessInteger(value)) callback(new Error('请输入非负正整数'));
+  else callback();
+};
 export default {
+  components: { UploadExcelComponent },
   data() {
-    // 车辆表单效验
-    const checkVehicleNum = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('数量不能为空'));
-      }
-      setTimeout(() => {
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('请输入非负正整数'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
-    const checkVehicleId = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('编号不能为空'));
-      }
-      setTimeout(() => {
-        if (/[\u4E00-\u9FA5]/g.test(value)) {
-          callback(new Error('编号不能为汉字'));
-        } else {
-          callback();
-        }
-      }, 500);
-      return false;
-    };
     return {
+      // Excel表格参数
+      tableData: [],
+      tableHeader: [],
+
+      importExcelVisible: false,
+
       loading: false,
       vehicleNumTotal: undefined,
       // 车辆
@@ -423,13 +456,12 @@ export default {
       },
       rules1: {
         vehicleCode: [
-          { required: true, message: '请填写编码' },
-          { validator: checkVehicleId, trigger: 'blur' },
+          { required: true, validator: checkVehicleId },
         ],
       },
       rules2: {
         count: [
-          { validator: checkVehicleNum, trigger: 'blur' },
+          { required: true, validator: checkVehicleNum },
         ],
       },
 
@@ -448,20 +480,6 @@ export default {
         { id: 'PEDAL', name: '脚蹬' },
         { id: 'DASHBOARD', name: '仪表盘' },
       ],
-      partsTypeList: [
-        { id: 'SEATS', name: '车座' },
-        { id: 'FRAME', name: '车架' },
-        { id: 'HANDLEBAR', name: '车把' },
-        { id: 'BELL', name: '车铃' },
-        { id: 'TYRE', name: '轮胎' },
-        { id: 'PEDAL', name: '脚蹬' },
-        { id: 'DASHBOARD', name: '仪表盘' },
-      ],
-      partsStatusList: [
-        { id: 'NORMAL', name: '正常' },
-        { id: 'FREEZE', name: '冻结/维保' },
-        { id: 'INVALID', name: '作废' },
-      ],
       searchPartsStatusList: [
         { id: 'NORMAL', name: '正常' },
       ],
@@ -471,54 +489,53 @@ export default {
       bindPartsFormVisible: false,
       bindPartsForm: {},
       unBindPartsForm: {},
-
-      partsPageSizes: [10, 20, 50, 100],
-      partsCurrentPage: 1,
-      partsPageSize: 5,
-      partsTotal: 0,
-
-      // 车辆
-      list: [],
+      // 配件
+      parts: {
+        pageSizes: [10, 20, 50, 100],
+        currentPage: 1,
+        pageSize: 5,
+        total: 0,
+      },
       search: {
         vehicleStatus: '',
         isBind: '',
       },
-      pageSizes: [10, 20, 50, 100],
-      currentPage: 1,
-      pageSize: 10,
-      total: 0,
+      // 车辆
+      vehicle: {
+        list: [],
+        pageSizes: [10, 20, 50, 100],
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+        formVisible: false,
+        vehicleIdForm: false,
+        editFormVisible: false,
+        searchStatusList: [
+          { id: '', name: '全部状态' },
+          { id: 'NORMAL', name: '正常' },
+          { id: 'FREEZE', name: '冻结/维保' },
+          { id: 'INVALID', name: '作废' },
+        ],
+        searchIsBindList: [
+          { id: '', name: '全部' },
+          { id: 'UNBIND', name: '未绑定电池' },
+          { id: 'BIND', name: '已绑定电池' },
+        ],
+      },
       form: {},
-      formVisible: false,
-
-      vehicleIdForm: false,
-      bindFormVisible: false,
+      battery: {
+        bindFormVisible: false,
+      },
       bindForm: {},
       bindForm_batteryList: [],
       bindForm_batteryLoading: false,
       // 编辑车辆
       editForm: {},
-      editFormVisible: false,
 
-      typeList: [
-        { id: 'VEHICLE', name: '车辆' },
-        { id: 'BATTERY', name: '电池' },
-        { id: 'PARTS', name: '配件' },
-      ],
-      statusList: [
+      statusTypeList: [
         { id: 'NORMAL', name: '正常' },
         { id: 'FREEZE', name: '冻结/维保' },
         { id: 'INVALID', name: '作废' },
-      ],
-      searchStatusList: [
-        { id: '', name: '全部状态' },
-        { id: 'NORMAL', name: '正常' },
-        { id: 'FREEZE', name: '冻结/维保' },
-        { id: 'INVALID', name: '作废' },
-      ],
-      searchIsBindList: [
-        { id: '', name: '全部' },
-        { id: 'UNBIND', name: '未绑定电池' },
-        { id: 'BIND', name: '已绑定电池' },
       ],
       mfrsList: [],
       // 电池
@@ -533,11 +550,6 @@ export default {
       bindPartsFormVisible2: false,
       batteryList: [],
       holdPartsList2: [],
-      batteryStatusList: [
-        { id: 'NORMAL', name: '正常' },
-        { id: 'FREEZE', name: '冻结/维保' },
-        { id: 'INVALID', name: '作废' },
-      ],
     };
   },
   computed: {
@@ -562,6 +574,31 @@ export default {
     },
   },
   methods: {
+    // 提交 入库
+    async commitExcel() {
+ 
+    },
+    // 关闭Excel窗口
+    closeExcel() {
+      this.importExcelVisible = false;
+      this.tableHeader = [];
+      this.tableData = [];
+    },
+    selected(data) {
+      let results;
+      this.tableHeader = data.header;
+      this.tableData = results = data.results;
+      console.log(results);
+      // _.pluck(results, )
+    },
+
+    // 车辆列表里的 电池信息下拉框('0': 新电池 '1': 旧电池 '2': 无电池 )
+    async changeBattery(flag) {
+      // 旧电池  调取接口数据
+      if (flag === '1') {
+        await this.remoteBattery('');
+      }
+    },
     // 电池信息
     saveBatteryForm() {
       this.bindBatteryFormVisible = false;
@@ -578,7 +615,7 @@ export default {
         if (code !== '200') throw new Error(message);
         this.batteryList = _.map(respData.bizBatteries, o => ({
           ...o,
-          batteryStatusText: (_.find(this.statusList, { id: o.batteryStatus }) || { name: o.batteryStatus }).name,
+          batteryStatusText: (_.find(statusList, { id: o.batteryStatus }) || { name: o.batteryStatus }).name,
         }));
       } catch (e) {
         if (!e) return;
@@ -627,18 +664,9 @@ export default {
     },
 
     // 配件———————————————————————————————————————————————————————————————————————————————————————————————————————
-    // 关闭配件列表
-    async holdClosePartsForm() {
-      // await this.partsReload();
-      this.bindPartsFormVisible = false;
-    },
-    // 保存配件列表
-    async holdSavePartsForm() {
-      this.bindPartsFormVisible = false;
-    },
     // 分页下拉
     async partsHandleSizeChange(partsPageSize) {
-      this.partsPageSize = partsPageSize;
+      this.parts.pageSize = partsPageSize;
       await this.partsReload();
     },
     // 弹出配件列表页面
@@ -671,8 +699,8 @@ export default {
         if (code !== '200') throw new Error(message);
         this.holdPartsList = _.map(respData, o => ({
           ...o,
-          partsTypeText: (_.find(this.partsTypeList, { id: o.partsType }) || { name: o.partsType }).name,
-          partsStatusText: (_.find(this.partsStatusList, { id: o.partsStatus }) || { name: o.partsStatus }).name,
+          partsTypeText: (_.find(partsTypeList, { id: o.partsType }) || { name: o.partsType }).name,
+          partsStatusText: (_.find(statusList, { id: o.partsStatus }) || { name: o.partsStatus }).name,
         }));
       } catch (e) {
         const message = e.statusText || e.message;
@@ -686,8 +714,8 @@ export default {
         if (code !== '200') throw new Error(message);
         this.holdPartsList2 = _.map(respData, o => ({
           ...o,
-          partsTypeText: (_.find(this.partsTypeList, { id: o.partsType }) || { name: o.partsType }).name,
-          partsStatusText: (_.find(this.partsStatusList, { id: o.partsStatus }) || { name: o.partsStatus }).name,
+          partsTypeText: (_.find(partsTypeList, { id: o.partsType }) || { name: o.partsType }).name,
+          partsStatusText: (_.find(statusList, { id: o.partsStatus }) || { name: o.partsStatus }).name,
         }));
       } catch (e) {
         const message = e.statusText || e.message;
@@ -711,23 +739,19 @@ export default {
         this.$message.error(message);
       }
     },
-    // 关闭配件页面
-    closePartsForm() {
-      this.allPartsFormVisible = false;
-    },
     // 保存配件页面
     async savePartsForm() {
       this.$message.success('保存成功');
       this.allPartsFormVisible = false;
     },
-    async handleSizeChange(pageSize) {
-      this.pageSize = pageSize;
+    async handleSizeChange(vehiclePageSize) {
+      this.vehicle.pageSize = vehiclePageSize;
       await this.reload();
     },
     async reload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
-          currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
+          currPage: this.vehicle.currentPage, pageSize: this.vehicle.pageSize, ...this.search,
         })).body;
         if (code === '40106') {
           this.$store.commit('relogin');
@@ -735,10 +759,10 @@ export default {
         }
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
-        this.total = total;
-        this.list = _.map(rows, o => ({
+        this.vehicle.total = total;
+        this.vehicle.list = _.map(rows, o => ({
           ...o,
-          vehicleStatusText: (_.find(this.statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
+          vehicleStatusText: (_.find(statusList, { id: o.vehicleStatus }) || { name: o.vehicleStatus }).name,
         }));
       } catch (e) {
         const message = e.statusText || e.message;
@@ -749,15 +773,15 @@ export default {
     async partsReload() {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/parts/list', {
-          currPage: this.partsCurrentPage, pageSize: this.partsPageSize, ...this.partsSearch, isBind: 'UNBIND',
+          currPage: this.parts.currentPage, pageSize: this.parts.pageSize, ...this.partsSearch, isBind: 'UNBIND',
         })).body;
         if (code !== '200') throw new Error(message);
         const { total, rows } = respData;
-        this.partsTotal = total;
+        this.parts.total = total;
         this.partsList = _.map(rows, o => ({
           ...o,
-          partsTypeText: (_.find(this.partsTypeList, { id: o.partsType }) || { name: o.partsType }).name,
-          partsStatusText: (_.find(this.partsStatusList, { id: o.partsStatus }) || { name: o.partsStatus }).name,
+          partsTypeText: (_.find(partsTypeList, { id: o.partsType }) || { name: o.partsType }).name,
+          partsStatusText: (_.find(statusList, { id: o.partsStatus }) || { name: o.partsStatus }).name,
         }));
       } catch (e) {
         const message = e.statusText || e.message;
@@ -776,7 +800,9 @@ export default {
         this.$message.error(message);
       }
     },
-    showForm(form = { }) {
+    // 添加车辆
+    async addVehicleForm(form = { }) {
+      await this.getMfrs();
       const $form = this.$refs.form;
       if ($form) $form.resetFields();
       this.form = _.pick(form, [
@@ -790,15 +816,21 @@ export default {
       ]);
       this.flag = '2';
       if (form.id) {
-        this.vehicleIdForm = true;
+        this.vehicle.vehicleIdForm = true;
       } else {
-        this.vehicleIdForm = false;
+        this.vehicle.vehicleIdForm = false;
       }
-      this.formVisible = true;
+      this.vehicle.formVisible = true;
     },
+    // 关闭车辆添加页面
     closeForm() {
-      this.formVisible = false;
+      const $batteryForm = this.$refs.batteryForm;
+      if ($batteryForm) $batteryForm.resetFields();
+      const $bindForm = this.$refs.bindForm;
+      if ($bindForm) $bindForm.resetFields();
+      this.vehicle.formVisible = false;
     },
+    // 添加车辆页面 '0': 新电池, '1': 旧电池 , '2': 无电池
     async saveForm() {
       const { loginName } = this.key_user_info;
       try {
@@ -858,9 +890,7 @@ export default {
       }
     },
     // 编辑车辆Form
-    showEditForm(form = { }) {
-      const $form = this.$refs.editForm;
-      if ($form) $form.resetFields();
+    async showEditForm(form = {}) {
       this.editForm = _.pick(form, [
         'id',
         'vehicleCode',
@@ -872,16 +902,12 @@ export default {
       ]);
       this.flag = '2';
       if (form.id) {
-        this.vehicleIdForm = true;
+        await this.getMfrs();
+        this.vehicle.vehicleIdForm = true;
       } else {
-        // const $form = this.$refs.form;
-        // if ($form) $form.resetFields();
-        this.vehicleIdForm = false;
+        this.vehicle.vehicleIdForm = false;
       }
-      this.editFormVisible = true;
-    },
-    closeEditForm() {
-      this.editFormVisible = false;
+      this.vehicle.editFormVisible = true;
     },
     async saveEditForm() {
       const { loginName } = this.key_user_info;
@@ -898,54 +924,59 @@ export default {
           this.$message.success('编辑成功');
         }
         await this.reload();
-        this.closeEditForm();
+        this.vehicle.editFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
-    showBindForm({ id }) {
-      const $form = this.$refs.bindForm;
-      if ($form) $form.resetFields();
+    async showBindForm({ id }) {
+      await this.remoteBattery('');
       this.bindForm = { vehicleId: id };
-      this.bindFormVisible = true;
+      this.battery.bindFormVisible = true;
     },
-    closeBindForm() {
-      this.bindFormVisible = false;
-    },
+    // 单独绑定电池页面
     async saveBindForm() {
       try {
-        const $form = this.$refs.bindForm;
-        await $form.validate();
         const { ...form } = this.bindForm;
         const { code, message } = (await this.$http.post('/api/manager/vehicle/batterybind', form)).body;
         if (code !== '200') throw new Error(message);
         this.$message.success('绑定成功');
         await this.reload();
-        this.closeBindForm();
+        this.battery.bindFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
-    // 显示配件窗口
-    closeBindPartsForm() {
-      this.allPartsFormVisible = false;
-    },
     async handleUnbind({ id, batteryId }) {
       try {
-        await this.$confirm('确认解绑该车电池, 是否继续?', '提示', { type: 'warning' });
-        const { code, message } = (await this.$http.post('/api/manager/vehicle/batteryunbind', { vehicleId: id, batteryId })).body;
-        if (code !== '200') throw new Error(message);
-        await this.reload();
-        this.$message.success('解绑成功');
+        this.$confirm('确认解绑该车电池, 是否继续?', '提示', {
+          type: 'warning',
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(async () => {
+          const { code, message } = (await this.$http.post('/api/manager/vehicle/batteryunbind', { vehicleId: id, batteryId })).body;
+          if (code !== '200') throw new Error(message);
+          await this.reload();
+          this.$message({
+            type: 'success',
+            message: '解绑成功',
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消解绑',
+          });
+        });
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
+    // 获取正常未绑定的电池集合
     async remoteBattery(keyStr) {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/battery/list', {
@@ -955,30 +986,35 @@ export default {
         const { rows } = respData;
         this.bindForm_batteryList = _.map(rows, o => ({
           ...o,
-          batteryStatusText: (_.find(this.statusList, { id: o.batteryStatus }) || { name: o.batteryStatus }).name,
         }));
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
     },
-  },
-  async mounted() {
-    if (this.key_user_info.userType === 'PLATFORM') {
-      try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
-          currPage: 1, pageSize: 999,
-        })).body;
-        if (code !== '200') throw new Error(message);
-        this.mfrsList = respData.rows;
-      } catch (e) {
-        const message = e.statusText || e.message;
-        this.$message.error(message);
+    // 获取制造商集合
+    async getMfrs() {
+      // 平台用户权限
+      if (this.key_user_info.userType === 'PLATFORM') {
+        try {
+          const { code, message, respData } = (await this.$http.post('/api/manager/mfrs/list', {
+            currPage: 1, pageSize: 999,
+          })).body;
+          if (code !== '200') throw new Error(message);
+          this.mfrsList = respData.rows;
+        } catch (e) {
+          const message = e.statusText || e.message;
+          this.$message.error(message);
+        }
+      } else {
+        this.mfrsList = [];
       }
-    }
+    },
+  },
+  async created() {
     this.loading = true;
     await this.reload();
-    await this.partsReload();
+    // await this.partsReload();
     this.loading = false;
   },
 };
@@ -990,17 +1026,18 @@ export default {
 }
 >>> .vehicleHeight {
   position: relative;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  /* overflow-x: auto; */
+  /* white-space: nowrap; */
+  overflow-y: auto;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
   width: 100%;
-  max-width: 100%;
-  color: #606266;
+  /* max-width: 100%; */
   height: 85%;
   max-height: 85%;
+  color: #606266;
 }
 </style>

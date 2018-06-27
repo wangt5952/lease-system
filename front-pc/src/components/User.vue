@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
@@ -9,7 +9,7 @@
       <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
         <el-form :inline="true">
           <el-form-item>
-            <el-input style="width:500px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
+            <el-input style="width:400px;" v-model="search.keyStr" placeholder="登录名/手机号码/昵称/姓名/所属企业Code/所属企业名"></el-input>
           </el-form-item>
           <el-form-item>
             <el-select v-model="search.userStatus" placeholder="请选择状态" style="width:100%;">
@@ -25,25 +25,25 @@
       </template>
     </div>
     <el-table :data="list" class="userHeight">
-      <el-table-column prop="loginName" label="用户名"></el-table-column>
-      <el-table-column prop="userMobile" label="手机号"></el-table-column>
-      <el-table-column prop="userTypeText" label="用户类型"></el-table-column>
-      <el-table-column prop="orgName" label="所属企业名称">
+      <el-table-column prop="loginName" label="用户名" width="100"></el-table-column>
+      <el-table-column prop="userMobile" label="手机号" width="100"></el-table-column>
+      <el-table-column prop="userTypeText" label="用户类型" width="100"></el-table-column>
+      <el-table-column prop="orgName" label="所属企业" width="100">
         <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
           {{ scope.row.orgName }}
         </template>
       </el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO"></el-table-column>
-      <el-table-column prop="nickName" label="昵称"></el-table-column>
-      <el-table-column prop="userName" label="姓名"></el-table-column>
-      <el-table-column prop="userRealNameAuthFlagText" label="实名认证">
+      <el-table-column prop="userIcon" label="用户LOGO" width="150"></el-table-column>
+      <el-table-column prop="nickName" label="昵称" width="100"></el-table-column>
+      <el-table-column prop="userName" label="姓名" width="100"></el-table-column>
+      <el-table-column prop="userRealNameAuthFlagText" label="实名认证" width="100">
         <template slot-scope="{row}">
           <template v-if="row.userRealNameAuthFlag === 'AUTHORIZED'"><span style="color:#17BE45">已实名</span></template>
           <template v-else><span style="color:red">未实名</span></template>
         </template>
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <el-table-column label="操作" width="270">
+      <el-table-column label="操作" width="500">
         <template slot-scope="{row}">
           <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
             <template v-if="row.userType === 'INDIVIDUAL'">
@@ -101,7 +101,7 @@
             <el-form-item label="企业图标">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
               <el-select v-model="form.userIcon" placeholder="请选择企业Logo" style="width:100%;">
-                <el-option v-for="(o, i) in userIconPhoto" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #F1F1F1" :key="`${i}`" :label="o.iconName" :value="o.iconName">
                   <img class="companyLogo" :src="userIconPath + o.iconName" alt="">
                 </el-option>
               </el-select>
@@ -160,7 +160,7 @@
     <el-dialog title="车辆列表" :visible.sync="vehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:500px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
+          <el-input style="width:400px;" v-model="vehicleSearch.keyStr" placeholder="车辆编号/车辆型号/车辆品牌/车辆产地/生产商ID/生产商名"></el-input>
         </el-form-item>
       </el-form>
       <el-table :data="vehicleList" style="width: 100%">
@@ -226,16 +226,41 @@
 
     <!-- 照片表单 -->
     <el-dialog title="用户认证信息" :visible.sync="photoFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
-      <!-- 身份证正面 -->
-      <img :src="userPidPath + cardPhotoFront" alt="">
-      <!-- 身份证反面 -->
-      <!-- <img :src="`data:image/jpg;base64,${cardPhotoBack}`"/> -->
-      <!-- 双手举起身份证 -->
-      <!-- <img :src="`data:image/jpg;base64,${cardPhotoGroup}`"/> -->
+      <div style="margin-left:10px">
+        身份证号: <span style="margin-left:10px; color:blue">{{ userPid }}</span>
+      </div>
+      <div class="pidPhoto">
+        <!-- 身份证正面 -->
+        <div class="imgClass">
+          <img :src="userPidPath + cardPhotoFront" alt="">
+          <!-- <div class="imgButton">
+            <el-button type="primary" @click="searchPid(pid,'cardPhotoFront')">放大观看</el-button>
+          </div> -->
+        </div>
+        <!-- 身份证反面 -->
+        <div class="imgClass">
+          <img :src="userPidPath + cardPhotoBack" alt="">
+          <!-- <div class="imgButton">
+            <el-button type="primary" @click="searchPid(pid,'cardPhotoBack')">放大观看</el-button>
+          </div> -->
+        </div>
+        <!-- 双手举起身份证 -->
+        <div class="imgClass">
+          <img :src="userPidPath + cardPhotoGroup" alt="">
+          <!-- <div class="imgButton">
+            <el-button type="primary" @click="searchPid(pid,'cardPhotoGroup')">放大观看</el-button>
+          </div> -->
+        </div>
+      </div>
       <span slot="footer" class="dialog-footer" >
+        <el-button @click="photoFormVisible = false">关闭</el-button>
         <el-button type="info" @click="overrule">驳回</el-button>
         <el-button :disabled="loading" type="primary" @click="identification">通过</el-button>
       </span>
+    </el-dialog>
+    <!-- 放大后的表单 -->
+    <el-dialog :title="pidInfo" :visible.sync="photoInfoVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%" center>
+      <img :src="userPidPath + cardPhoto" alt="">
     </el-dialog>
   </div>
 </template>
@@ -274,6 +299,8 @@ export default {
       return false;
     };
     return {
+      userPid: null,
+
       loading: false,
       // 车辆
       vehicleList: [],
@@ -348,9 +375,17 @@ export default {
       },
       roleList: [],
       orgList: [],
-      userIconPhoto: [],
+      userIconPhoto: [
+        { iconName: '20180514171821.png' },
+        { iconName: '20180514172108.png' },
+        { iconName: '20180514172120.png' },
+      ],
       // 照片表单
       photoFormVisible: false,
+      pid: '',
+      photoInfoVisible: false,
+      cardPhoto: '',
+      pidInfo: '',
 
       // 表单效验
       rules2: {
@@ -406,17 +441,54 @@ export default {
       this.cardForm = row;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [row.id])).body;
-        const data = respData.key_user_info;
-        this.cardPhotoFront = data.userIcFront;
-        // this.cardPhotoBack = data.userIcBack;
-        // this.cardPhotoGroup = data.userIcGroup;
         if (code !== '200') throw new Error(message);
+        const data = respData.key_user_info;
+        // hasOwnProperty(暂时不可用) 查看某个元素中是否包含 某元素  返回 boolean
+        // typeof 判断该对象里 有没有该字段
+        // 判断 用户是否上传的身份证
+        this.userPid = data.userPid;
+        if (!(typeof (data.userIcFront)) ||
+           !(typeof (data.userIcBack)) ||
+           !(typeof (data.userIcGroup)) ||
+           data.userIcFront === '' || data.userIcBack === '' || data.userIcGroup === '') {
+          throw new Error('该用户身份照不齐全');
+        } else {
+          this.pid = row.id;
+          this.cardPhotoFront = data.userIcFront;
+          this.cardPhotoBack = data.userIcBack;
+          this.cardPhotoGroup = data.userIcGroup;
+          // console.log(this.userPidPath+this.cardPhotoFronta);
+          // console.log(this.userPidPath+this.cardPhotoGroup);
+          this.photoFormVisible = true;
+        }
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      this.photoFormVisible = true;
+    },
+    // 查看放大的身份证
+    async searchPid(pid, value) {
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/user/getbypk', [pid])).body;
+        if (code !== '200') throw new Error(message);
+        const data = respData.key_user_info;
+        if (value === 'cardPhotoFront') {
+          this.pidInfo = '正面照';
+          this.cardPhoto = data.userIcFront;
+        } else if (value === 'cardPhotoBack') {
+          this.pidInfo = '背面照';
+          this.cardPhoto = data.userIcBack;
+        } else {
+          this.pidInfo = '举起双手合照';
+          this.cardPhoto = data.userIcGroup;
+        }
+        this.photoInfoVisible = true;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     // 通过
     async identification() {
@@ -426,7 +498,9 @@ export default {
           userId: cardForm.id, flag: 'AUTHORIZED',
         })).body;
         if (code !== '200') throw new Error(message);
-        this.$message.success('驳回成功');
+        this.$message.success('实名认证成功');
+        await this.reload();
+        this.photoFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -441,7 +515,9 @@ export default {
           userId: cardForm.id, flag: 'REJECTAUTHORIZED',
         })).body;
         if (code !== '200') throw new Error(message);
-        this.$message.success('实名认证成功');
+        this.$message.success('驳回成功');
+        await this.reload();
+        this.photoFormVisible = false;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
@@ -627,8 +703,7 @@ export default {
           userTypeText: (_.find(this.typeList2, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
         }));
-        await this.getOrgList();
-        await this.getUserIcon();
+        // await this.getOrgList();
       } catch (e) {
         this.loading = false;
         const message = e.statusText || e.message;
@@ -647,7 +722,8 @@ export default {
         this.$message.error(message);
       }
     },
-    showForm(form = { }) {
+    async showForm(form = { }) {
+      await this.getOrgList();
       this.form = _.pick(form, [
         'id',
         'loginName',
@@ -742,16 +818,6 @@ export default {
         this.$message.error(message);
       }
     },
-    async getUserIcon() {
-      try {
-        const { code, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
-        if (code === '200') this.userIconPhoto = respData;
-      } catch (e) {
-        if (!e) return;
-        const message = e.statusText || e.message;
-        this.$message.error(message);
-      }
-    },
     async getRoleList() {
       const { code, respData } = (await this.$http.post('/api/manager/role/list', {
         currPage: 1, pageSize: 999,
@@ -768,6 +834,19 @@ export default {
 </script>
 
 <style scoped>
+.pidPhoto {
+  display: flex;
+  flex-direction: row;
+}
+.pidPhoto > .imgClass {
+  margin: 10px;
+  height: 339px;
+  width: 350px;
+}
+.imgButton {
+  margin-left: 30%;
+}
+/* 企业图片1 */
 .companyLogo {
   width: 30px;
   height: 30px;
@@ -794,7 +873,7 @@ export default {
   /* width: 100%; */
   max-width: 100%;
   color: #606266;
-  height: 85%;
-  max-height: 85%;
+  height: 90%;
+  max-height: 90%;
 }
 </style>

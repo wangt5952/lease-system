@@ -4,29 +4,28 @@
       <div style="display:flex;height:100px;background:#070f3e;color:#fff;">
         <div style="flex:1;padding:10px;padding-top:25px;">
           <!-- <div style="font-size:12px;">车辆实时情况</div> -->
-          <el-input v-model="search.keyword" style="margin-top:5px;" size="mini" suffix-icon="el-icon-search" placeholder="请输入要查看的地址"></el-input>
+          <el-input v-model="search.keyword" style="margin-top:5px;width:75%" size="mini" suffix-icon="el-icon-edit" placeholder="请输入要查看的地址" clearable></el-input>
+          <el-button size="mini" @click="searchStreet(search.keyword)">查看路况</el-button>
         </div>
-        <div @click="showVehicleDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="vehicleDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{vehicleInfo.vehicleCode}}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆编码</div>
         </div>
-        <div @click="showVehiclePath" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="vehiclePathVisible = !vehiclePathVisible" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:20px;">{{ address }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆当前位置</div>
         </div>
-        <div @click="showBatteryDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="batteryDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ selectedItem.RSOC ? selectedItem.RSOC+"%" : selectedItem.RSOC }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
-        <div @click="showUserDialog" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="userDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ userInfo.userName }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">使用人</div>
         </div>
       </div>
 
-      <baidu-map class="allmap" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
-        <!-- 圆形图 -->
-        <bm-circle :center="circlePath.center" :radius="circlePath.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="1" @lineupdate="updateCirclePath" :fill-opacity="0.1"></bm-circle>
+      <baidu-map  @ready="handler" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
         <!-- 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
@@ -172,25 +171,12 @@
 </template>
 
 <script>
+// import moment from 'moment';
 import _ from 'lodash';
-// import BMap from 'BMap';
-// const path = [
-//   { lng: 118.790852, lat: 32.057248 },
-//   { lng: 118.803069, lat: 32.055044 },
-//   { lng: 118.812267, lat: 32.063735 },
-// ];
 
 export default {
   data() {
     return {
-      // 绘制圆形图
-      circlePath: {
-        center: {
-          lng: 0,
-          lat: 0,
-        },
-        radius: 1000,
-      },
 
       address: '',
       search: {},
@@ -211,25 +197,48 @@ export default {
       radiusVehicleList: [],
     };
   },
+  async mounted() {
+    await this.reloadVehicleList();
+  },
   computed: {
     selectedItem() {
-      const vehicleListInfo = (_.find(this.radiusVehicleList, { vehicleId: this.selectedId }) || {});
-      return vehicleListInfo;
-    },
-  },
-  watch: {
-    'search.keyword'(v) {
-      this.mapCenter = v;
+      return _.find(this.radiusVehicleList, { vehicleId: this.selectedId }) || {};
     },
   },
   methods: {
+    async handler() {
+      const r = await this.getCurrentPosition();
+      this.mapCenter = {
+        lng: r.point.lng, lat: r.point.lat,
+      };
+    },
+    // 查看路况
+    async searchStreet(value) {
+      try {
+        const point = await this.getAddressByLocation(value);
+        if (!point) throw new Error('请输入正确地址');
+        this.mapCenter = {
+          lng: point.lng, lat: point.lat,
+        };
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: point.lng, lat: point.lat, radius: 2000,
+        })).body;
+        if (code === '200') {
+          this.radiusVehicleList = respData;
+        } else {
+          this.radiusVehicleList = [];
+          throw new Error(message);
+        }
+      } catch (e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
     // 单击车辆图标
     vehiclePicture() {
     },
     // 单击右下角的定位
     async positionSuccess(e) {
-      this.circlePath.center = e.point;
-      this.circlePath.radius = 1000;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: e.point.lng, lat: e.point.lat, radius: 1000,
@@ -252,11 +261,6 @@ export default {
     },
     positionError() {
     },
-    // 圆形区域
-    updateCirclePath(e) {
-      this.circlePath.center = e.target.getCenter();
-      this.circlePath.radius = e.target.getRadius();
-    },
     // 地图更改缩放级别结束时触发触发此事件
     async syncCenterAndZoom(e) {
       // 获取地图中心点
@@ -268,14 +272,14 @@ export default {
       if (zoomNum > 10) {
         switch (zoomNum) {
           // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: this.circlePath.radius = 900; num = 900; break;
+          case 16: num = 900; break;
           // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: this.circlePath.radius = 2000; num = 2000; break;
-          case 14: this.circlePath.radius = 2000; num = 2000; break;
-          case 13: this.circlePath.radius = 4000; num = 4000; break;
-          case 12: this.circlePath.radius = 10000; num = 10000; break;
-          case 11: this.circlePath.radius = 20000; num = 20000; break;
-          default: this.circlePath.radius = 1000; num = 1000;
+          case 15: num = 2000; break;
+          case 14: num = 2000; break;
+          case 13: num = 4000; break;
+          case 12: num = 10000; break;
+          case 11: num = 20000; break;
+          default: num = 1000;
         }
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -300,21 +304,21 @@ export default {
     // 停止拖拽地图时触发此事件
     async syncCenterAndZooms(e) {
       const { lng, lat } = e.target.getCenter();
-      this.circlePath.center = e.target.getCenter();
+      // this.circlePath.center = e.target.getCenter();
       // 获取缩放等级
       const zoomNum = e.target.getZoom();
       let num = 0;
       if (zoomNum > 10) {
         switch (zoomNum) {
           // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: this.circlePath.radius = 900; num = 900; break;
+          case 16: num = 900; break;
           // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: this.circlePath.radius = 2000; num = 2000; break;
-          case 14: this.circlePath.radius = 2000; num = 2000; break;
-          case 13: this.circlePath.radius = 4000; num = 4000; break;
-          case 12: this.circlePath.radius = 10000; num = 10000; break;
-          case 11: this.circlePath.radius = 20000; num = 20000; break;
-          default: this.circlePath.radius = 1000; num = 1000;
+          case 15: num = 2000; break;
+          case 14: num = 2000; break;
+          case 13: num = 4000; break;
+          case 12: num = 10000; break;
+          case 11: num = 20000; break;
+          default: num = 1000;
         }
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -336,15 +340,6 @@ export default {
         }
       }
     },
-    showVehicleDialog() {
-      this.vehicleDialogVisible = true;
-    },
-    showBatteryDialog() {
-      this.batteryDialogVisible = true;
-    },
-    showUserDialog() {
-      this.userDialogVisible = true;
-    },
     showVehiclePath() {
       this.vehiclePathVisible = !this.vehiclePathVisible;
     },
@@ -356,7 +351,6 @@ export default {
         lng: item.LON, lat: item.LAT,
       };
       this.selectedId = item.vehicleId;
-
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
         // 车辆、电池信息
@@ -385,10 +379,17 @@ export default {
         // 车辆某段时间内行驶路径
         const { time } = this.searchLocList;
         const id = item.vehicleId;
+        const param = { id };
+        if (time) {
+          param.startTime = time[0];
+          param.endTime = time[1];
+        }
+        // 日期显示控件 true false
         if (this.vehiclePathVisible) {
-          const { respData: timeRespData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', { id, startTime: time[0], endTime: time[1] })).body;
+          const { respData: timeRespData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
           // if (code !== '200') throw new Error(message);
           const locList = timeRespData;
+          if (!locList.length) throw new Error('该时间段没有行驶轨迹');
           this.mapCenter = {
             lng: locList[0].LON, lat: locList[0].LAT,
           };
@@ -417,19 +418,19 @@ export default {
       const loc = await this.getLocation(item.LON, item.LAT);
       this.address = loc.address;
     },
-
     // 获取所有车辆信息
     async reloadVehicleList() {
-      // 初始化坐标点
-      this.mapCenter = '南京';
-      // 南京市中心
+      // 获取当前城市的浏览器定位  (根据经纬度获取范围车辆).
+      const r = await this.getCurrentPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: 118.77807441, lat: 32.0572355, radius: 1000,
+          lng: r.point.lng, lat: r.point.lat, radius: 1000,
         })).body;
         if (code === '200') {
           this.radiusVehicleList = respData;
+          // 获取当前范围内第一辆车的信息
           await this.getVehicleInfo();
+          // 获取当前范围内第一辆车的用户信息
           await this.getUserInfo();
           if (this.radiusVehicleList && this.radiusVehicleList.length && !_.find(this.radiusVehicleList, { vehicleId: this.selectedId })) {
             this.selectedId = this.radiusVehicleList[0].vehicleId;
@@ -487,6 +488,8 @@ export default {
         param.startTime = time[0];
         param.endTime = time[1];
       }
+      // 日期格式 转换成时间戳 moment('').format('X')
+      // console.log(moment(time[0]).format('X'));
       try {
         const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
         // if (code !== '200') throw new Error(message);
@@ -510,20 +513,28 @@ export default {
         this.$message.error(message);
       }
     },
-    // 逆地址解析
+    // 逆地址解析(根据经纬度获取详细地址).
     getLocation(lng, lat) {
-      return new Promise((resolve, reject) => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+      return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+    },
+    // 根据地址获取经纬度
+    getAddressByLocation(address) {
+      return new Promise(resolve => (new global.BMap.Geocoder()).getPoint(address, (res) => {
+        // 给一个初始化坐标
+        new BMap.Point(118.805297, 32.052656);
+        resolve(res);
+      }, address));
     },
     // 浏览器定位
-    // getLocations() {
-    //   return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition((r) => {
-    //     this.mapCenter = r.point;
-    //     alert(`您的位置：${r.point.lng} ,${r.point.lat}`);
-    //   }, { enableHighAccuracy: true }));
-    // },
-  },
-  async mounted() {
-    await this.reloadVehicleList();
+    getCurrentPosition() {
+      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
+        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
+          resolve(r);
+        } else {
+          reject(this.getStatus());
+        }
+      }, { enableHighAccuracy: true }));
+    },
   },
 };
 </script>

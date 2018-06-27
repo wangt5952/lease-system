@@ -1,13 +1,11 @@
 package com.elextec.lease.mobile.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
-import com.elextec.framework.common.request.LoginParam;
-import com.elextec.framework.common.request.RegisterParam;
-import com.elextec.framework.common.request.ResetPasswordParam;
-import com.elextec.framework.common.request.SmsParam;
+import com.elextec.framework.common.request.*;
 import com.elextec.framework.common.response.MessageResponse;
 import com.elextec.framework.exceptions.BizException;
 import com.elextec.framework.plugins.sms.SmsClient;
@@ -19,9 +17,11 @@ import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
-import com.elextec.persist.model.mybatis.BizOrganization;
+import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysUser;
+import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
+import org.hibernate.usertype.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -548,6 +548,19 @@ public class SysAuthApi extends BaseController {
             //默认暂时未实名认证
             userTemp.setUserRealNameAuthFlag(RealNameAuthFlag.UNAUTHORIZED);
             sysUserService.insertSysUser(userTemp);
+
+            //手机端注册，默认给该用户分配个人用户权限角色
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria sysUserExampleCriteria = sysUserExample.createCriteria();
+            sysUserExampleCriteria.andUserMobileEqualTo(resetParam.getUserMobile());
+            SysUser sysUser = sysUserService.getExtById(sysUserExample);
+
+            RefUserRolesParam refUserRolesParam = new RefUserRolesParam();
+            refUserRolesParam.setUserId(sysUser.getId());
+            refUserRolesParam.setRoleIds("1dc5e062e6964b1c857098e30d89b945");
+            refUserRolesParam.setDeleteAllFlg("false");
+            sysUserService.refSysUserAndRoles(refUserRolesParam);
+
             return new MessageResponse(RunningResult.SUCCESS);
         }
     }
@@ -642,6 +655,7 @@ public class SysAuthApi extends BaseController {
     /**
      * 上传用户头像.
      * @param userIdAndIconBase64Data 用户ID和用户头像图片BASE64
+     * @param request 登录用户
      * <pre>
      *     {
      *         id:ID,
@@ -659,7 +673,7 @@ public class SysAuthApi extends BaseController {
      * </pre>
      */
     @RequestMapping(path = {"/uplodeusericon"})
-    public MessageResponse uplodeUserIcon(@RequestBody String userIdAndIconBase64Data){
+    public MessageResponse uplodeUserIcon(@RequestBody String userIdAndIconBase64Data,HttpServletRequest request){
         // 无参数则报“无参数”
         if (WzStringUtil.isBlank(userIdAndIconBase64Data)) {
             MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
@@ -703,6 +717,27 @@ public class SysAuthApi extends BaseController {
                         if(WzStringUtil.isNotBlank(oldIconName)){
                             WzFileUtil.deleteFile(uploadUserIconRoot,oldIconName);
                         }
+
+                        //获取登录token
+                        String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+                        //获取所有登录信息
+                        Map<String,Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
+                        //获取登录用户信息
+                        SysUserExt sysUserExt = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+                        //把登录用户信息字段重新复制
+                        sysUserExt.setUserIcon(requestUrl);
+
+                        //把改好的对象重新放进map
+                        Map<String,Object> map = new HashMap<String,Object>();
+                        map.put(WzConstants.KEY_USER_INFO,sysUserExt);
+                        //设置超时时间
+                        Integer overtime = 300;
+                        if (WzStringUtil.isNumeric(loginOvertime)) {
+                            overtime = Integer.parseInt(loginOvertime);
+                        }
+                        //重新塞回缓存
+                        redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, map, overtime, TimeUnit.MINUTES);
+
                         //保存成功后将全路径返回给移动端
                         return new MessageResponse(RunningResult.SUCCESS,requestUrl);
                     }else{
@@ -781,16 +816,16 @@ public class SysAuthApi extends BaseController {
                     }
                     //将身份证正面照片保存到图片服务器中
                     String frontImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", frontImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserRealnameRoot, "", frontImageName, WzFileUtil.EXT_JPG);
+                    //String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     //将身份证背面照片保存到图片服务器中
                     String backImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", backImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcBack().replace(" ","+"), uploadUserRealnameRoot, "", backImageName, WzFileUtil.EXT_JPG);
+                    //String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     //将用户手持身份证的照片保存到图片服务器中
                     String groupImageName = WzUniqueValUtil.makeUniqueTimes();
-                    WzFileUtil.save(resetParam.getUserIcFront().replace(" ","+"), uploadUserIconRoot, "", groupImageName, WzFileUtil.EXT_JPG);
-//                        String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
+                    WzFileUtil.save(resetParam.getUserIcGroup().replace(" ","+"), uploadUserRealnameRoot, "", groupImageName, WzFileUtil.EXT_JPG);
+                    //String requestUrl = WzFileUtil.makeRequestUrl(downloadUserIconPrefix,"", frontImageName + WzFileUtil.EXT_JPG);
                     userTemp.setUserPid(resetParam.getUserPid());
                     userTemp.setUpdateUser(resetParam.getUpdateUser());
                     //数据库只保存文件名
@@ -844,5 +879,156 @@ public class SysAuthApi extends BaseController {
     public MessageResponse userBindOrg(){
         return new MessageResponse(RunningResult.SUCCESS,bizOrganizationService.orgList());
     }
+
+    /**
+     * 获取最新用户状态，并且更新缓存
+     * @param request
+     * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *             key_login_token:登录Token,
+     *             key_user_info:{
+     *                 id:ID,
+     *                 loginName:登录用户名,
+     *                 userMobile:手机号码,
+     *                 userType:用户类型（PLATFORM-平台、ENTERPRISE-企业、INDIVIDUAL-个人）,
+     *                 userIcon:Icon路径,
+     *                 nickName:昵称,
+     *                 userName:名称,
+     *                 userRealNameAuthFlag:是否已实名认证,
+     *                 userPid:身份证号,
+     *                 userIcFront:身份证正面照路径,
+     *                 userIcBack:身份证背面照路径,
+     *                 userIcGroup:本人于身份证合照路径,
+     *                 orgId:所属企业ID,
+     *                 orgCode:企业Code,
+     *                 orgName:企业名,
+     *                 userStatus:用户状态（NORMAL-正常、FREEZE-冻结/维保、INVALID-作废）,
+     *                 createUser:创建人,
+     *                 createTime:创建时间,
+     *                 updateUser:更新人,
+     *                 updateTime:更新时间
+     *             },
+     *             key_res_info:[
+     *                 {
+     *                     id:资源ID,
+     *                     res_code:资源Code,
+     *                     res_name:资源名称,
+     *                     res_type:资源类型,
+     *                     res_url:请求地址或页面名,
+     *                     res_sort:分组排序（通过分组排序将菜单组排序后，菜单组内通过级别进行排序）,
+     *                     show_flag:是否显示,
+     *                     parent:父级ID（最上级为null）,
+     *                     level:级别,
+     *                     create_user:创建人,
+     *                     create_time:创建时间,
+     *                     update_user:更新人,
+     *                     update_time:更新时间
+     *                 },
+     *                 ... ...
+     *             ],
+     *             key_vehicle_info:[
+     *                 {
+     *                     id:ID,
+     *                     vehicleCode:车辆编号,
+     *                     vehiclePn:车辆型号,
+     *                     vehicleBrand:车辆品牌,
+     *                     vehicleMadeIn:车辆产地,
+     *                     mfrsName:生产商名称,
+     *                     vehicleStatus:车辆状态（正常、冻结、报废）,
+     *                     createUser:创建人,
+     *                     createTime:创建时间,
+     *                     updateUser:更新人,
+     *                     updateTime:更新时间,
+     *                     bizBatteries:[电池信息
+     *                         {
+     *                              id:ID,
+     *                              batteryCode:电池编号,
+     *                              batteryName:电池货名,
+     *                              batteryBrand:电池品牌,
+     *                              batteryPn:电池型号,
+     *                              batteryParameters:电池参数,
+     *                              mfrsName:生产商名称,
+     *                              batteryStatus:电池状态（正常、冻结、作废）,
+     *                              createUser:创建人,
+     *                              createTime:创建时间,
+     *                              updateUser:更新人,
+     *                              updateTime:更新时间
+     *                         },
+     *                         ........
+     *                     ],
+     *                     bizPartss:[配件信息
+     *                         {
+     *                             id:ID,
+     *                             partsCode:配件编码,
+     *                             partsName:配件货名,
+     *                             partsBrand:配件品牌,
+     *                             partsPn:配件型号,
+     *                             partsType:配件类别（）,
+     *                             partsParameters:配件参数,
+     *                             mfrsName:生产商名称,
+     *                             partsStatus:配件状态（正常、冻结、作废）,
+     *                             createUser:创建人,
+     *                             createTime:创建时间,
+     *                             updateUser:更新人,
+     *                             updateTime:更新时间
+     *                         },
+     *                         .........
+     *                     ]
+     *                 },
+     *                 .......
+     *             ]
+     *         }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/userState",method = RequestMethod.GET)
+    public MessageResponse userState(HttpServletRequest request){
+        try{
+            //获取登录token
+            String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
+            //获取所有登录信息
+            Map<String,Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
+            //获取登录用户信息
+            SysUserExt userExt = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
+
+            //查询最新的用户状态
+            SysUserExample sysUserExample = new SysUserExample();
+            SysUserExample.Criteria criteria = sysUserExample.createCriteria();
+            criteria.andIdEqualTo(userExt.getId());
+            SysUserExt sysUserExt = sysUserService.getExtById(sysUserExample);
+
+            //把缓存中的登录用户信息字段重新赋值
+            userExt.setUserRealNameAuthFlag(sysUserExt.getUserRealNameAuthFlag());
+
+            //生成新的登录token
+            String loginToken = WzUniqueValUtil.makeUUID();
+            //重新组织登录信息
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put(WzConstants.KEY_LOGIN_TOKEN, loginToken);//登录token
+            map.put(WzConstants.KEY_USER_INFO,sysUserExt);//用户信息
+            map.put(WzConstants.KEY_RES_INFO,userInfo.get(WzConstants.KEY_RES_INFO));//用户资源
+            map.put(WzConstants.KEY_VEHICLE_INFO,userInfo.get(WzConstants.KEY_VEHICLE_INFO));//车辆信息
+
+            //设置超时时间
+            Integer overtime = 300;
+            //判断是否是数字
+            if (WzStringUtil.isNumeric(loginOvertime)) {
+                overtime = Integer.parseInt(loginOvertime);
+            }
+            //重新塞回缓存
+            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, map, overtime, TimeUnit.MINUTES);
+            //组织返回
+            return new MessageResponse(RunningResult.SUCCESS,map);
+        }  catch (BizException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+        }
+    }
+
 
 }
