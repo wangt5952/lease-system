@@ -57,7 +57,7 @@ export default {
     };
   },
   created() {
-    this.headerImage = this.key_user_info.userIcon.includes(this.website) ?  this.$route.query.userIcon : `${this.website}${ this.$route.query.userIcon}`;
+    this.headerImage = this.key_user_info.userIcon.includes(this.website) ? this.$route.query.userIcon : `${this.website}${ this.$route.query.userIcon}`;
   },
   mounted() {
     const self = this;
