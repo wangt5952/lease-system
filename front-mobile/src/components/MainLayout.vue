@@ -1,6 +1,5 @@
 <template>
   <div style="height:100%;">
-
     <drawer
     width="200px;"
     :show.sync="drawerVisibility"
@@ -37,7 +36,6 @@
       </div>
 
       <view-box ref="viewBox">
-
         <x-header slot="header"
         :left-options="leftOptions"
         title="小哥乐途">
