@@ -7,7 +7,7 @@
     </div>
 
     <group>
-      <x-input v-model="val" title="请输入昵称" required></x-input>
+      <x-input v-model="val" title="请输入昵称" required>{{this.val}}</x-input>
     </group>
 
   </div>
@@ -52,21 +52,13 @@ export default {
         this.key_user_info.nickName = this.val;
         localStorage.setItem('key_user_info', JSON.stringify(this.key_user_info));
         this.$vux.toast.show({ text: '修改成功', type: 'success', width: '10em' });
-        //  setTimeout(() => { window.history.go(-1) }, 100);
         setTimeout(() => { this.$router.push('/profile'); }, 100);
       }
     },
   },
-  created() {
-    // 判断字段是否存在
-    if (this.key_user_info.nickName) this.val = this.$route.params.nickName;
-    else this.val = '';
-    console.log(this.val);
-    // 
-    this.$vux.toast.show({ text: this.$route.params.nickName, type: 'success', width: '10em' });
+  async mounted() {
+    if (this.key_user_info.nickName) this.val = this.key_user_info.nickName;
   },
-  mounted() {
-  }
 };
 </script>
 

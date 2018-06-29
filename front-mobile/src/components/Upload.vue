@@ -56,18 +56,9 @@ export default {
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',
     };
   },
-  created() {
-    // 判断字段是否存在
-    if (this.key_user_info.userIcon) {
-      this.headerImage = this.key_user_info.userIcon.indexOf(this.website) >= 0 ? this.$route.query.userIcon : this.website + this.$route.query.userIcon;
-    } else {
-      this.headerImage = '/static/images/users/1.jpg';
-    }
-    console.log(1);
-    console.log(this.headerImage);
-  },
   mounted() {
-    console.log(2);
+    if (!this.key_user_info.userIcon) this.headerImage = '/static/images/users/1.jpg';
+    else this.headerImage = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
     const self = this;
     const image = document.getElementById('image');
     this.cropper = new Cropper(image, {
@@ -80,7 +71,6 @@ export default {
   },
   methods: {
     back() {
-      // window.history.go(-1)
       this.$router.push('/profile');
     },
     getObjectURL(file) {

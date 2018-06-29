@@ -12,7 +12,7 @@
             <img :src="this.portrait" class="dr_profile">
           </span>
           <div class="info">
-            <p class="name">{{key_user_info.nickName ? key_user_info.nickName: ''}}</p>
+            <p class="name">{{key_user_info.nickName}}</p>
             <a :href="key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'javascript:;':'/authentication_step1'" @click="getPath"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
           </div>
         </div>
@@ -166,12 +166,9 @@ export default {
     },
   },
   async mounted() {
-    // 静态文件
     if (!this.key_user_info.userIcon) this.portrait = '/static/images/users/1.jpg';
-    else this.portrait = this.key_user_info.userIcon.indexOf(this.website) >= 0 ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
+    else this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
     if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
-    console.log(this.key_user_info);
-    console.log(this.portrait);
   },
 };
 </script>
