@@ -95,7 +95,6 @@ export default {
       this.picValue = files[0];
       this.url = this.getObjectURL(this.picValue);
       if (this.cropper) {
-        console.log(this.cropper);
         this.cropper.replace(this.url);
       }
       this.panel = true;
