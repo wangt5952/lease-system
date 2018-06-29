@@ -78,8 +78,8 @@ export default {
       if (window.createObjectURL !== undefined) {
         url = window.createObjectURL(file);
         url = window.URL.createObjectURL(file);
-      } else if (window.webkitURL !== undefined) {
-        url = window.webkitURL.createObjectURL(file);
+      } else if (window.URL !== undefined) {
+        url = window.URL.createObjectURL(file);
       }
       return url;
     },
@@ -95,7 +95,8 @@ export default {
       this.picValue = files[0];
       this.url = this.getObjectURL(this.picValue);
       if (this.cropper) {
-        this.cropper.push(this.url);
+        console.log(this.cropper);
+        this.cropper.replace(this.url);
       }
       this.panel = true;
     },
