@@ -62,6 +62,7 @@ export default {
     if (this.key_user_info.nickName) this.val = this.$route.params.nickName;
     else this.val = '';
     console.log(this.val);
+    // 
     this.$vux.toast.show({ text: this.$route.params.nickName, type: 'success', width: '10em' });
   },
   mounted() {
