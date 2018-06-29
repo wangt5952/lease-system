@@ -59,12 +59,15 @@ export default {
   created() {
     // 判断字段是否存在
     if (this.key_user_info.userIcon) {
-      this.headerImage = this.key_user_info.userIcon.includes(this.website) ? this.$route.query.userIcon : this.website + this.$route.query.userIcon;
+      this.headerImage = this.key_user_info.userIcon.indexOf(this.website) >= 0 ? this.$route.query.userIcon : this.website + this.$route.query.userIcon;
     } else {
       this.headerImage = '/static/images/users/1.jpg';
     }
+    console.log(1);
+    console.log(this.headerImage);
   },
   mounted() {
+    console.log(2);
     const self = this;
     const image = document.getElementById('image');
     this.cropper = new Cropper(image, {
