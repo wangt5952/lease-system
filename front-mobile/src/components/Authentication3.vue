@@ -46,7 +46,7 @@ export default {
       window.history.go(-1);
     },
     handler() {
-      this.$router.replace('/');
+      this.$router.push('/');
     },
   },
 };

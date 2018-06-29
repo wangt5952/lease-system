@@ -81,7 +81,7 @@ export default {
   methods: {
     back() {
       // window.history.go(-1)
-      this.$router.replace('/profile');
+      this.$router.push('/profile');
     },
     getObjectURL(file) {
       let url = null;
@@ -105,7 +105,7 @@ export default {
       this.picValue = files[0];
       this.url = this.getObjectURL(this.picValue);
       if (this.cropper) {
-        this.cropper.replace(this.url);
+        this.cropper.push(this.url);
       }
       this.panel = true;
     },
@@ -149,7 +149,7 @@ export default {
         this.key_user_info.userIcon = respData;
         localStorage.setItem('key_user_info', JSON.stringify(this.key_user_info));
         this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em', time: '100' });
-        setTimeout(() => { this.$router.replace('/'); }, 200);
+        setTimeout(() => { this.$router.push('/'); }, 200);
       }
     },
   },

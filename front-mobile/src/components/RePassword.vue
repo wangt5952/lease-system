@@ -63,7 +63,7 @@ export default {
         if (code !== '200') throw new Error(message);
         this.$vux.toast.show({ text: '修改密码成功', type: 'success', width: '10em' });
         await this.$store.commit('logout');
-        setTimeout(() => { this.$router.replace('/login'); }, 200);
+        setTimeout(() => { this.$router.push('/login'); }, 200);
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;

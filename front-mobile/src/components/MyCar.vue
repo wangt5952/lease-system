@@ -42,10 +42,10 @@ export default {
   },
   methods: {
     back() {
-      this.$router.replace('/');
+      this.$router.push('/');
     },
     handler() {
-      this.$router.replace('/authentication_step1');
+      this.$router.push('/authentication_step1');
     },
   },
   async mounted() {

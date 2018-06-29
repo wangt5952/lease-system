@@ -146,7 +146,7 @@ export default {
   },
   methods: {
     back() {
-      this.$router.replace('/authentication_step1');
+      this.$router.push('/authentication_step1');
     },
     select(index) {
       if (index === 1) {
@@ -202,7 +202,7 @@ export default {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {
         this.$vux.toast.show({ text: respData, type: 'success', width: '10em' });
-        this.$router.replace('/authentication_step3');
+        this.$router.push('/authentication_step3');
       }
     },
   },

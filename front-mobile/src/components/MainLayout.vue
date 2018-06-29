@@ -162,7 +162,7 @@ export default {
     },
     async loginOut() {
       await this.$store.commit('logout');
-      this.$router.replace('/login');
+      this.$router.push('/login');
     },
   },
   async mounted() {
