@@ -27,13 +27,13 @@
     <el-table :data="list" class="userHeight">
       <el-table-column prop="loginName" label="用户名" width="100"></el-table-column>
       <el-table-column prop="userMobile" label="手机号" width="100"></el-table-column>
-      <el-table-column prop="userTypeText" label="用户类型" width="100"></el-table-column>
-      <el-table-column prop="orgName" label="所属企业" width="100">
+      <el-table-column prop="userTypeText" label="用户类型" width="70"></el-table-column>
+      <el-table-column prop="orgName" label="所属企业" width="110">
         <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
           {{ scope.row.orgName }}
         </template>
       </el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO" width="150"></el-table-column>
+      <!-- <el-table-column prop="userIcon" label="用户LOGO" width="150"></el-table-column> -->
       <el-table-column prop="nickName" label="昵称" width="100"></el-table-column>
       <el-table-column prop="userName" label="姓名" width="100"></el-table-column>
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证" width="100">
@@ -43,7 +43,7 @@
         </template>
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <el-table-column label="操作" width="500">
+      <el-table-column label="操作" width="360">
         <template slot-scope="{row}">
           <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
             <template v-if="row.userType === 'INDIVIDUAL'">

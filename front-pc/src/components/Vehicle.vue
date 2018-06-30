@@ -37,13 +37,13 @@
     </div>
 
     <el-table :data="vehicle.list" class="vehicleHeight">
-      <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
+      <el-table-column prop="vehicleCode" label="编号" width="150"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
       <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
-      <el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>
+      <!--<el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>-->
       <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
-      <el-table-column prop="vehicleStatusText" label="状态" width="60">
+      <el-table-column prop="vehicleStatusText" label="状态" width="80">
         <template slot-scope="{row}">
           <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else-if="row.vehicleStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
@@ -54,20 +54,20 @@
       <!-- 管理员查看的信息 -->
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <!-- v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" -->
-        <el-table-column label="电池" width="150">
+        <el-table-column label="电池" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
             <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
             <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="配件" width="180">
+        <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180">
+        <el-table-column label="操作" width="200">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">编辑</el-button>
           </template>
