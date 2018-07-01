@@ -7,7 +7,7 @@
 
     <group v-if="this.list.length === 0">
      <div class="bg"><span>{{this.value}}</span></div>
-     <x-button type="primary" @click.native="handler">实名认证</x-button>
+     <x-button v-if="this.isEnable" type="primary" @click.native="handler">实名认证</x-button>
     </group>
 
     <group v-for="(item,index) in list" :key="item.id">
