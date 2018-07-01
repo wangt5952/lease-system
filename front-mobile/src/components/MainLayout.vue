@@ -138,7 +138,7 @@ export default {
     getPath() {
       if (this.key_user_info.userRealNameAuthFlag === 'AUTHORIZED') {
         this.$vux.toast.show({ text: '您已经实名认证，请勿重复提交', type: 'cancel', width: '10em' });
-      } else if (this.key_user_info.userRealNameAuthFlag === 'AUTHORIZED') {
+      } else if (this.key_user_info.userRealNameAuthFlag === 'TOAUTHORIZED') {
         this.$vux.toast.show({ text: '您已经提交资料，请耐心等待审核', type: 'cancel', width: '10em' });
       } else {
         this.$router.push('/authentication_step1');
