@@ -12,9 +12,9 @@
        <step-item title="步骤2:" description="上传身份证件图片"></step-item>
      </step>
    </div>
-   <x-hr></x-hr>
 
-    <group>
+
+    <group style="margin-top:10px">
       <cell
       title="请您上传身份证正面照片"
       is-link
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { Cell, Group, XDialog, Step, StepItem, XHr, XButton, TransferDom } from 'vux';
+import { Cell, Group, XDialog, Step, StepItem, XButton, TransferDom } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
@@ -114,7 +114,6 @@ export default {
     XButton,
     Step,
     StepItem,
-    XHr,
     TransferDom,
   },
   computed: {
@@ -219,7 +218,7 @@ export default {
     background: linear-gradient(#16D0A2,#20C987)!important;
     display: flex;
     justify-content: space-between;
-    margin: 0 auto;
+    margin: 0px auto;
     z-index: -1;
   }
   .left {

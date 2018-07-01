@@ -11,9 +11,8 @@
        <step-item title="步骤1:" description="输入身份证号"></step-item>
      </step>
    </div>
-   <x-hr></x-hr>
 
-   <group>
+   <group style="margin-top:10px">
     <x-input title="身份证号：" placeholder="请输入身份证号" :min="15" :max="18" required v-model="value"></x-input>
    </group>
    <x-button type="primary" @click.native="handler">下一步</x-button>
@@ -21,14 +20,13 @@
 </template>
 
 <script>
-import { Step, StepItem, XButton, XHr, XInput, Group } from 'vux';
+import { Step, StepItem, XButton, XInput, Group } from 'vux';
 
 export default {
   components: {
     Step,
     StepItem,
     XButton,
-    XHr,
     XInput,
     Group,
   },

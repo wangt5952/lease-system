@@ -13,9 +13,8 @@
        <step-item title="步骤3:" description="等待审核"></step-item>
      </step>
    </div>
-   <x-hr></x-hr>
 
-   <group>
+   <group style="margin-top:10px;">
     <div class="bg"><span>{{this.value}}</span></div>
    </group>
    <div class="botmline"></div>
@@ -24,15 +23,13 @@
 </template>
 
 <script>
-import { Step, StepItem, XButton, XHr, XTextarea, Group } from 'vux';
+import { Step, StepItem, XButton, Group } from 'vux';
 
 export default {
   components: {
     Step,
     StepItem,
     XButton,
-    XHr,
-    XTextarea,
     Group,
   },
   data() {
