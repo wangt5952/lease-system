@@ -380,7 +380,6 @@ export default {
         if (userCode !== '200') throw new Error(userMessage);
         if (userRespData) {
           this.userInfo = userRespData;
-          console.log(userRespData);
         } else {
           this.userInfo = {};
         }
