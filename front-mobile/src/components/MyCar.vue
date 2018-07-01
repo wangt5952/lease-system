@@ -7,7 +7,7 @@
 
     <group v-if="this.list.length === 0">
      <div class="bg"><span>{{this.value}}</span></div>
-     <x-button v-if="this.isEnable" type="primary" @click.native="handler">实名认证</x-button>
+     <x-button type="primary" @click.native="handler">实名认证</x-button>
     </group>
 
     <group v-for="(item,index) in list" :key="item.id">
@@ -105,8 +105,8 @@ export default {
   }
   .bg {
     width:100%;
-    height:100px;
-    background-color: #eae5e5;
+    height:50px;
+    margin: 10px auto;
   }
   .bg span {
     margin:auto 20px;
