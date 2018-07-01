@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       step: 0,
-      value: '        请耐心等待企业审核',
+      value: '请耐心等待企业审核',
     };
   },
   methods: {

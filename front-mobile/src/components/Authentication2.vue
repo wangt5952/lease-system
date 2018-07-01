@@ -147,6 +147,9 @@ export default {
     back() {
       this.$router.push('/authentication_step1');
     },
+    go() {
+      this.$router.push('/authentication_step3');
+    },
     select(index) {
       if (index === 1) {
         this.show = true;
@@ -201,7 +204,7 @@ export default {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {
         this.$vux.toast.show({ text: '资料提交成功！', type: 'success', width: '10em' });
-        this.$router.push('/authentication_step3');
+        this.go();
       }
     },
   },
