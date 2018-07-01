@@ -6,7 +6,7 @@
     </div>
 
     <group v-if="this.list.length === 0">
-     <x-textarea title="" v-model="value"></x-textarea>
+     <div class="bg"><span>{{this.value}}</span></div>
      <x-button v-if="this.isEnable" type="primary" @click.native="handler">实名认证</x-button>
     </group>
 
@@ -17,14 +17,13 @@
 </template>
 
 <script>
-import { Cell, Group, XTextarea, XButton } from 'vux';
+import { Cell, Group, XButton } from 'vux';
 import { mapState } from 'vuex';
 
 export default {
   components: {
     Group,
     Cell,
-    XTextarea,
     XButton,
   },
   data() {
@@ -54,7 +53,7 @@ export default {
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
     if (this.key_user_info.userRealNameAuthFlag === 'UNAUTHORIZED' || this.key_user_info.userRealNameAuthFlag === 'REJECTAUTHORIZED') {
-      this.Enable = true;
+      this.isEnable = true;
       this.value = '很遗憾您的名下没有车辆，赶快实名认证，赶快实去企业申领车辆吧！';
     } else {
       this.value = '很遗憾您的名下没有车辆，赶快去企业申领车辆吧！';
@@ -99,9 +98,19 @@ export default {
     margin:0;
   }
   >>>.vux-label {
-      font-size: 15pt;
+    font-size: 15pt;
     }
   .weui-btn {
     width:80%;
+  }
+  .bg {
+    width:100%;
+    height:100px;
+    background-color: #eae5e5;
+  }
+  .bg span {
+    margin:auto 20px;
+    padding:10px 0;
+    font-size: 18px;
   }
 </style>
