@@ -12,7 +12,7 @@
     </div>
 
     <el-table :data="list" class="roleHeight">
-      <el-table-column prop="roleName" label="角色名" width="350"></el-table-column>
+      <el-table-column prop="roleNameText" label="角色名" width="350"></el-table-column>
       <el-table-column prop="roleIntroduce" label="说明" width="350"></el-table-column>
       <el-table-column label="操作" width="500">
         <template slot-scope="{row}">
@@ -106,6 +106,11 @@ export default {
         { id: 'PAGE', name: '页面' },
         { id: 'FUNCTION', name: '功能' },
       ],
+      roleNameText: [
+        { id: 'personal', name: '个人' },
+        { id: 'enterprise', name: '企业' },
+        { id: 'admin', name: '管理员' },
+      ]
     };
   },
   computed: {
@@ -157,6 +162,7 @@ export default {
           ...o,
           userTypeText: (_.find(this.typeList, { id: o.userType }) || {}).name,
           userRealNameAuthFlagText: (_.find(this.authList, { id: o.userRealNameAuthFlag }) || {}).name,
+          roleNameText: (_.find(this.roleNameText, { id: o.roleName }) || {}).name,
         }));
       } catch (e) {
         this.loading = false;
@@ -248,7 +254,7 @@ export default {
           const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, deleteAllFlg: true })).body;
           if (code !== '200') throw new Error(message);
         }
-
+        // 关闭页面
         this.$message.success('分配成功');
         this.closeAssignResForm();
       } catch (e) {

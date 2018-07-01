@@ -197,7 +197,9 @@ export default {
       radiusVehicleList: [],
     };
   },
-  
+  async mounted() {
+    await this.reloadVehicleList();
+  },
   computed: {
     selectedItem() {
       return _.find(this.radiusVehicleList, { vehicleId: this.selectedId }) || {};
@@ -533,9 +535,6 @@ export default {
         }
       }, { enableHighAccuracy: true }));
     },
-  },
-  async mounted() {
-    await this.reloadVehicleList();
   },
 };
 </script>
