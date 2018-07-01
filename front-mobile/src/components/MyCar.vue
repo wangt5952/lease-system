@@ -7,7 +7,7 @@
 
     <group v-if="this.list.length === 0">
      <x-textarea title="" v-model="value"></x-textarea>
-     <x-button type="primary" @click.native="handler">实名认证</x-button>
+     <x-button v-if="this.isEnable" type="primary" @click.native="handler">实名认证</x-button>
     </group>
 
     <group v-for="(item,index) in list" :key="item.id">
@@ -30,8 +30,9 @@ export default {
   data() {
     return {
       list: [],
+      isEnable: false,
       localID: localStorage.getItem('vehicleId'),
-      value: '很遗憾您的名下没有车辆，赶快实名认证，去企业申领车辆吧！',
+      value: '',
     };
   },
   computed: {
@@ -52,6 +53,12 @@ export default {
     const { code, message, respData } = (await this.$http.post('/api/mobile/v1/device/getVehicleByUserId', { id: this.key_user_info.id })).body;
     if (code !== '200') throw new Error(message || code);
     this.list = respData;
+    if (this.key_user_info.userRealNameAuthFlag === 'UNAUTHORIZED' || this.key_user_info.userRealNameAuthFlag === 'REJECTAUTHORIZED') {
+      this.Enable = true;
+      this.value = '很遗憾您的名下没有车辆，赶快实名认证，赶快实去企业申领车辆吧！';
+    }else {
+      this.value = '很遗憾您的名下没有车辆，赶快去企业申领车辆吧！';
+    }
   },
 };
 </script>
