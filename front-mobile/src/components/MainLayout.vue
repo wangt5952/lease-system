@@ -13,7 +13,7 @@
           </span>
           <div class="info">
             <p class="name">{{key_user_info.nickName}}</p>
-            <a :href="key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'javascript:;':'/authentication_step1'" @click="getPath"><p class="realname">{{key_user_info.userRealNameAuthFlag=='AUTHORIZED'?'已实名':'未实名'}}</p></a>
+            <a href="javascript:;" @click="getPath"><p class="realname" v-bind:class="{ danger: this.isEnable }">{{this.realNameFlag}}</p></a>
           </div>
         </div>
 
@@ -68,6 +68,22 @@ import { Group, Cell, Drawer, ViewBox, XHeader, Loading } from 'vux';
 import { mapState } from 'vuex';
 import _ from 'lodash';
 
+const user_realName_flag = [
+  {
+    key: 'AUTHORIZED',
+    value: '已实名',
+  }, {
+    key: 'UNAUTHORIZED',
+    value: '未实名',
+  }, {
+    key: 'TOAUTHORIZED',
+    value: '待审核',
+  }, {
+    key: 'REJECTAUTHORIZED',
+    value: '已驳回',
+  },
+];
+
 export default {
   components: {
     Group,
@@ -113,12 +129,19 @@ export default {
       icon: { url: '/static/images/Red_Point.jpg', size: { width: 19, height: 25 }, opts: { imageSize: { width: 19, height: 25 } } },
       width: 0,
       height: 0,
+      realNameFlag: '',
+      isEnable: false,
+
     };
   },
   methods: {
     getPath() {
       if (this.key_user_info.userRealNameAuthFlag === 'AUTHORIZED') {
         this.$vux.toast.show({ text: '您已经实名认证，请勿重复提交', type: 'cancel', width: '10em' });
+      } else if (this.key_user_info.userRealNameAuthFlag === 'TOAUTHORIZED') {
+        this.$vux.toast.show({ text: '您已经提交资料，请耐心等待审核', type: 'cancel', width: '10em' });
+      } else {
+        this.$router.push('/authentication_step1');
       }
     },
     async vehicleBatterInfo(vehicleID) {
@@ -166,9 +189,13 @@ export default {
     },
   },
   async mounted() {
-    if (!this.key_user_info.userIcon) this.portrait = '/static/images/users/1.jpg';
-    else this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
+    this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
     if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
+    this.realNameFlag = _.find(user_realName_flag, { key: this.key_user_info.userRealNameAuthFlag }).value;
+    if (this.realNameFlag === '已驳回') {
+      this.isEnable = true;
+      this.$vux.toast.show({ text: '您的实名注册被驳回，请您重新提交资料！', type: 'warn', width: '10em' });
+    }
   },
 };
 </script>
@@ -361,5 +388,10 @@ export default {
   color: #fff;
   border-radius: 10px;
   text-align: center;
+}
+
+.info .danger {
+  color: red;
+  font-weight: bold,
 }
 </style>
