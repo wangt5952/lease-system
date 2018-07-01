@@ -41,7 +41,7 @@
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证" width="100">
         <template slot-scope="{row}">
           <template v-if="row.userRealNameAuthFlag === 'AUTHORIZED'"><span style="color:#17BE45">已实名</span></template>
-          <template v-if="row.userRealNameAuthFlag === 'TOAUTHORIZED'"><span style="color:red">待实名</span></template>
+          <template v-if="row.userRealNameAuthFlag === 'TOAUTHORIZED'"><span style="color:#fd8000">待实名</span></template>
           <template v-if="row.userRealNameAuthFlag === 'REJECTAUTHORIZED'"><span style="color:red">驳回</span></template>
           <template v-if="row.userRealNameAuthFlag === 'UNAUTHORIZED'"><span style="color:red">未实名</span></template>
         </template>
