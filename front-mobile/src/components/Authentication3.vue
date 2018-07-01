@@ -16,7 +16,7 @@
    <x-hr></x-hr>
 
    <group>
-    <x-textarea title="" v-model="value"></x-textarea>
+    <div class="bg"><span>{{this.value}}</span></div>
    </group>
    <div class="botmline"></div>
    <x-button type="primary" @click.native="handler">完成</x-button>
@@ -130,5 +130,19 @@ export default {
   .weui-btn {
     width:80%;
     margin:20px auto;
+  }
+  >>>.vux-x-hr {
+    margin:0;
+  }
+  .bg {
+    width:100%;
+    height:50px;
+    margin: 10px auto;
+    text-align: center;
+  }
+  .bg span {
+    margin:auto 20px;
+    padding:10px 0;
+    font-size: 18px;
   }
 </style>
