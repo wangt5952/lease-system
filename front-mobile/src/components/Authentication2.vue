@@ -149,7 +149,7 @@ export default {
       this.$router.push('/authentication_step1');
     },
     go() {
-      this.$router.push('/authentication_step3');
+      this.$router.push('/authentication_step1');
     },
     select(index) {
       if (index === 1) {
