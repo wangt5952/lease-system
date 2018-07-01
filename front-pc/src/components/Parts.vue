@@ -32,7 +32,13 @@
       <el-table-column prop="partsTypeText" label="类别" width="100"></el-table-column>
       <el-table-column prop="partsParameters" label="参数" width="100"></el-table-column>
       <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
-      <el-table-column prop="partsStatusText" label="状态" width="100"></el-table-column>
+      <el-table-column prop="partsStatusText" label="状态" width="100">
+        <template slot-scope="{row}">
+          <template v-if="row.partsStatus === 'INVALID'"><span style="color:red">作废</span></template>
+          <template v-if="row.partsStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
+          <template v-if="row.partsStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
+        </template>
+      </el-table-column>
       <el-table-column label="绑定车辆" width="100">
         <template slot-scope="{row}">
           <template v-if="!row.vehicleId"><span style="color:red">未绑定</span></template>

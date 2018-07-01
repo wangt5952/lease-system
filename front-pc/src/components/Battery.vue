@@ -284,6 +284,8 @@ export default {
         'batteryCode',
       ]);
       this.deviceForm.perSet = 30;
+      this.deviceForm.request = 0;
+      this.deviceForm.reset = 0;
       this.deviceForm.deviceType = '电池';
     },
     // 保存设备

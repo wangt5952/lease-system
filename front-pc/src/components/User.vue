@@ -1,11 +1,13 @@
 <template>
   <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
-      <template v-if="key_user_info.userType === 'PLATFORM'">
+      <!-- <template v-if="key_user_info.userType === 'PLATFORM'"> -->
+      <template v-if="res['FUNCTION'].indexOf('manager-user-addone') >= 0">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加用户</el-button>
         </div>
-      </template>
+        </template>
+      <!-- </template> -->
       <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
         <el-form :inline="true">
           <el-form-item>
@@ -27,23 +29,25 @@
     <el-table :data="list" class="userHeight">
       <el-table-column prop="loginName" label="用户名" width="100"></el-table-column>
       <el-table-column prop="userMobile" label="手机号" width="100"></el-table-column>
-      <el-table-column prop="userTypeText" label="用户类型" width="100"></el-table-column>
-      <el-table-column prop="orgName" label="所属企业" width="100">
+      <el-table-column prop="userTypeText" label="用户类型" width="70"></el-table-column>
+      <el-table-column prop="orgName" label="所属企业" width="110">
         <template v-if="scope.row.userType !== 'PLATFORM'" slot-scope="scope">
           {{ scope.row.orgName }}
         </template>
       </el-table-column>
-      <el-table-column prop="userIcon" label="用户LOGO" width="150"></el-table-column>
+      <!-- <el-table-column prop="userIcon" label="用户LOGO" width="150"></el-table-column> -->
       <el-table-column prop="nickName" label="昵称" width="100"></el-table-column>
       <el-table-column prop="userName" label="姓名" width="100"></el-table-column>
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证" width="100">
         <template slot-scope="{row}">
           <template v-if="row.userRealNameAuthFlag === 'AUTHORIZED'"><span style="color:#17BE45">已实名</span></template>
-          <template v-else><span style="color:red">未实名</span></template>
+          <template v-if="row.userRealNameAuthFlag === 'TOAUTHORIZED'"><span style="color:#fd8000">待实名</span></template>
+          <template v-if="row.userRealNameAuthFlag === 'REJECTAUTHORIZED'"><span style="color:red">驳回</span></template>
+          <template v-if="row.userRealNameAuthFlag === 'UNAUTHORIZED'"><span style="color:red">未实名</span></template>
         </template>
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
-      <el-table-column label="操作" width="500">
+      <el-table-column label="操作" width="360">
         <template slot-scope="{row}">
           <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
             <template v-if="row.userType === 'INDIVIDUAL'">
@@ -101,7 +105,8 @@
             <el-form-item label="企业图标">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
               <el-select v-model="form.userIcon" placeholder="请选择企业Logo" style="width:100%;">
-                <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #F1F1F1" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #5795D5" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                  <!-- <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #F1F1F1" :key="`${i}`" :label="o.iconName" :value="o.iconName"> -->
                   <img class="companyLogo" :src="userIconPath + o.iconName" alt="">
                 </el-option>
               </el-select>
@@ -144,7 +149,7 @@
           <el-col :span="24">
             <el-form-item label="角色">
               <el-select v-model="assignRoleForm.list" :placeholder="`请选择角色`" style="width:100%;" multiple>
-                <el-option v-for="o in roleList" :key="o.id" :label="o.roleName" :value="o.id"></el-option>
+                <el-option v-for="o in roleList" :key="o.id" :label="o.roleIntroduce" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -353,10 +358,13 @@ export default {
       authList: [
         { id: 'AUTHORIZED', name: '已实名' },
         { id: 'UNAUTHORIZED', name: '未实名' },
+        { id: 'TOAUTHORIZED', name: '待实名' },
+        { id: 'REJECTAUTHORIZED', name: '驳回' }
       ],
       statusList: [
         { id: 'NORMAL', name: '正常' },
         { id: 'INVALID', name: '作废' },
+        { id: 'FREEZE', name: '冻结' }
       ],
       searchTypeList: [
         { id: '', name: '全部类型' },
@@ -375,11 +383,7 @@ export default {
       },
       roleList: [],
       orgList: [],
-      userIconPhoto: [
-        { iconName: '20180514171821.png' },
-        { iconName: '20180514172108.png' },
-        { iconName: '20180514172120.png' },
-      ],
+      userIconPhoto: [],
       // 照片表单
       photoFormVisible: false,
       pid: '',
@@ -575,7 +579,7 @@ export default {
       if (row.orgId) {
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
-            orgId: row.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize,
+            orgId: row.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize, vehicleStatus: 'NORMAL'
           })).body;
           if (code === '40106') {
             this.$store.commit('relogin');
@@ -605,7 +609,7 @@ export default {
       if (vehicleForms.orgId) {
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
-            orgId: vehicleForms.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize, ...this.vehicleSearch,
+            orgId: vehicleForms.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize, ...this.vehicleSearch, vehicleStatus: 'NORMAL'
           })).body;
           if (code === '40106') {
             this.$store.commit('relogin');
@@ -724,6 +728,7 @@ export default {
     },
     async showForm(form = { }) {
       await this.getOrgList();
+      await this.getOrgIcons();
       this.form = _.pick(form, [
         'id',
         'loginName',
@@ -801,6 +806,16 @@ export default {
         this.$message.success('分配成功');
         this.assignRoleFormVisible = false;
       } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    async getOrgIcons() {
+      try {
+        const { code, messagem, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
+        if (code === '200') this.userIconPhoto = respData;
+      } catch (err) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);

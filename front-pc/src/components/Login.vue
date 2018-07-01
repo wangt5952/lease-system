@@ -1,15 +1,19 @@
 <template>
   <div style="display:flex;flex-direction:column;height:100%;">
-    <div style="padding:10px 30px;background:#000;color:#fff;font-size:22px;font-weight:bold;">
+    <div style="padding:10px 30px;background:#0A1B33;color:#fff;font-size:22px;font-weight:bold;">
       小哥乐途后台登录系统
+      
     </div>
     <el-row type="flex" justify="end" style="background:url(/static/pc-login-bg-1.jpg);height:100%;">
       <el-col style="display:flex;background:#ffffff80;padding:10px;max-width:500px;">
+        <div class="imgDivStyle">
+          <img src="../assets/xiaogeletu.jpg" alt="" class="imgStyle">
+        </div>
         <div style="margin:80px 40px; background:#fff;flex:1;">
           <div style="padding:60px;padding-bottom:0;border-bottom:1px solid #eee;">
             <div style="padding:10px 20px;border-bottom:4px solid #000;display:inline-block;font-size:20px;font-weight:bold;">登录</div>
           </div>
-          <el-form ref="form" :model="form" style="margin-top:40px;" >
+          <el-form ref="form" :model="form" style="margin-top:30px;" >
             <el-form-item>
               <el-input prefix-icon="lt lt-my" v-model="form.loginName" placeholder="用户名" @keyup.enter.native="$refs.pwd.focus()"></el-input>
             </el-form-item>
@@ -28,45 +32,54 @@
 </template>
 
 <script>
-import moment from 'moment';
-import md5 from 'js-md5';
+import moment from "moment";
+import md5 from "js-md5";
 
 export default {
   data() {
     return {
-      form: {},
+      form: {}
     };
   },
   methods: {
     async handleSubmit() {
-      if (this.form.loginName === '' || this.form.password === '') {
-        this.$message.error('用户名或者密码不能为空');
+      if (this.form.loginName === "" || this.form.password === "") {
+        this.$message.error("用户名或者密码不能为空");
         return;
       }
       const { password, ...form } = this.form;
       const loginTime = moment().unix() * 1000;
-      form.loginAuthStr = md5(form.loginName + md5(password).toUpperCase() + loginTime).toUpperCase();
+      form.loginAuthStr = md5(
+        form.loginName + md5(password).toUpperCase() + loginTime
+      ).toUpperCase();
       form.loginTime = loginTime;
 
       try {
-        const { code, message, respData } = (await this.$http.post('/api/manager/auth/login', form)).body;
-        if (code !== '200') throw new Error(message || code);
+        const { code, message, respData } = (await this.$http.post(
+          "/api/manager/auth/login",
+          form
+        )).body;
+        if (code !== "200") throw new Error(message || code);
         const { key_login_token, key_res_info, key_user_info } = respData;
-        await this.$store.commit('login', { key_login_token, key_res_info, key_user_info });
-        this.$message.success({
-          message: `欢迎回来，${key_user_info.userName}`,
+        await this.$store.commit("login", {
+          key_login_token,
+          key_res_info,
+          key_user_info
         });
-        this.$router.push('/monitor');
+        this.$message.success({
+          message: `欢迎回来，${key_user_info.userName}`
+        });
+        this.$router.push("/monitor");
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
       // this.$router.push('/');
-    },
+    }
     // resetPassword(){
     //   this.$router.push('/resetPassword');
     // }
-  },
+  }
 };
 </script>
 
@@ -94,5 +107,15 @@ export default {
   font-size: 20px;
   height: 44px;
   -webkit-box-shadow: 0 0 0px 1000px #eee inset !important;
+}
+.imgDivStyle {
+  position: absolute;
+}
+.imgStyle {
+  width: 400px;
+  height: 128px; 
+  justify-content: center;
+  margin-left: 40px;
+  border-bottom: #0A1B33 solid 
 }
 </style>
