@@ -254,6 +254,7 @@ export default {
           const { code, message } = (await this.$http.post('/api/manager/role/refroleandresources', { roleId: id, deleteAllFlg: true })).body;
           if (code !== '200') throw new Error(message);
         }
+        // 关闭页面
         this.$message.success('分配成功');
         this.closeAssignResForm();
       } catch (e) {
