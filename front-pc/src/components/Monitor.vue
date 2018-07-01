@@ -264,80 +264,88 @@ export default {
     // 地图更改缩放级别结束时触发触发此事件
     async syncCenterAndZoom(e) {
       // 获取地图中心点
-      const { lng, lat } = e.target.getCenter();
-      // this.circlePath.center = e.target.getCenter();
-      // 获取缩放等级
-      const zoomNum = e.target.getZoom();
-      let num = 0;
-      if (zoomNum > 10) {
-        switch (zoomNum) {
-          // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: num = 900; break;
-          // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: num = 2000; break;
-          case 14: num = 2000; break;
-          case 13: num = 4000; break;
-          case 12: num = 10000; break;
-          case 11: num = 20000; break;
-          default: num = 1000;
-        }
-        try {
-          const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-            lng: lng, lat: lat, radius: num,
-          })).body;
-          if (code === '200') {
-            this.radiusVehicleList = respData;
-          } else {
-            this.radiusVehicleList = [];
-            this.vehicleInfo = {};
-            this.powerInfo = {};
-            this.userInfo = {};
-            this.address = '';
-            throw new Error(message);
+      if (this.vehiclePathVisible === false) {
+        const { lng, lat } = e.target.getCenter();
+        // this.circlePath.center = e.target.getCenter();
+        // 获取缩放等级
+        const zoomNum = e.target.getZoom();
+        let num = 0;
+        if (zoomNum > 10) {
+          switch (zoomNum) {
+            // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
+            case 16: num = 900; break;
+            // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
+            case 15: num = 2000; break;
+            case 14: num = 2000; break;
+            case 13: num = 4000; break;
+            case 12: num = 10000; break;
+            case 11: num = 20000; break;
+            default: num = 1000;
           }
-        } catch (err) {
-          const message = err.statusText || err.message;
-          this.$message.error(message);
+          try {
+            const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+              lng: lng, lat: lat, radius: num,
+            })).body;
+            if (code === '200') {
+              this.radiusVehicleList = respData;
+            } else {
+              this.radiusVehicleList = [];
+              this.vehicleInfo = {};
+              this.powerInfo = {};
+              this.userInfo = {};
+              this.address = '';
+              throw new Error(message);
+            }
+          } catch (err) {
+            const message = err.statusText || err.message;
+            this.$message.error(message);
+          }
         }
+      } else {
+        await this.reloadLocList();
       }
     },
     // 停止拖拽地图时触发此事件
     async syncCenterAndZooms(e) {
-      const { lng, lat } = e.target.getCenter();
-      // this.circlePath.center = e.target.getCenter();
-      // 获取缩放等级
-      const zoomNum = e.target.getZoom();
-      let num = 0;
-      if (zoomNum > 10) {
-        switch (zoomNum) {
-          // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: num = 900; break;
-          // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: num = 2000; break;
-          case 14: num = 2000; break;
-          case 13: num = 4000; break;
-          case 12: num = 10000; break;
-          case 11: num = 20000; break;
-          default: num = 1000;
-        }
-        try {
-          const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-            lng: lng, lat: lat, radius: num,
-          })).body;
-          if (code === '200') {
-            this.radiusVehicleList = respData;
-          } else {
-            this.radiusVehicleList = [];
-            this.vehicleInfo = {};
-            this.powerInfo = {};
-            this.userInfo = {};
-            this.address = '';
-            throw new Error(message);
+      if (this.vehiclePathVisible === false) {
+        const { lng, lat } = e.target.getCenter();
+        // this.circlePath.center = e.target.getCenter();
+        // 获取缩放等级
+        const zoomNum = e.target.getZoom();
+        let num = 0;
+        if (zoomNum > 10) {
+          switch (zoomNum) {
+            // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
+            case 16: num = 900; break;
+            // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
+            case 15: num = 2000; break;
+            case 14: num = 2000; break;
+            case 13: num = 4000; break;
+            case 12: num = 10000; break;
+            case 11: num = 20000; break;
+            default: num = 1000;
           }
-        } catch (err) {
-          const message = err.statusText || err.message;
-          this.$message.error(message);
+          try {
+            const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+              lng: lng, lat: lat, radius: num,
+            })).body;
+            if (code === '200') {
+              this.radiusVehicleList = respData;
+            } else {
+              this.radiusVehicleList = [];
+              this.vehicleInfo = {};
+              this.powerInfo = {};
+              this.userInfo = {};
+              this.address = '';
+              throw new Error(message);
+            }
+          } catch (err) {
+            const message = err.statusText || err.message;
+            this.$message.error(message);
+          }
         }
+      } else {
+        await this.reloadLocList();
       }
     },
     showVehiclePath() {
