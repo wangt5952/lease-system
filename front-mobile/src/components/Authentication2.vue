@@ -202,7 +202,7 @@ export default {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {
         this.$vux.toast.show({ text: '资料提交成功！', type: 'success', width: '10em' });
-        self.$router.replace('/authentication_step3');
+        setTimeout(() => { this.$router.replace('/authentication_step3'); }, 1000);
       }
     },
   },
