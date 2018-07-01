@@ -56,7 +56,7 @@ export default {
     if (this.key_user_info.userRealNameAuthFlag === 'UNAUTHORIZED' || this.key_user_info.userRealNameAuthFlag === 'REJECTAUTHORIZED') {
       this.Enable = true;
       this.value = '很遗憾您的名下没有车辆，赶快实名认证，赶快实去企业申领车辆吧！';
-    }else {
+    } else {
       this.value = '很遗憾您的名下没有车辆，赶快去企业申领车辆吧！';
     }
   },
