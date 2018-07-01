@@ -41,7 +41,9 @@
       <el-table-column prop="userRealNameAuthFlagText" label="实名认证" width="100">
         <template slot-scope="{row}">
           <template v-if="row.userRealNameAuthFlag === 'AUTHORIZED'"><span style="color:#17BE45">已实名</span></template>
-          <template v-else><span style="color:red">未实名</span></template>
+          <template v-if="row.userRealNameAuthFlag === 'TOAUTHORIZED'"><span style="color:red">待实名</span></template>
+          <template v-if="row.userRealNameAuthFlag === 'REJECTAUTHORIZED'"><span style="color:red">驳回</span></template>
+          <template v-if="row.userRealNameAuthFlag === 'UNAUTHORIZED'"><span style="color:red">未实名</span></template>
         </template>
       </el-table-column>
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
@@ -355,6 +357,8 @@ export default {
       authList: [
         { id: 'AUTHORIZED', name: '已实名' },
         { id: 'UNAUTHORIZED', name: '未实名' },
+        { id: 'TOAUTHORIZED', name: '待实名' },
+        { id: 'REJECTAUTHORIZED', name: '驳回' }
       ],
       statusList: [
         { id: 'NORMAL', name: '正常' },
