@@ -1,11 +1,13 @@
 <template>
   <div v-loading="loading" style="padding:10px">
     <div style="display:flex;">
-      <template v-if="key_user_info.userType === 'PLATFORM'">
+      <!-- <template v-if="key_user_info.userType === 'PLATFORM'"> -->
+      <template v-if="res['FUNCTION'].indexOf('manager-user-addone') >= 0">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-plus" type="primary" size="small" @click="showForm()">添加用户</el-button>
         </div>
-      </template>
+        </template>
+      <!-- </template> -->
       <template v-if="key_user_info.userType !== 'INDIVIDUAL'">
         <el-form :inline="true">
           <el-form-item>
@@ -144,7 +146,7 @@
           <el-col :span="24">
             <el-form-item label="角色">
               <el-select v-model="assignRoleForm.list" :placeholder="`请选择角色`" style="width:100%;" multiple>
-                <el-option v-for="o in roleList" :key="o.id" :label="o.roleName" :value="o.id"></el-option>
+                <el-option v-for="o in roleList" :key="o.id" :label="o.roleIntroduce" :value="o.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -357,6 +359,7 @@ export default {
       statusList: [
         { id: 'NORMAL', name: '正常' },
         { id: 'INVALID', name: '作废' },
+        { id: 'FREEZE', name: '冻结' }
       ],
       searchTypeList: [
         { id: '', name: '全部类型' },
@@ -375,11 +378,7 @@ export default {
       },
       roleList: [],
       orgList: [],
-      userIconPhoto: [
-        { iconName: '20180514171821.png' },
-        { iconName: '20180514172108.png' },
-        { iconName: '20180514172120.png' },
-      ],
+      userIconPhoto: [],
       // 照片表单
       photoFormVisible: false,
       pid: '',
@@ -575,7 +574,7 @@ export default {
       if (row.orgId) {
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
-            orgId: row.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize,
+            orgId: row.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize, vehicleStatus: 'NORMAL'
           })).body;
           if (code === '40106') {
             this.$store.commit('relogin');
@@ -605,7 +604,7 @@ export default {
       if (vehicleForms.orgId) {
         try {
           const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/selectExtUnbindExtByParams', {
-            orgId: vehicleForms.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize, ...this.vehicleSearch,
+            orgId: vehicleForms.orgId, currPage: this.vehicleCurrentPage, pageSize: this.vehiclePageSize, ...this.vehicleSearch, vehicleStatus: 'NORMAL'
           })).body;
           if (code === '40106') {
             this.$store.commit('relogin');
@@ -724,6 +723,7 @@ export default {
     },
     async showForm(form = { }) {
       await this.getOrgList();
+      await this.getOrgIcons();
       this.form = _.pick(form, [
         'id',
         'loginName',
@@ -801,6 +801,16 @@ export default {
         this.$message.success('分配成功');
         this.assignRoleFormVisible = false;
       } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    async getOrgIcons() {
+      try {
+        const { code, messagem, respData } = (await this.$http.get('/api/manager/user/listIcon')).body;
+        if (code === '200') this.userIconPhoto = respData;
+      } catch (err) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);

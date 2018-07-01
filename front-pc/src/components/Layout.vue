@@ -1,7 +1,12 @@
 <template>
   <div style="display:flex;flex-direction:column;height:100%;">
-    <div style="background:#05002a;height:64px;display:flex;align-items:center;padding:0 10px;">
-      <div style="flex:1;"></div>
+    <div style="background:#000039;height:64px;display:flex;align-items:center;padding:0 10px;">
+      <div style="flex:1; display:flex;flex-direction: row">
+        <div style="display:flex;align-items:center;">
+          <img src="../assets/xgltIcon.png" alt="">
+        </div>
+        <div style="display:flex;align-items:center;color:#fff;margin-left:10px"><h2>小哥乐途电瓶车运营平台</h2></div>
+      </div>
       <div style="margin-right: 10px;">
         <img class="userHeadPortraitImg" :src="userIconPath + key_user_info.userIcon" alt="">
       </div>
@@ -177,6 +182,7 @@ const menuTree = [
     children: [
       { name: '车辆管理', path: '/vehicle', resCode: 'manager-vehicle-list' },
       // { name: '车辆管理', path: '/vehicle', resCode: 'vehicle_manager' },
+      { name: '申请管理', path: '/apply', resCode: 'vehide_order_manager' },
     ],
   },
   { name: '电池/配件/设备',
@@ -205,7 +211,6 @@ const menuTree = [
       { name: '用户管理', path: '/user', resCode: 'manager-user-list' },
       { name: '角色管理', path: '/role', resCode: 'manager-role-list' },
       { name: '资源管理', path: '/resource', resCode: 'manager-res-listicon' },
-      { name: '申请管理', path: '/apply', resCode: 'manager-user-list' },
     ],
   },
 ];

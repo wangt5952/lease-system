@@ -108,22 +108,22 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehiclePn" :rules="[{required:true, message:'请填写型号'}]" label="型号">
+            <el-form-item prop="vehiclePn" label="型号">
               <el-input v-model="form.vehiclePn" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehicleBrand" :rules="[{required:true, message:'请填写品牌'}]" label="品牌">
+            <el-form-item prop="vehicleBrand" label="品牌">
               <el-input v-model="form.vehicleBrand" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehicleMadeIn" :rules="[{required:true, message:'请填写产地'}]" label="产地">
+            <el-form-item prop="vehicleMadeIn" label="产地">
               <el-input v-model="form.vehicleMadeIn" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="生产商">
+            <el-form-item prop="mfrsId" label="生产商">
               <el-select v-model="form.mfrsId" placeholder="请选择生产商" style="width:100%;">
                 <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
               </el-select>
@@ -154,27 +154,27 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryName" :rules="[{required:true, message:'请填写电池货名'}]" label="电池货名">
+              <el-form-item prop="batteryName" label="电池货名">
                 <el-input v-model="batteryForm.batteryName" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryBrand" :rules="[{required:true, message:'请填写品牌'}]" label="电池品牌">
+              <el-form-item prop="batteryBrand" label="电池品牌">
                 <el-input v-model="batteryForm.batteryBrand" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryPn" :rules="[{required:true, message:'请填写型号'}]" label="电池型号">
+              <el-form-item prop="batteryPn" label="电池型号">
                 <el-input v-model="batteryForm.batteryPn" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryParameters" :rules="[{required:true, message:'请填写参数'}]" label="电池参数">
+              <el-form-item prop="batteryParameters" label="电池参数">
                 <el-input v-model="batteryForm.batteryParameters" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="电池生产商">
+              <el-form-item prop="mfrsId" label="电池生产商">
                 <el-select v-model="batteryForm.mfrsId" placeholder="请选择生产商" style="width:100%;">
                   <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
                 </el-select>

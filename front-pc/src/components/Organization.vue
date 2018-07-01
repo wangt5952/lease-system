@@ -376,6 +376,7 @@ export default {
     },
     // 跳转到给企业分配车辆页面
     async allotVehicle(row) {
+      console.log(this.key_user_info.orgId);
       const $form = this.$refs.bindFormOrg;
       if ($form) $form.resetFields();
       try {
