@@ -217,7 +217,7 @@
     <el-dialog title="批量收回车辆" :visible.sync="returnVehicleFormVehicle" :close-on-click-modal="false">
       <el-form class="edit-form" :model="returnVehicleForm" ref="returnVehicleForm" :rules="rules3">
         <el-form-item prop="count" style="margin-top:10px;height:30px;" label="回收数量">
-          <el-input-number v-model="returnVehicleForm.count" :step="1"></el-input-number>
+          <el-input-number v-model="returnVehicleForm.count" :step="1" :disabled="true"></el-input-number>
           <template>
             <span style="margin-left:20px">(当前企业共 {{ vehicleNumTotal }} 辆车)</span>
           </template>
@@ -554,9 +554,11 @@ export default {
       try {
         const { ...form } = this.returnVehicleForm;
         form.count = String(this.returnVehicleForm.count);
-        const { code, message } = (await this.$http.post('/api/manager/user/batchvehicleunbind', form)).body;
+        const { code, message } = (await this.$http.post('/api/manager/vehicle/vehicleRecovery', {
+          orgId: form.orgId
+        })).body;
         if (code !== '200') throw new Error(message);
-        this.$message.success('归还车辆成功');
+        this.$message.success('批量收回车辆成功');
         await this.reload();
         this.returnVehicleFormVehicle = false;
       } catch (e) {
