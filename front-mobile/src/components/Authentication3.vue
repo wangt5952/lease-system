@@ -10,14 +10,13 @@
        <div class="line"></div>
        <step-item title="" description="" style="display:none"></step-item>
        <step-item title="" description="" style="display:none"></step-item>
-       <step-item title="步骤3:" description="等待审核"></step-item>
+       <step-item title="步骤3:" description="企业审核"></step-item>
      </step>
    </div>
 
-   <group style="margin-top:10px;">
+   <group style="margin-top:10px">
     <div class="bg"><span>{{this.value}}</span></div>
    </group>
-   <div class="botmline"></div>
    <x-button type="primary" @click.native="handler">完成</x-button>
   </div>
 </template>
@@ -40,13 +39,9 @@ export default {
   },
   methods: {
     back() {
-      window.history.go(-1);
+      this.$router.push('/');
     },
-    async handler() {
-      const { code, message, respData } = (await this.$http.get('/api/mobile/v1/auth/userState')).body;
-      if (code !== '200') throw new Error(message || code);
-      const { key_user_info } = respData;
-      await this.$store.commit('update', { key_user_info });
+    handler() {
       this.$router.push('/');
     },
   },
@@ -91,15 +86,15 @@ export default {
   >>>.vux-label {
     font-size: 15pt;
   }
+  >>>.vux-step {
+    position: relative;
+  }
   >>>.vux-step-item {
     width:100%;
   }
-  >>>.vux-step-item-head-inner {
-    border: 1px solid #09bb07!important;
-    color: #FFF!important;
-    background: #09bb07 none repeat scroll 0 0!important;
-  }
   >>>.vux-step-item-head {
+    position: relative;
+    display: inline-block;
     margin: 2px 10px;
   }
   .line {
@@ -110,9 +105,7 @@ export default {
     position: absolute;
     top:14%;
   }
-  >>>.vux-step-item-main {
-    font-weight: bold;
-    color: #666;
+  >>>.vux-step-item-main-process {
     margin:0 10%;
     width:80%;
     height:80px;
@@ -127,9 +120,6 @@ export default {
   .weui-btn {
     width:80%;
     margin:20px auto;
-  }
-  >>>.vux-x-hr {
-    margin:0;
   }
   .bg {
     width:100%;
