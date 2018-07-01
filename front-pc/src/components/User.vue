@@ -105,7 +105,8 @@
             <el-form-item label="企业图标">
               <!-- <el-input v-model="form.userIcon" placeholder="请输入LOGO路径" auto-complete="off" :disabled="disabledForm"></el-input> -->
               <el-select v-model="form.userIcon" placeholder="请选择企业Logo" style="width:100%;">
-                <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #F1F1F1" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #5795D5" :key="`${i}`" :label="o.iconName" :value="o.iconName">
+                  <!-- <el-option v-for="(o, i) in userIconPhoto" style="backgroundColor: #F1F1F1" :key="`${i}`" :label="o.iconName" :value="o.iconName"> -->
                   <img class="companyLogo" :src="userIconPath + o.iconName" alt="">
                 </el-option>
               </el-select>
