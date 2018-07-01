@@ -259,9 +259,9 @@
       <el-form class="edit-form" :model="bindForm" ref="bindForm">
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择电池'}]" label="电池">
           <el-select style="width:100%;" v-model="bindForm.batteryId" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
-            <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
+            <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryPn}`" :value="o.id">
               <span style="float: left">{{ o.batteryBrand }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryPn }}</span>
             </el-option>
           </el-select>
         </el-form-item>
