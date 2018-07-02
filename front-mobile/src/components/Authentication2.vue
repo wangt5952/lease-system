@@ -200,12 +200,8 @@ export default {
       if (code !== '200') {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {
-        const { code1, message1, respData } = (await this.$http.get('/api/mobile/v1/auth/userState')).body;
-        if (code1 !== '200') throw new Error(message1 || code1);
-        const { key_user_info } = respData;
-        await this.$store.commit('update', { key_user_info });
         this.$vux.toast.show({ text: '资料上传成功', type: 'success', width: '10em' });
-        this.$router.push('/');
+        this.$router.push('/authentication_step3');
       }
     },
   },
