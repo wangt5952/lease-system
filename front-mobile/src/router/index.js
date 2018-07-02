@@ -18,6 +18,7 @@ export default new Router({
     { path: '/authentication_step1', component: () => import('@/components/Authentication1') },
     { path: '/authentication_step2/:id', component: () => import('@/components/Authentication2') },
     { path: '/authentication_step3', component: () => import('@/components/Authentication3') },
+    { path: '/authentication_step10', component: () => import('@/components/Authentication10') },
     { path: '/nickName', component: () => import('@/components/NickName') },
     { path: '/repassword', component: () => import('@/components/RePassword') },
     { path: '/upload', component: () => import('@/components/Upload') },
