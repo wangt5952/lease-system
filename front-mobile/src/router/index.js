@@ -16,7 +16,6 @@ export default new Router({
     { path: '/profile', component: () => import('@/components/Profile') },
     { path: '/parts/:id', component: () => import('@/components/Parts') },
     { path: '/authentication_step1', component: () => import('@/components/Authentication1') },
-    { path: '/authentication_step10', component: () => import('@/components/Authentication10') },
     { path: '/authentication_step2/:id', component: () => import('@/components/Authentication2') },
     { path: '/authentication_step3', component: () => import('@/components/Authentication3') },
     { path: '/nickName', component: () => import('@/components/NickName') },
