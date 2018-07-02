@@ -201,10 +201,7 @@ export default {
         this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
       } else {
         this.$vux.toast.show({ text: '资料上传成功', type: 'success', width: '10em' });
-        this.$router.push({
-          name: '/',
-          params: { id: 'TOAUTHORIZED' },
-        });
+        this.$router.push('/');
       }
     },
   },

@@ -193,7 +193,10 @@ export default {
     if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
     this.realNameFlag = _.find(user_realName_flag, { key: this.key_user_info.userRealNameAuthFlag }).value;
     if (this.realNameFlag === '已驳回') this.isEnable = true;
-    if (this.$route.params.id) console.log(this.$route.params.id);
+    const { code, message, respData } = (await this.$http.get('/api/mobile/v1/auth/userState')).body;
+    if (code !== '200') throw new Error(message || code);
+    const { key_user_info } = respData;
+    await this.$store.commit('update', { key_user_info });
   },
 };
 </script>
