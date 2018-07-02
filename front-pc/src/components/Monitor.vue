@@ -5,7 +5,7 @@
         <div style="flex:1;padding:10px;padding-top:25px;">
           <!-- <div style="font-size:12px;">车辆实时情况</div> -->
           <el-input v-model="search.keyword" style="margin-top:5px;width:75%" size="mini" suffix-icon="el-icon-edit" placeholder="请输入要查看的地址" clearable></el-input>
-          <el-button size="mini" @click="searchStreet(search.keyword)">查看路况</el-button>
+          <el-button size="mini" @click="searchStreet(search.keyword)">搜索</el-button>
         </div>
         <div @click="vehicleDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{vehicleInfo.vehicleCode}}</div>
