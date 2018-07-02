@@ -148,13 +148,13 @@ export default {
       this.$router.push('/authentication_step1');
     },
     select(index) {
-      if (index === 1) {
-        this.show = true;
-      } else if (index === 2) {
-        this.show1 = true;
-      } else if (index === 3) {
-        this.show2 = true;
-      }
+      // if (index === 1) {
+      //   this.show = true;
+      // } else if (index === 2) {
+      //   this.show1 = true;
+      // } else if (index === 3) {
+      //   this.show2 = true;
+      // }
     },
     change(index, e) {
       // const files = e.target.files || e.dataTransfer.files;
@@ -183,22 +183,22 @@ export default {
       // reader.readAsDataURL(files[0]);
     },
     getCanvas(sourceCanvas) {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      const width = 300;
-      const height = 300;
-
-      canvas.width = width;
-      canvas.height = height;
-
-      context.drawImage(sourceCanvas, 0, 0, width, height);
-      return canvas;
+      // const canvas = document.createElement('canvas');
+      // const context = canvas.getContext('2d');
+      // const width = 300;
+      // const height = 300;
+      //
+      // canvas.width = width;
+      // canvas.height = height;
+      //
+      // context.drawImage(sourceCanvas, 0, 0, width, height);
+      // return canvas;
     },
     async handler() {
       // const { code, message } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
       //   { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
       // if (code !== '200') throw new Error(message || code);
-      this.$router.push('/authentication_step10');
+      this.$router.push('/authentication_step3');
     },
   },
 };
