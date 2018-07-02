@@ -44,8 +44,11 @@
     <div style="display:flex;flex:1;">
       <!-- 左侧导航 -->
       <el-menu :router="true" :default-active="$route.path" :collapse="isCollapse" unique-opened>
-        <div style="padding:15px" @click="shrinkChang">
-          <i style="color:#ffffff;font-size:28px;" class="lt" :class="{ 'lt-arrow-double-left': !isCollapse, 'lt-arrow-double-right': isCollapse }"></i>
+        <div style="padding:15px;" @click="shrinkChang">
+          <div v-if="!isCollapse" style="position:absolute;font-size:16px;color:#fff;top:15px;left:21px">菜单</div>
+          <div>
+            <i style="color:#ffffff;font-size:18px;margin-left:3px" class="lt" :class="{ 'lt-arrow-double-left': !isCollapse, 'lt-arrow-double-right': isCollapse }"></i>
+          </div>
         </div>
         <template v-for="(o, i) in menuTree">
           <!-- 有子集 -->
