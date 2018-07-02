@@ -224,7 +224,6 @@ public class BizBatteryServcieImpl implements BizBatteryService {
         }
     }
 
-
     @Override
     public BizBattery getByPrimaryKey(Map<String,Object> param) {
         return bizBatteryMapperExt.getBatteryInfoByBatteryId(param);

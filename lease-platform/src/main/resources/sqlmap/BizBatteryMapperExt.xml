@@ -148,4 +148,11 @@
         </if>
     </select>
 
+    <select id="getVehicleIdByDeviceId" parameterType="java.lang.String" resultMap="BizBatteryExtResultMap">
+        select
+        d.vehicle_id vehicle_id
+        from biz_battery a
+        LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id AND d.bind_time IS NOT NULL AND d.unbind_time IS NULL
+        where a.battery_code = #{deviceCode,jdbcType=VARCHAR}
+    </select>
 </mapper>

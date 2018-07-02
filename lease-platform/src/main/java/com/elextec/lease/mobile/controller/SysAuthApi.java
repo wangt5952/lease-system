@@ -1,7 +1,6 @@
 package com.elextec.lease.mobile.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.RunningResult;
 import com.elextec.framework.common.constants.WzConstants;
@@ -17,11 +16,9 @@ import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
-import com.elextec.persist.model.mybatis.SysRefUserRoleKey;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
-import org.hibernate.usertype.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -537,10 +534,14 @@ public class SysAuthApi extends BaseController {
             userTemp.setPassword(resetParam.getPassword());
             userTemp.setOrgId(resetParam.getOrgId());
             //判断用户是手机号码注册还是用户名注册
-            if(!WzStringUtil.isNotBlank(resetParam.getLoginName())){
+            if(WzStringUtil.isBlank(resetParam.getLoginName())){
                 //用户名为空，则是手机号码注册，注入默认用户名为手机号码
                 userTemp.setLoginName(resetParam.getUserMobile());
             }
+            // 设置默认昵称为登录账号
+            userTemp.setNickName(userTemp.getLoginName());
+            // 设置默认头像
+            userTemp.setUserIcon("sysdefusericon.png");
             //手机注册默认是个人帐户
             userTemp.setUserType(OrgAndUserType.INDIVIDUAL);
             //默认状态为正常
@@ -714,7 +715,7 @@ public class SysAuthApi extends BaseController {
                         userTemp.setUpdateUser(resetParam.getUpdateUser());
                         sysUserService.updateSysUser(userTemp);
                         //删除旧的头像文件
-                        if(WzStringUtil.isNotBlank(oldIconName)){
+                        if(WzStringUtil.isNotBlank(oldIconName) && !"sysdefusericon.png".equalsIgnoreCase(oldIconName)){
                             WzFileUtil.deleteFile(uploadUserIconRoot,oldIconName);
                         }
 
@@ -728,15 +729,17 @@ public class SysAuthApi extends BaseController {
                         sysUserExt.setUserIcon(requestUrl);
 
                         //把改好的对象重新放进map
-                        Map<String,Object> map = new HashMap<String,Object>();
-                        map.put(WzConstants.KEY_USER_INFO,sysUserExt);
+//                        Map<String,Object> map = new HashMap<String,Object>();
+//                        map.put(WzConstants.KEY_USER_INFO,sysUserExt);
+                        userInfo.remove(WzConstants.KEY_USER_INFO);
+                        userInfo.put(WzConstants.KEY_USER_INFO, sysUserExt);
                         //设置超时时间
                         Integer overtime = 300;
                         if (WzStringUtil.isNumeric(loginOvertime)) {
                             overtime = Integer.parseInt(loginOvertime);
                         }
                         //重新塞回缓存
-                        redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, map, overtime, TimeUnit.MINUTES);
+                        redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, userInfo, overtime, TimeUnit.MINUTES);
 
                         //保存成功后将全路径返回给移动端
                         return new MessageResponse(RunningResult.SUCCESS,requestUrl);
@@ -988,47 +991,50 @@ public class SysAuthApi extends BaseController {
     @RequestMapping(value = "/userState",method = RequestMethod.GET)
     public MessageResponse userState(HttpServletRequest request){
         try{
-            //获取登录token
+            // 获取登录token
             String userToken = request.getHeader(WzConstants.HEADER_LOGIN_TOKEN);
-            //获取所有登录信息
+            // 获取所有登录信息
             Map<String,Object> userInfo = (Map<String, Object>) redisClient.valueOperations().get(WzConstants.GK_LOGIN_INFO + userToken);
-            //获取登录用户信息
+            // 获取登录用户信息
             SysUserExt userExt = (SysUserExt) userInfo.get(WzConstants.KEY_USER_INFO);
 
-            //查询最新的用户状态
+            // 查询最新的用户状态
             SysUserExample sysUserExample = new SysUserExample();
             SysUserExample.Criteria criteria = sysUserExample.createCriteria();
             criteria.andIdEqualTo(userExt.getId());
             SysUserExt sysUserExt = sysUserService.getExtById(sysUserExample);
 
-            //把缓存中的登录用户信息字段重新赋值
-            userExt.setUserRealNameAuthFlag(sysUserExt.getUserRealNameAuthFlag());
+            // 把缓存中的登录用户信息字段重新赋值
+//            userExt.setUserRealNameAuthFlag(sysUserExt.getUserRealNameAuthFlag());
 
-            //生成新的登录token
-            String loginToken = WzUniqueValUtil.makeUUID();
-            //重新组织登录信息
-            Map<String,Object> map = new HashMap<String,Object>();
-            map.put(WzConstants.KEY_LOGIN_TOKEN, loginToken);//登录token
-            map.put(WzConstants.KEY_USER_INFO,sysUserExt);//用户信息
-            map.put(WzConstants.KEY_RES_INFO,userInfo.get(WzConstants.KEY_RES_INFO));//用户资源
-            map.put(WzConstants.KEY_VEHICLE_INFO,userInfo.get(WzConstants.KEY_VEHICLE_INFO));//车辆信息
-
-            //设置超时时间
+            // 生成新的登录token
+//            String loginToken = WzUniqueValUtil.makeUUID();
+            // 重新组织登录信息
+//            Map<String,Object> map = new HashMap<String,Object>();
+//            map.put(WzConstants.KEY_LOGIN_TOKEN, loginToken);// 登录token
+//            map.put(WzConstants.KEY_USER_INFO, sysUserExt);// 用户信息
+//            map.put(WzConstants.KEY_RES_INFO, userInfo.get(WzConstants.KEY_RES_INFO));// 用户资源
+//            map.put(WzConstants.KEY_VEHICLE_INFO, userInfo.get(WzConstants.KEY_VEHICLE_INFO));// 车辆信息
+            userInfo.remove(WzConstants.KEY_USER_INFO);
+            userInfo.put(WzConstants.KEY_USER_INFO, sysUserExt);
+            //获取用户关联车辆信息
+            List<BizVehicleBatteryParts> vehicleBatteryPartsLs = sysUserService.getVehiclePartsById(sysUserExt.getId());
+            userInfo.remove(WzConstants.KEY_VEHICLE_INFO);
+            userInfo.put(WzConstants.KEY_VEHICLE_INFO, vehicleBatteryPartsLs);
+            // 设置超时时间
             Integer overtime = 300;
-            //判断是否是数字
+            // 判断是否是数字
             if (WzStringUtil.isNumeric(loginOvertime)) {
                 overtime = Integer.parseInt(loginOvertime);
             }
-            //重新塞回缓存
-            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, map, overtime, TimeUnit.MINUTES);
-            //组织返回
-            return new MessageResponse(RunningResult.SUCCESS,map);
+            // 重新塞回缓存
+            redisClient.valueOperations().set(WzConstants.GK_LOGIN_INFO + userToken, userInfo, overtime, TimeUnit.MINUTES);
+            // 组织返回
+            return new MessageResponse(RunningResult.SUCCESS, userInfo);
         }  catch (BizException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
         }
     }
-
-
 }

@@ -10,10 +10,10 @@ public interface BizManufacturerMapperExt extends BizManufacturerMapper {
 
     /**
      * 查询制造商名字
-     * @param mfrs_name
+     * @param mfrsName
      * @return
      */
-    public BizManufacturer getByName(String mfrs_name);
+    public BizManufacturer getByName(String mfrsName);
 
     /**
      * 查询制造商扩展信息列表.

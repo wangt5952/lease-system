@@ -11,6 +11,8 @@ public class DeviceApiConstants {
 
     /** 车辆ID. */
     public static final String REQ_RESP_VEHICLE_ID = "VehicleID";
+    /** 车辆编号. */
+    public static final String REQ_RESP_VEHICLE_CODE = "VehicleCode";
     /** 电池ID. */
     public static final String REQ_RESP_BATTERY_ID = "BatteryID";
     /** 设备ID. */
@@ -56,4 +58,7 @@ public class DeviceApiConstants {
     public static final String KEY_LOC_TIME = "LocTime";
     /** 停留时间（单位:毫秒）. */
     public static final String KEY_STAY_TIME = "StayTime";
+
+    /** 当前系统时间. */
+    public static final String KEY_CURRENT_SYS_TIME = "CurrentSysTime";
 }
