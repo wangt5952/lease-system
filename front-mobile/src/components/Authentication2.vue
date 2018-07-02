@@ -157,30 +157,30 @@ export default {
       }
     },
     change(index, e) {
-      const files = e.target.files || e.dataTransfer.files;
-      if (!files.length) return;
-      const thisOne = this;
-      const reader = new FileReader();
-      reader.onload = function get() {
-        const image = new Image();
-        image.src = this.result;
-        image.onload = function getImg() {
-          thisOne.headerImage = thisOne.getCanvas(image).toDataURL();
-
-          if (index === 1) {
-            thisOne.data = image.src;
-            thisOne.path = _.split(thisOne.headerImage, ',')[1];
-          } else if (index === 2) {
-            thisOne.data1 = image.src;
-            thisOne.path1 = _.split(thisOne.headerImage, ',')[1];
-          } else if (index === 3) {
-            thisOne.data2 = image.src;
-            thisOne.path2 = _.split(thisOne.headerImage, ',')[1];
-          }
-          thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
-        };
-      };
-      reader.readAsDataURL(files[0]);
+      // const files = e.target.files || e.dataTransfer.files;
+      // if (!files.length) return;
+      // const thisOne = this;
+      // const reader = new FileReader();
+      // reader.onload = function get() {
+      //   const image = new Image();
+      //   image.src = this.result;
+      //   image.onload = function getImg() {
+      //     thisOne.headerImage = thisOne.getCanvas(image).toDataURL();
+      //
+      //     if (index === 1) {
+      //       thisOne.data = image.src;
+      //       thisOne.path = _.split(thisOne.headerImage, ',')[1];
+      //     } else if (index === 2) {
+      //       thisOne.data1 = image.src;
+      //       thisOne.path1 = _.split(thisOne.headerImage, ',')[1];
+      //     } else if (index === 3) {
+      //       thisOne.data2 = image.src;
+      //       thisOne.path2 = _.split(thisOne.headerImage, ',')[1];
+      //     }
+      //     thisOne.$vux.toast.show({ text: '上传成功', type: 'success', width: '10em' });
+      //   };
+      // };
+      // reader.readAsDataURL(files[0]);
     },
     getCanvas(sourceCanvas) {
       const canvas = document.createElement('canvas');
@@ -195,9 +195,9 @@ export default {
       return canvas;
     },
     async handler() {
-      const { code, message } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
-        { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
-      if (code !== '200') throw new Error(message || code);
+      // const { code, message } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
+      //   { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
+      // if (code !== '200') throw new Error(message || code);
       this.$router.push('/authentication_step3');
     },
   },
