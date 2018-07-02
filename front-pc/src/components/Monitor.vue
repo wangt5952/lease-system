@@ -26,7 +26,7 @@
       </div>
 
       <baidu-map  @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
-        <!-- 比列尺 -->
+        <!--1 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
@@ -212,6 +212,14 @@ export default {
     //     lng: r.point.lng, lat: r.point.lat,
     //   };
     // },
+    async getVehicleByUserId() {
+      try {
+        
+      } catch (err) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
     // 查看路况
     async searchStreet(value) {
       try {
