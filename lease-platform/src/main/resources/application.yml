@@ -30,10 +30,10 @@ localsetting:
   cors:
     flag: true
   sms:
-    url: http://112.74.76.186:8030/service/httpService/httpInterface.do
-    username: JSM41961
-    password: 5tjfzvne
-    verycode: upxg5dedtrk2
-    tempid1: JSM41961-0001
+    url: http://127.0.0.1:8080/service/httpService/httpInterface.do
+    username: admin
+    password: admin
+    verycode: admin
+    tempid1: T-0001
   track-stay-time: 900000
   move-speed-threshold: 16
