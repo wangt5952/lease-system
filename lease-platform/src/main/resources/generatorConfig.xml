@@ -11,9 +11,9 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-            connectionURL="jdbc:mysql://106.14.172.38:3996/lease_sys?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;autoReconnect=true"
-            userId="njjsadmin"
-            password="njjspwd12345678$%^" />
+            connectionURL="jdbc:mysql://127.0.0.1:3306/lease_sys?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;autoReconnect=true"
+            userId="admin"
+            password="admin" />
 
         <!-- 下面的都不用修改 -->
         <javaTypeResolver>
