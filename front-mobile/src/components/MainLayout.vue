@@ -191,11 +191,14 @@ export default {
   async mounted() {
     const { code, message, respData } = (await this.$http.get('/api/mobile/v1/auth/userState')).body;
     if (code !== '200') throw new Error(message || code);
-    const { key_user_info } = respData;
+    const { key_user_info, key_vehicle_info } = respData;
     await this.$store.commit('update', { key_user_info });
-    this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
-    if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
-    this.realNameFlag = _.find(user_realName_flag, { key: this.key_user_info.userRealNameAuthFlag }).value;
+    this.portrait = key_user_info.userIcon.includes(this.website) ? key_user_info.userIcon : `${this.website}${key_user_info.userIcon}`;
+    if (key_vehicle_info.length !== 0) {
+      localStorage.setItem('vehicleId', key_vehicle_info[0].id);
+      this.vehicleId.push(localStorage.getItem('vehicleId'));
+    }
+    this.realNameFlag = _.find(user_realName_flag, { key: key_user_info.userRealNameAuthFlag }).value;
     if (this.realNameFlag === '已驳回') this.isEnable = true;
   },
 };
