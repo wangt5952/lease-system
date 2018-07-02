@@ -1,6 +1,5 @@
 package com.elextec.lease.manager.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.BizDeviceConfParam;
@@ -67,9 +66,4 @@ public interface BizDeviceConfService {
      */
     public BizDeviceConf getBizDeviceConfByPrimaryKey(BizDeviceConfKey key);
 
-    /**
-     * 上传数据接口
-     * @param info 监听队列值
-     */
-    public void sensorData(String info);
 }

@@ -802,6 +802,123 @@ public class BizVehicleController extends BaseController {
     }
 
     /**
+     * 根据车辆ID列表获取车辆定位字典.
+     * @param ids 车辆ID列表
+     * <pre>
+     *     [id1,id2,...]
+     * </pre>
+     * @param request HttpServletRequest
+     * @return 根据ID获取设备定位信息
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *             车辆ID: {
+     *                 VehicleID:车辆ID,
+     *                 BatteryID:电池ID,
+     *                 DeviceID:设备ID,
+     *                 DeviceType:设备类型,
+     *                 LocTime:记录时间,
+     *                 LAT:纬度,
+     *                 LON:经度
+     *             },
+     *             ... ...
+     *         }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/getlocmapbyvehiclepk")
+    public MessageResponse getLocMapByVehiclePK(@RequestBody String ids, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(ids)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> vehicleIds = null;
+            try {
+                String paramStr = URLDecoder.decode(ids, "utf-8");
+                vehicleIds = JSON.parseArray(paramStr, String.class);
+                if (null == vehicleIds || 0 == vehicleIds.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 循环获得车辆电池信息并获得定位信息
+            List<Map<String, Object>> vehicleInfos = null;
+            String batteryId = null;
+            String batteryCode = null;
+            String devicePk = null;
+            JSONObject locData = null;
+            Map<String, JSONObject> locDatas = new HashMap<String, JSONObject>();
+            StringBuffer errMsgs = new StringBuffer("");
+            SysUser userTemp = getLoginUserInfo(request);
+            if (userTemp == null) {
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            Map<String, Object> paramTemp = new HashMap<String, Object>();
+            if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("orgId", userTemp.getOrgId());
+            }
+            if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("userId", userTemp.getId());
+            }
+            for (String vId : vehicleIds) {
+                if (WzStringUtil.isNotBlank(vId)) {
+                    paramTemp.put("id", vId);
+                    vehicleInfos = bizVehicleService.getByPrimaryKey(paramTemp, true);
+                    if (null == vehicleInfos || 0 == vehicleInfos.size()) {
+                        errMsgs.append("未查询到车辆[ID:" + vId + "]信息;");
+                        continue;
+                    } else {
+                        for (Map<String, Object> vehicleInfo : vehicleInfos) {
+                            batteryId = (String) vehicleInfo.get("batteryId");
+                            batteryCode = (String) vehicleInfo.get("batteryCode");
+                            if (WzStringUtil.isBlank(batteryCode)) {
+                                errMsgs.append("未查询到车辆[ID:" + vId + "]对应的设备;");
+                                continue;
+                            }
+                            // 根据设备ID查询设备当前位置
+                            devicePk = batteryCode + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString();
+                            locData = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVICE_LOC_MAP, devicePk);
+                            // 组织返回结果
+                            if (null == locData
+//                    || null == locData.getString(DeviceApiConstants.KEY_LOC_TIME)
+                                    || null == locData.getDouble(DeviceApiConstants.REQ_LAT)
+                                    || null == locData.getDouble(DeviceApiConstants.REQ_LON)) {
+                                errMsgs.append("未查询到车辆[ID:" + batteryCode + "]对应设备的定位信息;");
+                                continue;
+                            }
+                            double latTmp = locData.getDoubleValue(DeviceApiConstants.REQ_LAT);
+                            double lngTmp = locData.getDoubleValue(DeviceApiConstants.REQ_LON);
+                            double[] bdLatLng = WzGPSUtil.wgs2bd(latTmp, lngTmp);
+                            locData.put(DeviceApiConstants.REQ_LAT, bdLatLng[0]);
+                            locData.put(DeviceApiConstants.REQ_LON, bdLatLng[1]);
+                            locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, vId);
+                            locData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, batteryId);
+                            locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryCode);
+                            locData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
+                            locDatas.put(vId, locData);
+                        }
+                    }
+                }
+            }
+            // 返回结果
+            MessageResponse mr = null;
+            if (0 == errMsgs.length()) {
+                mr = new MessageResponse(RunningResult.SUCCESS, locDatas);
+            } else {
+                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), locDatas);
+            }
+            return mr;
+        }
+    }
+
+    /**
      * 根据车辆ID列表获取设备电量信息列表.
      *
      * @param ids     车辆ID列表
@@ -817,6 +934,7 @@ public class BizVehicleController extends BaseController {
      *         respData:[
      *             {
      *                 VehicleID:车辆ID,
+     *                 VehicleCode:车辆Code,
      *                 BatteryID:电池ID,
      *                 DeviceID:设备ID,
      *                 DeviceType:设备类型,
@@ -851,6 +969,7 @@ public class BizVehicleController extends BaseController {
             }
             // 循环获得车辆电池信息并获得定位信息
             List<Map<String, Object>> vehicleInfos = null;
+            String vehicleCode = null;
             String batteryId = null;
             String batteryCode = null;
             String devicePk = null;
@@ -877,6 +996,7 @@ public class BizVehicleController extends BaseController {
                         continue;
                     } else {
                         for (Map<String, Object> vehicleInfo : vehicleInfos) {
+                            vehicleCode = (String) vehicleInfo.get("vehicleCode");
                             batteryId = (String) vehicleInfo.get("batteryId");
                             batteryCode = (String) vehicleInfo.get("batteryCode");
                             if (WzStringUtil.isBlank(batteryCode)) {
@@ -894,10 +1014,126 @@ public class BizVehicleController extends BaseController {
                                 powerData.put(DeviceApiConstants.REQ_PS, 0);
                             }
                             powerData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, vId);
+                            powerData.put(DeviceApiConstants.REQ_RESP_VEHICLE_CODE, vehicleCode);
                             powerData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, batteryId);
                             powerData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryCode);
                             powerData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
                             powerDatas.add(powerData);
+                        }
+                    }
+                }
+            }
+            // 返回结果
+            MessageResponse mr = null;
+            if (0 == errMsgs.length()) {
+                mr = new MessageResponse(RunningResult.SUCCESS, powerDatas);
+            } else {
+                mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString(), powerDatas);
+            }
+            return mr;
+        }
+    }
+
+    /**
+     * 根据车辆ID列表获取设备电量信息字典.
+     * @param ids 车辆ID列表
+     * <pre>
+     *    [id1,id2,...]
+     * </pre>
+     * @param request HttpServletRequest
+     * @return 根据ID获取设备电量信息
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *             车辆ID:{
+     *                 VehicleID:车辆ID,
+     *                 VehicleCode:车辆Code,
+     *                 BatteryID:电池ID,
+     *                 DeviceID:设备ID,
+     *                 DeviceType:设备类型,
+     *                 RSOC:电池剩余容量百分比,
+     *                 Quanity:设备电量,
+     *                 PS:保护状态
+     *             },
+     *             ... ...
+     *         }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(path = "/getpowermapbyvehiclepk")
+    public MessageResponse getPowerMapByVehiclePK(@RequestBody String ids, HttpServletRequest request) {
+        // 无参数则报“无参数”
+        if (WzStringUtil.isBlank(ids)) {
+            MessageResponse mr = new MessageResponse(RunningResult.NO_PARAM);
+            return mr;
+        } else {
+            // 参数解析错误报“参数解析错误”
+            List<String> vehicleIds = null;
+            try {
+                String paramStr = URLDecoder.decode(ids, "utf-8");
+                vehicleIds = JSON.parseArray(paramStr, String.class);
+                if (null == vehicleIds || 0 == vehicleIds.size()) {
+                    return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+                }
+            } catch (BizException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BizException(RunningResult.PARAM_ANALYZE_ERROR, ex);
+            }
+            // 循环获得车辆电池信息并获得定位信息
+            List<Map<String, Object>> vehicleInfos = null;
+            String vehicleCode = null;
+            String batteryId = null;
+            String batteryCode = null;
+            String devicePk = null;
+            JSONObject powerData = null;
+            Map<String, JSONObject> powerDatas = new HashMap<String, JSONObject>();
+            StringBuffer errMsgs = new StringBuffer("");
+            SysUser userTemp = getLoginUserInfo(request);
+            if (userTemp == null) {
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            Map<String, Object> paramTemp = new HashMap<String, Object>();
+            if (OrgAndUserType.ENTERPRISE.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("orgId", userTemp.getOrgId());
+            }
+            if (OrgAndUserType.INDIVIDUAL.toString().equals(userTemp.getUserType().toString())) {
+                paramTemp.put("userId", userTemp.getId());
+            }
+            for (String vId : vehicleIds) {
+                if (WzStringUtil.isNotBlank(vId)) {
+                    paramTemp.put("id", vId);
+                    vehicleInfos = bizVehicleService.getByPrimaryKey(paramTemp, true);
+                    if (null == vehicleInfos || 0 == vehicleInfos.size()) {
+                        errMsgs.append("未查询到车辆[ID:" + vId + "]信息;");
+                        continue;
+                    } else {
+                        for (Map<String, Object> vehicleInfo : vehicleInfos) {
+                            vehicleCode = (String) vehicleInfo.get("vehicleCode");
+                            batteryId = (String) vehicleInfo.get("batteryId");
+                            batteryCode = (String) vehicleInfo.get("batteryCode");
+                            if (WzStringUtil.isBlank(batteryCode)) {
+                                errMsgs.append("未查询到车辆[ID:" + vId + "]对应的设备;");
+                                continue;
+                            }
+                            // 根据设备ID查询设备当前位置
+                            devicePk = batteryCode + WzConstants.KEY_SPLIT + DeviceType.BATTERY.toString();
+                            powerData = (JSONObject) redisClient.hashOperations().get(WzConstants.GK_DEVIE_POWER_MAP, devicePk);
+                            // 组织返回结果
+                            if (null == powerData) {
+                                powerData = new JSONObject();
+                                powerData.put(DeviceApiConstants.REQ_RSOC, 0);
+                                powerData.put(DeviceApiConstants.REQ_QUANITY, 0);
+                                powerData.put(DeviceApiConstants.REQ_PS, 0);
+                            }
+                            powerData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, vId);
+                            powerData.put(DeviceApiConstants.REQ_RESP_VEHICLE_CODE, vehicleCode);
+                            powerData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, batteryId);
+                            powerData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryCode);
+                            powerData.put(DeviceApiConstants.REQ_DEVICE_TYPE, DeviceType.BATTERY.toString());
+                            powerDatas.put(vId, powerData);
                         }
                     }
                 }
@@ -1257,7 +1493,8 @@ public class BizVehicleController extends BaseController {
                         List<JSONObject> locListTemp = new ArrayList<JSONObject>();
 
                         //获取数据库中时间区间内的数据
-                        List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByTime(batteryCode, DeviceType.BATTERY.toString(), startTime, endTime);
+//                        List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByTime(batteryCode, DeviceType.BATTERY.toString(), startTime, endTime);
+                        List<BizVehicleTrack> locList = bizVehicleTrackService.getVehicleTracksByVehicleIdAndTime(idAndTimeIntervalInfo.get("id"), startTime, endTime);
                         //转换封装数据库的数据
                         if (null != locList && locList.size() > 0) {
                             for (int i = 0; i < locList.size(); i++) {

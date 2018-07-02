@@ -4,20 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.elextec.framework.BaseController;
 import com.elextec.framework.common.constants.WzConstants;
 import com.elextec.framework.exceptions.BizException;
-import com.elextec.framework.utils.WzGPSUtil;
 import com.elextec.framework.utils.WzStringUtil;
-import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.device.common.DeviceManager;
 import com.elextec.lease.device.common.DeviceRespMsg;
 import com.elextec.lease.manager.service.BizDeviceConfService;
-import com.elextec.lease.manager.service.BizVehicleTrackService;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.model.mybatis.BizDeviceConf;
 import com.elextec.persist.model.mybatis.BizDeviceConfKey;
-import com.elextec.persist.model.mybatis.BizVehicleTrack;
-import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.command.ActiveMQTempTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.jms.Destination;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -167,32 +157,33 @@ public class DeviceApi extends BaseController {
      */
     @RequestMapping(path = {"/sensordata"}, method = RequestMethod.POST)
     public JSONObject sensorData(@RequestBody String data) {
-//        JSONObject respData = new JSONObject();
-//        // 解析参数
-//        JSONObject sensorData = null;
-//        // 无参数情况
-//        if (WzStringUtil.isBlank(data)) {
-//            respData.put(RESP_ERR_CODE, DeviceRespMsg.NO_PARAM.code());
-//            respData.put(RESP_ERR_MSG, DeviceRespMsg.NO_PARAM.getInfo());
-//            return respData;
-//            // 有参数情况
-//        } else {
-//            try {
-//                String paramStr = URLDecoder.decode(data, "utf-8");
-//                sensorData = JSONObject.parseObject(paramStr);
-//                // 解析失败
-//                if (null == sensorData) {
-//                   respData.put(RESP_ERR_CODE, DeviceRespMsg.PARAM_ANALYZE_ERROR.code());
-//                    respData.put(RESP_ERR_MSG, DeviceRespMsg.PARAM_ANALYZE_ERROR.getInfo());
-//                    return respData;
-//                }
-//            } catch (Exception ex) {
-//                logger.error(DeviceRespMsg.PARAM_ANALYZE_ERROR.getInfo(), ex);
-//                respData.put(RESP_ERR_CODE, DeviceRespMsg.PARAM_ANALYZE_ERROR.code());
-//                respData.put(RESP_ERR_MSG, DeviceRespMsg.PARAM_ANALYZE_ERROR.getInfo());
-//                return respData;
-//            }
-//        }
+        JSONObject respData = new JSONObject();
+        // 解析参数
+        JSONObject sensorData = null;
+        // 无参数情况
+        if (WzStringUtil.isBlank(data)) {
+            respData.put(RESP_ERR_CODE, DeviceRespMsg.NO_PARAM.code());
+            respData.put(RESP_ERR_MSG, DeviceRespMsg.NO_PARAM.getInfo());
+            return respData;
+            // 有参数情况
+        } else {
+            try {
+                String paramStr = URLDecoder.decode(data, "utf-8");
+                sensorData = JSONObject.parseObject(paramStr);
+                // 解析失败
+                if (null == sensorData) {
+                    respData.put(RESP_ERR_CODE, DeviceRespMsg.PARAM_ANALYZE_ERROR.code());
+                    respData.put(RESP_ERR_MSG, DeviceRespMsg.PARAM_ANALYZE_ERROR.getInfo());
+                    return respData;
+                }
+            } catch (Exception ex) {
+                logger.error(DeviceRespMsg.PARAM_ANALYZE_ERROR.getInfo(), ex);
+                respData.put(RESP_ERR_CODE, DeviceRespMsg.PARAM_ANALYZE_ERROR.code());
+                respData.put(RESP_ERR_MSG, DeviceRespMsg.PARAM_ANALYZE_ERROR.getInfo());
+                return respData;
+            }
+        }
+        sensorData.put(DeviceApiConstants.KEY_CURRENT_SYS_TIME, System.currentTimeMillis());
 //        try {
 //            // 获得设备数据
 //            // 设备ID
@@ -392,13 +383,13 @@ public class DeviceApi extends BaseController {
 //            respData.put(RESP_ERR_MSG, "接口调用出现异常");
 //            return respData;
 //        }
-        //新增消息队列
-        Destination destination = new ActiveMQQueue("sensorData");
+//        //新增消息队列
+//        Destination destination = new ActiveMQQueue("sensorData");
         //传入队列以及值
-        deviceManager.send(destination,data);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(RESP_ERR_CODE,DeviceRespMsg.SUCCESS.code());
-        jsonObject.put(RESP_ERR_MSG, DeviceRespMsg.SUCCESS.getInfo());
-        return  jsonObject;
+        String sendMsg = JSONObject.toJSONString(sensorData);
+        deviceManager.send(sendMsg);
+        respData.put(RESP_ERR_CODE, DeviceRespMsg.SUCCESS.code());
+        respData.put(RESP_ERR_MSG, DeviceRespMsg.SUCCESS.getInfo());
+        return respData;
     }
 }

@@ -17,7 +17,6 @@ import com.elextec.persist.model.mybatis.*;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
-import com.sun.prism.impl.Disposer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,20 +153,18 @@ public class BizVehicleServcieImpl implements BizVehicleService {
             if(org.size() != 1){
                 throw new BizException(RunningResult.DB_ERROR.code(), "记录插入时发生错误,平台企业不存在或存在多个");
             }
-            BizRefOrgVehicle ref = new BizRefOrgVehicle();
-            ref.setOrgId(org.get(0).getId());
             for (; i < vehicleInfos.size(); i++) {
-                //校验车辆制造商是否存在（状态为正常）
-                if(WzStringUtil.isNotBlank(vehicleInfos.get(i).getBizVehicleInfo().getMfrsId())){
-                    BizManufacturerExample manuExample = new BizManufacturerExample();
-                    BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
-                    manuCriteria.andIdEqualTo(vehicleInfos.get(i).getBizVehicleInfo().getMfrsId());
-                    manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
-                    int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
-                    if(manuCot < 1){
-                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录插入时发生错误,车辆对应的制造商不存在或已作废");
-                    }
-                }
+//                //校验车辆制造商是否存在（状态为正常）
+//                if(WzStringUtil.isNotBlank(vehicleInfos.get(i).getBizVehicleInfo().getMfrsId())){
+//                    BizManufacturerExample manuExample = new BizManufacturerExample();
+//                    BizManufacturerExample.Criteria manuCriteria = manuExample.createCriteria();
+//                    manuCriteria.andIdEqualTo(vehicleInfos.get(i).getBizVehicleInfo().getMfrsId());
+//                    manuCriteria.andMfrsStatusEqualTo(RecordStatus.NORMAL);
+//                    int manuCot = bizManufacturerMapperExt.countByExample(manuExample);
+//                    if(manuCot < 1){
+//                        throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "第" + i + "条记录插入时发生错误,车辆对应的制造商不存在或已作废");
+//                    }
+//                }
                 //新车与新电池信息配对
                 if("0".equals(vehicleInfos.get(i).getFlag())){
                     //校验电池制造商是否存在（状态为正常）
@@ -224,6 +221,8 @@ public class BizVehicleServcieImpl implements BizVehicleService {
                     bizVehicleMapperExt.insertSelective(insertVehicleVo);
                 }
                 //新建车辆默认绑定在平台下面
+                BizRefOrgVehicle ref = new BizRefOrgVehicle();
+                ref.setOrgId(org.get(0).getId());
                 ref.setVehicleId(vehicleInfos.get(i).getBizVehicleInfo().getId());
                 ref.setBindTime(new Date());
                 bizRefOrgVehicleMapperExt.insertSelective(ref);
@@ -695,7 +694,17 @@ public class BizVehicleServcieImpl implements BizVehicleService {
         //查询当前企业下是否有用户绑定了车辆
         //int bindVehicleCount = bizRefUserVehicleMapperExt.getOrgIdByUser(map.get("orgId").toString());
         //查询未绑定用户的车辆
-        int unbindVehicleCount = bizVehicleMapperExt.countExtUnbindExtByParam(pagingParam);
+//        int unbindVehicleCount = bizVehicleMapperExt.countExtUnbindExtByParam(pagingParam);
+        List<BizVehicleExt> vLs = bizVehicleMapperExt.selectExtUnbindExtByParams(pagingParam);
+        if (null == vLs || 0 == vLs.size()) {
+            throw new BizException(RunningResult.NO_RESOURCE.code(),"该企业下无闲置车辆");
+        }
+        int unbindVehicleCount = 0;
+        for (int i = 0; i < vLs.size(); i++) {
+            if (null != vLs.get(i).getVehicleStatus() && RecordStatus.NORMAL.toString().equalsIgnoreCase(vLs.get(i).getVehicleStatus().toString())) {
+                unbindVehicleCount++;
+            }
+        }
         if (unbindVehicleCount == 0) {
             throw new BizException(RunningResult.NO_RESOURCE.code(),"该企业下无闲置车辆");
         }

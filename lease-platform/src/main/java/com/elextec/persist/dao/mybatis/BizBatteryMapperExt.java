@@ -22,9 +22,20 @@ public interface BizBatteryMapperExt extends BizBatteryMapper {
      */
     int countExtByParam(BizBatteryParam batteryParam);
 
-    //根据车辆ID获取电池信息
+    /**
+     * 根据车辆ID获取电池信息.
+     */
     public List<BizBatteryExt> getBatteryInfoByVehicleId(Map<String,Object> param);
 
-    //根据电池ID查找电池信息扩展
+    /*
+     * 根据电池ID查找电池信息扩展.
+     */
     BizBatteryExt getBatteryInfoByBatteryId(Map<String,Object> param);
+
+    /**
+     * 根据设备ID获取车辆ID.
+     * @param deviceCode 设备ID（电池编号）
+     * @return 车辆ID
+     */
+    BizBatteryExt getVehicleIdByDeviceId(String deviceCode);
 }

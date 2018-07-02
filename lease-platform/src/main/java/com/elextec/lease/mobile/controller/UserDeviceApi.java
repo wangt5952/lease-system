@@ -261,6 +261,9 @@ public class UserDeviceApi extends BaseController {
                                 errMsgs.append("未查询到车辆[ID:" + batteryCode + "]对应设备的定位信息;");
                                 continue;
                             }
+                            double[] bdgps = WzGPSUtil.wgs2bd(locData.getDouble(DeviceApiConstants.REQ_LAT), locData.getDouble(DeviceApiConstants.REQ_LON));
+                            locData.put(DeviceApiConstants.REQ_LAT, bdgps[0]);
+                            locData.put(DeviceApiConstants.REQ_LON, bdgps[1]);
                             locData.put(DeviceApiConstants.REQ_RESP_VEHICLE_ID, vId);
                             locData.put(DeviceApiConstants.REQ_RESP_BATTERY_ID, batteryId);
                             locData.put(DeviceApiConstants.REQ_RESP_DEVICE_ID, batteryCode);

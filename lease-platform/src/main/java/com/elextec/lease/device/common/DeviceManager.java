@@ -1,5 +1,6 @@
 package com.elextec.lease.device.common;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -15,13 +16,14 @@ public class DeviceManager {
     @Autowired
     private JmsMessagingTemplate jmsMessagingTemplate;
 
-    /**
-     * 及时发送
-     * @param destination
-     * @param data
-     */
-    public void send(Destination destination, String data){
-        this.jmsMessagingTemplate.convertAndSend(destination,data);
-    }
+    @Autowired
+    private Destination sensorDataQueue;
 
+    /**
+     * 及时发送.
+     * @param data 数据
+     */
+    public void send(String data){
+        this.jmsMessagingTemplate.convertAndSend(sensorDataQueue, data);
+    }
 }
