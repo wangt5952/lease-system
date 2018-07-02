@@ -202,7 +202,7 @@ export default {
       } else {
         this.$vux.toast.show({ text: '资料提交成功！', type: 'success', width: '10em' });
         this.$router.push('/authentication_step3');
-    }
+      }
     },
   },
 };
