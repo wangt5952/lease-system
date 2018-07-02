@@ -195,17 +195,13 @@ export default {
       return canvas;
     },
     async handler() {
-      if (this.path === '' || this.path1 === '' || this.path2 === '') {
-        this.$vux.toast.show({ text: '上传图片不能为空！', type: 'warn', width: '10em' });
-      } else {
         const { code, message } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
           { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
         if (code !== '200') {
           this.$vux.toast.show({ text: message, type: 'cancel', width: '10em' });
         } else {
           this.$vux.toast.show({ text: '资料提交成功！', type: 'success', width: '10em' });
-          this.$router.push('/authentication_step10');
-        }
+          this.$router.push('/authentication_step3');
       }
     },
   },
