@@ -212,6 +212,14 @@ export default {
     //     lng: r.point.lng, lat: r.point.lat,
     //   };
     // },
+    async getVehicleByUserId() {
+      try {
+        
+      } catch (err) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
     // 查看路况
     async searchStreet(value) {
       try {
