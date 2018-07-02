@@ -193,7 +193,7 @@ export default {
     if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
     this.realNameFlag = _.find(user_realName_flag, { key: this.key_user_info.userRealNameAuthFlag }).value;
     if (this.realNameFlag === '已驳回') this.isEnable = true;
-    if(this.$route.params.state) console.log(this.$route.params.state);
+    if (this.$route.params.id) console.log(this.$route.params.id);
   },
 };
 </script>
