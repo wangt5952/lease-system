@@ -192,10 +192,7 @@ export default {
     this.portrait = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
     if (localStorage.getItem('vehicleId') !== '') this.vehicleId.push(localStorage.getItem('vehicleId'));
     this.realNameFlag = _.find(user_realName_flag, { key: this.key_user_info.userRealNameAuthFlag }).value;
-    if (this.realNameFlag === '已驳回') {
-      this.isEnable = true;
-      this.$vux.toast.show({ text: '您的实名注册被驳回，请您重新提交资料！', type: 'warn', width: '10em' });
-    }
+    if (this.realNameFlag === '已驳回') this.isEnable = true;
   },
 };
 </script>
