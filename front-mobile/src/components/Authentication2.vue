@@ -195,10 +195,10 @@ export default {
       return canvas;
     },
     async handler() {
-      const { code, message } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
-        { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
-      if (code !== '200') throw new Error(message || code);
-      //this.$router.push('/authentication_step3');
+      // const { code, message } = (await this.$http.post('/api/mobile/v1/auth/userrealnameauth',
+      //   { id: this.key_user_info.id, userPid: this.$route.params.id, userIcFront: this.path, userIcBack: this.path1, userIcGroup: this.path2, updateUser: this.key_user_info.loginName })).body;
+      // if (code !== '200') throw new Error(message || code);
+      this.$router.push('/authentication_step3');
     },
   },
 };
