@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="form" style="margin:40px 30px;font-size:0.4rem;">
-      <x-input placeholder="请输入帐号" v-model="form.loginName" required style="background:#fff;">
+      <x-input placeholder="请输入帐号" type="tel" v-model="form.loginName" required style="background:#fff;">
         <template slot="label">
           <i class="lt lt-my"/>
         </template>

@@ -5,7 +5,7 @@
         <div style="flex:1;padding:10px;padding-top:25px;">
           <!-- <div style="font-size:12px;">车辆实时情况</div> -->
           <el-input v-model="search.keyword" style="margin-top:5px;width:75%" size="mini" suffix-icon="el-icon-edit" placeholder="请输入要查看的地址" clearable></el-input>
-          <el-button size="mini" @click="searchStreet(search.keyword)">查看路况</el-button>
+          <el-button size="mini" @click="searchStreet(search.keyword)">搜索</el-button>
         </div>
         <div @click="vehicleDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{vehicleInfo.vehicleCode}}</div>
@@ -25,8 +25,8 @@
         </div>
       </div>
 
-      <baidu-map  @ready="handler" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
-        <!-- 比列尺 -->
+      <baidu-map  @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+        <!--1 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
@@ -206,11 +206,19 @@ export default {
     },
   },
   methods: {
-    async handler() {
-      const r = await this.getCurrentPosition();
-      this.mapCenter = {
-        lng: r.point.lng, lat: r.point.lat,
-      };
+    // async handler() {
+    //   const r = await this.getCurrentPositions();
+    //   this.mapCenter = {
+    //     lng: r.point.lng, lat: r.point.lat,
+    //   };
+    // },
+    async getVehicleByUserId() {
+      try {
+        
+      } catch (err) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     // 查看路况
     async searchStreet(value) {
@@ -264,80 +272,88 @@ export default {
     // 地图更改缩放级别结束时触发触发此事件
     async syncCenterAndZoom(e) {
       // 获取地图中心点
-      const { lng, lat } = e.target.getCenter();
-      // this.circlePath.center = e.target.getCenter();
-      // 获取缩放等级
-      const zoomNum = e.target.getZoom();
-      let num = 0;
-      if (zoomNum > 10) {
-        switch (zoomNum) {
-          // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: num = 900; break;
-          // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: num = 2000; break;
-          case 14: num = 2000; break;
-          case 13: num = 4000; break;
-          case 12: num = 10000; break;
-          case 11: num = 20000; break;
-          default: num = 1000;
-        }
-        try {
-          const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-            lng: lng, lat: lat, radius: num,
-          })).body;
-          if (code === '200') {
-            this.radiusVehicleList = respData;
-          } else {
-            this.radiusVehicleList = [];
-            this.vehicleInfo = {};
-            this.powerInfo = {};
-            this.userInfo = {};
-            this.address = '';
-            throw new Error(message);
+      if (this.vehiclePathVisible === false) {
+        const { lng, lat } = e.target.getCenter();
+        // this.circlePath.center = e.target.getCenter();
+        // 获取缩放等级
+        const zoomNum = e.target.getZoom();
+        let num = 0;
+        if (zoomNum > 10) {
+          switch (zoomNum) {
+            // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
+            case 16: num = 900; break;
+            // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
+            case 15: num = 2000; break;
+            case 14: num = 2000; break;
+            case 13: num = 4000; break;
+            case 12: num = 10000; break;
+            case 11: num = 20000; break;
+            default: num = 1000;
           }
-        } catch (err) {
-          const message = err.statusText || err.message;
-          this.$message.error(message);
+          try {
+            const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+              lng: lng, lat: lat, radius: num,
+            })).body;
+            if (code === '200') {
+              this.radiusVehicleList = respData;
+            } else {
+              this.radiusVehicleList = [];
+              this.vehicleInfo = {};
+              this.powerInfo = {};
+              this.userInfo = {};
+              this.address = '';
+              throw new Error('正在加载中. . .');
+            }
+          } catch (err) {
+            const message = err.statusText || err.message;
+            this.$message.error('正在加载中. . .');
+          }
         }
+      } else {
+        await this.reloadLocList();
       }
     },
     // 停止拖拽地图时触发此事件
     async syncCenterAndZooms(e) {
-      const { lng, lat } = e.target.getCenter();
-      // this.circlePath.center = e.target.getCenter();
-      // 获取缩放等级
-      const zoomNum = e.target.getZoom();
-      let num = 0;
-      if (zoomNum > 10) {
-        switch (zoomNum) {
-          // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-          case 16: num = 900; break;
-          // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-          case 15: num = 2000; break;
-          case 14: num = 2000; break;
-          case 13: num = 4000; break;
-          case 12: num = 10000; break;
-          case 11: num = 20000; break;
-          default: num = 1000;
-        }
-        try {
-          const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-            lng: lng, lat: lat, radius: num,
-          })).body;
-          if (code === '200') {
-            this.radiusVehicleList = respData;
-          } else {
-            this.radiusVehicleList = [];
-            this.vehicleInfo = {};
-            this.powerInfo = {};
-            this.userInfo = {};
-            this.address = '';
-            throw new Error(message);
+      if (this.vehiclePathVisible === false) {
+        const { lng, lat } = e.target.getCenter();
+        // this.circlePath.center = e.target.getCenter();
+        // 获取缩放等级
+        const zoomNum = e.target.getZoom();
+        let num = 0;
+        if (zoomNum > 10) {
+          switch (zoomNum) {
+            // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
+            case 16: num = 900; break;
+            // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
+            case 15: num = 2000; break;
+            case 14: num = 2000; break;
+            case 13: num = 4000; break;
+            case 12: num = 10000; break;
+            case 11: num = 20000; break;
+            default: num = 1000;
           }
-        } catch (err) {
-          const message = err.statusText || err.message;
-          this.$message.error(message);
+          try {
+            const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+              lng: lng, lat: lat, radius: num,
+            })).body;
+            if (code === '200') {
+              this.radiusVehicleList = respData;
+            } else {
+              this.radiusVehicleList = [];
+              this.vehicleInfo = {};
+              this.powerInfo = {};
+              this.userInfo = {};
+              this.address = '';
+              throw new Error('正在加载中 . . .');
+            }
+          } catch (err) {
+            const message = err.statusText || err.message;
+            this.$message.error('正在加载中 . . .');
+          }
         }
+      } else {
+        await this.reloadLocList();
       }
     },
     showVehiclePath() {
@@ -389,7 +405,9 @@ export default {
           const { respData: timeRespData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
           // if (code !== '200') throw new Error(message);
           const locList = timeRespData;
-          if (!locList.length) throw new Error('该时间段没有行驶轨迹');
+          if (!locList.length) {
+            throw new Error('该时间段没有行驶轨迹');
+          }
           this.mapCenter = {
             lng: locList[0].LON, lat: locList[0].LAT,
           };
@@ -421,13 +439,17 @@ export default {
     // 获取所有车辆信息
     async reloadVehicleList() {
       // 获取当前城市的浏览器定位  (根据经纬度获取范围车辆).
-      const r = await this.getCurrentPosition();
+      const r = await this.getCurrentPositions();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: r.point.lng, lat: r.point.lat, radius: 1000,
+          lng: r.point.lng, lat: r.point.lat, radius: 2000 * 100,
         })).body;
         if (code === '200') {
-          this.radiusVehicleList = respData;
+          if(respData.length <= 15){
+            this.radiusVehicleList = respData;
+          } else if (respData.length > 15) {
+            this.radiusVehicleList = _.dropRight(respData, respData.length - 15);
+          }
           // 获取当前范围内第一辆车的信息
           await this.getVehicleInfo();
           // 获取当前范围内第一辆车的用户信息
@@ -435,6 +457,11 @@ export default {
           if (this.radiusVehicleList && this.radiusVehicleList.length && !_.find(this.radiusVehicleList, { vehicleId: this.selectedId })) {
             this.selectedId = this.radiusVehicleList[0].vehicleId;
           }
+          this.mapCenter = {
+            lng: this.radiusVehicleList[0].LON, lat: this.radiusVehicleList[0].LAT,
+          };
+          const loc = await this.getLocation(this.radiusVehicleList[0].LON, this.radiusVehicleList[0].LAT);
+          this.address = loc.address;
         } else {
           this.radiusVehicleList = [];
           this.vehicleInfo = {};
@@ -494,7 +521,9 @@ export default {
         const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
         // if (code !== '200') throw new Error(message);
         const locList = respData;
-        if (!locList.length) throw new Error('该时间段没有行驶轨迹');
+        if (!locList.length) {
+          throw new Error('该时间段没有行驶轨迹');
+        }
         this.mapCenter = {
           lng: locList[0].LON, lat: locList[0].LAT,
         };
@@ -508,6 +537,7 @@ export default {
             })),
           };
         });
+        
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
@@ -526,7 +556,7 @@ export default {
       }, address));
     },
     // 浏览器定位
-    getCurrentPosition() {
+    getCurrentPositions() {
       return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
         if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
           resolve(r);

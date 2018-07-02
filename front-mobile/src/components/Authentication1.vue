@@ -11,9 +11,8 @@
        <step-item title="步骤1:" description="输入身份证号"></step-item>
      </step>
    </div>
-   <x-hr></x-hr>
 
-   <group>
+   <group style="margin-top:10px">
     <x-input title="身份证号：" placeholder="请输入身份证号" :min="15" :max="18" required v-model="value"></x-input>
    </group>
    <x-button type="primary" @click.native="handler">下一步</x-button>
@@ -21,14 +20,13 @@
 </template>
 
 <script>
-import { Step, StepItem, XButton, XHr, XInput, Group } from 'vux';
+import { Step, StepItem, XButton, XInput, Group } from 'vux';
 
 export default {
   components: {
     Step,
     StepItem,
     XButton,
-    XHr,
     XInput,
     Group,
   },
@@ -40,7 +38,7 @@ export default {
   },
   methods: {
     back() {
-      this.$router.replace('/');
+      this.$router.push('/');
     },
     handler() {
       if (this.value === '') {
@@ -50,7 +48,7 @@ export default {
       const p18 = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(this.value);
       const p15 = /^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$/.test(this.value);
       if (p18 || p15) {
-        this.$router.replace(`/authentication_step2/${this.value}`);
+        this.$router.push(`/authentication_step2/${this.value}`);
       } else {
         this.$vux.toast.show({ text: '错误的身份证号', type: 'cancel', width: '10em' });
       }

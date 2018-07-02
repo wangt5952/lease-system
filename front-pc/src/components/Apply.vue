@@ -131,9 +131,11 @@
         <el-tab-pane label="我的申请" name="first">
           <div style="flex-direction:column;">
             <div style="display:flex;">
-              <div style="margin-right:10px;">
-                <el-button icon="el-icon-plus" type="primary" size="small" @click="addApply()">添加申请</el-button>
-              </div>
+              <template v-if="res['FUNCTION'].indexOf('vehide-order-addone') >= 0">
+                <div style="margin-right:10px;">
+                  <el-button icon="el-icon-plus" type="primary" size="small" @click="addApply()">添加申请</el-button>
+                </div>
+              </template>
               <el-form :inline="true">
                 <el-form-item>
                   <el-input style="width:400px;" v-model="enterpriseMySearch.keyStr" placeholder="登录名/手机号码/昵称/姓名/身份证号/所属企业Code/所属企业名"></el-input>
@@ -158,8 +160,10 @@
               <el-table-column prop="applyUserName" label="申请人名称"></el-table-column>
               <el-table-column prop="applyOrgName" label="申请企业名称"></el-table-column>
               <el-table-column label="操作">
-                <template slot-scope="{row}">
-                  <el-button icon="el-icon-edit" size="mini" type="text" @click="searchApplyInfo(row)">查看内容</el-button>
+                <template v-if="res['FUNCTION'].indexOf('vehide-order-list') >= 0">
+                  <template slot-scope="{row}">
+                    <el-button icon="el-icon-edit" size="mini" type="text" @click="searchApplyInfo(row)">查看内容</el-button>
+                  </template>
                 </template>
               </el-table-column>
             </el-table>
@@ -217,9 +221,11 @@
         <el-tab-pane label="我的申请" name="first">
           <div style="flex-direction:column;">
             <div style="display:flex;">
-              <div style="margin-right:10px;">
-                <el-button icon="el-icon-plus" type="primary" size="small" @click="addApply()">添加申请</el-button>
-              </div>
+              <template v-if="res['FUNCTION'].indexOf('vehide-order-addone') >= 0">
+                <div style="margin-right:10px;">
+                  <el-button icon="el-icon-plus" type="primary" size="small" @click="addApply()">添加申请</el-button>
+                </div>
+              </template>
               <el-form :inline="true">
                 <el-form-item>
                   <el-input style="width:400px;" v-model="individualSearch.keyStr" placeholder="申请标题/内容/申请人/申请企业名称"></el-input>

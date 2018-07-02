@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     back() {
-      this.$router.replace('/');
+      this.$router.push('/');
     },
     select(index) {
       this.index = index;

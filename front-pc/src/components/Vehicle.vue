@@ -23,11 +23,12 @@
         </el-form-item>
       </el-form>
       <!-- 平台 -->
-      <template v-if="key_user_info.userType === 'PLATFORM'">
+      
+      <!-- <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-tickets" type="success" size="small" @click="importExcelVisible = true">导入 Excel 表格</el-button>
         </div>
-      </template>
+      </template> -->
       <!-- 企业 -->
       <template v-if="key_user_info.userType === 'ENTERPRISE'">
         <div style="margin-right:10px;">
@@ -37,13 +38,13 @@
     </div>
 
     <el-table :data="vehicle.list" class="vehicleHeight">
-      <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
+      <el-table-column prop="vehicleCode" label="编号" width="150"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
       <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
-      <el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>
+      <!--<el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>-->
       <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
-      <el-table-column prop="vehicleStatusText" label="状态" width="60">
+      <el-table-column prop="vehicleStatusText" label="状态" width="80">
         <template slot-scope="{row}">
           <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
           <template v-else-if="row.vehicleStatus === 'FREEZE'"><span style="color:red">冻结/维保</span></template>
@@ -54,20 +55,20 @@
       <!-- 管理员查看的信息 -->
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <!-- v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" -->
-        <el-table-column label="电池" width="150">
+        <el-table-column label="电池" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
             <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
             <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="配件" width="180">
+        <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180">
+        <el-table-column label="操作" width="200">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">编辑</el-button>
           </template>
@@ -108,22 +109,22 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehiclePn" :rules="[{required:true, message:'请填写型号'}]" label="型号">
+            <el-form-item prop="vehiclePn" label="型号">
               <el-input v-model="form.vehiclePn" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehicleBrand" :rules="[{required:true, message:'请填写品牌'}]" label="品牌">
+            <el-form-item prop="vehicleBrand" label="品牌">
               <el-input v-model="form.vehicleBrand" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehicleMadeIn" :rules="[{required:true, message:'请填写产地'}]" label="产地">
+            <el-form-item prop="vehicleMadeIn" label="产地">
               <el-input v-model="form.vehicleMadeIn" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="生产商">
+            <el-form-item prop="mfrsId" label="生产商">
               <el-select v-model="form.mfrsId" placeholder="请选择生产商" style="width:100%;">
                 <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
               </el-select>
@@ -154,27 +155,27 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryName" :rules="[{required:true, message:'请填写电池货名'}]" label="电池货名">
+              <el-form-item prop="batteryName" label="电池货名">
                 <el-input v-model="batteryForm.batteryName" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryBrand" :rules="[{required:true, message:'请填写品牌'}]" label="电池品牌">
+              <el-form-item prop="batteryBrand" label="电池品牌">
                 <el-input v-model="batteryForm.batteryBrand" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryPn" :rules="[{required:true, message:'请填写型号'}]" label="电池型号">
+              <el-form-item prop="batteryPn" label="电池型号">
                 <el-input v-model="batteryForm.batteryPn" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="batteryParameters" :rules="[{required:true, message:'请填写参数'}]" label="电池参数">
+              <el-form-item prop="batteryParameters" label="电池参数">
                 <el-input v-model="batteryForm.batteryParameters" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="电池生产商">
+              <el-form-item prop="mfrsId" label="电池生产商">
                 <el-select v-model="batteryForm.mfrsId" placeholder="请选择生产商" style="width:100%;">
                   <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
                 </el-select>
@@ -258,9 +259,9 @@
       <el-form class="edit-form" :model="bindForm" ref="bindForm">
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择电池'}]" label="电池">
           <el-select style="width:100%;" v-model="bindForm.batteryId" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
-            <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryCode}`" :value="o.id">
+            <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryPn}`" :value="o.id">
               <span style="float: left">{{ o.batteryBrand }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryCode }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryPn }}</span>
             </el-option>
           </el-select>
         </el-form-item>

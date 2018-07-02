@@ -59,6 +59,10 @@ const store = new Vuex.Store({
       state.key_login_token = key_login_token;
       state.key_user_info = key_user_info;
     },
+    update(state, { key_user_info }) {
+      localStorage.setItem('key_user_info', JSON.stringify(key_user_info));
+      state.key_user_info = key_user_info;
+    },
     // 登出
     logout(state) {
       // 删除本地信息

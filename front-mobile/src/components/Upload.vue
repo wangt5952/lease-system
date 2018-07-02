@@ -56,15 +56,9 @@ export default {
       website: 'http://106.14.172.38:8990/leaseupload/usericon/',
     };
   },
-  created() {
-    // 判断字段是否存在
-    if (this.key_user_info.userIcon) {
-      this.headerImage = this.key_user_info.userIcon.includes(this.website) ? this.$route.query.userIcon : this.website + this.$route.query.userIcon;
-    } else {
-      this.headerImage = '/static/images/users/1.jpg';
-    }
-  },
   mounted() {
+    if (!this.key_user_info.userIcon) this.headerImage = '/static/images/users/1.jpg';
+    else this.headerImage = this.key_user_info.userIcon.includes(this.website) ? this.key_user_info.userIcon : `${this.website}${this.key_user_info.userIcon}`;
     const self = this;
     const image = document.getElementById('image');
     this.cropper = new Cropper(image, {
@@ -77,15 +71,15 @@ export default {
   },
   methods: {
     back() {
-      window.history.go(-1);
+      this.$router.push('/profile');
     },
     getObjectURL(file) {
       let url = null;
       if (window.createObjectURL !== undefined) {
         url = window.createObjectURL(file);
         url = window.URL.createObjectURL(file);
-      } else if (window.webkitURL !== undefined) {
-        url = window.webkitURL.createObjectURL(file);
+      } else if (window.URL !== undefined) {
+        url = window.URL.createObjectURL(file);
       }
       return url;
     },
@@ -145,7 +139,7 @@ export default {
         this.key_user_info.userIcon = respData;
         localStorage.setItem('key_user_info', JSON.stringify(this.key_user_info));
         this.$vux.toast.show({ text: '提交成功', type: 'success', width: '10em', time: '100' });
-        setTimeout(() => { this.$router.replace('/'); }, 200);
+        setTimeout(() => { this.$router.push('/'); }, 200);
       }
     },
   },

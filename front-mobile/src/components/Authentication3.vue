@@ -13,10 +13,9 @@
        <step-item title="步骤3:" description="等待审核"></step-item>
      </step>
    </div>
-   <x-hr></x-hr>
 
-   <group>
-    <x-textarea title="" v-model="value"></x-textarea>
+   <group style="margin-top:10px;">
+    <div class="bg"><span>{{this.value}}</span></div>
    </group>
    <div class="botmline"></div>
    <x-button type="primary" @click.native="handler">完成</x-button>
@@ -24,29 +23,31 @@
 </template>
 
 <script>
-import { Step, StepItem, XButton, XHr, XTextarea, Group } from 'vux';
+import { Step, StepItem, XButton, Group } from 'vux';
 
 export default {
   components: {
     Step,
     StepItem,
     XButton,
-    XHr,
-    XTextarea,
     Group,
   },
   data() {
     return {
       step: 0,
-      value: '        请耐心等待企业审核',
+      value: '请耐心等待企业审核',
     };
   },
   methods: {
     back() {
       window.history.go(-1);
     },
-    handler() {
-      this.$router.replace('/');
+    async handler() {
+      const { code, message, respData } = (await this.$http.get('/api/mobile/v1/auth/userState')).body;
+      if (code !== '200') throw new Error(message || code);
+      const { key_user_info } = respData;
+      await this.$store.commit('update', { key_user_info });
+      this.$router.push('/');
     },
   },
 };
@@ -126,5 +127,19 @@ export default {
   .weui-btn {
     width:80%;
     margin:20px auto;
+  }
+  >>>.vux-x-hr {
+    margin:0;
+  }
+  .bg {
+    width:100%;
+    height:50px;
+    margin: 10px auto;
+    text-align: center;
+  }
+  .bg span {
+    margin:auto 20px;
+    padding:10px 0;
+    font-size: 18px;
   }
 </style>
