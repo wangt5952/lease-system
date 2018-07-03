@@ -38,12 +38,12 @@
     </div>
 
     <el-table :data="vehicle.list" class="vehicleHeight">
-      <el-table-column prop="vehicleCode" label="编号" width="150"></el-table-column>
+      <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
       <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
       <!--<el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>-->
-      <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="120"></el-table-column>
       <el-table-column prop="vehicleStatusText" label="状态" width="80">
         <template slot-scope="{row}">
           <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
@@ -55,14 +55,14 @@
       <!-- 管理员查看的信息 -->
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <!-- v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" -->
-        <el-table-column label="电池" width="200">
+        <el-table-column label="电池" width="160">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
             <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
             <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="配件" width="200">
+        <el-table-column label="配件" width="180">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
@@ -71,6 +71,7 @@
         <el-table-column label="操作" width="200">
           <template slot-scope="{row}">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">编辑</el-button>
+            <el-button icon="el-icon-search" size="mini" type="text" @click="showVehicleLocation(row)">查看车辆位置</el-button>
           </template>
         </el-table-column>
       </template>
@@ -260,7 +261,7 @@
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择电池'}]" label="电池">
           <el-select style="width:100%;" v-model="bindForm.batteryId" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
             <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryPn}`" :value="o.id">
-              <span style="float: left">{{ o.batteryBrand }}</span>
+              <span style="float: left">{{ o.batteryCode }}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryPn }}</span>
             </el-option>
           </el-select>
@@ -387,7 +388,7 @@
     </el-dialog>
 
     <!-- Excel表格数据入库 -->
-    <el-dialog title="导入Excel" :visible.sync="importExcelVisible" :before-close="closeExcel" style="margin-top:-50px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
+    <el-dialog title="导入Excel" :visible.sync="importExcelVisible" :before-close="closeExcel" style="margin-top:-50px;" :close-on-click-modal="false" width="90%" center close-on-press-escape>
       <div class="app-container">
         <upload-excel-component @on-selected-file='selected'></upload-excel-component>
         <el-table :data="tableData" border highlight-current-row style="width: 100%;margin-top:20px;height: 350px; overflow-y: auto;">
@@ -401,11 +402,37 @@
       </span>
     </el-dialog>
 
+    <div class="vehicleClass">
+      <el-dialog title="" :visible.sync="vehicleLocationVisible" :before-close="closeVehicleLocationVisible" style="margin-top:-60px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
+        <div style="width:100%;height:20px;background-color:#3D1D93">
+          <div style="display: flex;justify-content:center;line-height:20px">
+            <span style="color:#fff;font-size:1em;">详细地址: {{ address }}</span>
+          </div>
+        </div>
+        <div class="vehicleLocationClass" style="width:100%; height:100%">
+          <baidu-map @ready="handler" style="width: 100%;height:450px" :center="center" :zoom="zoom" auto-resize>
+            <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
+            <bm-marker 
+              :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
+              :position="{lng: vehiclLocation.LON, lat: vehiclLocation.LAT}">
+            </bm-marker>
+            <bm-info-window :position="PopCenter" :title="infoWindow.title" :show="infoWindow.show" :width="70" :height="60">
+              <p v-text="infoWindow.contents"></p>
+            </bm-info-window>
+          </baidu-map>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeVehicleLocationVisible">关闭</el-button>
+        </span>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
+// import BMap from 'BMap'
+// import {MP} from '../util/map'
 import UploadExcelComponent from '@/components/UploadExcel/index'
 import {
   mapState,
@@ -442,6 +469,19 @@ export default {
   components: { UploadExcelComponent },
   data() {
     return {
+      center: {lng: 0, lat: 0},
+      zoom: 3,
+      vehiclLocation:{},
+      vehiclPowner:{},
+      PopCenter: { lng: 0, lat: 0 },
+      infoWindow: {
+        title: '',
+        show: true,
+        contents: ''
+      },
+      // 地址解析
+      address: '',
+
       // Excel表格参数
       tableData: [],
       tableHeader: [],
@@ -551,6 +591,9 @@ export default {
       bindPartsFormVisible2: false,
       batteryList: [],
       holdPartsList2: [],
+
+      // 车辆地址
+      vehicleLocationVisible: false,
     };
   },
   computed: {
@@ -575,9 +618,50 @@ export default {
     },
   },
   methods: {
+    handler ({BMap, map}) {
+      console.log('handler');
+      this.center.lng = 116.404;
+      this.center.lat = 39.915;
+      this.zoom = 15;
+    },
+    // 显示车辆地址信息
+    async showVehicleLocation(row) {
+      try {
+        // 获取坐标
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk',[row.id])).body;
+        if (code !== '200') throw new Error(message);
+        this.vehiclLocation = respData[0];
+        console.log(this.vehiclLocation);
+        // 设置地图中心点
+        const center = this.center = {
+          lng: respData[0].LON, lat: respData[0].LAT,
+        };
+        // this.zoom = 15;
+        this.PopCenter = this.center;
+
+        // 获取电池剩余电量
+        const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
+        if (pCode !== '200') throw new Error(pMess);
+        this.infoWindow.contents = `电池电量:  ${pRes[0].RSOC} %`;
+
+        // 逆地址解析 (根据经纬度获取详细地址)
+        const loc = await this.getLocation(respData[0].LON, respData[0].LAT);
+        this.address = loc.address;
+        this.vehicleLocationVisible = true;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+        const pMess = e.statusText || e.pMess;
+        this.$message.error(pMess);
+      }
+    },
+    // 车辆地址 回调
+    closeVehicleLocationVisible() {
+      this.vehicleLocationVisible = false;
+    },
     // 提交 入库
     async commitExcel() {
- 
     },
     // 关闭Excel窗口
     closeExcel() {
@@ -993,6 +1077,10 @@ export default {
         this.$message.error(message);
       }
     },
+    // 逆地址解析(根据经纬度获取详细地址).
+    getLocation(lng, lat) {
+      return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+    },
     // 获取制造商集合
     async getMfrs() {
       // 平台用户权限
@@ -1022,6 +1110,10 @@ export default {
 </script>
 
 <style scoped>
+.vehicleClass >>>.el-dialog__body   {
+    padding: 15px 25px 5px;
+}
+
 .edit-form >>> .el-form-item {
   height: 55px;
 }

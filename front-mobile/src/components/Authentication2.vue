@@ -203,7 +203,6 @@ export default {
         this.$vux.toast.show({ text: '资料上传成功', type: 'success', width: '10em' });
         this.$router.push('/');
       }
-
     },
   },
 };

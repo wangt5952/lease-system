@@ -424,7 +424,9 @@ export default {
   padding: 0 45px;
   min-width: 180px;
 }
-
+>>> .el-submenu__title {
+  padding: 0px 50px;
+}
 >>> .el-menu .el-submenu .el-submenu__title,
 >>> .el-menu .el-submenu .el-submenu__title i,
 >>> .el-menu .el-menu-item {

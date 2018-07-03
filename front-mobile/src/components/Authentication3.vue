@@ -43,10 +43,10 @@ export default {
       window.history.go(-1);
     },
     async handler() {
-      const { code, message, respData } = (await this.$http.get('/api/mobile/v1/auth/userState')).body;
-      if (code !== '200') throw new Error(message || code);
-      const { key_user_info } = respData;
-      await this.$store.commit('update', { key_user_info });
+      // const { code, message, respData } = (await this.$http.get('/api/mobile/v1/auth/userState')).body;
+      // if (code !== '200') throw new Error(message || code);
+      // const { key_user_info } = respData;
+      // await this.$store.commit('update', { key_user_info });
       this.$router.push('/');
     },
   },

@@ -13,9 +13,9 @@ spring:
     pool.enabled: false
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://106.14.172.38:3996/lease_sys?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true
-    username: njjsadmin
-    password: njjspwd12345678$%^
+    url: jdbc:mysql://127.0.0.1:3306/lease_sys?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true
+    username: admin
+    password: admin
     druid:
       initial-size: 5
       min-idle: 3
@@ -33,15 +33,15 @@ spring:
       web-stat-filter:
         enabled: false
   redis:
-    host: 106.14.172.38
-    port: 9736
+    host: 127.0.0.1
+    port: 6379
     pool:
       max-active: 8
       max-wait: -1
       max-idle: 8
       min-idle: 0
     timeout: 0
-    password: Njjs12345678%^&
+    password: admin
   session:
     store-type: none
 mybatis:
