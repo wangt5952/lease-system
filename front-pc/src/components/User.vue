@@ -236,25 +236,25 @@
       </div>
       <div class="pidPhoto">
         <!-- 身份证正面 -->
-        <div>
+        <div class="pidPhotos">
           <img class="imgClass" :src="userPidPath + cardPhotoFront" alt="">
-          <!-- <div class="imgButton">
+          <div class="imgButton">
             <el-button type="primary" @click="searchPid(pid,'cardPhotoFront')">放大观看</el-button>
-          </div> -->
+          </div>
         </div>
         <!-- 身份证反面 -->
-        <div>
+        <div class="pidPhotos">
           <img class="imgClass" :src="userPidPath + cardPhotoBack" alt="">
-          <!-- <div class="imgButton">
+          <div class="imgButton">
             <el-button type="primary" @click="searchPid(pid,'cardPhotoBack')">放大观看</el-button>
-          </div> -->
+          </div>
         </div>
         <!-- 双手举起身份证 -->
-        <div>
+        <div class="pidPhotos">
           <img class="imgClass" :src="userPidPath + cardPhotoGroup" alt="">
-          <!-- <div class="imgButton">
+          <div class="imgButton">
             <el-button type="primary" @click="searchPid(pid,'cardPhotoGroup')">放大观看</el-button>
-          </div> -->
+          </div>
         </div>
       </div>
       <span slot="footer" class="dialog-footer" >
@@ -265,7 +265,12 @@
     </el-dialog>
     <!-- 放大后的表单 -->
     <el-dialog :title="pidInfo" :visible.sync="photoInfoVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%" center>
-      <img :src="userPidPath + cardPhoto" alt="">
+      <div style="display:flex;justify-content:center">
+        <img :src="userPidPath + cardPhoto" alt="">
+      </div>
+      <span slot="footer" class="dialog-footer" >
+        <el-button @click="photoInfoVisible = false;">关闭</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -854,11 +859,19 @@ export default {
 .pidPhoto {
   display: flex;
   flex-direction: row;
+  width: 100%
+}
+.pidPhotos {
+  padding: 0 5px;
+  width: 40%;
 }
 .pidPhoto .imgClass {
-  margin: 10px;
+  padding: 3px;
   height: 339px;
-  width: 350px;
+  /**
+    width: 350px;
+  */
+  width: 100%;
 }
 .imgButton {
   margin-left: 30%;
