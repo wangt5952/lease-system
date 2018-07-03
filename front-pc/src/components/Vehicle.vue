@@ -23,7 +23,6 @@
         </el-form-item>
       </el-form>
       <!-- 平台 -->
-      
       <!-- <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-tickets" type="success" size="small" @click="importExcelVisible = true">导入 Excel 表格</el-button>
@@ -479,6 +478,7 @@ export default {
       zoom: 3,
       vehiclLocation:{},
       vehiclPowner:{},
+      markerCenter: { lng: 0, lat: 0 },
       PopCenter: { lng: 0, lat: 0 },
       infoWindow: {
         title: '',
@@ -653,6 +653,8 @@ export default {
         if (pCode !== '200') throw new Error(pMess);
         this.infoWindow.contents = `电池电量:  ${pRes[0].RSOC} %`;
 
+        this.vehicleLocationVisible = true;
+        this.vehicleLocationVisible = false;
         this.vehicleLocationVisible = true;
       } catch (e) {
         if (!e) return;
