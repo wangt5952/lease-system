@@ -418,6 +418,7 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: item.LON, lat: item.LAT, radius: 2000,
         })).body;
+        //
         const loc = await getLocation(item.LON, item.LAT);
         this.searchAddress = loc.address;
         if (code === '200') {
