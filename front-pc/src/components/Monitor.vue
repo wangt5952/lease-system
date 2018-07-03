@@ -356,6 +356,7 @@ export default {
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
+        console.log(lng);
         const loc = await getLocation(lng, lat);
         this.searchAddress = loc.address;
         // this.circlePath.center = e.target.getCenter();
@@ -417,6 +418,8 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: item.LON, lat: item.LAT, radius: 2000,
         })).body;
+        const loc = await getLocation(item.LON, item.LAT);
+        this.searchAddress = loc.address;
         if (code === '200') {
           this.radiusVehicleList = respData;
           this.openInfo = true;
