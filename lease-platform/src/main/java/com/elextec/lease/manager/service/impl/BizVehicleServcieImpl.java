@@ -9,7 +9,6 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
-import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.dao.mybatis.*;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
@@ -520,7 +519,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public List<BizVehicleBatteryParts> getByUserId(String id) {
+//    public List<BizVehicleBatteryParts> getByUserId(String id) {
+//        return bizVehicleMapperExt.getVehicleInfoByUserId(id);
+//    }
+    public List<BizVehicleExt> getByUserId(String id) {
         return bizVehicleMapperExt.getVehicleInfoByUserId(id);
     }
 
@@ -599,8 +601,10 @@ public class BizVehicleServcieImpl implements BizVehicleService {
     }
 
     @Override
-    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed) {
-        BizVehicleBatteryParts vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(paramMap);
+//    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed) {
+    public BizVehicleExt queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed) {
+//        BizVehicleBatteryParts vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(paramMap);
+        BizVehicleExt vehicle = bizVehicleMapperExt.getVehicleInfoByVehicleId(paramMap);
         Map<String,Object> param = new HashMap<String,Object>();
         if(vehicle != null){
             param.put("flag",isUsed);

@@ -16,7 +16,6 @@ import com.elextec.lease.manager.request.LocAndRadiusParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
 import com.elextec.lease.manager.service.BizVehicleService;
 import com.elextec.lease.manager.service.BizVehicleTrackService;
-import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RecordStatus;
@@ -599,7 +598,8 @@ public class BizVehicleController extends BaseController {
                 paramMap.put("userId", userTemp.getId());
             }
 //            List<Map<String,Object>> vehicleInfo = bizVehicleService.getByPrimaryKey((String) paramMap.get("id"), isUsedBattery);
-            BizVehicleBatteryParts vehicleInfo = bizVehicleService.queryBatteryInfoByVehicleId(paramMap, isUsedBattery);
+            BizVehicleExt vehicleInfo = bizVehicleService.queryBatteryInfoByVehicleId(paramMap, isUsedBattery);
+//            BizVehicleBatteryParts vehicleInfo = bizVehicleService.queryBatteryInfoByVehicleId(paramMap, isUsedBattery);
             // 组织返回结果并返回
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, vehicleInfo);
             return mr;
@@ -1354,7 +1354,7 @@ public class BizVehicleController extends BaseController {
                 }
             }
             if (null == deviceCds || 0 == deviceCds.size()) {
-                return new MessageResponse(RunningResult.NOT_FOUND.code(), "未发现车辆");
+                return new MessageResponse(RunningResult.NOT_FOUND.code(), "该区域未发现可用车辆");
             }
             SysUser userTemp = getLoginUserInfo(request);
             if (userTemp == null) {
@@ -1371,6 +1371,9 @@ public class BizVehicleController extends BaseController {
             }
             // 查询所有范围内的车辆信息
             List<Map<String, Object>> vehicles = bizVehicleService.listByBatteryCode(paramTemp);
+            if (null == vehicles || 0 == vehicles.size()) {
+                return new MessageResponse(RunningResult.NOT_FOUND.code(), "该区域无可用车辆");
+            }
             // 循环每个车辆信息并装配位置信息及电量信息
             JSONObject powerInfo = null;
             for (Map<String, Object> vh : vehicles) {
@@ -1510,9 +1513,11 @@ public class BizVehicleController extends BaseController {
                                                 JSONObject temp = new JSONObject();
                                                 temp.put(DeviceApiConstants.KEY_LOC_TIME, Long.valueOf(locInfo[0]));
                                                 //将WGS坐标系转换为BD坐标
-                                                double[] douTemp = WzGPSUtil.wgs2bd(Double.valueOf(locInfo[1]), Double.valueOf(locInfo[2]));
-                                                temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
-                                                temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
+//                                                double[] douTemp = WzGPSUtil.wgs2bd(Double.valueOf(locInfo[1]), Double.valueOf(locInfo[2]));
+//                                                temp.put(DeviceApiConstants.REQ_LAT, douTemp[0]);
+//                                                temp.put(DeviceApiConstants.REQ_LON, douTemp[1]);
+                                                temp.put(DeviceApiConstants.REQ_LAT, Double.valueOf(locInfo[1]));
+                                                temp.put(DeviceApiConstants.REQ_LON, Double.valueOf(locInfo[2]));
                                                 locListTemp.add(temp);
                                             }
                                         } else {
@@ -1528,8 +1533,14 @@ public class BizVehicleController extends BaseController {
                         //转换封装缓存中的数据
                         if (null != lastLocSet && lastLocSet.size() > 0) {
                             List<Object> lastLocLs = new ArrayList<Object>(lastLocSet);
+                            JSONObject lastSwitchedLocVo = null;
                             for (int i = 0; i < lastLocLs.size(); i++) {
                                 JSONObject locVo = (JSONObject) lastLocLs.get(i);
+//                                lastSwitchedLocVo = new JSONObject();
+//                                lastSwitchedLocVo.put(DeviceApiConstants.KEY_LOC_TIME, locVo.getLongValue(DeviceApiConstants.KEY_LOC_TIME));
+//                                double[] lastDouTemp = WzGPSUtil.wgs2bd(Double.valueOf(locVo.getDoubleValue(DeviceApiConstants.REQ_LAT)), Double.valueOf(locVo.getDoubleValue(DeviceApiConstants.REQ_LON)));
+//                                lastSwitchedLocVo.put(DeviceApiConstants.REQ_LAT, lastDouTemp[0]);
+//                                lastSwitchedLocVo.put(DeviceApiConstants.REQ_LON, lastDouTemp[1]);
                                 locListTemp.add(locVo);
                             }
                         }
@@ -1565,6 +1576,7 @@ public class BizVehicleController extends BaseController {
             MessageResponse mr = null;
             if (0 == errMsgs.length()) {
                 mr = new MessageResponse(RunningResult.SUCCESS, locDatas);
+//                logger.info(JSONObject.toJSONString(locDatas));
             } else {
                 mr = new MessageResponse(RunningResult.NOT_FOUND.code(), errMsgs.toString());
             }

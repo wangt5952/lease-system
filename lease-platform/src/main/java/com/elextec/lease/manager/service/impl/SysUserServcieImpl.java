@@ -9,7 +9,6 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.SysUserParam;
 import com.elextec.lease.manager.service.SysUserService;
-import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.lease.model.SysUserIcon;
 import com.elextec.persist.dao.mybatis.*;
 import com.elextec.persist.field.enums.OrgAndUserType;
@@ -390,8 +389,10 @@ public class SysUserServcieImpl implements SysUserService {
     }
 
     @Override
-    public List<BizVehicleBatteryParts> getVehiclePartsById(String userId) {
-        List<BizVehicleBatteryParts> datas = bizVehicleMapperExt.getVehicleInfoByUserId(userId);
+//    public List<BizVehicleBatteryParts> getVehiclePartsById(String userId) {
+    public List<BizVehicleExt> getVehiclePartsById(String userId) {
+//        List<BizVehicleBatteryParts> datas = bizVehicleMapperExt.getVehicleInfoByUserId(userId);
+        List<BizVehicleExt> datas = bizVehicleMapperExt.getVehicleInfoByUserId(userId);
         Map<String,Object> param = new HashMap<String,Object>();
         param.put("flag",true);
         if(datas.size() > 0){
@@ -662,12 +663,15 @@ public class SysUserServcieImpl implements SysUserService {
         SysUserExample example = new SysUserExample();
         SysUserExample.Criteria selectMobile = example.createCriteria();
         selectMobile.andIdEqualTo(userId);
-        selectMobile.andOrgIdEqualTo(orgId);
+//        selectMobile.andOrgIdEqualTo(orgId);
         selectMobile.andUserStatusEqualTo(RecordStatus.NORMAL);
         selectMobile.andUserTypeEqualTo(OrgAndUserType.INDIVIDUAL);
         List<SysUser> user = sysUserMapperExt.selectByExample(example);
         if(user.size() != 1){
             throw new BizException(RunningResult.NO_USER.code(),"用户不存在或已作废");
+        }
+        if (null != orgId && null != user.get(0).getOrgId() && !orgId.equals(user.get(0).getOrgId())) {
+            throw new BizException(RunningResult.NO_FUNCTION_PERMISSION);
         }
         if(RealNameAuthFlag.AUTHORIZED.toString().equals(user.get(0).getUserRealNameAuthFlag().toString())){
             throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(), "用户不能重复认证");

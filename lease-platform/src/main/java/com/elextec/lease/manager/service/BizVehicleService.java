@@ -5,7 +5,6 @@ import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.BizVehicleParam;
 import com.elextec.lease.manager.request.VehicleBatteryParam;
-import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.ext.BizPartsExt;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
@@ -80,7 +79,8 @@ public interface BizVehicleService {
      * 根据用户ID查询车辆信息
      * @param id 用户ID
      * */
-    public List<BizVehicleBatteryParts> getByUserId(String id);
+//    public List<BizVehicleBatteryParts> getByUserId(String id);
+    public List<BizVehicleExt> getByUserId(String id);
 
     /**
      * 车辆与电池解绑.
@@ -109,7 +109,8 @@ public interface BizVehicleService {
      * @param isUsed 是否查询在用电池，true：查在用电池；false：查在用及解绑的电池
      * @return 车辆扩展信息列表
      */
-    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed);
+//    public BizVehicleBatteryParts queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed);
+    public BizVehicleExt queryBatteryInfoByVehicleId(Map<String,Object> paramMap, Boolean isUsed);
 
     /**
      * 根据车辆ID查询配件信息

@@ -1084,7 +1084,7 @@ public class SysUserController extends BaseController {
                 if(RealNameAuthFlag.UNAUTHORIZED.toString().equals(param.get("flag").toString())) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
-                sysUserService.approval(param.get("userId"),param.get("flag"),userTemp.getOrgId());
+                sysUserService.approval(param.get("userId"),param.get("flag"), userTemp.getOrgId());
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {
@@ -1150,15 +1150,21 @@ public class SysUserController extends BaseController {
                 if (list == null || list.size() == 0 || WzStringUtil.isBlank(list.get(0))) {
                     return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
                 }
+                SysUser userInfoByVehicle = null;
                 if (sysUser != null) {
                     if (sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
-                        return new MessageResponse(RunningResult.SUCCESS,sysUserService.getUserByVehicle(list.get(0),sysUser.getId(),null));
+                        userInfoByVehicle = sysUserService.getUserByVehicle(list.get(0),sysUser.getId(),null);
                     }
                     if (sysUser.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
-                        return new MessageResponse(RunningResult.SUCCESS,sysUserService.getUserByVehicle(list.get(0),null,sysUser.getOrgId()));
+                        userInfoByVehicle = sysUserService.getUserByVehicle(list.get(0),null,sysUser.getOrgId());
                     }
                 }
-                return new MessageResponse(RunningResult.SUCCESS,sysUserService.getUserByVehicle(list.get(0),null,null));
+                userInfoByVehicle = sysUserService.getUserByVehicle(list.get(0),null,null);
+                if (null == userInfoByVehicle) {
+                    return new MessageResponse(RunningResult.NOT_FOUND.code(), "该车辆暂无人使用");
+                } else {
+                    return new MessageResponse(RunningResult.SUCCESS, userInfoByVehicle);
+                }
             } catch (BizException ex) {
                 throw ex;
             } catch (Exception ex) {

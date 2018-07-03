@@ -1,20 +1,15 @@
 package com.elextec.lease.manager.service;
 
 import com.elextec.framework.common.request.RefUserRolesParam;
-import com.elextec.framework.plugins.paging.PageRequest;
 import com.elextec.framework.plugins.paging.PageResponse;
-import com.elextec.lease.manager.request.BizOrganizationParam;
 import com.elextec.lease.manager.request.SysUserParam;
-import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.lease.model.SysUserIcon;
-import com.elextec.persist.field.enums.RealNameAuthFlag;
-import com.elextec.persist.model.mybatis.BizOrganization;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 接口 用户控制Service.
@@ -89,8 +84,9 @@ public interface SysUserService {
 
     /**
      * 根据用户ID查询车辆、电池以及配件信息
-     * */
-    public List<BizVehicleBatteryParts> getVehiclePartsById(String userId);
+     */
+//    public List<BizVehicleBatteryParts> getVehiclePartsById(String userId);
+    public List<BizVehicleExt> getVehiclePartsById(String userId);
 
 
     /**

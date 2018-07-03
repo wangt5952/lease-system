@@ -1,16 +1,10 @@
 package com.elextec.lease.manager.service;
 
-import com.elextec.framework.common.request.RefUserRolesParam;
 import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.lease.manager.request.SysApplyParam;
-import com.elextec.lease.manager.request.SysUserParam;
-import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.model.mybatis.SysApply;
 import com.elextec.persist.model.mybatis.SysApplyExample;
-import com.elextec.persist.model.mybatis.SysUser;
-import com.elextec.persist.model.mybatis.SysUserExample;
 import com.elextec.persist.model.mybatis.ext.SysApplyExt;
-import com.elextec.persist.model.mybatis.ext.SysUserExt;
 
 import java.util.List;
 

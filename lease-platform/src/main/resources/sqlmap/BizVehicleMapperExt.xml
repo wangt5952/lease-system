@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.elextec.persist.dao.mybatis.BizVehicleMapperExt">
-    <resultMap extends="BaseResultMap" id="BizVehicleExtResultMap" type="com.elextec.lease.model.BizVehicleBatteryParts">
+    <resultMap extends="BaseResultMap" id="BizVehicleExtResultMap" type="com.elextec.persist.model.mybatis.ext.BizVehicleExt">
         <result column="mfrs_name" jdbcType="VARCHAR" property="mfrsName" />
         <result column="battery_id" jdbcType="VARCHAR" property="batteryId" />
         <result column="part_count" jdbcType="INTEGER" property="partCount" />
         <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+        <result column="login_name" jdbcType="VARCHAR" property="loginName"/>
     </resultMap>
 
     <select id="getVehicleInfoByUserId" parameterType="java.lang.String" resultMap="BizVehicleExtResultMap">
@@ -134,6 +135,7 @@
         d.battery_id battery_id,
         b.mfrs_name mfrs_name,
         o.org_name org_name,
+        u.login_name login_name,
         (select COUNT(*) FROM biz_ref_vehicle_parts where vehicle_id = a.id and unbind_time IS NULL) part_count
         FROM
         biz_vehicle a
@@ -142,6 +144,7 @@
         LEFT JOIN biz_ref_org_vehicle r ON a.id = r.vehicle_id AND r.unbind_time IS NULL
         LEFT JOIN biz_organization o ON r.org_id = o.id
         LEFT JOIN biz_ref_user_vehicle r1 ON a.id = r1.vehicle_id AND r1.unbind_time IS NULL
+        LEFT JOIN sys_user u ON u.id = r1.user_id
         <where>
             1=1
             <if test="keyStr != null and keyStr != ''" >
@@ -234,7 +237,7 @@
         <if test="batteryCodes != null and batteryCodes.size > 0" >
             AND
           <foreach collection="batteryCodes" item="batteryCode" index="index"  open="(" separator="or" close=")">
-              b.battery_code = #{batteryCode}
+              b.battery_code = #{batteryCode,jdbcType=VARCHAR}
           </foreach>
         </if>
         <if test="userId != null and userId != ''" >

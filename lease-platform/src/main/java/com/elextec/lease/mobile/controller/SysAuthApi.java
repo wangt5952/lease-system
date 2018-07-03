@@ -12,12 +12,12 @@ import com.elextec.framework.utils.*;
 import com.elextec.lease.manager.service.BizOrganizationService;
 import com.elextec.lease.manager.service.SysAuthService;
 import com.elextec.lease.manager.service.SysUserService;
-import com.elextec.lease.model.BizVehicleBatteryParts;
 import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.field.enums.RealNameAuthFlag;
 import com.elextec.persist.field.enums.RecordStatus;
 import com.elextec.persist.model.mybatis.SysUser;
 import com.elextec.persist.model.mybatis.SysUserExample;
+import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 import com.elextec.persist.model.mybatis.ext.SysUserExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,7 +238,8 @@ public class SysAuthApi extends BaseController {
 
             //获取用户关联车辆信息
             SysUserExt user = (SysUserExt)loginVo.get(WzConstants.KEY_USER_INFO);
-            List<BizVehicleBatteryParts> vehicleBatteryPartss = sysUserService.getVehiclePartsById(user.getId());
+//            List<BizVehicleBatteryParts> vehicleBatteryPartss = sysUserService.getVehiclePartsById(user.getId());
+            List<BizVehicleExt> vehicleBatteryPartss = sysUserService.getVehiclePartsById(user.getId());
 
             // 组织登录返回信息
             Map<String, Object> loginInfo = new HashMap<String, Object>();
@@ -1018,7 +1019,8 @@ public class SysAuthApi extends BaseController {
             userInfo.remove(WzConstants.KEY_USER_INFO);
             userInfo.put(WzConstants.KEY_USER_INFO, sysUserExt);
             //获取用户关联车辆信息
-            List<BizVehicleBatteryParts> vehicleBatteryPartsLs = sysUserService.getVehiclePartsById(sysUserExt.getId());
+//            List<BizVehicleBatteryParts> vehicleBatteryPartsLs = sysUserService.getVehiclePartsById(sysUserExt.getId());
+            List<BizVehicleExt> vehicleBatteryPartsLs = sysUserService.getVehiclePartsById(sysUserExt.getId());
             userInfo.remove(WzConstants.KEY_VEHICLE_INFO);
             userInfo.put(WzConstants.KEY_VEHICLE_INFO, vehicleBatteryPartsLs);
             // 设置超时时间
