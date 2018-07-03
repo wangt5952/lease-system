@@ -261,7 +261,7 @@
         <el-form-item prop="batteryId" :rules="[{required:true, message:'请选择电池'}]" label="电池">
           <el-select style="width:100%;" v-model="bindForm.batteryId" filterable placeholder="请输入电池 电池编号、电池货名、电池品牌、电池型号、电池参数、生产商ID、生产商名" :loading="bindForm_batteryLoading">
             <el-option v-for="o in bindForm_batteryList" :key="o.id" :label="`${o.batteryBrand}-${o.batteryPn}`" :value="o.id">
-              <span style="float: left">{{ o.batteryBrand }}</span>
+              <span style="float: left">{{ o.batteryCode }}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">{{ o.batteryPn }}</span>
             </el-option>
           </el-select>
@@ -410,7 +410,7 @@
           </div>
         </div>
         <div class="vehicleLocationClass" style="width:100%; height:100%">
-          <baidu-map @ready="handler" style="width: 100%;height:450px" :center="center" :zoom="zoom" >
+          <baidu-map @ready="handler" style="width: 100%;height:450px" :center="center" :zoom="zoom" auto-resize>
             <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
             <bm-marker 
               :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
@@ -619,7 +619,7 @@ export default {
   },
   methods: {
     handler ({BMap, map}) {
-      console.log(BMap, map);
+      console.log('handler');
       this.center.lng = 116.404;
       this.center.lat = 39.915;
       this.zoom = 15;
@@ -633,7 +633,7 @@ export default {
         this.vehiclLocation = respData[0];
         console.log(this.vehiclLocation);
         // 设置地图中心点
-        this.center = {
+        const center = this.center = {
           lng: respData[0].LON, lat: respData[0].LAT,
         };
         // this.zoom = 15;
@@ -647,7 +647,6 @@ export default {
         // 逆地址解析 (根据经纬度获取详细地址)
         const loc = await this.getLocation(respData[0].LON, respData[0].LAT);
         this.address = loc.address;
-
         this.vehicleLocationVisible = true;
       } catch (e) {
         if (!e) return;
@@ -1106,7 +1105,6 @@ export default {
     await this.reload();
     // await this.partsReload();
     this.loading = false;
-    console.log(new BMap()); 
   },
 };
 </script>
