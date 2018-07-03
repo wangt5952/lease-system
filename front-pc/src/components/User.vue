@@ -236,22 +236,22 @@
       </div>
       <div class="pidPhoto">
         <!-- 身份证正面 -->
-        <div class="imgClass">
-          <img :src="userPidPath + cardPhotoFront" alt="">
+        <div>
+          <img class="imgClass" :src="userPidPath + cardPhotoFront" alt="">
           <!-- <div class="imgButton">
             <el-button type="primary" @click="searchPid(pid,'cardPhotoFront')">放大观看</el-button>
           </div> -->
         </div>
         <!-- 身份证反面 -->
-        <div class="imgClass">
-          <img :src="userPidPath + cardPhotoBack" alt="">
+        <div>
+          <img class="imgClass" :src="userPidPath + cardPhotoBack" alt="">
           <!-- <div class="imgButton">
             <el-button type="primary" @click="searchPid(pid,'cardPhotoBack')">放大观看</el-button>
           </div> -->
         </div>
         <!-- 双手举起身份证 -->
-        <div class="imgClass">
-          <img :src="userPidPath + cardPhotoGroup" alt="">
+        <div>
+          <img class="imgClass" :src="userPidPath + cardPhotoGroup" alt="">
           <!-- <div class="imgButton">
             <el-button type="primary" @click="searchPid(pid,'cardPhotoGroup')">放大观看</el-button>
           </div> -->
@@ -855,7 +855,7 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.pidPhoto > .imgClass {
+.pidPhoto .imgClass {
   margin: 10px;
   height: 339px;
   width: 350px;
