@@ -609,20 +609,6 @@ export default {
       res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
     }),
   },
-  watch: {
-    search: {
-      async handler() {
-        await this.reload();
-      },
-      deep: true,
-    },
-    partsSearch: {
-      async handler() {
-        await this.partsReload();
-      },
-      deep: true,
-    },
-  },
   methods: {
     handler ({BMap, map}) {
       this.center.lng = this.vehiclLocation.LON;
@@ -639,8 +625,6 @@ export default {
           }
       });
     },
-    // 显示车辆地址信息
-    // 显示车辆地址信息
     async showVehicleLocation(row) {
       try {
         // 获取坐标

@@ -143,7 +143,7 @@
           </template>
         </div>
         <div class="item"><div class="item-name">昵称</div><div class="item-value">{{ userInfo.nickName }}</div></div>
-        
+
         <div class="item"><div class="item-name">实名认证标示</div>
           <template v-if="userInfo.userRealNameAuthFlag === 'AUTHORIZED'">
             <div class="item-value">已实名</div>
@@ -216,22 +216,51 @@ export default {
       if (this.openInfo) this.userDialogVisible = true;
       else this.userDialogVisible = false;
     },
-    async handler() {
-      const r = await this.getCurrentPositions();
+    async handler({BMap}) {
+
+      // 浏览器定位
+      const getCurPosition = () => {
+        return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
+          if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+            resolve(r);
+          } else {
+            reject(this.getStatus());
+          }
+        }, { enableHighAccuracy: true }));
+      };
+
+      const r = await getCurPosition();
       this.mapCenter = {
         lng: r.point.lng, lat: r.point.lat,
       };
-      return r;
+
+      // 逆地址解析(根据经纬度获取详细地址).
+      const getLocation = (lng, lat) => {
+        return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+      };
+
+      // 根据地址获取经纬度
+      const getAddressByLocation = (address) => {
+        return new Promise(resolve => (new global.BMap.Geocoder()).getPoint(address, (res) => {
+          // 给一个初始化坐标
+          new BMap.Point(118.805297, 32.052656);
+          resolve(res);
+        }, address));
+      };
+
+      window.getLocation = getLocation;
+      window.getAddressByLocation = getAddressByLocation;
+
     },
     // 搜索
     async searchStreet(value) {
       try {
-        const point = await this.getAddressByLocation(value);
+        const point = await getAddressByLocation(value);
         if (!point) throw new Error('请输入正确地址');
         this.mapCenter = {
           lng: point.lng, lat: point.lat,
         };
-        const loc = await this.getLocation(point.lng, point.lat);
+        const loc = await getLocation(point.lng, point.lat);
         this.searchAddress = loc.address;
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: point.lng, lat: point.lat, radius: 2000,
@@ -324,7 +353,7 @@ export default {
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
-        const loc = await this.getLocation(lng, lat);
+        const loc = await getLocation(lng, lat);
         this.searchAddress = loc.address;
         // this.circlePath.center = e.target.getCenter();
         // 获取缩放等级
@@ -378,7 +407,7 @@ export default {
         lng: item.LON, lat: item.LAT,
       };
       this.selectedId = item.vehicleId;
-      const loc = await this.getLocation(item.LON, item.LAT);
+      const loc = await getLocation(item.LON, item.LAT);
       this.address = loc.address;
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
@@ -449,11 +478,9 @@ export default {
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
-      // 获取当前城市的浏览器定位 (根据经纬度获取范围车辆).
-      const r = await this.getCurrentPositions();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: r.point.lng, lat: r.point.lat, radius: 2000,
+          lng: this.mapCenter.lng, lat: this.mapCenter.lat, radius: 2000,
         })).body;
         if (code === '200') {
           this.radiusVehicleList = respData;
@@ -467,7 +494,7 @@ export default {
           this.mapCenter = {
             lng: this.radiusVehicleList[0].LON, lat: this.radiusVehicleList[0].LAT,
           };
-          const loc = await this.getLocation(this.radiusVehicleList[0].LON, this.radiusVehicleList[0].LAT);
+          const loc = await getLocation(this.radiusVehicleList[0].LON, this.radiusVehicleList[0].LAT);
           this.address = loc.address;
         } else {
           this.radiusVehicleList = [];
@@ -546,33 +573,11 @@ export default {
             })),
           };
         });
-        
+
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    },
-    // 逆地址解析(根据经纬度获取详细地址).
-    getLocation(lng, lat) {
-      return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
-    },
-    // 根据地址获取经纬度
-    getAddressByLocation(address) {
-      return new Promise(resolve => (new global.BMap.Geocoder()).getPoint(address, (res) => {
-        // 给一个初始化坐标
-        new BMap.Point(118.805297, 32.052656);
-        resolve(res);
-      }, address));
-    },
-    // 浏览器定位
-    getCurrentPositions() {
-      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
-        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
-          resolve(r);
-        } else {
-          reject(this.getStatus());
-        }
-      }, { enableHighAccuracy: true }));
     },
   },
 };
