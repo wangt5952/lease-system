@@ -92,6 +92,11 @@
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm2(row)">查看配件</el-button>
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="200">
+          <template slot-scope="{row}">
+            <el-button icon="el-icon-search" size="mini" type="text" @click="showVehicleLocation(row)">查看车辆位置</el-button>
+          </template>
+        </el-table-column>
       </template>
     </el-table>
 
@@ -408,21 +413,17 @@
     </el-dialog>
 
     <div class="vehicleClass">
-      <el-dialog title="" :visible.sync="vehicleLocationVisible" :before-close="closeVehicleLocationVisible" style="margin-top:-60px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
-        <div style="width:100%;height:20px;background-color:#3D1D93">
-          <div style="display: flex;justify-content:center;line-height:20px">
-            <span style="color:#fff;font-size:1em;">详细地址: {{ address }}</span>
-          </div>
-        </div>
+      <el-dialog :title="`详细地址：${this.address}`" :visible.sync="vehicleLocationVisible" :before-close="closeVehicleLocationVisible" style="margin-top:-60px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
         <div class="vehicleLocationClass" style="width:100%; height:100%">
-          <baidu-map @ready="handler" style="width: 100%;height:450px" :center="center" :zoom="zoom" auto-resize>
+          <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:450px" :center="center" :zoom="zoom" >
             <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
-            <bm-marker 
+            <bm-marker
               :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
-              :position="{lng: vehiclLocation.LON, lat: vehiclLocation.LAT}">
+              :position="markerCenter"
+              :dragging="false">
             </bm-marker>
-            <bm-info-window :position="PopCenter" :title="infoWindow.title" :show="infoWindow.show" :width="70" :height="60">
-              <p v-text="infoWindow.contents"></p>
+            <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">
+              <p v-text="this.infoWindow.contents"></p>
             </bm-info-window>
           </baidu-map>
         </div>
@@ -624,11 +625,21 @@ export default {
   },
   methods: {
     handler ({BMap, map}) {
-      console.log('handler');
       this.center.lng = this.vehiclLocation.LON;
       this.center.lat = this.vehiclLocation.LAT;
+      this.PopCenter = this.center;
+      this.markerCenter = this.center;
       this.zoom = 15;
+
+      const myGeo = new BMap.Geocoder();
+      const thisOne = this;
+      myGeo.getLocation(new BMap.Point(thisOne.center.lng, thisOne.center.lat), function(result){
+          if (result){
+            thisOne.address = result.address
+          }
+      });
     },
+    // 显示车辆地址信息
     // 显示车辆地址信息
     async showVehicleLocation(row) {
       try {
@@ -636,29 +647,17 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk',[row.id])).body;
         if (code !== '200') throw new Error(message);
         this.vehiclLocation = respData[0];
-        console.log(this.vehiclLocation);
-        // 设置地图中心点
-        const center = {
-          lng: respData[0].LON, lat: respData[0].LAT,
-        };
-        // this.zoom = 15;
-        this.PopCenter = center;
 
         // 获取电池剩余电量
         const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
         if (pCode !== '200') throw new Error(pMess);
         this.infoWindow.contents = `电池电量:  ${pRes[0].RSOC} %`;
 
-        // 逆地址解析 (根据经纬度获取详细地址)
-        const loc = await this.getLocation(respData[0].LON, respData[0].LAT);
-        this.address = loc.address;
         this.vehicleLocationVisible = true;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
-        const pMess = e.statusText || e.pMess;
-        this.$message.error(pMess);
       }
     },
     // 车辆地址 回调
@@ -678,7 +677,6 @@ export default {
       let results;
       this.tableHeader = data.header;
       this.tableData = results = data.results;
-      console.log(results);
       // _.pluck(results, )
     },
 
@@ -1081,10 +1079,6 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    },
-    // 逆地址解析(根据经纬度获取详细地址).
-    getLocation(lng, lat) {
-      return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
     },
     // 获取制造商集合
     async getMfrs() {
