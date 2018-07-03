@@ -38,12 +38,12 @@
     </div>
 
     <el-table :data="vehicle.list" class="vehicleHeight">
-      <el-table-column prop="vehicleCode" label="编号" width="150"></el-table-column>
+      <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
       <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
       <!--<el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>-->
-      <el-table-column prop="mfrsName" label="生产商" width="100"></el-table-column>
+      <el-table-column prop="mfrsName" label="生产商" width="120"></el-table-column>
       <el-table-column prop="vehicleStatusText" label="状态" width="80">
         <template slot-scope="{row}">
           <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
@@ -55,14 +55,14 @@
       <!-- 管理员查看的信息 -->
       <template v-if="key_user_info.userType === 'PLATFORM'">
         <!-- v-show="key_user_info.userType === 'PLATFORM' || key_user_info.userType === 'ENTERPRISE'" -->
-        <el-table-column label="电池" width="200">
+        <el-table-column label="电池" width="160">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="!row.batteryId" type="text" @click="showBindForm(row)">绑定</el-button>
             <el-button v-else type="text" @click="handleUnbind(row)">解绑</el-button>
             <el-button v-if="row.batteryId" icon="el-icon-search" size="mini" type="text" @click="showHoldBindBatteryForm(row)">查看电池</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="配件" width="200">
+        <el-table-column label="配件" width="180">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button icon="el-icon-plus" size="mini" type="text" @click="showBindPartForm(row)">添加配件</el-button>
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm(row)">查看配件</el-button>
@@ -402,34 +402,37 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="车辆地理位置信息" :visible.sync="vehicleLocationVisible" :before-close="closeVehicleLocationVisible" style="margin-top:-60px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
-      <div style="width:100%;height:100px;background-color:#3D1D93">
-        <div style="display: flex;justify-content:center;line-height:100px">
-          <span style="color:#fff;font-size:3em;">详细地址: {{ address }}</span>
+    <div class="vehicleClass">
+      <el-dialog title="" :visible.sync="vehicleLocationVisible" :before-close="closeVehicleLocationVisible" style="margin-top:-60px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
+        <div style="width:100%;height:20px;background-color:#3D1D93">
+          <div style="display: flex;justify-content:center;line-height:20px">
+            <span style="color:#fff;font-size:1em;">详细地址: {{ address }}</span>
+          </div>
         </div>
-      </div>
-      <div class="vehicleLocationClass" style="width:100%; height: 300px;">
-        <baidu-map style="width: 100%;height:100%" :center="mapCenter" :zoom="zoomNum" :scroll-wheel-zoom="true">
-          <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
-          <bm-marker 
-            :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
-            :position="{lng: vehiclLocation.LON, lat: vehiclLocation.LAT}">
-          </bm-marker>
-          <bm-info-window :position="PopCenter" :title="infoWindow.title" :show="infoWindow.show" :width="70" :height="60">
-            <p v-text="infoWindow.contents"></p>
-          </bm-info-window>
-        </baidu-map>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="closeVehicleLocationVisible">关闭</el-button>
-      </span>
-    </el-dialog>
+        <div class="vehicleLocationClass" style="width:100%; height:100%">
+          <baidu-map @ready="handler" style="width: 100%;height:450px" :center="center" :zoom="zoom" >
+            <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
+            <bm-marker 
+              :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
+              :position="{lng: vehiclLocation.LON, lat: vehiclLocation.LAT}">
+            </bm-marker>
+            <bm-info-window :position="PopCenter" :title="infoWindow.title" :show="infoWindow.show" :width="70" :height="60">
+              <p v-text="infoWindow.contents"></p>
+            </bm-info-window>
+          </baidu-map>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeVehicleLocationVisible">关闭</el-button>
+        </span>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
 // import BMap from 'BMap'
+// import {MP} from '../util/map'
 import UploadExcelComponent from '@/components/UploadExcel/index'
 import {
   mapState,
@@ -466,13 +469,13 @@ export default {
   components: { UploadExcelComponent },
   data() {
     return {
-      mapCenter: '南京',
-      zoomNum: 16,
+      center: {lng: 0, lat: 0},
+      zoom: 3,
       vehiclLocation:{},
       vehiclPowner:{},
       PopCenter: { lng: 0, lat: 0 },
       infoWindow: {
-        title: '电量显示',
+        title: '',
         show: true,
         contents: ''
       },
@@ -615,6 +618,12 @@ export default {
     },
   },
   methods: {
+    handler ({BMap, map}) {
+      console.log(BMap, map);
+      this.center.lng = 116.404;
+      this.center.lat = 39.915;
+      this.zoom = 15;
+    },
     // 显示车辆地址信息
     async showVehicleLocation(row) {
       try {
@@ -622,17 +631,18 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk',[row.id])).body;
         if (code !== '200') throw new Error(message);
         this.vehiclLocation = respData[0];
+        console.log(this.vehiclLocation);
         // 设置地图中心点
-        this.mapCenter = {
+        this.center = {
           lng: respData[0].LON, lat: respData[0].LAT,
         };
-        this.zoomNum = 15;
-        this.PopCenter = this.mapCenter;
+        // this.zoom = 15;
+        this.PopCenter = this.center;
 
         // 获取电池剩余电量
         const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
         if (pCode !== '200') throw new Error(pMess);
-        this.infoWindow.contents = `电池电量剩余:  ${pRes[0].RSOC} %`;
+        this.infoWindow.contents = `电池电量:  ${pRes[0].RSOC} %`;
 
         // 逆地址解析 (根据经纬度获取详细地址)
         const loc = await this.getLocation(respData[0].LON, respData[0].LAT);
@@ -1096,13 +1106,14 @@ export default {
     await this.reload();
     // await this.partsReload();
     this.loading = false;
+    console.log(new BMap()); 
   },
 };
 </script>
 
 <style scoped>
-.vehicleLocationClass {
-  
+.vehicleClass >>>.el-dialog__body   {
+    padding: 15px 25px 5px;
 }
 
 .edit-form >>> .el-form-item {
