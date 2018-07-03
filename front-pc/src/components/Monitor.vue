@@ -314,8 +314,8 @@ export default {
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
-        // const loc = await this.getLocation(lng, lat);
-        // this.searchAddress = loc.address;
+        const loc = await this.getLocation(lng, lat);
+        this.searchAddress = loc.address;
         // this.circlePath.center = e.target.getCenter();
         // 获取缩放等级
         const zoomNum = e.target.getZoom();
