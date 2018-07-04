@@ -416,15 +416,17 @@
       <div style="height:50px; width:100%">
         <div style="display:flex; justify-content:center; line-height:50px;font-size:1em;">
           {{ address }}
-          <div @click="closeAddresBut" style="position:absolute;left:650px;color:#409eff;cursor:pointer">
-            <i class="el-icon-circle-close-outline"></i>
+          <div @click="closeAddresBut" style="position:absolute;top:10px;left:650px;color:#409eff;cursor:pointer">
+            <!-- <i class="el-icon-circle-close-outline"></i> -->
+            <img src="../assets/close.png" alt="" style="height:30px; width:30px;">
           </div>
         </div>
       </div>
       <div style="display:flex; flex:1" >
-        <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:300px" :center="center" :zoom="zoom" >
+        <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:300px" :center="center" :zoom="zoom" :scroll-wheel-zoom="true">
           <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
           <bm-marker
+            @click="aaa"
             :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
             :position="markerCenter"
             :dragging="false">
@@ -621,6 +623,9 @@ export default {
     }),
   },
   methods: {
+    async aaa () {
+      this.infoWindow.show = !this.infoWindow.show;
+    },
     async handler ({BMap, map}) {
 
       this.center.lng = this.vehiclLocation.LON;
