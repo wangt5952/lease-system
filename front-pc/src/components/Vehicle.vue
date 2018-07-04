@@ -411,26 +411,25 @@
       </span>
     </el-dialog>
 
-    <div class="vehicleClass">
-      <el-dialog :title="`详细地址：${this.address}`" :visible.sync="vehicleLocationVisible" :before-close="closeVehicleLocationVisible" style="margin-top:-60px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
-        <div class="vehicleLocationClass" style="width:100%; height:100%">
-          <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:450px" :center="center" :zoom="zoom" >
-            <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
-            <bm-marker
-              :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
-              :position="markerCenter"
-              :dragging="false">
-            </bm-marker>
-            <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">
-              <p v-text="this.infoWindow.contents"></p>
-            </bm-info-window>
-          </baidu-map>
-        </div>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="closeVehicleLocationVisible">关闭</el-button>
-        </span>
-      </el-dialog>
+    <div class="vehicleLocationClass" :style="styleDiv" style="width:1000px; height:500px;position:absolute;top:100px;" >
+      
+      <div>
+        <baidu-map @ready="handler" id="baiduMap" style="width: 1000px;height:500px" :center="center" :zoom="zoom" >
+          <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
+          <bm-marker
+            :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
+            :position="markerCenter"
+            :dragging="false">
+          </bm-marker>
+          <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">
+            <p v-text="this.infoWindow.contents"></p>
+          </bm-info-window>
+        </baidu-map>
+      </div>
+      
     </div>
+    <!-- -->
+    
   </div>
 </template>
 
@@ -487,6 +486,7 @@ export default {
       },
       // 地址解析
       address: '',
+      styleDiv: 'display:none',
 
       // Excel表格参数
       tableData: [],
@@ -599,7 +599,7 @@ export default {
       holdPartsList2: [],
 
       // 车辆地址
-      vehicleLocationVisible: false,
+      vehicleLocationVisible: true,
     };
   },
   computed: {
@@ -610,12 +610,27 @@ export default {
     }),
   },
   methods: {
-    handler ({BMap, map}) {
-      this.center.lng = this.vehiclLocation.LON;
-      this.center.lat = this.vehiclLocation.LAT;
+    async handler ({BMap, map}) {
+      // 浏览器定位
+      const getCurPosition = () => {
+        return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
+          if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+            resolve(r);
+          } else {
+            reject(this.getStatus());
+          }
+        }, { enableHighAccuracy: true }));
+      };
+
+      const r = await getCurPosition();
+      this.center = {
+        lng: r.point.lng, lat: r.point.lat,
+      };
+      this.zoom = 17;
+      // this.center.lng = this.vehiclLocation.LON;
+      // this.center.lat = this.vehiclLocation.LAT;
       this.PopCenter = this.center;
       this.markerCenter = this.center;
-      this.zoom = 15;
 
       const myGeo = new BMap.Geocoder();
       const thisOne = this;
@@ -624,22 +639,39 @@ export default {
             thisOne.address = result.address
           }
       });
+
+      window.getCurPosition = getCurPosition;
     },
     async showVehicleLocation(row) {
       try {
         // 获取坐标
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk',[row.id])).body;
-        if (code !== '200') throw new Error(message);
+        if (code !== '200') {
+          this.styleDiv = 'display: block';
+          this.styleDiv = 'display: none';
+          // const r = await getCurPosition();
+          // this.center = {
+          //   lng: r.point.lng, lat: r.point.lat,
+          // };
+          // console.log(this.center);
+          console.log('没出来');
+          throw new Error(message);
+        }
+        console.log('出来');
+        this.styleDiv = 'display: none';
+        this.styleDiv = 'display: block';
         this.vehiclLocation = respData[0];
-
+        this.center = {
+          lng: respData[0].LON, lat: respData[0].LAT,
+        };
+        this.markerCenter = this.center;
+        this.PopCenter = this.center;
         // 获取电池剩余电量
         const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
         if (pCode !== '200') throw new Error(pMess);
         this.infoWindow.contents = `电池电量:  ${pRes[0].RSOC} %`;
 
-        this.vehicleLocationVisible = true;
-        this.vehicleLocationVisible = false;
-        this.vehicleLocationVisible = true;
+        // this.vehicleLocationVisible = true;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
