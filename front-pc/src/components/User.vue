@@ -465,8 +465,6 @@ export default {
           this.cardPhotoFront = data.userIcFront;
           this.cardPhotoBack = data.userIcBack;
           this.cardPhotoGroup = data.userIcGroup;
-          // console.log(this.userPidPath+this.cardPhotoFronta);
-          // console.log(this.userPidPath+this.cardPhotoGroup);
           this.photoFormVisible = true;
         }
       } catch (e) {

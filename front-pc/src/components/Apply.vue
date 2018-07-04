@@ -422,7 +422,6 @@ export default {
     handleClick() {
     },
     // handleClick(tab, event) {
-    //   console.log(tab, event);
     // },
     closeUnitApplyForm() {
       this.showFormVisible = false;
@@ -515,7 +514,6 @@ export default {
     // 驳回
     async reject() {
       const { appleForms } = this;
-      // console.log(appleForms);
       try {
         const { code, message } = (await this.$http.post('/api/manager/apply/applyapproval', {
           applyId: appleForms.id, flag: 'REJECT', examineContent: this.applyForm.examineContent,

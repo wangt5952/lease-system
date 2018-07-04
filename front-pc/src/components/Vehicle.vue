@@ -35,7 +35,7 @@
         </div>
       </template>
     </div>
-
+    
     <el-table :data="vehicle.list" class="vehicleHeight">
       <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
@@ -411,10 +411,18 @@
       </span>
     </el-dialog>
 
-    <div class="vehicleLocationClass" :style="styleDiv" style="width:1000px; height:500px;position:absolute;top:100px;" >
-      
-      <div>
-        <baidu-map @ready="handler" id="baiduMap" style="width: 1000px;height:500px" :center="center" :zoom="zoom" >
+    <!-- -->
+    <div class="vehicleLocationClass" :style="styleDiv">
+      <div style="height:50px; width:100%">
+        <div style="display:flex; justify-content:center; line-height:50px;font-size:1em;">
+          {{ address }}
+          <div @click="closeAddresBut" style="position:absolute;left:650px;color:#409eff;cursor:pointer">
+            <i class="el-icon-circle-close-outline"></i>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex:1" >
+        <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:300px" :center="center" :zoom="zoom" >
           <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
           <bm-marker
             :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
@@ -426,9 +434,12 @@
           </bm-info-window>
         </baidu-map>
       </div>
-      
+      <div>
+        <div @click="closeAddresBut" style="display:flex; justify-content:center;margin-top: 10px">
+          <el-button type="info">关闭</el-button>
+        </div>
+      </div>
     </div>
-    <!-- -->
     
   </div>
 </template>
@@ -486,7 +497,7 @@ export default {
       },
       // 地址解析
       address: '',
-      styleDiv: 'display:none',
+      styleDiv: 'display: block; opacity:0; z-index:-1',
 
       // Excel表格参数
       tableData: [],
@@ -611,61 +622,58 @@ export default {
   },
   methods: {
     async handler ({BMap, map}) {
-      // 浏览器定位
-      const getCurPosition = () => {
-        return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
-          if (this.getStatus() === BMAP_STATUS_SUCCESS) {
-            resolve(r);
-          } else {
-            reject(this.getStatus());
-          }
-        }, { enableHighAccuracy: true }));
-      };
 
-      const r = await getCurPosition();
-      this.center = {
-        lng: r.point.lng, lat: r.point.lat,
-      };
-      this.zoom = 17;
-      // this.center.lng = this.vehiclLocation.LON;
-      // this.center.lat = this.vehiclLocation.LAT;
+      this.center.lng = this.vehiclLocation.LON;
+      this.center.lat = this.vehiclLocation.LAT;
       this.PopCenter = this.center;
       this.markerCenter = this.center;
+      this.zoom = 17;
 
-      const myGeo = new BMap.Geocoder();
-      const thisOne = this;
-      myGeo.getLocation(new BMap.Point(thisOne.center.lng, thisOne.center.lat), function(result){
-          if (result){
-            thisOne.address = result.address
-          }
-      });
+      // const myGeo = new BMap.Geocoder();
+      // const thisOne = this;
+      // myGeo.getLocation(new BMap.Point(thisOne.center.lng, thisOne.center.lat), function(result){
+      //   if (result){
+      //     thisOne.address = result.address
+      //   }
+      // });
 
-      window.getCurPosition = getCurPosition;
+      // 逆地址解析(根据经纬度获取详细地址).
+      const getLocation = (lng, lat) => {
+        return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+      };
+      window.getLocation = getLocation;
     },
+    // 关闭车辆位置窗口按钮
+    closeAddresBut() {
+      this.styleDiv = 'display: block;opacity:0;z-index:-1';
+    },
+    // 车辆位置
     async showVehicleLocation(row) {
       try {
+        // this.styleDiv = 'display: block';
         // 获取坐标
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk',[row.id])).body;
         if (code !== '200') {
-          this.styleDiv = 'display: block';
-          this.styleDiv = 'display: none';
+          this.styleDiv = 'display: block;opacity:0;z-index:-1';
           // const r = await getCurPosition();
-          // this.center = {
-          //   lng: r.point.lng, lat: r.point.lat,
-          // };
-          // console.log(this.center);
-          console.log('没出来');
+          this.center = {
+            lng: 0, lat: 0,
+          };
           throw new Error(message);
         }
-        console.log('出来');
-        this.styleDiv = 'display: none';
-        this.styleDiv = 'display: block';
+        this.styleDiv = 'display: block; opacity:1;z-index:1';
+
+        this.zoom = 18;
         this.vehiclLocation = respData[0];
         this.center = {
           lng: respData[0].LON, lat: respData[0].LAT,
         };
         this.markerCenter = this.center;
         this.PopCenter = this.center;
+        const loc = await getLocation(respData[0].LON, respData[0].LAT);
+        if(loc) this.address = `地址: ${loc.address}` ;
+        else this.address = '地址: ';
+
         // 获取电池剩余电量
         const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
         if (pCode !== '200') throw new Error(pMess);
@@ -855,6 +863,7 @@ export default {
       await this.reload();
     },
     async reload() {
+      this.styleDiv = 'display: block;opacity:0;z-index:-1';
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
           currPage: this.vehicle.currentPage, pageSize: this.vehicle.pageSize, ...this.search,
@@ -1130,7 +1139,18 @@ export default {
 .vehicleClass >>>.el-dialog__body   {
     padding: 15px 25px 5px;
 }
-
+.vehicleLocationClass {
+  border:1px solid #f2f2f2;
+  display:flex;
+  background-color:#f2f2f2;
+  border-radius:5px;
+  flex-direction:column;
+  width:700px;
+  height:400px;
+  position:absolute;
+  left:350px;
+  top: 160px
+}
 .edit-form >>> .el-form-item {
   height: 55px;
 }
