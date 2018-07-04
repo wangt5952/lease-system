@@ -38,7 +38,7 @@
           <!-- 路线折线图 -->
           <bm-polyline v-if="selectedItem.path" :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
           <!-- 点聚合(图片所在位置) -->
-          <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
+          <bm-marker @click="aaa" :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
         </template>
         <bm-marker v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
       </baidu-map>
@@ -211,6 +211,9 @@ export default {
     },
   },
   methods: {
+    async aaa(){
+      console.log(11);
+    },
     openUserInfoVis() {
       console.log(this.openInfo);
       if (this.openInfo) this.userDialogVisible = true;
@@ -353,6 +356,7 @@ export default {
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
+        console.log(lng);
         const loc = await getLocation(lng, lat);
         this.searchAddress = loc.address;
         // this.circlePath.center = e.target.getCenter();
@@ -402,7 +406,6 @@ export default {
     },
     // 车辆单击事件
     async handleSelectItem(item) {
-      console.log(1);
       this.mapCenter = {
         lng: item.LON, lat: item.LAT,
       };
@@ -411,6 +414,31 @@ export default {
       this.address = loc.address;
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
+        console.log('第一个try');
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: item.LON, lat: item.LAT, radius: 2000,
+        })).body;
+        //
+        const loc = await getLocation(item.LON, item.LAT);
+        this.searchAddress = loc.address;
+        if (code === '200') {
+          this.radiusVehicleList = respData;
+          this.openInfo = true;
+        } else {
+          this.radiusVehicleList = [];
+          this.vehicleInfo = {};
+          this.powerInfo = {};
+          this.openInfo = false;;
+          this.address = '';
+          throw new Error(message);
+        }
+      } catch(e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+
+      try {
+        console.log('第2个try');
         // 车辆、电池信息
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
           id: item.vehicleId, flag: 'true',
@@ -475,6 +503,7 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
+      console.log('00');
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
