@@ -212,12 +212,15 @@ export default {
   },
   methods: {
     async aaa(){
+      console.log(11);
     },
     openUserInfoVis() {
+      console.log(this.openInfo);
       if (this.openInfo) this.userDialogVisible = true;
       else this.userDialogVisible = false;
     },
     async handler({BMap}) {
+
       // 浏览器定位
       const getCurPosition = () => {
         return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
@@ -353,6 +356,7 @@ export default {
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
+        console.log(lng);
         const loc = await getLocation(lng, lat);
         this.searchAddress = loc.address;
         // this.circlePath.center = e.target.getCenter();
@@ -410,6 +414,7 @@ export default {
       this.address = loc.address;
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
+        console.log('第一个try');
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: item.LON, lat: item.LAT, radius: 2000,
         })).body;
@@ -433,6 +438,7 @@ export default {
       }
 
       try {
+        console.log('第2个try');
         // 车辆、电池信息
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
           id: item.vehicleId, flag: 'true',
@@ -446,15 +452,23 @@ export default {
           this.vehicleInfo = {};
           this.powerInfo = {};
         }
+        console.log(1);
         // 使用人信息 (如果没有用户则不显示用户信息)
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.vehicleId])).body;
         if (userCode !== '200') {
+          console.log('异常')
           this.openInfo = false;
+          console.log(this.openInfo);
+          console.log(1);
           this.userInfo = {nickName:'',loginName:'',userMobile:'',userType:'',userRealNameAuthFlag:'',userPid:'',orgName:'',userStatus:''};
+          console.log(userMessage);
+          console.log(this.userInfo);
           throw new Error(userMessage);
         }
+        console.log('完成');
         this.openInfo = true;
         this.userInfo = userRespData;
+        console.log(1);
         // 车辆某段时间内行驶路径
         const { time } = this.searchLocList;
         const id = item.vehicleId;
@@ -489,6 +503,7 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
+      console.log('00');
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
