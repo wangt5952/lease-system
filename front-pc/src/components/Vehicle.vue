@@ -615,6 +615,20 @@ export default {
       vehicleLocationVisible: true,
     };
   },
+  watch: {
+    search: {
+      async handler() {
+        await this.reload();
+      },
+      deep: true,
+    },
+    partsSearch: {
+      async handler() {
+        await this.partsReload();
+      },
+      deep: true,
+    },
+  },
   computed: {
     ...mapState({
       key_user_info: state => state.key_user_info,
