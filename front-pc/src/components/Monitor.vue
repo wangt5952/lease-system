@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <baidu-map @ready="handler" id="baiduMap" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+      <baidu-map @ready="handler" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
         <!--1 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
@@ -38,9 +38,9 @@
           <!-- 路线折线图 -->
           <bm-polyline v-if="selectedItem.path" :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
           <!-- 点聚合(图片所在位置) -->
-          <bm-marker @click="aaa" :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
+          <bm-marker @click="clickVehicle" :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
         </template>
-        <bm-marker v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
+        <bm-marker @click="clickVehicle" v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
       </baidu-map>
 
       <!-- Element <DateTimePicker>日期选择器控件 -->
@@ -211,21 +211,20 @@ export default {
     },
   },
   methods: {
-    async aaa(){
-      console.log(11);
+    // 
+    async clickVehicle(){
     },
     openUserInfoVis() {
-      console.log(this.openInfo);
       if (this.openInfo) this.userDialogVisible = true;
       else this.userDialogVisible = false;
     },
     async handler({BMap, map}) {
 
-      //根据经纬度定位
       const new_point = (lng, lat) => {
         const point = new BMap.Point(lng, lat);
         map.panTo(point);
       };
+      window.new_point = new_point;
       // 浏览器定位
       const getCurPosition = () => {
         return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
@@ -256,7 +255,6 @@ export default {
         }, address));
       };
 
-      window.new_point = new_point;
       window.getLocation = getLocation;
       window.getAddressByLocation = getAddressByLocation;
 
@@ -407,15 +405,19 @@ export default {
     showVehiclePath() {
       this.vehiclePathVisible = !this.vehiclePathVisible;
     },
+    handleMapClick() {
+    },
     // 车辆单击事件
     async handleSelectItem(item) {
-      await new_point(item.LON, item.LAT);
+      // this.mapCenter = {
+      //   lng: item.LON, lat: item.LAT,
+      // };
+      await new_point(item.LON,item.LAT);
       this.selectedId = item.vehicleId;
       const loc = await getLocation(item.LON, item.LAT);
       this.address = loc.address;
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
-        console.log('第一个try');
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: item.LON, lat: item.LAT, radius: 2000,
         })).body;
@@ -439,7 +441,6 @@ export default {
       }
 
       try {
-        console.log('第2个try');
         // 车辆、电池信息
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
           id: item.vehicleId, flag: 'true',
@@ -453,23 +454,15 @@ export default {
           this.vehicleInfo = {};
           this.powerInfo = {};
         }
-        console.log(1);
         // 使用人信息 (如果没有用户则不显示用户信息)
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.vehicleId])).body;
         if (userCode !== '200') {
-          console.log('异常')
           this.openInfo = false;
-          console.log(this.openInfo);
-          console.log(1);
           this.userInfo = {nickName:'',loginName:'',userMobile:'',userType:'',userRealNameAuthFlag:'',userPid:'',orgName:'',userStatus:''};
-          console.log(userMessage);
-          console.log(this.userInfo);
           throw new Error(userMessage);
         }
-        console.log('完成');
         this.openInfo = true;
         this.userInfo = userRespData;
-        console.log(1);
         // 车辆某段时间内行驶路径
         const { time } = this.searchLocList;
         const id = item.vehicleId;
@@ -486,9 +479,10 @@ export default {
           if (!locList.length) {
             throw new Error('该时间段没有行驶轨迹');
           }
-          this.mapCenter = {
-            lng: locList[0].LON, lat: locList[0].LAT,
-          };
+          await new_point(locList[0].LON, locList[0].LAT);
+          // this.mapCenter = {
+          //   lng: locList[0].LON, lat: locList[0].LAT,
+          // };
           this.radiusVehicleList = _.map(this.radiusVehicleList, (o) => {
             if (o.id !== id) return o;
             return {
@@ -504,7 +498,6 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-      console.log('00');
     },
     // 获取所有车辆信息
     async reloadVehicleList() {

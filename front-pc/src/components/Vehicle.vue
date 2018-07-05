@@ -35,7 +35,7 @@
         </div>
       </template>
     </div>
-
+    
     <el-table :data="vehicle.list" class="vehicleHeight">
       <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
@@ -412,7 +412,7 @@
     </el-dialog>
 
     <!-- -->
-    <div class="vehicleLocationClass" :style="styleDiv">
+    <div class="vehicleLocationClass" :style="styleDiv" @keyup.esc="closeAddresBut">
       <div style="height:50px; width:100%">
         <div style="display:flex; justify-content:center; line-height:50px;font-size:1em;">
           {{ address }}
@@ -426,14 +426,15 @@
         <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:300px" :center="center" :zoom="zoom" :scroll-wheel-zoom="true">
           <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
           <bm-marker
-            @click="aaa"
+            @click="clickBmInfoWindow"
             :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
             :position="markerCenter"
             :dragging="false">
+            <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">
+              <p v-text="this.infoWindow.contents"></p>
+            </bm-info-window>
           </bm-marker>
-          <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">
-            <p v-text="this.infoWindow.contents"></p>
-          </bm-info-window>
+          
         </baidu-map>
       </div>
       <div>
@@ -442,7 +443,7 @@
         </div>
       </div>
     </div>
-
+    
   </div>
 </template>
 
@@ -637,40 +638,28 @@ export default {
     }),
   },
   methods: {
-    async aaa () {
+    async clickBmInfoWindow () {
       this.infoWindow.show = !this.infoWindow.show;
     },
     async handler ({BMap, map}) {
 
-      // this.center.lng = this.vehiclLocation.LON;
-      // this.center.lat = this.vehiclLocation.LAT;
-      this.PopCenter = {
-        lng: this.vehiclLocation.LOT, lat: this.vehiclLocation.LAT };
-      //this.markerCenter = this.center;
-      this.zoom = 17;
+      this.center.lng = this.vehiclLocation.LON;
+      this.center.lat = this.vehiclLocation.LAT;
+      this.PopCenter = this.center;
+      this.markerCenter = this.center;
+      this.zoom = 16;
 
-      //根据经纬度定位
       const new_point = (lng, lat) => {
-        map.clearOverlays();
+        this.center.lng = this.vehiclLocation.LON;
+        this.center.lat = this.vehiclLocation.LAT;
+        this.PopCenter = this.center;
+        this.markerCenter = this.center;
+        this.zoom = 16;
         const point = new BMap.Point(lng, lat);
-        const myIcon = new BMap.Icon('/static/vehicle-cur.svg', new BMap.Size(48, 48), {
-          imageSize: new BMap.Size(48,48),
-        });
-        const mkr = new BMap.Marker(point,{icon:myIcon});
-        map.addOverlay(mkr);
         map.panTo(point);
-        // const opts = {
-        //   width : 70,
-        //   height: 60,
-        //   title : this.infoWindow.title,
-        // };
-        // const infoWindow = new BMap.InfoWindow(this.infoWindow.contents, opts);
-        //
-        // mkr.addEventListener("click", function(){
-        //   map.openInfoWindow(infoWindow,point);
-        // });
       };
-
+      // 
+      window.new_point = new_point;
       // const myGeo = new BMap.Geocoder();
       // const thisOne = this;
       // myGeo.getLocation(new BMap.Point(thisOne.center.lng, thisOne.center.lat), function(result){
@@ -678,13 +667,23 @@ export default {
       //     thisOne.address = result.address
       //   }
       // });
+      // 浏览器定位
+      const getCurPosition = () => {
+        return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
+          if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+            resolve(r);
+          } else {
+            reject(this.getStatus());
+          }
+        }, { enableHighAccuracy: true }));
+      };
 
       // 逆地址解析(根据经纬度获取详细地址).
       const getLocation = (lng, lat) => {
         return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
       };
-      window.new_point = new_point;
       window.getLocation = getLocation;
+      window.getCurPosition = getCurPosition;
     },
     // 关闭车辆位置窗口按钮
     closeAddresBut() {
@@ -697,18 +696,26 @@ export default {
         // 获取坐标
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk',[row.id])).body;
         if (code !== '200') {
-          this.styleDiv = 'display: block;opacity:0;z-index:-1';
           // const r = await getCurPosition();
-          this.center = {
-            lng: 0, lat: 0,
-          };
+          // this.center = {
+          //   lng: 0, lat: 0,
+          // };
+          // const r = await getCurPosition();
+          // await new_point(r.longitude, r.latitude);
+          this.styleDiv = 'display: block;opacity:0;z-index:-1';
           throw new Error(message);
         }
+        this.vehiclLocation = respData[0];
+        await new_point(respData[0].LON, respData[0].LAT);
         this.styleDiv = 'display: block; opacity:1;z-index:1';
 
-        //this.zoom = 18;
-        this.vehiclLocation = respData[0];
-        await new_point(this.vehiclLocation.LON, this.vehiclLocation.LAT);
+        // this.zoom = 16;
+
+        // this.center = {
+        //   lng: respData[0].LON, lat: respData[0].LAT,
+        // };
+        // this.markerCenter = this.center;
+        // this.PopCenter = this.center;
 
         const loc = await getLocation(respData[0].LON, respData[0].LAT);
         if(loc) this.address = `地址: ${loc.address}` ;
