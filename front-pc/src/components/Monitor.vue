@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <baidu-map @ready="handler" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
+      <baidu-map @ready="handler" id="baiduMap" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
         <!--1 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
         <!-- 右上角控件 -->
@@ -219,8 +219,13 @@ export default {
       if (this.openInfo) this.userDialogVisible = true;
       else this.userDialogVisible = false;
     },
-    async handler({BMap}) {
+    async handler({BMap, map}) {
 
+      //根据经纬度定位
+      const new_point = (lng, lat) => {
+        const point = new BMap.Point(lng, lat);
+        map.panTo(point);
+      };
       // 浏览器定位
       const getCurPosition = () => {
         return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
@@ -251,6 +256,7 @@ export default {
         }, address));
       };
 
+      window.new_point = new_point;
       window.getLocation = getLocation;
       window.getAddressByLocation = getAddressByLocation;
 
@@ -356,7 +362,6 @@ export default {
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
-        console.log(lng);
         const loc = await getLocation(lng, lat);
         this.searchAddress = loc.address;
         // this.circlePath.center = e.target.getCenter();
@@ -402,13 +407,9 @@ export default {
     showVehiclePath() {
       this.vehiclePathVisible = !this.vehiclePathVisible;
     },
-    handleMapClick() {
-    },
     // 车辆单击事件
     async handleSelectItem(item) {
-      this.mapCenter = {
-        lng: item.LON, lat: item.LAT,
-      };
+      await new_point(item.LON, item.LAT);
       this.selectedId = item.vehicleId;
       const loc = await getLocation(item.LON, item.LAT);
       this.address = loc.address;
