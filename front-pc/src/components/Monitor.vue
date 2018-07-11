@@ -18,7 +18,7 @@
           <div style="font-size:12px;height:40px;color:#5f7aa7;">车辆当前位置</div>
         </div>
           <div @click="batteryDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ selectedItem.RSOC ? selectedItem.RSOC+"%" : selectedItem.RSOC }}</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ selectedItem.Rsoc ? selectedItem.Rsoc+"%" : selectedItem.Rsoc }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
         <div @click="openUserInfoVis" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
@@ -90,7 +90,7 @@
         <div @click="handleSelectItem(o)" v-for="o in radiusVehicleList" :key="o.vehicleId" :style="selectedId == o.vehicleId ? {backgroundColor:'#39a0f6', color:'#fff'} : {backgroundColor:'#e7eef5', color:'#9096ad'}"
           style="display:flex;align-items:center;height:36px;margin-bottom:5px;border-radius:3px;text-align:center;cursor:pointer;">
           <div style="flex:1;">{{o.vehicleCode}}</div>
-          <div style="width:80px;">{{o.RSOC}}%</div>
+          <div style="width:80px;">{{o.Rsoc}}%</div>
         </div>
       </div>
     </div>

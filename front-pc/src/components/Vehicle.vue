@@ -724,7 +724,7 @@ export default {
         // 获取电池剩余电量
         const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
         if (pCode !== '200') throw new Error(pMess);
-        this.infoWindow.contents = `电池电量:  ${pRes[0].RSOC} %`;
+        this.infoWindow.contents = `电池电量:  ${pRes[0].Rsoc} %`;
 
         // this.vehicleLocationVisible = true;
       } catch (e) {
