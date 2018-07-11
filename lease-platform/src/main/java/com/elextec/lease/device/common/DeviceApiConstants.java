@@ -48,7 +48,7 @@ public class DeviceApiConstants {
     /** 车辆信息. */
     public static final String REQ_DEVICE_DATA = "DeviceData";
     /** 剩余容量百分比. */
-    public static final String REQ_RSOC = "RSOC";
+    public static final String REQ_RSOC = "Rsoc";
     /** 保护状态，不同数字保护状态说明不一. */
     public static final String REQ_PS = "PS";
     /** 设备电量. */
@@ -61,4 +61,6 @@ public class DeviceApiConstants {
 
     /** 当前系统时间. */
     public static final String KEY_CURRENT_SYS_TIME = "CurrentSysTime";
+    /** 上传时间. */
+    public static final String KEY_UPTIME = "uptime";
 }
