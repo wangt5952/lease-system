@@ -21,8 +21,8 @@
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ selectedItem.RSOC ? selectedItem.RSOC+"%" : selectedItem.RSOC }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
-        <div @click="userDialogVisible = true" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ userInfo.userName }}</div>
+        <div @click="openUserInfoVis" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ userInfo.nickName }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">使用人</div>
         </div>
       </div>
@@ -38,9 +38,9 @@
           <!-- 路线折线图 -->
           <bm-polyline v-if="selectedItem.path" :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
           <!-- 点聚合(图片所在位置) -->
-          <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
+          <bm-marker @click="clickVehicle" :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
         </template>
-        <bm-marker v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
+        <bm-marker @click="clickVehicle" v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
       </baidu-map>
 
       <!-- Element <DateTimePicker>日期选择器控件 -->
@@ -133,42 +133,43 @@
         </template>
       </div>
     </el-dialog>
+    <template v-if="openInfo">
+      <el-dialog title="用户信息" :visible.sync="userDialogVisible" width="30%">
+        <div class="item"><div class="item-name">用户名</div><div class="item-value">{{ userInfo.loginName }}</div></div>
+        <div class="item"><div class="item-name">手机号码</div><div class="item-value">{{ userInfo.userMobile }}</div></div>
+        <div class="item"><div class="item-name">用户类别</div>
+          <template v-if="userInfo.userType === 'INDIVIDUAL'">
+            <div class="item-value">个人</div>
+          </template>
+        </div>
+        <div class="item"><div class="item-name">昵称</div><div class="item-value">{{ userInfo.nickName }}</div></div>
 
-    <el-dialog title="用户信息" :visible.sync="userDialogVisible" width="30%">
-      <div class="item"><div class="item-name">用户名</div><div class="item-value">{{ userInfo.loginName }}</div></div>
-      <div class="item"><div class="item-name">手机号码</div><div class="item-value">{{ userInfo.userMobile }}</div></div>
-      <div class="item"><div class="item-name">用户类别</div>
-        <template v-if="userInfo.userType === 'INDIVIDUAL'">
-          <div class="item-value">个人</div>
-        </template>
-      </div>
-      <div class="item"><div class="item-name">昵称</div><div class="item-value">{{ userInfo.nickName }}</div></div>
-      <div class="item"><div class="item-name">姓名</div><div class="item-value">{{ userInfo.userName }}</div></div>
-      <div class="item"><div class="item-name">实名认证标示</div>
-        <template v-if="userInfo.userRealNameAuthFlag === 'AUTHORIZED'">
-          <div class="item-value">已实名</div>
-        </template>
-        <template v-else-if="userInfo.userRealNameAuthFlag === 'UNAUTHORIZED'">
-          <div class="item-value">未实名</div>
-        </template>
-        <template v-else>
-          <div class="item-value"></div>
-        </template>
-      </div>
-      <div class="item"><div class="item-name">身份证号</div><div class="item-value">{{ userInfo.userPid }}</div></div>
-      <div class="item"><div class="item-name">所属企业</div><div class="item-value">{{ userInfo.orgName }}</div></div>
-      <div class="item"><div class="item-name">用户状态</div>
-        <template v-if="userInfo.userStatus === 'NORMAL'">
-          <div class="item-value">正常</div>
-        </template>
-        <template v-if="userInfo.userStatus === 'FREEZE'">
-          <div class="item-value">冻结</div>
-        </template>
-        <template v-if="userInfo.userStatus === 'INVALID'">
-          <div class="item-value">作废</div>
-        </template>
-      </div>
-    </el-dialog>
+        <div class="item"><div class="item-name">实名认证标示</div>
+          <template v-if="userInfo.userRealNameAuthFlag === 'AUTHORIZED'">
+            <div class="item-value">已实名</div>
+          </template>
+          <template v-else-if="userInfo.userRealNameAuthFlag === 'UNAUTHORIZED'">
+            <div class="item-value">未实名</div>
+          </template>
+          <template v-else>
+            <div class="item-value"></div>
+          </template>
+        </div>
+        <div class="item"><div class="item-name">身份证号</div><div class="item-value">{{ userInfo.userPid }}</div></div>
+        <div class="item"><div class="item-name">所属企业</div><div class="item-value">{{ userInfo.orgName }}</div></div>
+        <div class="item"><div class="item-name">用户状态</div>
+          <template v-if="userInfo.userStatus === 'NORMAL'">
+            <div class="item-value">正常</div>
+          </template>
+          <template v-if="userInfo.userStatus === 'FREEZE'">
+            <div class="item-value">冻结</div>
+          </template>
+          <template v-if="userInfo.userStatus === 'INVALID'">
+            <div class="item-value">作废</div>
+          </template>
+        </div>
+      </el-dialog>
+    </template>
   </div>
 </template>
 
@@ -197,6 +198,8 @@ export default {
 
       // 指定范围内的车辆集合
       radiusVehicleList: [],
+
+      openInfo: false,
     };
   },
   async mounted() {
@@ -208,24 +211,63 @@ export default {
     },
   },
   methods: {
-    async handler() {
-      const r = await this.getCurrentPositions();
+    // 
+    async clickVehicle(){
+    },
+    openUserInfoVis() {
+      if (this.openInfo) this.userDialogVisible = true;
+      else this.userDialogVisible = false;
+    },
+    async handler({BMap, map}) {
+
+      const new_point = (lng, lat) => {
+        const point = new BMap.Point(lng, lat);
+        map.panTo(point);
+      };
+      window.new_point = new_point;
+      // 浏览器定位
+      const getCurPosition = () => {
+        return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
+          if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+            resolve(r);
+          } else {
+            reject(this.getStatus());
+          }
+        }, { enableHighAccuracy: true }));
+      };
+
+      const r = await getCurPosition();
       this.mapCenter = {
         lng: r.point.lng, lat: r.point.lat,
       };
-      return r;
+
+      // 逆地址解析(根据经纬度获取详细地址).
+      const getLocation = (lng, lat) => {
+        return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+      };
+
+      // 根据地址获取经纬度
+      const getAddressByLocation = (address) => {
+        return new Promise(resolve => (new global.BMap.Geocoder()).getPoint(address, (res) => {
+          // 给一个初始化坐标
+          new BMap.Point(118.805297, 32.052656);
+          resolve(res);
+        }, address));
+      };
+
+      window.getLocation = getLocation;
+      window.getAddressByLocation = getAddressByLocation;
+
     },
     // 搜索
     async searchStreet(value) {
       try {
-        const point = await this.getAddressByLocation(value);
-        console.log(point);
+        const point = await getAddressByLocation(value);
         if (!point) throw new Error('请输入正确地址');
         this.mapCenter = {
           lng: point.lng, lat: point.lat,
         };
-        const loc = await this.getLocation(point.lng, point.lat);
-        console.log(loc);
+        const loc = await getLocation(point.lng, point.lat);
         this.searchAddress = loc.address;
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: point.lng, lat: point.lat, radius: 2000,
@@ -248,12 +290,15 @@ export default {
           lng: e.point.lng, lat: e.point.lat, radius: 1000,
         })).body;
         if (code === '200') {
+          this.openInfo = true;
           this.radiusVehicleList = respData;
         } else {
           this.radiusVehicleList = [];
           this.vehicleInfo = {};
           this.powerInfo = {};
-          this.userInfo = {};
+          // this.userInfo = {};
+          this.userInfo = {nickName:'',loginName:'',userMobile:'',userType:'',userRealNameAuthFlag:'',userPid:'',orgName:'',userStatus:''};
+          this.openInfo = false;
           this.address = '';
           throw new Error(message);
         }
@@ -292,12 +337,13 @@ export default {
               lng: lng, lat: lat, radius: num,
             })).body;
             if (code === '200') {
+              this.openInfo = true;
               this.radiusVehicleList = respData;
             } else {
               this.radiusVehicleList = [];
               this.vehicleInfo = {};
               this.powerInfo = {};
-              this.userInfo = {};
+              this.openInfo = false;;
               this.address = '';
               throw new Error(message);
             }
@@ -314,7 +360,7 @@ export default {
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
-        const loc = await this.getLocation(lng, lat);
+        const loc = await getLocation(lng, lat);
         this.searchAddress = loc.address;
         // this.circlePath.center = e.target.getCenter();
         // 获取缩放等级
@@ -338,11 +384,12 @@ export default {
             })).body;
             if (code === '200') {
               this.radiusVehicleList = respData;
+              this.openInfo = true;
             } else {
               this.radiusVehicleList = [];
               this.vehicleInfo = {};
               this.powerInfo = {};
-              this.userInfo = {};
+              this.openInfo = false;;
               this.address = '';
               throw new Error(message);
             }
@@ -362,11 +409,37 @@ export default {
     },
     // 车辆单击事件
     async handleSelectItem(item) {
-      this.mapCenter = {
-        lng: item.LON, lat: item.LAT,
-      };
+      // this.mapCenter = {
+      //   lng: item.LON, lat: item.LAT,
+      // };
+      await new_point(item.LON,item.LAT);
       this.selectedId = item.vehicleId;
+      const loc = await getLocation(item.LON, item.LAT);
+      this.address = loc.address;
       // 车辆、电池、使用人、根据半径查看车辆 信息
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
+          lng: item.LON, lat: item.LAT, radius: 2000,
+        })).body;
+        //
+        const loc = await getLocation(item.LON, item.LAT);
+        this.searchAddress = loc.address;
+        if (code === '200') {
+          this.radiusVehicleList = respData;
+          this.openInfo = true;
+        } else {
+          this.radiusVehicleList = [];
+          this.vehicleInfo = {};
+          this.powerInfo = {};
+          this.openInfo = false;;
+          this.address = '';
+          throw new Error(message);
+        }
+      } catch(e) {
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+
       try {
         // 车辆、电池信息
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
@@ -381,16 +454,15 @@ export default {
           this.vehicleInfo = {};
           this.powerInfo = {};
         }
-
         // 使用人信息 (如果没有用户则不显示用户信息)
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.vehicleId])).body;
-        if (userCode !== '200') throw new Error(userMessage);
-        if (userRespData) {
-          this.userInfo = userRespData;
-        } else {
-          this.userInfo = {};
+        if (userCode !== '200') {
+          this.openInfo = false;
+          this.userInfo = {nickName:'',loginName:'',userMobile:'',userType:'',userRealNameAuthFlag:'',userPid:'',orgName:'',userStatus:''};
+          throw new Error(userMessage);
         }
-
+        this.openInfo = true;
+        this.userInfo = userRespData;
         // 车辆某段时间内行驶路径
         const { time } = this.searchLocList;
         const id = item.vehicleId;
@@ -407,9 +479,10 @@ export default {
           if (!locList.length) {
             throw new Error('该时间段没有行驶轨迹');
           }
-          this.mapCenter = {
-            lng: locList[0].LON, lat: locList[0].LAT,
-          };
+          await new_point(locList[0].LON, locList[0].LAT);
+          // this.mapCenter = {
+          //   lng: locList[0].LON, lat: locList[0].LAT,
+          // };
           this.radiusVehicleList = _.map(this.radiusVehicleList, (o) => {
             if (o.id !== id) return o;
             return {
@@ -424,24 +497,13 @@ export default {
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
-
-        const userMessage = e.statusText || e.userMessage;
-        this.$message.error(userMessage);
-
-        const radiusMessage = e.statusText || e.radiusMessage;
-        this.$message.error(radiusMessage);
       }
-
-      const loc = await this.getLocation(item.LON, item.LAT);
-      this.address = loc.address;
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
-      // 获取当前城市的浏览器定位 (根据经纬度获取范围车辆).
-      const r = await this.getCurrentPositions();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: r.point.lng, lat: r.point.lat, radius: 2000,
+          lng: this.mapCenter.lng, lat: this.mapCenter.lat, radius: 2000,
         })).body;
         if (code === '200') {
           this.radiusVehicleList = respData;
@@ -455,13 +517,13 @@ export default {
           this.mapCenter = {
             lng: this.radiusVehicleList[0].LON, lat: this.radiusVehicleList[0].LAT,
           };
-          const loc = await this.getLocation(this.radiusVehicleList[0].LON, this.radiusVehicleList[0].LAT);
+          const loc = await getLocation(this.radiusVehicleList[0].LON, this.radiusVehicleList[0].LAT);
           this.address = loc.address;
         } else {
           this.radiusVehicleList = [];
           this.vehicleInfo = {};
           this.powerInfo = {};
-          this.userInfo = {};
+          this.openInfo = false;;
           this.address = '';
           throw new Error(message);
         }
@@ -494,8 +556,11 @@ export default {
       const { radiusVehicleList } = this;
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [radiusVehicleList[0].vehicleId])).body;
-        if (code !== '200') throw new Error(message);
-        if (respData) this.userInfo = respData;
+        if (code !== '200') {
+          this.userInfo = {nickName:'',loginName:'',userMobile:'',userType:'',userRealNameAuthFlag:'',userPid:'',orgName:'',userStatus:''};
+          throw new Error(message);
+        }
+        this.userInfo = respData;
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
@@ -511,7 +576,6 @@ export default {
         param.endTime = time[1];
       }
       // 日期格式 转换成时间戳 moment('').format('X')
-      // console.log(moment(time[0]).format('X'));
       try {
         const { respData } = (await this.$http.post('/api/manager/vehicle/gettrackbytime', param)).body;
         // if (code !== '200') throw new Error(message);
@@ -532,33 +596,11 @@ export default {
             })),
           };
         });
-        
+
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    },
-    // 逆地址解析(根据经纬度获取详细地址).
-    getLocation(lng, lat) {
-      return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
-    },
-    // 根据地址获取经纬度
-    getAddressByLocation(address) {
-      return new Promise(resolve => (new global.BMap.Geocoder()).getPoint(address, (res) => {
-        // 给一个初始化坐标
-        new BMap.Point(118.805297, 32.052656);
-        resolve(res);
-      }, address));
-    },
-    // 浏览器定位
-    getCurrentPositions() {
-      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
-        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
-          resolve(r);
-        } else {
-          reject(this.getStatus());
-        }
-      }, { enableHighAccuracy: true }));
     },
   },
 };

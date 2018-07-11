@@ -23,7 +23,6 @@
         </el-form-item>
       </el-form>
       <!-- 平台 -->
-      
       <!-- <template v-if="key_user_info.userType === 'PLATFORM'">
         <div style="margin-right:10px;">
           <el-button icon="el-icon-tickets" type="success" size="small" @click="importExcelVisible = true">导入 Excel 表格</el-button>
@@ -36,14 +35,19 @@
         </div>
       </template>
     </div>
-
+    
     <el-table :data="vehicle.list" class="vehicleHeight">
       <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
-      <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
-      <!--<el-table-column prop="orgName" label="所属单位" width="100"></el-table-column>-->
-      <el-table-column prop="mfrsName" label="生产商" width="120"></el-table-column>
+      <template v-if="key_user_info.userType === 'ENTERPRISE'">
+        <el-table-column prop="vehicleMadeIn" label="车辆产地" width="100"></el-table-column>
+        <el-table-column prop="mfrsName" label="生产商" width="120"></el-table-column>
+      </template>
+      <template v-if="key_user_info.userType === 'PLATFORM'">
+        <el-table-column prop="orgName" label="所属企业" width="150"></el-table-column>
+      </template>
+      <el-table-column prop="loginName" label="所属用户" width="120"></el-table-column>
       <el-table-column prop="vehicleStatusText" label="状态" width="80">
         <template slot-scope="{row}">
           <template v-if="row.vehicleStatus === 'NORMAL'"><span style="color:#17BE45">正常</span></template>
@@ -70,7 +74,7 @@
         </el-table-column>
         <el-table-column label="操作" width="200">
           <template slot-scope="{row}">
-            <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">编辑</el-button>
+            <el-button icon="el-icon-edit" size="mini" type="text" @click="showEditForm(row)">详情/编辑</el-button>
             <el-button icon="el-icon-search" size="mini" type="text" @click="showVehicleLocation(row)">查看车辆位置</el-button>
           </template>
         </el-table-column>
@@ -85,6 +89,11 @@
         <el-table-column label="配件" width="200">
           <template v-if="row.vehicleStatus === 'NORMAL'" slot-scope="{row}">
             <el-button v-if="row.partCount > 0" icon="el-icon-search" size="mini" type="text" @click="showHoldBindPartForm2(row)">查看配件</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="200">
+          <template slot-scope="{row}">
+            <el-button icon="el-icon-search" size="mini" type="text" @click="showVehicleLocation(row)">查看车辆位置</el-button>
           </template>
         </el-table-column>
       </template>
@@ -402,30 +411,39 @@
       </span>
     </el-dialog>
 
-    <div class="vehicleClass">
-      <el-dialog title="" :visible.sync="vehicleLocationVisible" :before-close="closeVehicleLocationVisible" style="margin-top:-60px" :close-on-click-modal="false" width="90%" center close-on-press-escape>
-        <div style="width:100%;height:20px;background-color:#3D1D93">
-          <div style="display: flex;justify-content:center;line-height:20px">
-            <span style="color:#fff;font-size:1em;">详细地址: {{ address }}</span>
+    <!-- -->
+    <div class="vehicleLocationClass" :style="styleDiv" @keyup.esc="closeAddresBut">
+      <div style="height:50px; width:100%">
+        <div style="display:flex; justify-content:center; line-height:50px;font-size:1em;">
+          {{ address }}
+          <div @click="closeAddresBut" style="position:absolute;top:10px;left:650px;color:#409eff;cursor:pointer">
+            <!-- <i class="el-icon-circle-close-outline"></i> -->
+            <img src="../assets/close.png" alt="" style="height:30px; width:30px;">
           </div>
         </div>
-        <div class="vehicleLocationClass" style="width:100%; height:100%">
-          <baidu-map @ready="handler" style="width: 100%;height:450px" :center="center" :zoom="zoom" auto-resize>
-            <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
-            <bm-marker 
-              :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
-              :position="{lng: vehiclLocation.LON, lat: vehiclLocation.LAT}">
-            </bm-marker>
-            <bm-info-window :position="PopCenter" :title="infoWindow.title" :show="infoWindow.show" :width="70" :height="60">
-              <p v-text="infoWindow.contents"></p>
+      </div>
+      <div style="display:flex; flex:1" >
+        <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:300px" :center="center" :zoom="zoom" :scroll-wheel-zoom="true">
+          <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
+          <bm-marker
+            @click="clickBmInfoWindow"
+            :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
+            :position="markerCenter"
+            :dragging="false">
+            <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">
+              <p v-text="this.infoWindow.contents"></p>
             </bm-info-window>
-          </baidu-map>
+          </bm-marker>
+          
+        </baidu-map>
+      </div>
+      <div>
+        <div @click="closeAddresBut" style="display:flex; justify-content:center;margin-top: 10px">
+          <el-button type="info">关闭</el-button>
         </div>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="closeVehicleLocationVisible">关闭</el-button>
-        </span>
-      </el-dialog>
+      </div>
     </div>
+    
   </div>
 </template>
 
@@ -473,6 +491,7 @@ export default {
       zoom: 3,
       vehiclLocation:{},
       vehiclPowner:{},
+      markerCenter: { lng: 0, lat: 0 },
       PopCenter: { lng: 0, lat: 0 },
       infoWindow: {
         title: '',
@@ -481,6 +500,7 @@ export default {
       },
       // 地址解析
       address: '',
+      styleDiv: 'display: block; opacity:0; z-index:-1',
 
       // Excel表格参数
       tableData: [],
@@ -593,15 +613,8 @@ export default {
       holdPartsList2: [],
 
       // 车辆地址
-      vehicleLocationVisible: false,
+      vehicleLocationVisible: true,
     };
-  },
-  computed: {
-    ...mapState({
-      key_user_info: state => state.key_user_info,
-      key_res_info: state => state.key_res_info,
-      res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
-    }),
   },
   watch: {
     search: {
@@ -617,43 +630,107 @@ export default {
       deep: true,
     },
   },
+  computed: {
+    ...mapState({
+      key_user_info: state => state.key_user_info,
+      key_res_info: state => state.key_res_info,
+      res: state => _.mapValues(_.groupBy(state.key_res_info, 'resType'), o => _.map(o, 'resCode')),
+    }),
+  },
   methods: {
-    handler ({BMap, map}) {
-      console.log('handler');
-      this.center.lng = 116.404;
-      this.center.lat = 39.915;
-      this.zoom = 15;
+    async clickBmInfoWindow () {
+      this.infoWindow.show = !this.infoWindow.show;
     },
-    // 显示车辆地址信息
+    async handler ({BMap, map}) {
+
+      this.center.lng = this.vehiclLocation.LON;
+      this.center.lat = this.vehiclLocation.LAT;
+      this.PopCenter = this.center;
+      this.markerCenter = this.center;
+      this.zoom = 16;
+
+      const new_point = (lng, lat) => {
+        this.center.lng = this.vehiclLocation.LON;
+        this.center.lat = this.vehiclLocation.LAT;
+        this.PopCenter = this.center;
+        this.markerCenter = this.center;
+        this.zoom = 16;
+        const point = new BMap.Point(lng, lat);
+        map.panTo(point);
+      };
+      // 
+      window.new_point = new_point;
+      // const myGeo = new BMap.Geocoder();
+      // const thisOne = this;
+      // myGeo.getLocation(new BMap.Point(thisOne.center.lng, thisOne.center.lat), function(result){
+      //   if (result){
+      //     thisOne.address = result.address
+      //   }
+      // });
+      // 浏览器定位
+      const getCurPosition = () => {
+        return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
+          if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+            resolve(r);
+          } else {
+            reject(this.getStatus());
+          }
+        }, { enableHighAccuracy: true }));
+      };
+
+      // 逆地址解析(根据经纬度获取详细地址).
+      const getLocation = (lng, lat) => {
+        return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+      };
+      window.getLocation = getLocation;
+      window.getCurPosition = getCurPosition;
+    },
+    // 关闭车辆位置窗口按钮
+    closeAddresBut() {
+      this.styleDiv = 'display: block;opacity:0;z-index:-1';
+    },
+    // 车辆位置
     async showVehicleLocation(row) {
       try {
+        // this.styleDiv = 'display: block';
         // 获取坐标
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getlocbyvehiclepk',[row.id])).body;
-        if (code !== '200') throw new Error(message);
+        if (code !== '200') {
+          // const r = await getCurPosition();
+          // this.center = {
+          //   lng: 0, lat: 0,
+          // };
+          // const r = await getCurPosition();
+          // await new_point(r.longitude, r.latitude);
+          this.styleDiv = 'display: block;opacity:0;z-index:-1';
+          throw new Error(message);
+        }
         this.vehiclLocation = respData[0];
-        console.log(this.vehiclLocation);
-        // 设置地图中心点
-        const center = this.center = {
-          lng: respData[0].LON, lat: respData[0].LAT,
-        };
-        // this.zoom = 15;
-        this.PopCenter = this.center;
+        await new_point(respData[0].LON, respData[0].LAT);
+        this.styleDiv = 'display: block; opacity:1;z-index:1';
+
+        // this.zoom = 16;
+
+        // this.center = {
+        //   lng: respData[0].LON, lat: respData[0].LAT,
+        // };
+        // this.markerCenter = this.center;
+        // this.PopCenter = this.center;
+
+        const loc = await getLocation(respData[0].LON, respData[0].LAT);
+        if(loc) this.address = `地址: ${loc.address}` ;
+        else this.address = '地址: ';
 
         // 获取电池剩余电量
         const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
         if (pCode !== '200') throw new Error(pMess);
         this.infoWindow.contents = `电池电量:  ${pRes[0].RSOC} %`;
 
-        // 逆地址解析 (根据经纬度获取详细地址)
-        const loc = await this.getLocation(respData[0].LON, respData[0].LAT);
-        this.address = loc.address;
-        this.vehicleLocationVisible = true;
+        // this.vehicleLocationVisible = true;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
-        const pMess = e.statusText || e.pMess;
-        this.$message.error(pMess);
       }
     },
     // 车辆地址 回调
@@ -673,7 +750,6 @@ export default {
       let results;
       this.tableHeader = data.header;
       this.tableData = results = data.results;
-      console.log(results);
       // _.pluck(results, )
     },
 
@@ -834,6 +910,7 @@ export default {
       await this.reload();
     },
     async reload() {
+      this.styleDiv = 'display: block;opacity:0;z-index:-1';
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/list', {
           currPage: this.vehicle.currentPage, pageSize: this.vehicle.pageSize, ...this.search,
@@ -1077,10 +1154,6 @@ export default {
         this.$message.error(message);
       }
     },
-    // 逆地址解析(根据经纬度获取详细地址).
-    getLocation(lng, lat) {
-      return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
-    },
     // 获取制造商集合
     async getMfrs() {
       // 平台用户权限
@@ -1113,7 +1186,18 @@ export default {
 .vehicleClass >>>.el-dialog__body   {
     padding: 15px 25px 5px;
 }
-
+.vehicleLocationClass {
+  border:1px solid #f2f2f2;
+  display:flex;
+  background-color:#f2f2f2;
+  border-radius:5px;
+  flex-direction:column;
+  width:700px;
+  height:400px;
+  position:absolute;
+  left:350px;
+  top: 160px
+}
 .edit-form >>> .el-form-item {
   height: 55px;
 }

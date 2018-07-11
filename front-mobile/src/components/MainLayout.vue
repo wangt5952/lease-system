@@ -151,23 +151,24 @@ export default {
       this.infoWindow.contents = `剩余电量：${respData[0].RSOC}%`;
     },
     async handler() {
-      const r = await this.getCurrentPosition();
+      const getCurrentPosition = () => {
+        this.$vux.loading.show({ text: 'Loading' });
+        const thisOne = this;
+        return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
+          if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
+            setTimeout(() => { thisOne.$vux.loading.hide(); }, 1000);
+            resolve(r);
+          } else {
+            reject(this.getStatus());
+          }
+        }, { enableHighAccuracy: true }));
+      };
+
+      const r = await getCurrentPosition();
       this.mapCenter.lng = r.point.lng;
       this.mapCenter.lat = r.point.lat;
       this.Center.lng = r.point.lng;
       this.Center.lat = r.point.lat;
-    },
-    getCurrentPosition() {
-      this.$vux.loading.show({ text: 'Loading' });
-      const thisOne = this;
-      return new Promise((resolve, reject) => (new global.BMap.Geolocation()).getCurrentPosition(function get(r) {
-        if (this.getStatus() === global.BMAP_STATUS_SUCCESS) {
-          setTimeout(() => { thisOne.$vux.loading.hide(); }, 1000);
-          resolve(r);
-        } else {
-          reject(this.getStatus());
-        }
-      }, { enableHighAccuracy: true }));
     },
     async location() {
       if (this.vehicleId.length === 0) {

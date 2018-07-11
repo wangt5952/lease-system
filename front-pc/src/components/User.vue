@@ -192,7 +192,6 @@
       </el-pagination>
       <span slot="footer" class="dialog-footer">
         <el-button @click="vehicleFormVisible = false">关闭</el-button>
-        <el-button type="primary" @click="saveVehicleForm">保存</el-button>
       </span>
     </el-dialog>
     <el-dialog title="用户车辆列表" :visible.sync="userVehicleFormVisible" style="margin-top:-50px" :close-on-click-modal="false" width="80%">
@@ -466,8 +465,6 @@ export default {
           this.cardPhotoFront = data.userIcFront;
           this.cardPhotoBack = data.userIcBack;
           this.cardPhotoGroup = data.userIcGroup;
-          // console.log(this.userPidPath+this.cardPhotoFronta);
-          // console.log(this.userPidPath+this.cardPhotoGroup);
           this.photoFormVisible = true;
         }
       } catch (e) {
@@ -651,10 +648,6 @@ export default {
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
-    },
-    saveVehicleForm() {
-      this.$message.success('保存成功');
-      this.vehicleFormVisible = false;
     },
 
     // 用户车辆
