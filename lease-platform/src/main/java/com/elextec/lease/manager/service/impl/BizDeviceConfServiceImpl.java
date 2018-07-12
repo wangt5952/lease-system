@@ -274,4 +274,5 @@ public class BizDeviceConfServiceImpl implements BizDeviceConfService {
         }
         return map;
     }
+
 }

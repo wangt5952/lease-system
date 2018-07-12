@@ -654,5 +654,6 @@ public class BizDeviceConfController extends BaseController {
         }
         return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.getLocationByDevice(bizDeviceConfKey));
     }
+    
 
 }

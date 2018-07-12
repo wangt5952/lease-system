@@ -89,5 +89,4 @@ public interface BizDeviceConfService {
      * @return 定位
      */
     public Map<String,Object> getLocationByDevice(BizDeviceConfKey bizDeviceConfKey);
-
 }
