@@ -17,14 +17,17 @@ import com.elextec.persist.field.enums.OrgAndUserType;
 import com.elextec.persist.model.mybatis.BizDeviceConf;
 import com.elextec.persist.model.mybatis.BizDeviceConfKey;
 import com.elextec.persist.model.mybatis.SysUser;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -121,6 +124,82 @@ public class BizDeviceConfController extends BaseController {
             MessageResponse mr = new MessageResponse(RunningResult.SUCCESS, devPageResp);
             return mr;
         }
+    }
+
+    /**
+     * 查询结果列表（增加电量和定位）
+     * @param param 查询及分页参数
+     * @param request
+     * <pre>
+     *     {
+     *         keyStr:查询关键字（非必填，模糊查询，可填写设备ID）,
+     *         deviceType:设备ID（非必填，包括VEHICLE、BATTERY、PARTS）,
+     *         needPaging:是否需要分页（仅为false时不需要分页，其余情况均需要分页）,
+     *         currPage:当前页（needPaging不为false时必填）,
+     *         pageSize:每页记录数（needPaging不为false时必填）
+     *     }
+     * </pre>
+     * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:[
+     *             {
+     *                 deviceId:设备ID,
+     *                 deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *                 perSet:请求间隔时间（单位：秒）,
+     *                 reset:硬件复位标志（0：无处理；1；复位重启）,
+     *                 request:主动请求数据标志（0：无处理；1：主动请求）,
+     *                 RSOC:电量，
+     *                 LON:经度，
+     *                 LAT:纬度
+     *             },
+     *             ... ...
+     *         ]
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/lists",method = RequestMethod.POST)
+    public MessageResponse lists(@RequestBody String param,HttpServletRequest request){
+        if (WzStringUtil.isBlank(param)) {
+            //参数为空，则报无参数
+            return new MessageResponse(RunningResult.NO_PARAM);
+        }
+        BizDeviceConfParam bizDeviceConfParam = null;
+        try {
+            String paramStr = URLDecoder.decode(param, "utf-8");
+            bizDeviceConfParam = JSONObject.parseObject(paramStr,BizDeviceConfParam.class);
+            if (bizDeviceConfParam == null) {
+                //参数解析失败
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+            }
+            SysUser sysUser = super.getLoginUserInfo(request);
+            if (sysUser == null) {
+                //用户认证超时
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if (sysUser.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
+                    || sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                //如果是企业和个人则无法调用该接口
+                return new MessageResponse(RunningResult.NO_FUNCTION_PERMISSION);
+            }
+            if (WzStringUtil.isNotBlank(bizDeviceConfParam.getNeedPaging())
+                    && bizDeviceConfParam.getNeedPaging().equals("false")) {
+                //是否分页不能为空并且是false
+                bizDeviceConfParam.setNeedPaging("false");
+            }
+            if (bizDeviceConfParam.getCurrPage() == null
+                    || bizDeviceConfParam.getPageSize() == null) {
+                //如果当前页和每页显示数量为空的话则提示未获得参数
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"未获得分页参数");
+            }
+            //分页参数为true
+            bizDeviceConfParam.setNeedPaging("true");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.lists(Boolean.valueOf(bizDeviceConfParam.getNeedPaging()),bizDeviceConfParam));
     }
 
     /**
@@ -476,4 +555,104 @@ public class BizDeviceConfController extends BaseController {
             return mr;
         }
     }
+
+    /**
+     * 根据设备id查询当前设备的电量
+     * <pre>
+     *     [deviceId]
+     * </pre>
+     * @param param 设备id
+     * @param request 登录
+     * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *             RSOC:电量
+     *         }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/getElectricByDevice",method = RequestMethod.POST)
+    public MessageResponse getElectricByDevice(@RequestBody String param,HttpServletRequest request) {
+        if (WzStringUtil.isBlank(param)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        }
+        List<String> list = null;
+        try {
+            String paramStr = URLDecoder.decode(param,"utf-8");
+            list = JSONObject.parseObject(paramStr,List.class);
+            if (WzStringUtil.isBlank(list.get(0))) {
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+            }
+            SysUser sysUser = super.getLoginUserInfo(request);
+            if (sysUser == null) {
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if (sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())
+                    || sysUser.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"无权限操作");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.getElectricByDevice(list.get(0)));
+    }
+
+    /**
+     * 根据设备id查询当前设备的定位
+     * <pre>
+     *     {
+     *         deviceId:设备ID,
+     *         deviceType:设备类别（VEHICLE-车辆、BATTERY-电池、PARTS-配件）,
+     *     }
+     * </pre>
+     * @param param 设备id
+     * @param request 登录
+     * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回消息,
+     *         respData:{
+     *
+     *         }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/getLocationByDevice",method = RequestMethod.POST)
+    public MessageResponse getLocationByDevice(@RequestBody String param,HttpServletRequest request) {
+        if (WzStringUtil.isBlank(param)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        }
+        BizDeviceConfKey bizDeviceConfKey = null;
+        try {
+            String paramStr = URLDecoder.decode(param,"utf-8");
+            bizDeviceConfKey = JSONObject.parseObject(paramStr,BizDeviceConfKey.class);
+            if (bizDeviceConfKey == null){
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR);
+            }
+            SysUser sysUser = super.getLoginUserInfo(request);
+            if (sysUser == null) {
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if (sysUser.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())
+                    || sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())) {
+                return new MessageResponse(RunningResult.NO_PERMISSION);
+            }
+            if (WzStringUtil.isBlank(bizDeviceConfKey.getDeviceId())) {
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"设备id不能为空");
+            }
+            if (!bizDeviceConfKey.getDeviceType().toString().equals(DeviceType.BATTERY.toString())
+                    && !bizDeviceConfKey.getDeviceType().toString().equals(DeviceType.VEHICLE.toString())
+                    && !bizDeviceConfKey.getDeviceType().toString().equals(DeviceType.PARTS.toString())) {
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"设备类型错误");
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.getLocationByDevice(bizDeviceConfKey));
+    }
+
 }
