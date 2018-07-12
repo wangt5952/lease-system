@@ -12,7 +12,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- 列表a -->
+    <!-- 列表aa -->
     <el-table :data="list" class="deviceHeight">
       <el-table-column prop="deviceId" label="编号" width="100" header-align="left" align="left"></el-table-column>
       <el-table-column prop="deviceTypeListText" label="设备类别" width="80" align="center"></el-table-column>
