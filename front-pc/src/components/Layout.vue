@@ -178,13 +178,13 @@ const menuTree = [
     icon: 'lt lt-jiankong',
     children: [
       { name: '车辆监控', path: '/monitor', resCode: 'vehicle_monitor' },
+      { name: '设备监控', path: '/monitorDevice', resCode: 'vehicle_monitor' },
     ],
   },
   { name: '车辆',
     icon: 'lt lt-diandongche',
     children: [
       { name: '车辆管理', path: '/vehicle', resCode: 'manager-vehicle-list' },
-      // { name: '车辆管理', path: '/vehicle', resCode: 'vehicle_manager' },
       { name: '申请管理', path: '/apply', resCode: 'vehide_order_manager' },
     ],
   },
