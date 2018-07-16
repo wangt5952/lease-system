@@ -9,18 +9,14 @@ import com.elextec.framework.plugins.paging.PageResponse;
 import com.elextec.framework.plugins.redis.RedisClient;
 import com.elextec.framework.utils.WzStringUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
-import com.elextec.lease.manager.request.BizBatteryParam;
 import com.elextec.lease.manager.request.BizDeviceConfParam;
 import com.elextec.lease.manager.service.BizDeviceConfService;
+import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizDeviceConfMapperExt;
+import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
 import com.elextec.persist.field.enums.DeviceType;
-import com.elextec.persist.model.mybatis.BizDeviceConf;
-import com.elextec.persist.model.mybatis.BizDeviceConfExample;
-import com.elextec.persist.model.mybatis.BizDeviceConfKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.elextec.persist.model.mybatis.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,6 +33,12 @@ public class BizDeviceConfServiceImpl implements BizDeviceConfService {
 
     @Autowired
     private RedisClient redisClient;
+
+    @Autowired
+    private BizBatteryMapperExt bizBatteryMapperExt;
+
+    @Autowired
+    private BizVehicleMapperExt bizVehicleMapperExt;
 
     @Override
     public PageResponse<BizDeviceConf> list(boolean needPaging, PageRequest pr) {
@@ -272,6 +274,16 @@ public class BizDeviceConfServiceImpl implements BizDeviceConfService {
             map.put(DeviceApiConstants.REQ_LON,"");//经度
             map.put(DeviceApiConstants.REQ_LAT,"");//纬度
         }
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getRelationInformationByDevice(String deviceId) {
+        Map<String,Object> map = new HashMap<String,Object>();//返回结果
+        BizBattery bizBattery = bizBatteryMapperExt.getBizBatteryInfoByDevice(deviceId);//根据设备id获取电池信息
+        BizVehicle bizVehicle = bizVehicleMapperExt.getBizVehicleInfoByBattery(bizBattery.getId());//根据电池id获取车辆信息
+        map.put(WzConstants.KEY_VEHICLE_INFO,bizVehicle);
+        map.put(WzConstants.KEY_BATTERY_INFO,bizBattery);
         return map;
     }
 

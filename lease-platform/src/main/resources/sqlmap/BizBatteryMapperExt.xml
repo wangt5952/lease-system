@@ -155,4 +155,11 @@
         LEFT JOIN biz_ref_vehicle_battery d ON a.id = d.battery_id AND d.bind_time IS NOT NULL AND d.unbind_time IS NULL
         where a.battery_code = #{deviceCode,jdbcType=VARCHAR}
     </select>
+
+    <select id="getBizBatteryInfoByDevice" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM biz_battery b
+        RIGHT JOIN biz_device_conf d ON d.device_id = b.battery_code
+        WHERE d.device_id = #{deviceId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

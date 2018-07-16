@@ -89,4 +89,12 @@ public interface BizDeviceConfService {
      * @return 定位
      */
     public Map<String,Object> getLocationByDevice(BizDeviceConfKey bizDeviceConfKey);
+
+    /**
+     * 根据设备id查询关联信息
+     * @param deviceId 设备id
+     * @return 关联信息
+     */
+    public Map<String,Object> getRelationInformationByDevice(String deviceId);
+
 }

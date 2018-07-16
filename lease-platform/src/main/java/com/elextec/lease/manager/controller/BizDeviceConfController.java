@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -151,7 +152,7 @@ public class BizDeviceConfController extends BaseController {
      *                 perSet:请求间隔时间（单位：秒）,
      *                 reset:硬件复位标志（0：无处理；1；复位重启）,
      *                 request:主动请求数据标志（0：无处理；1：主动请求）,
-     *                 RSOC:电量，
+     *                 Rsoc:电量，
      *                 LON:经度，
      *                 LAT:纬度
      *             },
@@ -654,6 +655,75 @@ public class BizDeviceConfController extends BaseController {
         }
         return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.getLocationByDevice(bizDeviceConfKey));
     }
-    
+
+    /**
+     * 根据设备id查询关联的车辆和电池信息
+     * <pre>
+     *     [id]
+     * </pre>
+     * @param param 设备参数
+     * @param request
+     * @return
+     * <pre>
+     *     {
+     *         code:返回Code,
+     *         message:返回信息,
+     *         respData:{
+     *             key_battery_info:{
+     *                 id:id,
+     *                 battery_code:电池编号,
+     *                 battery_name:电池货名,
+     *                 battery_brand:电池品牌,
+     *                 battery_pn:电池型号,
+     *                 battery_parameters:电池参数,
+     *                 mfrs_id:生产商id,
+     *                 battery_status:电池状态,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             },
+     *             key_vehicle_info:{
+     *                 id:id,
+     *                 vehicle_code:车辆编号,
+     *                 vehicle_pn:车辆型号,
+     *                 vehicle_brand:车辆品牌,
+     *                 vehicle_made_in:车辆产地,
+     *                 mfrs_id:生产商id,
+     *                 vehicle_status:车辆状态,
+     *                 create_user:创建人,
+     *                 create_time:创建时间,
+     *                 update_user:更新人,
+     *                 update_time:更新时间
+     *             }
+     *         }
+     *     }
+     * </pre>
+     */
+    @RequestMapping(value = "/getRelationInformationByDevice",method = RequestMethod.POST)
+    public MessageResponse getRelationInformationByDevice(@RequestBody String param,HttpServletRequest request) {
+        if (WzStringUtil.isBlank(param)) {
+            return new MessageResponse(RunningResult.NO_PARAM);
+        }
+        List<String> list = null;
+        try {
+            String paramStr = URLDecoder.decode(param,"utf-8");
+            list = JSONObject.parseObject(paramStr,List.class);
+            if (WzStringUtil.isBlank(list.get(0))) {
+                return new MessageResponse(RunningResult.PARAM_ANALYZE_ERROR.code(),"设备id不能为空");
+            }
+            SysUser sysUser = super.getLoginUserInfo(request);
+            if (sysUser == null) {
+                return new MessageResponse(RunningResult.AUTH_OVER_TIME);
+            }
+            if (sysUser.getUserType().toString().equals(OrgAndUserType.INDIVIDUAL.toString())
+                    || sysUser.getUserType().toString().equals(OrgAndUserType.ENTERPRISE.toString())) {
+                return new MessageResponse(RunningResult.NO_PERMISSION);
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.getRelationInformationByDevice(list.get(0)));
+    }
 
 }
