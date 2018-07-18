@@ -12,15 +12,21 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- 列表a -->
+    <!-- 列表aa -->
     <el-table :data="list" class="deviceHeight">
-      <el-table-column prop="deviceId" label="编号" width="150"></el-table-column>
-      <el-table-column prop="deviceTypeListText" label="设备类别" width="100"></el-table-column>
-      <el-table-column prop="perSet" label="请求间隔时间(单位:秒)" width="200"></el-table-column>
-      <el-table-column prop="resetTypeText" label="硬件复位标志" width="100"></el-table-column>
-      <el-table-column prop="requestTypeText" label="主动请求数据标志" width="200"></el-table-column>
-      <el-table-column label="操作" width="400">
+      <el-table-column prop="deviceId" label="编号" width="100" header-align="left" align="left"></el-table-column>
+      <el-table-column prop="deviceTypeListText" label="设备类别" width="80" align="center"></el-table-column>
+      <el-table-column prop="perSet" label="请求间隔时间(单位:秒)" width="150" align="center"></el-table-column>
+      <el-table-column prop="" label="电池电量" width="70" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.perSet }} %
+        </template>
+      </el-table-column>
+      <el-table-column prop="resetTypeText" label="硬件复位标志" width="100" align="center"></el-table-column>
+      <el-table-column prop="requestTypeText" label="主动请求数据标志" width="200" align="center"></el-table-column>
+      <el-table-column label="操作" width="400" align="left">
         <template slot-scope="{row}">
+          <el-button icon="el-icon-search" size="mini" type="text" @click="showDeviceLocation(row)">查看设备位置</el-button>
           <template v-if="res['FUNCTION'].indexOf('manager-device-modify') >= 0">
             <el-button icon="el-icon-edit" size="mini" type="text" @click="editButton(row)">编辑</el-button>
           </template>
@@ -85,6 +91,36 @@
         <el-button type="primary" v-if="addButtonVisible" @click="addForm">添加</el-button>
       </span>
     </el-dialog>
+
+    <div class="deviceLocationClass" :style="styleDiv" @keyup.esc="closeAddresBut">
+      <div style="height:50px; width:100%">
+        <div style="display:flex; justify-content:center; line-height:50px;font-size:1em;">
+          {{ address }}
+          <div @click="closeAddresBut" style="position:absolute;top:10px;left:650px;color:#409eff;cursor:pointer">
+            <img src="../assets/close.png" alt="" style="height:30px; width:30px;">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex:1" >
+        <baidu-map @ready="handler" id="baiduMap" style="width: 100%;height:300px" :center="center" :zoom="zoom" :scroll-wheel-zoom="true">
+          <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
+          <bm-marker
+            @click="clickBmInfoWindow"
+            :icon="{url: '/static/device-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
+            :position="markerCenter"
+            :dragging="false">
+            <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">
+              <p v-text="this.infoWindow.contents"></p>
+            </bm-info-window>
+          </bm-marker>
+        </baidu-map>
+      </div>
+      <div>
+        <div @click="closeAddresBut" style="display:flex; justify-content:center;margin-top: 10px">
+          <el-button type="info">关闭</el-button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -109,6 +145,23 @@ const checkTime = (rule, value, callback) => {
 export default {
   data() {
     return {
+      center: {lng: 0, lat: 0},
+      zoom: 3,
+      deviceLocation:{},
+      vehiclPowner:{},
+      markerCenter: { lng: 0, lat: 0 },
+      PopCenter: { lng: 0, lat: 0 },
+      infoWindow: {
+        title: '',
+        show: true,
+        contents: ''
+      },
+      // 地址解析
+      address: '',
+      styleDiv: 'display: block; opacity:0; z-index:-1',
+      deviceFrom: {},
+      batteryNum: '',
+
       loading: false,
       formVisible: false,
       editButtonVisible: false,
@@ -173,6 +226,109 @@ export default {
     },
   },
   methods: {
+    async clickBmInfoWindow () {
+      this.infoWindow.show = !this.infoWindow.show;
+      const { batteryNum } = this;
+      try {
+        // 获取电池剩余电量
+        const { code, message, respData } = (await this.$http.post('/api/manager/device/getElectricByDevice',[batteryNum])).body;
+        if (code !== '200') throw new Error(message);
+        if (respData.Rsoc === "") throw new Error("该设备无电量");
+        this.infoWindow.contents = `电池电量:  ${respData.Rsoc} %`;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+    async handler ({BMap, map}) {
+      this.center.lng = this.deviceLocation.LON;
+      this.center.lat = this.deviceLocation.LAT;
+      this.PopCenter = this.center;
+      this.markerCenter = this.center;
+      this.zoom = 16;
+
+      const new_point = (lng, lat) => {
+        this.center.lng = this.deviceLocation.LON;
+        this.center.lat = this.deviceLocation.LAT;
+        this.PopCenter = this.center;
+        this.markerCenter = this.center;
+        this.zoom = 16;
+        const point = new BMap.Point(lng, lat);
+        map.panTo(point);
+      };
+      // 
+      window.new_point = new_point;
+      // const myGeo = new BMap.Geocoder();
+      // const thisOne = this;
+      // myGeo.getLocation(new BMap.Point(thisOne.center.lng, thisOne.center.lat), function(result){
+      //   if (result){
+      //     thisOne.address = result.address
+      //   }
+      // });
+      // 浏览器定位
+      const getCurPosition = () => {
+        return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
+          if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+            resolve(r);
+          } else {
+            reject(this.getStatus());
+          }
+        }, { enableHighAccuracy: true }));
+      };
+
+      // 逆地址解析(根据经纬度获取详细地址).
+      const getLocation = (lng, lat) => {
+        return new Promise(resolve => (new BMap.Geocoder()).getLocation(new BMap.Point(lng, lat), res => resolve(res)));
+      };
+      window.getLocation = getLocation;
+      window.getCurPosition = getCurPosition;
+    },
+    // 关闭车辆位置窗口按钮
+    closeAddresBut() {
+      this.styleDiv = 'display: block;opacity:0;z-index:-1';
+    },
+    // 设备位置
+    async showDeviceLocation(row) {
+      this.batteryNum = row.deviceId;
+      try {
+        // 获取坐标
+        const { code, message, respData } = (await this.$http.post('/api/manager/device/getLocationByDevice',{
+          deviceId: row.deviceId, deviceType: row.deviceType,
+        })).body;
+        if (code !== '200') {
+          this.styleDiv = 'display: block;opacity:0;z-index:-1';
+          throw new Error(message);
+        }
+        if(respData.LON === "" || respData.LAT === "") {
+          this.styleDiv = 'display: block;opacity:0;z-index:-1';
+          throw new Error("该设备无坐标");
+        }
+        this.deviceLocation = respData;
+        await new_point(respData.LON, respData.LAT);
+        this.styleDiv = 'display: block; opacity:1;z-index:1';
+
+        const loc = await getLocation(respData.LON, respData.LAT);
+        if(loc) this.address = `地址: ${loc.address}` ;
+        else this.address = '地址: ';
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      try {
+        // 获取电池剩余电量
+        const { code, message, respData } = (await this.$http.post('/api/manager/device/getElectricByDevice',[row.deviceId])).body;
+        if (code !== '200') throw new Error(message);
+        if (respData.Rsoc === "") throw new Error("该设备无电量");
+        this.infoWindow.contents = `电池电量:  ${respData.Rsoc} %`;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+    },
+
     // 分页下拉列表改变出发事件
     async handleSizeChange(pageSize) {
       this.pageSize = pageSize;
@@ -180,10 +336,10 @@ export default {
     },
     // 加载
     async reload() {
-      this.loading = false;
+      this.loading = true;
       if (this.key_user_info.userType === 'PLATFORM') {
         try {
-          const { code, message, respData } = (await this.$http.post('/api/manager/device/list', {
+          const { code, message, respData } = (await this.$http.post('/api/manager/device/lists', {
             currPage: this.currentPage, pageSize: this.pageSize, ...this.search,
           })).body;
           if (code === '40106') {
@@ -329,5 +485,17 @@ export default {
   color: #606266;
   height: 85%;
   max-height: 85%;
+}
+.deviceLocationClass {
+  border:1px solid #f2f2f2;
+  display:flex;
+  background-color:#f2f2f2;
+  border-radius:5px;
+  flex-direction:column;
+  width:700px;
+  height:400px;
+  position:absolute;
+  left:350px;
+  top: 160px
 }
 </style>

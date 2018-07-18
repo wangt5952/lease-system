@@ -313,4 +313,24 @@
         </where>
     </select>
 
+    <select id="getBizVehicleInfoByBattery" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        v.id id,
+        v.vehicle_code vehicle_code,
+        v.vehicle_pn vehicle_pn,
+        v.vehicle_brand vehicle_brand,
+        v.vehicle_made_in vehicle_made_in,
+        v.mfrs_id mfrs_id,
+        v.vehicle_status vehicle_status,
+        v.create_user create_user,
+        v.create_time create_time,
+        v.update_user update_user,
+        v.update_time update_time
+        FROM biz_ref_vehicle_battery r
+        LEFT JOIN biz_battery b ON b.id = r.battery_id
+        LEFT JOIN biz_vehicle v ON v.id = r.vehicle_id
+        WHERE r.battery_id = #{batteryId,jdbcType=VARCHAR}
+        AND r.unbind_time IS NULL
+    </select>
+
 </mapper>

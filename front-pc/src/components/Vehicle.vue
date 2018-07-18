@@ -606,6 +606,7 @@ export default {
         { id: '1', name: '旧电池' },
         { id: '2', name: '无电池' },
       ],
+      batteryNum: '',
       batteryForm: {},
       bindBatteryFormVisible: false,
       bindPartsFormVisible2: false,
@@ -639,7 +640,17 @@ export default {
   },
   methods: {
     async clickBmInfoWindow () {
-      this.infoWindow.show = !this.infoWindow.show;
+      try {
+        this.infoWindow.show = !this.infoWindow.show;
+        const { batteryNum  } = this;
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[batteryNum])).body;
+        if (code !== '200') throw new Error(message);
+        this.infoWindow.contents = `电池电量:  ${respData[0].Rsoc} %`;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
     },
     async handler ({BMap, map}) {
 
@@ -691,6 +702,8 @@ export default {
     },
     // 车辆位置
     async showVehicleLocation(row) {
+      this.batteryNum = row.id;
+      // 获取车辆坐标
       try {
         // this.styleDiv = 'display: block';
         // 获取坐标
@@ -707,7 +720,7 @@ export default {
         }
         this.vehiclLocation = respData[0];
         await new_point(respData[0].LON, respData[0].LAT);
-        this.styleDiv = 'display: block; opacity:1;z-index:1';
+        this.styleDiv = 'display:block; opacity:1; z-index:1';
 
         // this.zoom = 16;
 
@@ -720,18 +733,23 @@ export default {
         const loc = await getLocation(respData[0].LON, respData[0].LAT);
         if(loc) this.address = `地址: ${loc.address}` ;
         else this.address = '地址: ';
-
-        // 获取电池剩余电量
-        const { code: pCode, message: pMess, respData: pRes } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
-        if (pCode !== '200') throw new Error(pMess);
-        this.infoWindow.contents = `电池电量:  ${pRes[0].Rsoc} %`;
-
-        // this.vehicleLocationVisible = true;
       } catch (e) {
         if (!e) return;
         const message = e.statusText || e.message;
         this.$message.error(message);
       }
+
+      // 获取电池剩余电量
+      try {
+        const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getpowerbyvehiclepk',[row.id])).body;
+        if (code !== '200') throw new Error(message);
+        this.infoWindow.contents = `电池电量:  ${respData[0].Rsoc} %`;
+      } catch (e) {
+        if (!e) return;
+        const message = e.statusText || e.message;
+        this.$message.error(message);
+      }
+      // this.vehicleLocationVisible = true;
     },
     // 车辆地址 回调
     closeVehicleLocationVisible() {

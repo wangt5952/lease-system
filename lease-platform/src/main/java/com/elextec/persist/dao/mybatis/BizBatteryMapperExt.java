@@ -1,7 +1,9 @@
 package com.elextec.persist.dao.mybatis;
 
 import com.elextec.lease.manager.request.BizBatteryParam;
+import com.elextec.persist.model.mybatis.BizBattery;
 import com.elextec.persist.model.mybatis.BizBatteryExample;
+import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
 
 import java.util.List;
@@ -38,4 +40,11 @@ public interface BizBatteryMapperExt extends BizBatteryMapper {
      * @return 车辆ID
      */
     BizBatteryExt getVehicleIdByDeviceId(String deviceCode);
+
+    /**
+     * 根据设备id获取电池信息
+     * @param deviceId 设备id
+     * @return 关联的电池信息
+     */
+    BizBattery getBizBatteryInfoByDevice(String deviceId);
 }

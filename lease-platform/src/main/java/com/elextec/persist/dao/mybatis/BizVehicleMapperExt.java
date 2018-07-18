@@ -1,6 +1,7 @@
 package com.elextec.persist.dao.mybatis;
 
 import com.elextec.lease.manager.request.BizVehicleParam;
+import com.elextec.persist.model.mybatis.BizVehicle;
 import com.elextec.persist.model.mybatis.ext.BizVehicleExt;
 
 import java.util.List;
@@ -65,6 +66,13 @@ public interface BizVehicleMapperExt extends BizVehicleMapper {
      * @return 个数
      */
     public int countExtUnbindExtByParam(BizVehicleParam bizVehicleParam);
+
+    /**
+     * 根据电池id查询绑定的车辆信息
+     * @param batteryId 电池id
+     * @return 车辆信息
+     */
+    BizVehicle getBizVehicleInfoByBattery(String batteryId);
 
 //    /**
 //     * 查询车辆是否已被绑定
