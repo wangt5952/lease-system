@@ -1,0 +1,119 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=yes">
+<title>小哥乐途移动端下载页</title>
+<meta name="description" content="小哥乐途移动端下载页" />
+<meta name="keywords" content="小哥乐途;移动端;下载" />
+<meta name="author" content="lee" />
+<meta name="renderer" content="webkit">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+<style>
+    /* ----------- base ------------- */
+    * {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    margin: 0px;
+    padding: 0px;
+    }
+    body,html {
+    width:100%;
+    height:100%;
+    }
+    body {
+    background-color: #fff;
+    font-family: "微软雅黑", "Microsoft Yahei", "Arial";
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    }
+    a {
+        text-decoration: none;
+    }
+    /* ----------- main ------------- */
+    .bg {
+    width:100%;
+    height:100%;
+    position: relative;
+    }
+    .main {
+    width:100%;
+    height:100%;
+    position: absolute;
+    background: url("./img/bg-mobile.png");
+    background-size:100% 100%;
+    }
+    .logo {
+    width:100%;
+    height:20%;
+    background: url("./img/logo-mobile.png");
+    background-size:100% 90%;
+    }
+    .content {
+    width:100%;
+    height: 70%;
+    text-align: center;
+    }
+    .content .btn {
+    width:200px;
+    height:40px;
+    color: #333;
+    margin-top: 70%;
+    font-weight: bold;
+    border-radius: 4px;
+    background: rgb(253,208,0);
+    }
+    .main p {
+    margin-top: 10px;
+    font-weight: bold;
+    color: red;
+    }
+</style>
+</head>
+<body>
+<div class="bg">
+    <div class="main">
+        <p>如使用微信请点击右上角"..." -> "在浏览器打开"进行下载！</p>
+        <div class="logo animated fadeInDown"></div>
+        <div class="content">
+            <button type="button" class="btn animated bounceInLeft" onclick="window.open('./apk/xglt.apk')">立即下载</button>
+            <!--<p class="animated bounceInRight">如使用微信请点击右上角"..." -> "在浏览器打开"进行下载！</p>-->
+        </div>
+    </div>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $.fn.extend({
+        animateCss: function(animationName, callback) {
+            var animationEnd = (function(el) {
+                var animations = {
+                    animation: 'animationend',
+                    OAnimation: 'oAnimationEnd',
+                    MozAnimation: 'mozAnimationEnd',
+                    WebkitAnimation: 'webkitAnimationEnd',
+                };
+
+                for (var t in animations) {
+                    if (el.style[t] !== undefined) {
+                        return animations[t];
+                    }
+                }
+            })(document.createElement('div'));
+
+            this.addClass('animated ' + animationName).one(animationEnd, function() {
+                $(this).removeClass('animated ' + animationName);
+
+                if (typeof callback === 'function') callback();
+            });
+
+            return this;
+        },
+    });
+
+</script>
+</body>
+</html>
