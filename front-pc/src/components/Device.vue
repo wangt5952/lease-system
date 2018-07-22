@@ -106,7 +106,7 @@
           <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
           <bm-marker
             @click="clickBmInfoWindow"
-            :icon="{url: '/static/device-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
+            :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }"
             :position="markerCenter"
             :dragging="false">
             <bm-info-window :position="PopCenter" :title="this.infoWindow.title" :show="this.infoWindow.show" :width="70" :height="60">

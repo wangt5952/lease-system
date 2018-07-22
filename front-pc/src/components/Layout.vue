@@ -206,6 +206,7 @@ const menuTree = [
     icon: 'lt lt-web-icon-',
     children: [
       { name: '企业管理', path: '/organization', resCode: 'org_manager' },
+      { name: '企业设备管理', path: '/deviceDetails', resCode: 'org_manager' },
     ],
   },
   { name: '权限',

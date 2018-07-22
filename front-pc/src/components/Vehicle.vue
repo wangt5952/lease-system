@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" style="padding:10px;">
+  <div style="padding:10px;">
     <div style="display:flex;">
       <!-- PLATFORM:平台, ENTERPRISE:企业 -->
       <template v-if="res['FUNCTION'].indexOf('manager-vehicle-addone') >= 0">
@@ -36,7 +36,7 @@
       </template>
     </div>
     
-    <el-table :data="vehicle.list" class="vehicleHeight">
+    <el-table v-loading="loading" :data="vehicle.list" class="vehicleHeight">
       <el-table-column prop="vehicleCode" label="编号" width="100"></el-table-column>
       <el-table-column prop="vehiclePn" label="型号" width="100"></el-table-column>
       <el-table-column prop="vehicleBrand" label="品牌" width="80"></el-table-column>
@@ -228,22 +228,22 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehiclePn" :rules="[{required:true, message:'请填写型号'}]" label="型号">
+            <el-form-item prop="vehiclePn" label="型号">
               <el-input v-model="editForm.vehiclePn" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehicleBrand" :rules="[{required:true, message:'请填写品牌'}]" label="品牌">
+            <el-form-item prop="vehicleBrand" label="品牌">
               <el-input v-model="editForm.vehicleBrand" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="vehicleMadeIn" :rules="[{required:true, message:'请填写产地'}]" label="产地">
+            <el-form-item prop="vehicleMadeIn" label="产地">
               <el-input v-model="editForm.vehicleMadeIn" auto-complete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item prop="mfrsId" :rules="[{required:true, message:'请选择生产商'}]" label="生产商">
+            <el-form-item prop="mfrsId" label="生产商">
               <el-select v-model="editForm.mfrsId" placeholder="请选择生产商" style="width:100%;">
                 <el-option v-for="o in mfrsList" :key="o.id" :label="o.mfrsName" :value="o.id"></el-option>
               </el-select>

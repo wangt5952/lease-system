@@ -30,9 +30,9 @@
       <baidu-map @ready="handler" @click="handleMapClick" style="width: 100%;flex:1;" :center="mapCenter" :zoom="zoomNum" @dragend="syncCenterAndZooms" @zoomend="syncCenterAndZoom" :scroll-wheel-zoom="true">
         <!--1 比列尺 -->
         <bm-scale anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-scale>
-        <!-- 右上角控件 -->
+        <!--2 右上角控件 -->
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
-        <!-- 定位控件 -->
+        <!--3 定位控件 -->
         <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true" @locationSuccess="positionSuccess" @locationError="positionError"></bm-geolocation>
         <template v-if="vehiclePathVisible">
           <!-- 路线折线图 -->
@@ -596,7 +596,6 @@ export default {
             })),
           };
         });
-
       } catch (e) {
         const message = e.statusText || e.message;
         this.$message.error(message);
