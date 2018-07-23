@@ -214,6 +214,7 @@ export default {
       await this.handleSelectItem(item);
     },
     async handler({BMap, map}) {
+      console.log('handler');
       const new_point = (lng, lat) => {
         const point = new BMap.Point(lng, lat);
         map.panTo(point);
@@ -482,6 +483,7 @@ export default {
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
+      console.log('获取全部');
       const curPoint = await getCurPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
