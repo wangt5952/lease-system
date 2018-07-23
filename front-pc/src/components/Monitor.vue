@@ -306,7 +306,7 @@ export default {
     async positionError(e) {
       alert('定位失败');
     },
-    // 地图更改缩放级别结束时触发触发此事件
+    // 地图更改缩放级别结束时触发触发此事件(git)
     async syncCenterAndZoom(e) {
       // 获取地图中心点
       if (this.vehiclePathVisible === false) {
