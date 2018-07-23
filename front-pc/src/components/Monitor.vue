@@ -311,7 +311,7 @@ export default {
       // 获取地图中心点
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
-        // this.circlePath.center = e.target.getCenter();
+        // this.circlePath.center = e.target.getCenter(123);
         // 获取缩放等级.
         const zoomNum = e.target.getZoom();
         let num = 0;
