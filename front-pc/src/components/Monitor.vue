@@ -212,7 +212,7 @@ export default {
     },
   },
   methods: {
-    // 地图车辆图标单击事件
+    // 地图车辆图标单击事件1
     async clickVehicle(item){
       await this.handleSelectItem(item);
     },
