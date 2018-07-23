@@ -281,7 +281,7 @@ export default {
     shrinkChang() {
       this.isCollapse = !this.isCollapse;
     },
-    // 企业
+    // 企业.
     closeEnterpiseForm() {
       this.enterpriseVisible = false;
     },

@@ -520,7 +520,7 @@ export default {
         this.$message.error(message);
       }
     },
-    // 获取所有车辆信息
+    // 获取所有车辆信息.
     async reloadVehicleList() {
       const curPoint = await getCurPosition();
       try {
