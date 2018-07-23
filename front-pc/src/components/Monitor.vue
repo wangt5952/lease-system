@@ -312,7 +312,7 @@ export default {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
         // this.circlePath.center = e.target.getCenter();
-        // 获取缩放等级
+        // 获取缩放等级1
         const zoomNum = e.target.getZoom();
         let num = 0;
         if (zoomNum) {
