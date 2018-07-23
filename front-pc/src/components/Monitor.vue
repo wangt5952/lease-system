@@ -201,7 +201,10 @@ export default {
     };
   },
   async mounted() {
-    await this.reloadVehicleList();
+    // 先让地图加载完，然后调用 methods 里的方法 (异步操作)
+    await setTimeout(()=> {
+      this.reloadVehicleList();
+    }, 300);
   },
   computed: {
     selectedItem() {
@@ -231,7 +234,6 @@ export default {
       };
       // 浏览器定位
       window.getCurPosition = getCurPosition;
-
       const r = await getCurPosition();
       this.mapCenter = {
         lng: r.point.lng, lat: r.point.lat,
@@ -623,7 +625,7 @@ export default {
   color: #9298ae;
 }
 >>> .el-dialog .el-dialog__close {
-  font-family:"lt" !important;
+  font-family: "lt" !important;
   color: #fa142d;
 }
 >>> .el-dialog .el-dialog__close::before {
