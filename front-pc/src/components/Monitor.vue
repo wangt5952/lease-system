@@ -21,7 +21,7 @@
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ selectedItem.Rsoc ? selectedItem.Rsoc+"%" : selectedItem.Rsoc }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">剩余电量</div>
         </div>
-        <div @click="openUserInfoVis" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
+        <div @click="userDialogVisible = true;" style="display:flex;flex-direction:column;width:150px;text-align:center;cursor:pointer;">
           <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:20px;">{{ userInfo.nickName }}</div>
           <div style="font-size:12px;height:40px;color:#5f7aa7;">使用人</div>
         </div>
@@ -38,9 +38,9 @@
           <!-- 路线折线图 -->
           <bm-polyline v-if="selectedItem.path" :path="selectedItem.path" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-polyline>
           <!-- 点聚合(图片所在位置) -->
-          <bm-marker @click="clickVehicle" :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
+          <bm-marker :icon="{url: '/static/vehicle-cur.svg', size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: selectedItem.LON, lat: selectedItem.LAT}"></bm-marker>
         </template>
-        <bm-marker @click="clickVehicle" v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
+        <bm-marker @click="clickVehicle(o)" v-else v-for="o in radiusVehicleList" :key="o.vehicleId" :icon="{url: selectedItem.vehicleId == o.vehicleId ? '/static/vehicle-cur.svg' : (`/static/${o.icon || 'vehicle-ok.svg'}`), size: {width: 48, height: 48}, opts:{ imageSize: {width: 48, height: 48} } }" :position="{lng: o.LON, lat: o.LAT}"></bm-marker>
       </baidu-map>
 
       <!-- Element <DateTimePicker>日期选择器控件 -->
@@ -90,7 +90,7 @@
         <div @click="handleSelectItem(o)" v-for="o in radiusVehicleList" :key="o.vehicleId" :style="selectedId == o.vehicleId ? {backgroundColor:'#39a0f6', color:'#fff'} : {backgroundColor:'#e7eef5', color:'#9096ad'}"
           style="display:flex;align-items:center;height:36px;margin-bottom:5px;border-radius:3px;text-align:center;cursor:pointer;">
           <div style="flex:1;">{{o.vehicleCode}}</div>
-          <div style="width:80px;">{{o.Rsoc}}%</div>
+          <div style="width:80px;">{{ o.Rsoc ? `${o.Rsoc}%`:o.Rsoc }}</div>
         </div>
       </div>
     </div>
@@ -133,43 +133,42 @@
         </template>
       </div>
     </el-dialog>
-    <template v-if="openInfo">
-      <el-dialog title="用户信息" :visible.sync="userDialogVisible" width="30%">
-        <div class="item"><div class="item-name">用户名</div><div class="item-value">{{ userInfo.loginName }}</div></div>
-        <div class="item"><div class="item-name">手机号码</div><div class="item-value">{{ userInfo.userMobile }}</div></div>
-        <div class="item"><div class="item-name">用户类别</div>
-          <template v-if="userInfo.userType === 'INDIVIDUAL'">
-            <div class="item-value">个人</div>
-          </template>
-        </div>
-        <div class="item"><div class="item-name">昵称</div><div class="item-value">{{ userInfo.nickName }}</div></div>
 
-        <div class="item"><div class="item-name">实名认证标示</div>
-          <template v-if="userInfo.userRealNameAuthFlag === 'AUTHORIZED'">
-            <div class="item-value">已实名</div>
-          </template>
-          <template v-else-if="userInfo.userRealNameAuthFlag === 'UNAUTHORIZED'">
-            <div class="item-value">未实名</div>
-          </template>
-          <template v-else>
-            <div class="item-value"></div>
-          </template>
-        </div>
-        <div class="item"><div class="item-name">身份证号</div><div class="item-value">{{ userInfo.userPid }}</div></div>
-        <div class="item"><div class="item-name">所属企业</div><div class="item-value">{{ userInfo.orgName }}</div></div>
-        <div class="item"><div class="item-name">用户状态</div>
-          <template v-if="userInfo.userStatus === 'NORMAL'">
-            <div class="item-value">正常</div>
-          </template>
-          <template v-if="userInfo.userStatus === 'FREEZE'">
-            <div class="item-value">冻结</div>
-          </template>
-          <template v-if="userInfo.userStatus === 'INVALID'">
-            <div class="item-value">作废</div>
-          </template>
-        </div>
-      </el-dialog>
-    </template>
+    <el-dialog title="用户信息" :visible.sync="userDialogVisible" width="30%">
+      <div class="item"><div class="item-name">用户名</div><div class="item-value">{{ userInfo.loginName }}</div></div>
+      <div class="item"><div class="item-name">手机号码</div><div class="item-value">{{ userInfo.userMobile }}</div></div>
+      <div class="item"><div class="item-name">用户类别</div>
+        <template v-if="userInfo.userType === 'INDIVIDUAL'">
+          <div class="item-value">个人</div>
+        </template>
+      </div>
+      <div class="item"><div class="item-name">昵称</div><div class="item-value">{{ userInfo.nickName }}</div></div>
+
+      <div class="item"><div class="item-name">实名认证标示</div>
+        <template v-if="userInfo.userRealNameAuthFlag === 'AUTHORIZED'">
+          <div class="item-value">已实名</div>
+        </template>
+        <template v-else-if="userInfo.userRealNameAuthFlag === 'UNAUTHORIZED'">
+          <div class="item-value">未实名</div>
+        </template>
+        <template v-else>
+          <div class="item-value"></div>
+        </template>
+      </div>
+      <div class="item"><div class="item-name">身份证号</div><div class="item-value">{{ userInfo.userPid }}</div></div>
+      <div class="item"><div class="item-name">所属企业</div><div class="item-value">{{ userInfo.orgName }}</div></div>
+      <div class="item"><div class="item-name">用户状态</div>
+        <template v-if="userInfo.userStatus === 'NORMAL'">
+          <div class="item-value">正常</div>
+        </template>
+        <template v-if="userInfo.userStatus === 'FREEZE'">
+          <div class="item-value">冻结</div>
+        </template>
+        <template v-if="userInfo.userStatus === 'INVALID'">
+          <div class="item-value">作废</div>
+        </template>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -193,13 +192,12 @@ export default {
       userDialogVisible: false,
       vehiclePathVisible: false,
       mapCenter: '南京',
-      zoomNum: 15,
+      zoomNum: 10,
       searchAddress: '',
 
       // 指定范围内的车辆集合
       radiusVehicleList: [],
 
-      openInfo: false,
     };
   },
   async mounted() {
@@ -211,20 +209,15 @@ export default {
     },
   },
   methods: {
-    // 
-    async clickVehicle(){
-    },
-    openUserInfoVis() {
-      if (this.openInfo) this.userDialogVisible = true;
-      else this.userDialogVisible = false;
+    // 地图车辆图标单击事件
+    async clickVehicle(item){
+      await this.handleSelectItem(item);
     },
     async handler({BMap, map}) {
-
       const new_point = (lng, lat) => {
         const point = new BMap.Point(lng, lat);
         map.panTo(point);
       };
-      window.new_point = new_point;
       // 浏览器定位
       const getCurPosition = () => {
         return new Promise((resolve, reject) => (new BMap.Geolocation()).getCurrentPosition(function get(r) {
@@ -235,6 +228,8 @@ export default {
           }
         }, { enableHighAccuracy: true }));
       };
+      // 浏览器定位
+      window.getCurPosition = getCurPosition;
 
       const r = await getCurPosition();
       this.mapCenter = {
@@ -255,9 +250,10 @@ export default {
         }, address));
       };
 
+      window.new_point = new_point;
       window.getLocation = getLocation;
+      // 浏览器定位
       window.getAddressByLocation = getAddressByLocation;
-
     },
     // 搜索
     async searchStreet(value) {
@@ -290,15 +286,12 @@ export default {
           lng: e.point.lng, lat: e.point.lat, radius: 1000,
         })).body;
         if (code === '200') {
-          this.openInfo = true;
           this.radiusVehicleList = respData;
         } else {
           this.radiusVehicleList = [];
           this.vehicleInfo = {};
           this.powerInfo = {};
-          // this.userInfo = {};
-          this.userInfo = {nickName:'',loginName:'',userMobile:'',userType:'',userRealNameAuthFlag:'',userPid:'',orgName:'',userStatus:''};
-          this.openInfo = false;
+          this.userInfo = {};
           this.address = '';
           throw new Error(message);
         }
@@ -330,20 +323,18 @@ export default {
             case 13: num = 4000; break;
             case 12: num = 10000; break;
             case 11: num = 20000; break;
-            default: num = 1000;
+            default: num = 20 * 1000;
           }
           try {
             const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
               lng: lng, lat: lat, radius: num,
             })).body;
             if (code === '200') {
-              this.openInfo = true;
               this.radiusVehicleList = respData;
             } else {
               this.radiusVehicleList = [];
               this.vehicleInfo = {};
               this.powerInfo = {};
-              this.openInfo = false;;
               this.address = '';
               throw new Error(message);
             }
@@ -376,7 +367,7 @@ export default {
             case 13: num = 4000; break;
             case 12: num = 10000; break;
             case 11: num = 20000; break;
-            default: num = 1000;
+            default: num = 20 * 1000;
           }
           try {
             const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -384,12 +375,10 @@ export default {
             })).body;
             if (code === '200') {
               this.radiusVehicleList = respData;
-              this.openInfo = true;
             } else {
               this.radiusVehicleList = [];
               this.vehicleInfo = {};
               this.powerInfo = {};
-              this.openInfo = false;;
               this.address = '';
               throw new Error(message);
             }
@@ -407,11 +396,8 @@ export default {
     },
     handleMapClick() {
     },
-    // 车辆单击事件
+    // 右边车辆列表单击事件
     async handleSelectItem(item) {
-      // this.mapCenter = {
-      //   lng: item.LON, lat: item.LAT,
-      // };
       await new_point(item.LON,item.LAT);
       this.selectedId = item.vehicleId;
       const loc = await getLocation(item.LON, item.LAT);
@@ -419,19 +405,17 @@ export default {
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: item.LON, lat: item.LAT, radius: 2000,
+          lng: item.LON, lat: item.LAT, radius: 20 * 1000,
         })).body;
         //
         const loc = await getLocation(item.LON, item.LAT);
         this.searchAddress = loc.address;
         if (code === '200') {
           this.radiusVehicleList = respData;
-          this.openInfo = true;
         } else {
           this.radiusVehicleList = [];
           this.vehicleInfo = {};
           this.powerInfo = {};
-          this.openInfo = false;;
           this.address = '';
           throw new Error(message);
         }
@@ -457,11 +441,8 @@ export default {
         // 使用人信息 (如果没有用户则不显示用户信息)
         const { code: userCode, message: userMessage, respData: userRespData } = (await this.$http.post('/api/manager/user/getUserByVehicle', [item.vehicleId])).body;
         if (userCode !== '200') {
-          this.openInfo = false;
-          this.userInfo = {nickName:'',loginName:'',userMobile:'',userType:'',userRealNameAuthFlag:'',userPid:'',orgName:'',userStatus:''};
           throw new Error(userMessage);
         }
-        this.openInfo = true;
         this.userInfo = userRespData;
         // 车辆某段时间内行驶路径
         const { time } = this.searchLocList;
@@ -501,9 +482,10 @@ export default {
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
+      const curPoint = await getCurPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: this.mapCenter.lng, lat: this.mapCenter.lat, radius: 2000,
+          lng: curPoint.point.lng, lat: curPoint.point.lat, radius: 20 * 1000,
         })).body;
         if (code === '200') {
           this.radiusVehicleList = respData;
@@ -523,7 +505,6 @@ export default {
           this.radiusVehicleList = [];
           this.vehicleInfo = {};
           this.powerInfo = {};
-          this.openInfo = false;;
           this.address = '';
           throw new Error(message);
         }
