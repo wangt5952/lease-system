@@ -217,7 +217,6 @@ export default {
       await this.handleSelectItem(item);
     },
     async handler({BMap, map}) {
-      console.log('handler');
       const new_point = (lng, lat) => {
         const point = new BMap.Point(lng, lat);
         map.panTo(point);
@@ -286,7 +285,7 @@ export default {
     async positionSuccess(e) {
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: e.point.lng, lat: e.point.lat, radius: 1000,
+          lng: e.point.lng, lat: e.point.lat, radius: 2 * 1000,
         })).body;
         if (code === '200') {
           this.radiusVehicleList = respData;
@@ -318,15 +317,22 @@ export default {
         let num = 0;
         if (zoomNum > 10) {
           switch (zoomNum) {
-            // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-            case 16: num = 900; break;
+            // 地图缩放等级 18 圆圈显示900M  车辆范围取150M
+            case 19: num = 0.15 * 1000; break;
+            case 18: num = 0.2 * 1000; break;
+            case 17: num = 0.5 * 1000; break;
+            case 16: num = 0.9 * 1000; break;
             // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-            case 15: num = 2000; break;
-            case 14: num = 2000; break;
-            case 13: num = 4000; break;
-            case 12: num = 10000; break;
-            case 11: num = 20000; break;
-            default: num = 20 * 1000;
+            case 15: num = 2 * 1000; break;
+            case 14: num = 3 * 1000; break;
+            case 13: num = 6 * 1000; break;
+            case 12: num = 15 * 1000; break;
+            case 11: num = 30 * 1000; break;
+            case 10: num = 50 * 1000; break;
+            case 9: num = 50 * 1000; break;
+            case 8: num = 60 * 1000; break;
+            case 7: num = 100 * 1000; break;
+            default: num = 100 * 1000;
           }
           try {
             const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -362,15 +368,22 @@ export default {
         let num = 0;
         if (zoomNum > 10) {
           switch (zoomNum) {
-            // 地图缩放等级 16 圆圈显示900M  车辆范围取900M
-            case 16: num = 900; break;
+            // 地图缩放等级 18 圆圈显示900M  车辆范围取150M
+            case 19: num = 0.15 * 1000; break;
+            case 18: num = 0.2 * 1000; break;
+            case 17: num = 0.5 * 1000; break;
+            case 16: num = 0.9 * 1000; break;
             // 地图缩放等级 15 圆圈显示2000M  车辆范围取2000M  <--以下同理-->
-            case 15: num = 2000; break;
-            case 14: num = 2000; break;
-            case 13: num = 4000; break;
-            case 12: num = 10000; break;
-            case 11: num = 20000; break;
-            default: num = 20 * 1000;
+            case 15: num = 2 * 1000; break;
+            case 14: num = 3 * 1000; break;
+            case 13: num = 6 * 1000; break;
+            case 12: num = 15 * 1000; break;
+            case 11: num = 30 * 1000; break;
+            case 10: num = 50 * 1000; break;
+            case 9: num = 50 * 1000; break;
+            case 8: num = 60 * 1000; break;
+            case 7: num = 100 * 1000; break;
+            default: num = 100 * 1000;
           }
           try {
             const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
@@ -408,7 +421,7 @@ export default {
       // 车辆、电池、使用人、根据半径查看车辆 信息
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: item.LON, lat: item.LAT, radius: 20 * 1000,
+          lng: item.LON, lat: item.LAT, radius: 50 * 1000,
         })).body;
         //
         const loc = await getLocation(item.LON, item.LAT);
@@ -485,11 +498,10 @@ export default {
     },
     // 获取所有车辆信息
     async reloadVehicleList() {
-      console.log('获取全部');
       const curPoint = await getCurPosition();
       try {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
-          lng: curPoint.point.lng, lat: curPoint.point.lat, radius: 20 * 1000,
+          lng: curPoint.point.lng, lat: curPoint.point.lat, radius: 50 * 1000,
         })).body;
         if (code === '200') {
           this.radiusVehicleList = respData;

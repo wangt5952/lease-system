@@ -42,7 +42,11 @@ const store = new Vuex.Store({
       tokenButtonType: 'primary',
       // 全局时间
       time: localStorage.getItem('time'),
-
+      // // 77服务器
+      // orgPhotoPath: 'https://m.dpc.xiaogeletu.com/upload/otherimg/', // 企业照片路径
+      // userIconPath: 'https://m.dpc.xiaogeletu.com/upload/usericon/pc/', // 用户图标路径
+      // userPidPath: 'https://m.dpc.xiaogeletu.com/upload/userrealname/', // 用户身份证图片
+      // 38服务器
       orgPhotoPath: 'http://106.14.172.38:8990/leaseupload/otherimg/', // 企业照片路径
       userIconPath: 'http://106.14.172.38:8990/leaseupload/usericon/pc/', // 用户图标路径
       userPidPath: 'http://106.14.172.38:8990/leaseupload/userrealname/', // 用户身份证图片
