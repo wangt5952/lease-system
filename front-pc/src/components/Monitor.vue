@@ -412,7 +412,7 @@ export default {
     },
     handleMapClick() {
     },
-    // 右边车辆列表单击事件
+    // 右边车辆列表单击事件1
     async handleSelectItem(item) {
       await new_point(item.LON,item.LAT);
       this.selectedId = item.vehicleId;

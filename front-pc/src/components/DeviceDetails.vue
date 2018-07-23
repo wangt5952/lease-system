@@ -42,6 +42,7 @@ export default {
   },
   watch: {},
   methods: {
+    // 
     async searchDevice() {
       const { search } = this;
       if (search.startTime) search.startTime = moment(search.startTime).format("X") * 1000;
