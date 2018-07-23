@@ -312,7 +312,7 @@ export default {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
         // this.circlePath.center = e.target.getCenter();
-        // 获取缩放等级1
+        // 获取缩放等级.
         const zoomNum = e.target.getZoom();
         let num = 0;
         if (zoomNum) {
@@ -356,7 +356,7 @@ export default {
         await this.reloadLocList();
       }
     },
-    // 停止拖拽地图时触发此事件
+    // 停止拖拽地图时触发此事件.
     async syncCenterAndZooms(e) {
       if (this.vehiclePathVisible === false) {
         const { lng, lat } = e.target.getCenter();
