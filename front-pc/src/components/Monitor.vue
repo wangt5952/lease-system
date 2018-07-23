@@ -315,7 +315,7 @@ export default {
         // 获取缩放等级
         const zoomNum = e.target.getZoom();
         let num = 0;
-        if (zoomNum > 10) {
+        if (zoomNum) {
           switch (zoomNum) {
             // 地图缩放等级 18 圆圈显示900M  车辆范围取150M
             case 19: num = 0.15 * 1000; break;
@@ -366,7 +366,7 @@ export default {
         // 获取缩放等级
         const zoomNum = e.target.getZoom();
         let num = 0;
-        if (zoomNum > 10) {
+        if (zoomNum) {
           switch (zoomNum) {
             // 地图缩放等级 18 圆圈显示900M  车辆范围取150M
             case 19: num = 0.15 * 1000; break;
