@@ -270,6 +270,10 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: point.lng, lat: point.lat, radius: 2000,
         })).body;
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
         if (code === '200') {
           this.radiusVehicleList = respData;
         } else {
@@ -287,6 +291,10 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: e.point.lng, lat: e.point.lat, radius: 2 * 1000,
         })).body;
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
         if (code === '200') {
           this.radiusVehicleList = respData;
         } else {
@@ -338,6 +346,10 @@ export default {
             const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
               lng: lng, lat: lat, radius: num,
             })).body;
+            if (code === '40106') {
+              this.$store.commit('relogin');
+              throw new Error('认证超时，请重新登录');
+            }
             if (code === '200') {
               this.radiusVehicleList = respData;
             } else {
@@ -389,6 +401,10 @@ export default {
             const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
               lng: lng, lat: lat, radius: num,
             })).body;
+            if (code === '40106') {
+              this.$store.commit('relogin');
+              throw new Error('认证超时，请重新登录');
+            }
             if (code === '200') {
               this.radiusVehicleList = respData;
             } else {
@@ -426,6 +442,10 @@ export default {
         //
         const loc = await getLocation(item.LON, item.LAT);
         this.searchAddress = loc.address;
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
         if (code === '200') {
           this.radiusVehicleList = respData;
         } else {
@@ -446,6 +466,10 @@ export default {
           id: item.vehicleId, flag: 'true',
         })).body;
         if (code !== '200') throw new Error(message);
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
         if (respData) {
           this.vehicleInfo = respData;
           this.powerInfo = respData.bizBatteries[0];
@@ -503,6 +527,10 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/listvehiclesbylocandradius', {
           lng: curPoint.point.lng, lat: curPoint.point.lat, radius: 50 * 1000,
         })).body;
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
         if (code === '200') {
           this.radiusVehicleList = respData;
           // 获取当前范围内第一辆车的信息
@@ -536,6 +564,10 @@ export default {
         const { code, message, respData } = (await this.$http.post('/api/manager/vehicle/getbypk', {
           id: radiusVehicleList[0].vehicleId, flag: 'true',
         })).body;
+        if (code === '40106') {
+          this.$store.commit('relogin');
+          throw new Error('认证超时，请重新登录');
+        }
         if (code !== '200') throw new Error(message);
         if (respData) {
           this.vehicleInfo = respData;

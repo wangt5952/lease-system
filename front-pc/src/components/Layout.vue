@@ -93,7 +93,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="用户登录" :visible.sync="loginFormVisible" :show-close="false" :close-on-click-modal="false">
+    <el-dialog title="用户登录" :visible.sync="loginFormVisible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-form class="edit-form" :model="loginForm" ref="passwordForm">
         <el-form-item prop="loginName" :rules="[{required:true, message:'请输入用户名'}]" label="用户名">
           <el-input v-model="loginForm.loginName" auto-complete="off"></el-input>
