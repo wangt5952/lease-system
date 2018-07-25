@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 9000
   tomcat:
     uri-encoding: utf-8
 spring:
@@ -13,9 +13,9 @@ spring:
     pool.enabled: false
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/lease_sys?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true
-    username: admin
-    password: admin
+    url: jdbc:mysql://127.0.0.1:13996/lease_sys?useUnicode=true&characterEncoding=utf8&useSSL=false&autoReconnect=true
+    username: xgltadmin
+    password: XgLt@#$%^2018&*
     druid:
       initial-size: 5
       min-idle: 3
@@ -34,14 +34,14 @@ spring:
         enabled: false
   redis:
     host: 127.0.0.1
-    port: 9736
+    port: 19736
     pool:
       max-active: 8
       max-wait: -1
       max-idle: 8
       min-idle: 0
     timeout: 0
-    password: admin
+    password: XiaoGeLeTu@#2018$%^12345678&*
   session:
     store-type: none
 mybatis:
@@ -63,15 +63,15 @@ mybatis:
 logging:
   config: classpath:logback.xml
 localsetting:
-  upload-root: /root/tomcat-8990/webapps/leaseupload
-  download-prefix: http://127.0.0.1:8990/leaseupload
-  upload-captcha-root: /root/tomcat-8990/webapps/leaseupload/captcha
-  download-captcha-prefix: http://127.0.0.1:8990/leaseupload/captcha
-  upload-user-icon-root: /root/tomcat-8990/webapps/leaseupload/usericon
-  download-user-icon-prefix: http://127.0.0.1:8990/leaseupload/usericon
-  upload-user-realname-root: /root/tomcat-8990/webapps/leaseupload/userrealname
-  download-user-realname-prefix: http://127.0.0.1:8990/leaseupload/userrealname
-  upload-res-icon-root: /root/tomcat-8990/webapps/leaseupload/resicon
-  download-res-icon-prefix: http://127.0.0.1:8990/leaseupload/resicon
-  upload-other-img-root: /root/tomcat-8990/webapps/leaseupload/otherimg
-  download-other-img-prefix: http://127.0.0.1:8990/leaseupload/otherimg
+  upload-root: /root/runenv/tomcat-9001/webapps/leaseupload
+  download-prefix: http://106.14.150.77:9001/leaseupload
+  upload-captcha-root: /root/runenv/tomcat-9001/webapps/leaseupload/captcha
+  download-captcha-prefix: http://106.14.150.77:9001/leaseupload/captcha
+  upload-user-icon-root: /root/runenv/tomcat-9001/webapps/leaseupload/usericon
+  download-user-icon-prefix: http://106.14.150.77:90010/leaseupload/usericon
+  upload-user-realname-root: /root/runenv/tomcat-9001/webapps/leaseupload/userrealname
+  download-user-realname-prefix: http://106.14.150.77:9001/leaseupload/userrealname
+  upload-res-icon-root: /root/runenv/tomcat-9001/webapps/leaseupload/resicon
+  download-res-icon-prefix: http://106.14.150.77:9001/leaseupload/resicon
+  upload-other-img-root: /root/runenv/tomcat-9001/webapps/leaseupload/otherimg
+  download-other-img-prefix: http://106.14.150.77:9001/leaseupload/otherimg

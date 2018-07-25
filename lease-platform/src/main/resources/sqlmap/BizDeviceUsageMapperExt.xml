@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.elextec.persist.dao.mybatis.BizDeviceUsageMapperExt">
+
+    <select id="countByParam" parameterType="com.elextec.lease.manager.request.BizDeviceUsageParam" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT u.device_id)
+        FROM biz_device_usage u
+        LEFT JOIN biz_device_conf c ON c.device_id = u.device_id
+        LEFT JOIN biz_battery b ON b.id = c.device_id
+        LEFT JOIN biz_ref_vehicle_battery ref ON ref.battery_id = b.id AND ref.unbind_time IS NULL
+        LEFT JOIN biz_ref_org_vehicle ov ON ov.vehicle_id = ref.vehicle_id AND ov.unbind_time IS NULL
+        <where>
+            1 = 1
+            <if test="orgId != null and orgId != ''">
+                AND ov.org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
+            <if test="deviceId != null and deviceId != ''">
+                AND u.device_id = #{deviceId,jdbcType=VARCHAR}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND u.startTime >= #{startTime,jdbcType=VARCHAR}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND u.endTime <![CDATA[<=]]> #{endTime,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByParam" parameterType="com.elextec.lease.manager.request.BizDeviceUsageParam" resultMap="BaseResultMap">
+        SELECT u.device_id, u.use_distance, u.use_duration, u.rec_time
+        FROM biz_device_usage u
+        LEFT JOIN biz_device_conf c ON c.device_id = u.device_id
+        LEFT JOIN biz_battery b ON b.id = c.device_id
+        LEFT JOIN biz_ref_vehicle_battery ref ON ref.battery_id = b.id AND ref.unbind_time IS NULL
+        LEFT JOIN biz_ref_org_vehicle ov ON ov.vehicle_id = ref.vehicle_id AND ov.unbind_time IS NULL
+        <where>
+            1 = 1
+            <if test="orgId != null and orgId != ''">
+                AND ov.org_id = #{orgId,jdbcType=VARCHAR}
+            </if>
+            <if test="deviceId != null and deviceId != ''">
+                AND u.device_id = #{deviceId,jdbcType=VARCHAR}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND u.startTime >= #{startTime,jdbcType=VARCHAR}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND u.endTime <![CDATA[<=]]> #{endTime,jdbcType=VARCHAR}
+            </if>
+        </where>
+        ORDER BY ov.org_id ASC
+        <if test="needPaging=='true'">
+            limit #{pageBegin} , #{pageSize}
+        </if>
+    </select>
+
+</mapper>

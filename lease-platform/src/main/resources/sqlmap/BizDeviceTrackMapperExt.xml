@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.elextec.persist.dao.mybatis.BizDeviceTrackMapperExt">
+
+    <delete id="del" parameterType="java.lang.String">
+        DELETE FROM biz_device_track WHERE device_id = #{deviceId,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="deviceLocation" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT t.device_id,t.loc_time,t.lon,t.lat
+        FROM biz_device_track t
+        WHERE t.device_id = #{deviceId,jdbcType=VARCHAR} AND t.loc_time >= #{startTime,jdbcType=VARCHAR} AND t.loc_time <![CDATA[<=]]> #{endTime,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectDistinctDeviceId" resultMap="BaseResultMap">
+        SELECT DISTINCT t.device_id FROM biz_device_track t
+    </select>
+
+    <select id="getLocationByDeviceId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM biz_device_track d
+        WHERE d.device_id = #{deviceId,jdbcType=VARCHAR}
+        ORDER BY d.loc_time DESC
+    </select>
+
+    <select id="getTotalTime" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT t.device_id,t.loc_time,t.lon,t.lat
+        FROM biz_device_track t
+        WHERE t.device_id = #{deviceId,jdbcType=VARCHAR} AND t.loc_time >= #{startTime,jdbcType=VARCHAR} AND t.loc_time <![CDATA[<=]]> #{endTime,jdbcType=VARCHAR}
+        ORDER BY t.loc_time DESC
+    </select>
+</mapper>
