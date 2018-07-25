@@ -14,6 +14,7 @@ import com.elextec.lease.manager.service.BizDeviceConfService;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
 import com.elextec.persist.dao.mybatis.BizDeviceConfMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleMapperExt;
+import com.elextec.persist.dao.mybatis.SysUserMapperExt;
 import com.elextec.persist.field.enums.DeviceType;
 import com.elextec.persist.model.mybatis.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class BizDeviceConfServiceImpl implements BizDeviceConfService {
 
     @Autowired
     private BizVehicleMapperExt bizVehicleMapperExt;
+
+    @Autowired
+    private SysUserMapperExt sysUserMapperExt;
 
     @Override
     public PageResponse<BizDeviceConf> list(boolean needPaging, PageRequest pr) {
@@ -280,10 +284,121 @@ public class BizDeviceConfServiceImpl implements BizDeviceConfService {
     @Override
     public Map<String, Object> getRelationInformationByDevice(String deviceId) {
         Map<String,Object> map = new HashMap<String,Object>();//返回结果
-        BizBattery bizBattery = bizBatteryMapperExt.getBizBatteryInfoByDevice(deviceId);//根据设备id获取电池信息
-        BizVehicle bizVehicle = bizVehicleMapperExt.getBizVehicleInfoByBattery(bizBattery.getId());//根据电池id获取车辆信息
-        map.put(WzConstants.KEY_VEHICLE_INFO,bizVehicle);
-        map.put(WzConstants.KEY_BATTERY_INFO,bizBattery);
+        BizDeviceConfExample bizDeviceConfExample = new BizDeviceConfExample();
+        BizDeviceConfExample.Criteria criteria = bizDeviceConfExample.createCriteria();
+        criteria.andDeviceIdEqualTo(deviceId);
+        //确定设备是否存在
+        if (bizDeviceConfMapperExt.countByExample(bizDeviceConfExample) > 0) {
+            BizBattery bizBattery = bizBatteryMapperExt.getBizBatteryInfoByDevice(deviceId);//根据设备id获取电池信息
+            BizVehicle bizVehicle = bizVehicleMapperExt.getBizVehicleInfoByBattery(bizBattery.getId());//根据电池id获取车辆信息
+            SysUser sysUser = sysUserMapperExt.getUserByVehicle(bizVehicle.getId());//根据车辆id查询使用人信息
+            if (bizBattery != null) {
+                if (bizBattery.getBatteryName() == null) {
+                    bizBattery.setBatteryName("");
+                }
+                if (bizBattery.getBatteryBrand() == null) {
+                    bizBattery.setBatteryName("");
+                }
+                if (bizBattery.getBatteryPn() == null) {
+                    bizBattery.setBatteryPn("");
+                }
+                if (bizBattery.getBatteryParameters() == null) {
+                    bizBattery.setBatteryParameters("");
+                }
+                if (bizBattery.getMfrsId() == null) {
+                    bizBattery.setMfrsId("");
+                }
+                map.put(WzConstants.KEY_BATTERY_INFO, bizBattery);
+            } else {
+                bizBattery = new BizBattery();
+                bizBattery.setId("");
+                bizBattery.setMfrsId("");
+                bizBattery.setBatteryParameters("");
+                bizBattery.setBatteryPn("");
+                bizBattery.setBatteryName("");
+                bizBattery.setCreateTime(null);
+                bizBattery.setBatteryBrand("");
+                bizBattery.setBatteryCode("");
+                bizBattery.setBatteryStatus(null);
+                bizBattery.setCreateUser("");
+                bizBattery.setUpdateTime(null);
+                bizBattery.setUpdateUser("");
+                map.put(WzConstants.KEY_BATTERY_INFO, bizBattery);
+            }
+            if (bizVehicle != null) {
+                if (bizVehicle.getVehiclePn() == null) {
+                    bizVehicle.setVehiclePn("");
+                }
+                if (bizVehicle.getVehicleBrand() == null) {
+                    bizVehicle.setVehicleBrand("");
+                }
+                if (bizVehicle.getVehicleMadeIn() == null) {
+                    bizVehicle.setVehicleMadeIn("");
+                }
+                if (bizVehicle.getMfrsId() == null) {
+                    bizVehicle.setMfrsId("");
+                }
+                map.put(WzConstants.KEY_VEHICLE_INFO, bizVehicle);
+            } else {
+                bizVehicle = new BizVehicle();
+                bizVehicle.setMfrsId("");
+                bizVehicle.setVehicleMadeIn("");
+                bizVehicle.setVehicleBrand("");
+                bizVehicle.setVehiclePn("");
+                bizVehicle.setCreateTime(null);
+                bizVehicle.setId("");
+                bizVehicle.setUpdateTime(null);
+                bizVehicle.setCreateUser("");
+                bizVehicle.setUpdateUser("");
+                bizVehicle.setVehicleCode("");
+                bizVehicle.setVehicleStatus(null);
+                map.put(WzConstants.KEY_VEHICLE_INFO, bizVehicle);
+            }
+            if (sysUser != null) {
+                if (sysUser.getUserIcon() == null) {
+                    sysUser.setUserIcon("");
+                }
+                if (sysUser.getNickName() == null) {
+                    sysUser.setNickName("");
+                }
+                if (sysUser.getUserName() == null) {
+                    sysUser.setUserName("");
+                }
+                if (sysUser.getUserPid() == null) {
+                    sysUser.setUserPid("");
+                }
+                if (sysUser.getUserIcFront() == null) {
+                    sysUser.setUserIcFront("");
+                }
+                if (sysUser.getUserIcBack() == null) {
+                    sysUser.setUserIcBack("");
+                }
+                if (sysUser.getUserIcGroup() == null) {
+                    sysUser.setUserIcGroup("");
+                }
+                if (sysUser.getOrgId() == null) {
+                    sysUser.setOrgId("");
+                }
+                if (sysUser.getCreateUser() == null) {
+                    sysUser.setCreateUser("");
+                }
+                if (sysUser.getUpdateUser() == null) {
+                    sysUser.setUpdateUser("");
+                }
+                map.put(WzConstants.KEY_USER_INFO, sysUser);
+            } else {
+                sysUser = new SysUser();
+                sysUser.setId("");
+                sysUser.setLoginName("");
+                sysUser.setUserMobile("");
+                sysUser.setNickName("");
+                sysUser.setUserName("");
+                sysUser.setUserPid("");
+                map.put(WzConstants.KEY_USER_INFO, sysUser);
+            }
+        } else {
+            throw new BizException(RunningResult.PARAM_VERIFY_ERROR.code(),"该设备不存在");
+        }
         return map;
     }
 

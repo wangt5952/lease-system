@@ -11,8 +11,10 @@ import com.elextec.framework.utils.WzUniqueValUtil;
 import com.elextec.lease.device.common.DeviceApiConstants;
 import com.elextec.lease.manager.service.BizVehicleTrackService;
 import com.elextec.persist.dao.mybatis.BizBatteryMapperExt;
+import com.elextec.persist.dao.mybatis.BizDeviceTrackMapperExt;
 import com.elextec.persist.dao.mybatis.BizVehicleTrackMapperExt;
 import com.elextec.persist.field.enums.DeviceType;
+import com.elextec.persist.model.mybatis.BizDeviceTrack;
 import com.elextec.persist.model.mybatis.BizVehicleTrack;
 import com.elextec.persist.model.mybatis.BizVehicleTrackExample;
 import com.elextec.persist.model.mybatis.ext.BizBatteryExt;
@@ -41,6 +43,9 @@ public class BizVehicleTrackServiceImpl implements BizVehicleTrackService {
 
     @Autowired
     protected RedisClient redisClient;
+
+    @Autowired
+    private BizDeviceTrackMapperExt bizDeviceTrackMapperExt;
 
     @Value("${localsetting.track-stay-time}")
     private Long trackStayTime;
@@ -198,7 +203,15 @@ public class BizVehicleTrackServiceImpl implements BizVehicleTrackService {
                             || (!WzGPSUtil.outOfChina(lat.doubleValue(), lon.doubleValue())
                             && (lat.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LAT)
                             || lon.doubleValue() != nowLocVo.getDoubleValue(DeviceApiConstants.REQ_LON)))) {
-                        redisClient.hashOperations().put(WzConstants.GK_DEVICE_LOC_MAP, devicePk, locVo);
+                        redisClient.hashOperations().put(WzConstants.GK_DEVICE_LOC_MAP, devicePk, locVo);//进缓存
+
+                        //缓存存一次，表里存一次
+                        BizDeviceTrack bizDeviceTrack = new BizDeviceTrack();//设备轨迹
+                        bizDeviceTrack.setDeviceId(locVo.getString(DeviceApiConstants.REQ_RESP_DEVICE_ID));//设备id
+                        bizDeviceTrack.setLocTime(locVo.getLong(DeviceApiConstants.KEY_LOC_TIME));//定位时间
+                        bizDeviceTrack.setLon(locVo.getDoubleValue(DeviceApiConstants.REQ_LON));//经度
+                        bizDeviceTrack.setLat(locVo.getDoubleValue(DeviceApiConstants.REQ_LAT));//纬度
+                        bizDeviceTrackMapperExt.insert(bizDeviceTrack);//进库
                     }
                     // 记录轨迹信息
                     if (null == trackStayTime) {

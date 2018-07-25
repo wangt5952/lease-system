@@ -657,7 +657,7 @@ public class BizDeviceConfController extends BaseController {
     }
 
     /**
-     * 根据设备id查询关联的车辆和电池信息
+     * 根据设备id查询关联的车辆、电池、人员信息
      * <pre>
      *     [id]
      * </pre>
@@ -695,6 +695,14 @@ public class BizDeviceConfController extends BaseController {
      *                 create_time:创建时间,
      *                 update_user:更新人,
      *                 update_time:更新时间
+     *             },
+     *             key_user_info:{
+     *                 id:id，
+     *                 loginName:登录名，
+     *                 nicekName:昵称，
+     *                 userMobile：手机号码，
+     *                 userName:姓名，
+     *                 userPid:身份证号
      *             }
      *         }
      *     }
@@ -723,7 +731,7 @@ public class BizDeviceConfController extends BaseController {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.getRelationInformationByDevice(list.get(0)));
+            return new MessageResponse(RunningResult.SUCCESS,bizDeviceConfService.getRelationInformationByDevice(list.get(0)));
     }
 
 }
