@@ -28,4 +28,5 @@
         WHERE t.device_id = #{deviceId,jdbcType=VARCHAR} AND t.loc_time >= #{startTime,jdbcType=VARCHAR} AND t.loc_time <![CDATA[<=]]> #{endTime,jdbcType=VARCHAR}
         ORDER BY t.loc_time DESC
     </select>
+
 </mapper>
